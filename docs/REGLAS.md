@@ -22,7 +22,7 @@
 
 > **Nota sobre el tablero físico:** las etiquetas y banderas impresas en el tablero pueden no coincidir con el país real (por ejemplo, aparece “CANADÁ” donde debe ser Inglaterra). Se ignoran las etiquetas impresas y se mapean los 12 países oficiales por la posición de cada mesa.
 >
-> **Mapeo borrador de las 24 mesas:** ver [`referencias/mapeo-mesas-borrador.md`](referencias/mapeo-mesas-borrador.md). Pendiente de revisión por el usuario.
+> **Mapeo definitivo de las 24 mesas:** ver [`referencias/mapeo-mesas.md`](referencias/mapeo-mesas.md). Datos en `packages/content/board.json`.
 
 ---
 

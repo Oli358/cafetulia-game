@@ -5,6 +5,44 @@
 
 ---
 
+## Sesión 007 — 2026-10-22 — board.json validado y prompts para Argon
+
+**Objetivo:** generar los datos definitivos del tablero y preparar las instrucciones de programación para Gemini 4 Argon.
+
+**Hecho:**
+- Confirmado el mapeo de las 24 mesas con el usuario.
+- Ajustadas las filas del centro y de la parte inferior para cuadrar con las cuentas oficiales.
+- Generado `packages/content/board.json`:
+  - 24 mesas.
+  - 68 sillas únicas.
+  - 28 sillas compartidas.
+  - 20 plazas de barra con sus valores.
+- Documento final del mapeo: `docs/referencias/mapeo-mesas.md`.
+- Creada la carpeta `docs/ARGON/` con el contexto maestro y 8 fases de prompts:
+  1. Scaffolding.
+  2. Motor de reglas.
+  3. Servidor online.
+  4. Cliente 2.5D.
+  5. Arte y sonido.
+  6. Pulido y PWA.
+  7. Tests y calidad.
+  8. Despliegue.
+
+**Decisiones:**
+- El mapeo de mesas queda cerrado (D-051).
+- `board.json` queda validado (D-052).
+- La programación se reserva a Gemini 4 Argon, con los prompts de `docs/ARGON/` (D-053).
+
+**Problemas:**
+- Ninguno bloqueante. Queda elegir cuándo se arranca la programación.
+
+**Siguiente:**
+1. Arrancar con Gemini 4 Argon por la fase 1 (scaffolding).
+2. Revisar el resultado de cada fase y actualizar el registro.
+3. Preparar la prueba de estilo con Gemini 4 Argon cuando toque la fase de arte.
+
+---
+
 ## Sesión 006 — 2026-10-22 — Borrador de mapeo de mesas y modelo de IA
 
 **Objetivo:** preparar el borrador de las 24 mesas a partir de las fotos y dejar claro el uso de Gemini 4 Argon.

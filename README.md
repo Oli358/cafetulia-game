@@ -28,6 +28,8 @@ Juego digital cozy, online y para **2–4 jugadores**, basado en **Café Interna
 | [`docs/ARTE.md`](docs/ARTE.md) | Dirección de arte y pipeline de assets |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Versiones, fechas y alcance |
 | [`docs/NOMBRES.md`](docs/NOMBRES.md) | Brainstorming de nombres |
+| [`docs/ARGON/`](docs/ARGON/README.md) | Contexto y prompts para Gemini 4 Argon |
+| [`packages/content/board.json`](packages/content/board.json) | Datos validados del tablero |
 
 ---
 

@@ -1,0 +1,1149 @@
+{
+  "version": 1,
+  "grid": {
+    "rows": 13,
+    "cols": 13
+  },
+  "nations": [
+    {
+      "code": "af",
+      "name": "África"
+    },
+    {
+      "code": "it",
+      "name": "Italia"
+    },
+    {
+      "code": "ch",
+      "name": "China"
+    },
+    {
+      "code": "es",
+      "name": "España"
+    },
+    {
+      "code": "ru",
+      "name": "URS (Rusia)"
+    },
+    {
+      "code": "in",
+      "name": "India"
+    },
+    {
+      "code": "am",
+      "name": "América"
+    },
+    {
+      "code": "al",
+      "name": "Alemania"
+    },
+    {
+      "code": "tu",
+      "name": "Turquía"
+    },
+    {
+      "code": "cu",
+      "name": "Cuba"
+    },
+    {
+      "code": "en",
+      "name": "Inglaterra"
+    },
+    {
+      "code": "fr",
+      "name": "Francia"
+    }
+  ],
+  "tables": [
+    {
+      "id": "t_af_1",
+      "nation": "af",
+      "row": 1,
+      "col": 1
+    },
+    {
+      "id": "t_it_1",
+      "nation": "it",
+      "row": 1,
+      "col": 3
+    },
+    {
+      "id": "t_it_2",
+      "nation": "it",
+      "row": 1,
+      "col": 5
+    },
+    {
+      "id": "t_ch_1",
+      "nation": "ch",
+      "row": 1,
+      "col": 7
+    },
+    {
+      "id": "t_ch_2",
+      "nation": "ch",
+      "row": 1,
+      "col": 9
+    },
+    {
+      "id": "t_es_1",
+      "nation": "es",
+      "row": 1,
+      "col": 11
+    },
+    {
+      "id": "t_af_2",
+      "nation": "af",
+      "row": 3,
+      "col": 1
+    },
+    {
+      "id": "t_en_1",
+      "nation": "en",
+      "row": 3,
+      "col": 3
+    },
+    {
+      "id": "t_en_2",
+      "nation": "en",
+      "row": 3,
+      "col": 9
+    },
+    {
+      "id": "t_es_2",
+      "nation": "es",
+      "row": 3,
+      "col": 11
+    },
+    {
+      "id": "t_cu_1",
+      "nation": "cu",
+      "row": 5,
+      "col": 1
+    },
+    {
+      "id": "t_ru_1",
+      "nation": "ru",
+      "row": 5,
+      "col": 11
+    },
+    {
+      "id": "t_cu_2",
+      "nation": "cu",
+      "row": 7,
+      "col": 1
+    },
+    {
+      "id": "t_ru_2",
+      "nation": "ru",
+      "row": 7,
+      "col": 11
+    },
+    {
+      "id": "t_tu_1",
+      "nation": "tu",
+      "row": 9,
+      "col": 1
+    },
+    {
+      "id": "t_fr_1",
+      "nation": "fr",
+      "row": 9,
+      "col": 3
+    },
+    {
+      "id": "t_fr_2",
+      "nation": "fr",
+      "row": 9,
+      "col": 9
+    },
+    {
+      "id": "t_in_1",
+      "nation": "in",
+      "row": 9,
+      "col": 11
+    },
+    {
+      "id": "t_tu_2",
+      "nation": "tu",
+      "row": 11,
+      "col": 1
+    },
+    {
+      "id": "t_al_1",
+      "nation": "al",
+      "row": 11,
+      "col": 3
+    },
+    {
+      "id": "t_al_2",
+      "nation": "al",
+      "row": 11,
+      "col": 5
+    },
+    {
+      "id": "t_am_1",
+      "nation": "am",
+      "row": 11,
+      "col": 7
+    },
+    {
+      "id": "t_am_2",
+      "nation": "am",
+      "row": 11,
+      "col": 9
+    },
+    {
+      "id": "t_in_2",
+      "nation": "in",
+      "row": 11,
+      "col": 11
+    }
+  ],
+  "seats": [
+    {
+      "id": "s_0_1",
+      "row": 0,
+      "col": 1,
+      "tableIds": [
+        "t_af_1"
+      ],
+      "allowedNations": [
+        "af"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_0_3",
+      "row": 0,
+      "col": 3,
+      "tableIds": [
+        "t_it_1"
+      ],
+      "allowedNations": [
+        "it"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_0_5",
+      "row": 0,
+      "col": 5,
+      "tableIds": [
+        "t_it_2"
+      ],
+      "allowedNations": [
+        "it"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_0_7",
+      "row": 0,
+      "col": 7,
+      "tableIds": [
+        "t_ch_1"
+      ],
+      "allowedNations": [
+        "ch"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_0_9",
+      "row": 0,
+      "col": 9,
+      "tableIds": [
+        "t_ch_2"
+      ],
+      "allowedNations": [
+        "ch"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_0_11",
+      "row": 0,
+      "col": 11,
+      "tableIds": [
+        "t_es_1"
+      ],
+      "allowedNations": [
+        "es"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_1_0",
+      "row": 1,
+      "col": 0,
+      "tableIds": [
+        "t_af_1"
+      ],
+      "allowedNations": [
+        "af"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_1_2",
+      "row": 1,
+      "col": 2,
+      "tableIds": [
+        "t_af_1",
+        "t_it_1"
+      ],
+      "allowedNations": [
+        "af",
+        "it"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_1_4",
+      "row": 1,
+      "col": 4,
+      "tableIds": [
+        "t_it_1",
+        "t_it_2"
+      ],
+      "allowedNations": [
+        "it"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_1_6",
+      "row": 1,
+      "col": 6,
+      "tableIds": [
+        "t_ch_1",
+        "t_it_2"
+      ],
+      "allowedNations": [
+        "ch",
+        "it"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_1_8",
+      "row": 1,
+      "col": 8,
+      "tableIds": [
+        "t_ch_1",
+        "t_ch_2"
+      ],
+      "allowedNations": [
+        "ch"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_1_10",
+      "row": 1,
+      "col": 10,
+      "tableIds": [
+        "t_ch_2",
+        "t_es_1"
+      ],
+      "allowedNations": [
+        "ch",
+        "es"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_1_12",
+      "row": 1,
+      "col": 12,
+      "tableIds": [
+        "t_es_1"
+      ],
+      "allowedNations": [
+        "es"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_2_1",
+      "row": 2,
+      "col": 1,
+      "tableIds": [
+        "t_af_1",
+        "t_af_2"
+      ],
+      "allowedNations": [
+        "af"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_2_3",
+      "row": 2,
+      "col": 3,
+      "tableIds": [
+        "t_en_1",
+        "t_it_1"
+      ],
+      "allowedNations": [
+        "en",
+        "it"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_2_5",
+      "row": 2,
+      "col": 5,
+      "tableIds": [
+        "t_it_2"
+      ],
+      "allowedNations": [
+        "it"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_2_7",
+      "row": 2,
+      "col": 7,
+      "tableIds": [
+        "t_ch_1"
+      ],
+      "allowedNations": [
+        "ch"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_2_9",
+      "row": 2,
+      "col": 9,
+      "tableIds": [
+        "t_ch_2",
+        "t_en_2"
+      ],
+      "allowedNations": [
+        "ch",
+        "en"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_2_11",
+      "row": 2,
+      "col": 11,
+      "tableIds": [
+        "t_es_1",
+        "t_es_2"
+      ],
+      "allowedNations": [
+        "es"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_3_0",
+      "row": 3,
+      "col": 0,
+      "tableIds": [
+        "t_af_2"
+      ],
+      "allowedNations": [
+        "af"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_3_2",
+      "row": 3,
+      "col": 2,
+      "tableIds": [
+        "t_af_2",
+        "t_en_1"
+      ],
+      "allowedNations": [
+        "af",
+        "en"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_3_4",
+      "row": 3,
+      "col": 4,
+      "tableIds": [
+        "t_en_1"
+      ],
+      "allowedNations": [
+        "en"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_3_8",
+      "row": 3,
+      "col": 8,
+      "tableIds": [
+        "t_en_2"
+      ],
+      "allowedNations": [
+        "en"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_3_10",
+      "row": 3,
+      "col": 10,
+      "tableIds": [
+        "t_en_2",
+        "t_es_2"
+      ],
+      "allowedNations": [
+        "en",
+        "es"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_3_12",
+      "row": 3,
+      "col": 12,
+      "tableIds": [
+        "t_es_2"
+      ],
+      "allowedNations": [
+        "es"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_4_1",
+      "row": 4,
+      "col": 1,
+      "tableIds": [
+        "t_af_2",
+        "t_cu_1"
+      ],
+      "allowedNations": [
+        "af",
+        "cu"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_4_3",
+      "row": 4,
+      "col": 3,
+      "tableIds": [
+        "t_en_1"
+      ],
+      "allowedNations": [
+        "en"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_4_9",
+      "row": 4,
+      "col": 9,
+      "tableIds": [
+        "t_en_2"
+      ],
+      "allowedNations": [
+        "en"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_4_11",
+      "row": 4,
+      "col": 11,
+      "tableIds": [
+        "t_es_2",
+        "t_ru_1"
+      ],
+      "allowedNations": [
+        "es",
+        "ru"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_5_0",
+      "row": 5,
+      "col": 0,
+      "tableIds": [
+        "t_cu_1"
+      ],
+      "allowedNations": [
+        "cu"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_5_2",
+      "row": 5,
+      "col": 2,
+      "tableIds": [
+        "t_cu_1"
+      ],
+      "allowedNations": [
+        "cu"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_5_10",
+      "row": 5,
+      "col": 10,
+      "tableIds": [
+        "t_ru_1"
+      ],
+      "allowedNations": [
+        "ru"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_5_12",
+      "row": 5,
+      "col": 12,
+      "tableIds": [
+        "t_ru_1"
+      ],
+      "allowedNations": [
+        "ru"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_6_1",
+      "row": 6,
+      "col": 1,
+      "tableIds": [
+        "t_cu_1",
+        "t_cu_2"
+      ],
+      "allowedNations": [
+        "cu"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_6_11",
+      "row": 6,
+      "col": 11,
+      "tableIds": [
+        "t_ru_1",
+        "t_ru_2"
+      ],
+      "allowedNations": [
+        "ru"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_7_0",
+      "row": 7,
+      "col": 0,
+      "tableIds": [
+        "t_cu_2"
+      ],
+      "allowedNations": [
+        "cu"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_7_2",
+      "row": 7,
+      "col": 2,
+      "tableIds": [
+        "t_cu_2"
+      ],
+      "allowedNations": [
+        "cu"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_7_10",
+      "row": 7,
+      "col": 10,
+      "tableIds": [
+        "t_ru_2"
+      ],
+      "allowedNations": [
+        "ru"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_7_12",
+      "row": 7,
+      "col": 12,
+      "tableIds": [
+        "t_ru_2"
+      ],
+      "allowedNations": [
+        "ru"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_8_1",
+      "row": 8,
+      "col": 1,
+      "tableIds": [
+        "t_cu_2",
+        "t_tu_1"
+      ],
+      "allowedNations": [
+        "cu",
+        "tu"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_8_3",
+      "row": 8,
+      "col": 3,
+      "tableIds": [
+        "t_fr_1"
+      ],
+      "allowedNations": [
+        "fr"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_8_9",
+      "row": 8,
+      "col": 9,
+      "tableIds": [
+        "t_fr_2"
+      ],
+      "allowedNations": [
+        "fr"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_8_11",
+      "row": 8,
+      "col": 11,
+      "tableIds": [
+        "t_in_1",
+        "t_ru_2"
+      ],
+      "allowedNations": [
+        "in",
+        "ru"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_9_0",
+      "row": 9,
+      "col": 0,
+      "tableIds": [
+        "t_tu_1"
+      ],
+      "allowedNations": [
+        "tu"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_9_2",
+      "row": 9,
+      "col": 2,
+      "tableIds": [
+        "t_fr_1",
+        "t_tu_1"
+      ],
+      "allowedNations": [
+        "fr",
+        "tu"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_9_4",
+      "row": 9,
+      "col": 4,
+      "tableIds": [
+        "t_fr_1"
+      ],
+      "allowedNations": [
+        "fr"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_9_8",
+      "row": 9,
+      "col": 8,
+      "tableIds": [
+        "t_fr_2"
+      ],
+      "allowedNations": [
+        "fr"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_9_10",
+      "row": 9,
+      "col": 10,
+      "tableIds": [
+        "t_fr_2",
+        "t_in_1"
+      ],
+      "allowedNations": [
+        "fr",
+        "in"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_9_12",
+      "row": 9,
+      "col": 12,
+      "tableIds": [
+        "t_in_1"
+      ],
+      "allowedNations": [
+        "in"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_10_1",
+      "row": 10,
+      "col": 1,
+      "tableIds": [
+        "t_tu_1",
+        "t_tu_2"
+      ],
+      "allowedNations": [
+        "tu"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_10_3",
+      "row": 10,
+      "col": 3,
+      "tableIds": [
+        "t_al_1",
+        "t_fr_1"
+      ],
+      "allowedNations": [
+        "al",
+        "fr"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_10_5",
+      "row": 10,
+      "col": 5,
+      "tableIds": [
+        "t_al_2"
+      ],
+      "allowedNations": [
+        "al"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_10_7",
+      "row": 10,
+      "col": 7,
+      "tableIds": [
+        "t_am_1"
+      ],
+      "allowedNations": [
+        "am"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_10_9",
+      "row": 10,
+      "col": 9,
+      "tableIds": [
+        "t_am_2",
+        "t_fr_2"
+      ],
+      "allowedNations": [
+        "am",
+        "fr"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_10_11",
+      "row": 10,
+      "col": 11,
+      "tableIds": [
+        "t_in_1",
+        "t_in_2"
+      ],
+      "allowedNations": [
+        "in"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_11_0",
+      "row": 11,
+      "col": 0,
+      "tableIds": [
+        "t_tu_2"
+      ],
+      "allowedNations": [
+        "tu"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_11_2",
+      "row": 11,
+      "col": 2,
+      "tableIds": [
+        "t_al_1",
+        "t_tu_2"
+      ],
+      "allowedNations": [
+        "al",
+        "tu"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_11_4",
+      "row": 11,
+      "col": 4,
+      "tableIds": [
+        "t_al_1",
+        "t_al_2"
+      ],
+      "allowedNations": [
+        "al"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_11_6",
+      "row": 11,
+      "col": 6,
+      "tableIds": [
+        "t_al_2",
+        "t_am_1"
+      ],
+      "allowedNations": [
+        "al",
+        "am"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_11_8",
+      "row": 11,
+      "col": 8,
+      "tableIds": [
+        "t_am_1",
+        "t_am_2"
+      ],
+      "allowedNations": [
+        "am"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_11_10",
+      "row": 11,
+      "col": 10,
+      "tableIds": [
+        "t_am_2",
+        "t_in_2"
+      ],
+      "allowedNations": [
+        "am",
+        "in"
+      ],
+      "shared": true
+    },
+    {
+      "id": "s_11_12",
+      "row": 11,
+      "col": 12,
+      "tableIds": [
+        "t_in_2"
+      ],
+      "allowedNations": [
+        "in"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_12_1",
+      "row": 12,
+      "col": 1,
+      "tableIds": [
+        "t_tu_2"
+      ],
+      "allowedNations": [
+        "tu"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_12_3",
+      "row": 12,
+      "col": 3,
+      "tableIds": [
+        "t_al_1"
+      ],
+      "allowedNations": [
+        "al"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_12_5",
+      "row": 12,
+      "col": 5,
+      "tableIds": [
+        "t_al_2"
+      ],
+      "allowedNations": [
+        "al"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_12_7",
+      "row": 12,
+      "col": 7,
+      "tableIds": [
+        "t_am_1"
+      ],
+      "allowedNations": [
+        "am"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_12_9",
+      "row": 12,
+      "col": 9,
+      "tableIds": [
+        "t_am_2"
+      ],
+      "allowedNations": [
+        "am"
+      ],
+      "shared": false
+    },
+    {
+      "id": "s_12_11",
+      "row": 12,
+      "col": 11,
+      "tableIds": [
+        "t_in_2"
+      ],
+      "allowedNations": [
+        "in"
+      ],
+      "shared": false
+    }
+  ],
+  "bar": [
+    {
+      "index": 1,
+      "value": 1
+    },
+    {
+      "index": 2,
+      "value": 2
+    },
+    {
+      "index": 3,
+      "value": 3
+    },
+    {
+      "index": 4,
+      "value": 4
+    },
+    {
+      "index": 5,
+      "value": 5
+    },
+    {
+      "index": 6,
+      "value": -2
+    },
+    {
+      "index": 7,
+      "value": -4
+    },
+    {
+      "index": 8,
+      "value": -6
+    },
+    {
+      "index": 9,
+      "value": -8
+    },
+    {
+      "index": 10,
+      "value": -10
+    },
+    {
+      "index": 11,
+      "value": -4
+    },
+    {
+      "index": 12,
+      "value": -6
+    },
+    {
+      "index": 13,
+      "value": -8
+    },
+    {
+      "index": 14,
+      "value": -10
+    },
+    {
+      "index": 15,
+      "value": -12
+    },
+    {
+      "index": 16,
+      "value": -6
+    },
+    {
+      "index": 17,
+      "value": -8
+    },
+    {
+      "index": 18,
+      "value": -10
+    },
+    {
+      "index": 19,
+      "value": -12
+    },
+    {
+      "index": 20,
+      "value": -14
+    }
+  ]
+}
