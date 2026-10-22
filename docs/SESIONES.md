@@ -5,6 +5,32 @@
 
 ---
 
+## Sesión 006 — 2026-10-22 — Borrador de mapeo de mesas y modelo de IA
+
+**Objetivo:** preparar el borrador de las 24 mesas a partir de las fotos y dejar claro el uso de Gemini 4 Argon.
+
+**Hecho:**
+- Creado `docs/referencias/mapeo-mesas-borrador.md` con:
+  - Rejilla 13×13 con los códigos de país propuestos.
+  - Detalle de las 24 mesas: posición, etiqueta impresa (no fiable) y país propuesto.
+  - Lista de puntos a revisar por el usuario.
+- Actualizados `REGLAS.md` y `DECISIONES.md` (D-051).
+- Anotado que **Gemini 4 Argon** se reserva para la programación y los modelos que se usen.
+
+**Decisiones:**
+- La programación se reserva para Gemini 4 Argon; este agente no escribirá código.
+- El mapeo de mesas queda pendiente de revisión del usuario.
+
+**Problemas:**
+- El mapeo es un borrador; hay que confirmar las 24 mesas.
+
+**Siguiente:**
+1. Revisar el borrador de mapeo y corregir lo que haga falta.
+2. Preparar la especificación y los datos para que Gemini 4 Argon programe.
+3. Definir la prueba de estilo con Gemini 4 Argon.
+
+---
+
 ## Sesión 005 — 2026-10-22 — Confirmación de los 12 países
 
 **Objetivo:** cerrar la lista completa de países y su orden.

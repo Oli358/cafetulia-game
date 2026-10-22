@@ -56,3 +56,4 @@ Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 | D-048 | 2026-10-22 | Repositorio remoto de GitHub | Cerrada | <https://github.com/Oli358/cafetulia-game.git>; rama `main` subida |
 | D-049 | 2026-10-22 | Modelo de IA a probar: **Gemini 4 Argon** | Pendiente | Se probará en la prueba de estilo (arte y/o música); se evaluará su integración |
 | D-050 | 2026-10-22 | Orden cíclico de los países | Cerrada | 12 países confirmados: África, Italia, China, España, URS (Rusia), India, América, Alemania, Turquía, Cuba, Inglaterra y Francia. Cada país tiene 2 mesas |
+| D-051 | 2026-10-22 | Borrador de mapeo de las 24 mesas | Pendiente | Ver `docs/referencias/mapeo-mesas-borrador.md`; pendiente de revisión por el usuario |
