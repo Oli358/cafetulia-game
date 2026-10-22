@@ -108,3 +108,64 @@ Elegir 2 o 3 candidatos y comprobar:
 - Marca registrada.
 - Búsqueda en tiendas de apps y juegos de mesa.
 - Que el logo funcione en cuadrado, en horizontal y en una taza.
+
+---
+
+## 8. Ronda 3 — Opciones más originales (22-10-2026)
+
+La ronda anterior no convenció. Aquí van opciones con más carácter, más inventadas y menos descriptivas. Se han descartado todas las anteriores salvo que se indique lo contrario.
+
+### Inventadas / marca
+
+| Nombre | Idea | Dominios libres (DNS) |
+|---|---|---|
+| **Cafetulia** | Café + tertulia. Suena a reunión, a charla y a café | `.app`, `.es`, `.games` |
+| **Cafetopía** | Café + utopía. Un café ideal, brandable y optimista | `.app`, `.es`, `.games` |
+| **Mesabella** | “Mesa bella”. Suena a nombre de persona y a mesa bonita | `.app`, `.es`, `.games` |
+| **Mesalinda** | “Mesa linda”. Igual de cálido, algo más latino | `.app`, `.games` |
+| **Sillalinda** | “Silla linda”. Más específico y juguetón | `.app`, `.games` |
+| **Mesilla** | Juego de palabras: mesa + silla; también mesita de noche | `.app`, `.games` |
+| **Partidita** | Diminutivo de partida. La invitación perfecta | `.app`, `.es`, `.games` |
+| **Jueguito** | Diminutivo de juego. Cercano y simpático | `.app`, `.es`, `.games` |
+| **Juegote** | Aumentativo de juego. Un juego grande y divertido | `.app`, `.games` |
+| **Jugadón** | Jugada espectacular. Muy español y con energía | `.app`, `.es`, `.games` |
+
+### Frases e invitaciones
+
+| Nombre | Idea | Dominios libres (DNS) |
+|---|---|---|
+| **Café de Toda la Vida** | El café de siempre, nostálgico y cálido | `.com`, `.app`, `.es`, `.games` |
+| **Café de Antes** | El café de antes, con memoria y encanto | `.com`, `.app`, `.es`, `.games` |
+| **Café de Barrio** | El café de barrio, cercano y reconocible | `.com`, `.app`, `.es`, `.games` |
+| **¿Nos Sentamos?** | La invitación a sentarse y jugar | `.com`, `.app`, `.es`, `.games` |
+| **¿Una Partidita?** | La invitación a echar una partida | `.com`, `.app`, `.es`, `.games` |
+| **Nuestra Mesa** | “Nuestra mesa”, cálido e inclusivo | `.app`, `.games` |
+| **Nuestro Sitio** | “Nuestro sitio”, con el doble sentido de sitio/asiento | `.app`, `.es`, `.games` |
+| **Nos Vemos en el Café** | Frase cálida y narrativa | `.app`, `.games` |
+
+### Teatro, cómic y fiesta
+
+| Nombre | Idea | Dominios libres (DNS) |
+|---|---|---|
+| **Candilejas** | Las luces del teatro; bonito y original | `.app`, `.games` |
+| **Paraíso** | El paraíso y el gallinero del teatro; evocador | `.games` |
+| **Arcadia** | Lugar idílico; elegante y original | `.games` |
+| **Charanga** | Banda alegre; fiesta y buen rollo | `.app`, `.games` |
+| **Rondalla** | Grupo de músicos; social y simpático | `.app`, `.games` |
+| **Gallinero** | Las localidades altas del teatro; gracioso | `.app`, `.games` |
+| **Patio de Butacas** | El patio de butacas; muy teatral | `.app`, `.games` |
+
+### Recomendación de la ronda 3
+
+| Puesto | Nombre | Por qué |
+|---|---|---|
+| 1 | **Cafetulia** | Inventado, español, cálido y muy memorable; suena a reunión y a café |
+| 2 | **Cafetopía** | Inventado, optimista y brandable; ideal para un café ideal |
+| 3 | **Mesabella** | Suena a nombre propio y a mesa bonita; original y cercano |
+| 4 | **Café de Toda la Vida** | Nostálgico y con mucho sentimiento; dominio libre |
+| 5 | **Café de Barrio** | Cercano, español y cozy; dominio libre |
+| 6 | **Partidita** | La invitación a jugar; simpático y directo |
+| 7 | **¿Nos Sentamos?** | La invitación a sentarse; muy alineado con el juego |
+| 8 | **Candilejas** | Elegante y luminoso; encaja con el arte cómico |
+
+**Nota:** si el nombre va a llevar “Café”, conviene comprobar que el logo funcione también sin la palabra “Café” (por ejemplo, “Cafetulia” o “Mesabella” funcionan solos).

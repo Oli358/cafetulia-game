@@ -50,4 +50,6 @@ Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 | D-042 | 2026-10-22 | Uptime del servidor para modo asíncrono | Aplazada | Depende del plan de Render; se revisa en v1.1 |
 | D-043 | 2026-10-22 | Licencia y monetización | Pendiente | Se decide antes de publicar; arte y nombre originales desde ya |
 | D-044 | 2026-10-22 | Las fotos del tablero son reales; las etiquetas impresas no son fiables | Cerrada | El tablero tiene 24 mesas y 12 países, 2 por país. Se ignoran los nombres/banderas erróneos (p. ej. “CANADÁ” donde debe ser Inglaterra) y se mapean los 12 países oficiales por posición |
-| D-045 | 2026-10-22 | Candidatos de nombre preseleccionados | Pendiente | Hay Sitio, La Penúltima, La Butaca, El Entremés, La Historieta, La Merienda, El Sainete, La de Siempre, La Cuenta y El Taburete. Ver `NOMBRES.md` |
+| D-045 | 2026-10-22 | Candidatos de nombre preseleccionados | Pendiente | Ronda 3: Cafetulia, Cafetopía, Mesabella, Café de Toda la Vida, Café de Barrio, Partidita, ¿Nos Sentamos?, Candilejas. Ver `NOMBRES.md` |
+| D-046 | 2026-10-22 | Repositorio Git local inicializado | Cerrada | Rama `main`, primer commit `d215a87`. Remoto de GitHub pendiente de nombre |
+| D-047 | 2026-10-22 | Las fotos del tablero se guardan en `docs/referencias/` | Cerrada | `tablero-real-sin-fichas.png` y `tablero-real-con-fichas.jpg` |

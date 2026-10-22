@@ -5,6 +5,36 @@
 
 ---
 
+## Sesión 003 — 2026-10-22 — Corrección, Git y ronda 3 de nombres
+
+**Objetivo:** corregir la interpretación de las fotos, preparar el repositorio local y generar nombres más originales.
+
+**Hecho:**
+- Confirmado que las fotos son reales; el tablero tiene 24 mesas y 12 países, 2 por país.
+- Corregidos `REGLAS.md`, `DECISIONES.md` y `SESIONES.md`: se ignoran las etiquetas impresas erróneas (por ejemplo, “CANADÁ” donde debe ser Inglaterra).
+- Movidas las fotos a `docs/referencias/` con nombres claros: `tablero-real-sin-fichas.png` y `tablero-real-con-fichas.jpg`.
+- Creados `.gitattributes`, `.editorconfig`, `LICENSE.md` y `docs/GIT.md`.
+- Inicializado el repositorio Git local, rama `main`, con el primer commit: `docs: plan inicial, reglas y estructura del proyecto`.
+- Generada la ronda 3 de nombres, con comprobación de dominios; actualizado `docs/NOMBRES.md`.
+
+**Decisiones:**
+- Las fotos son la referencia real del tablero.
+- Los nombres y banderas impresas no son fiables; se mapean los 12 países oficiales por posición.
+- Repositorio local listo; el remoto de GitHub se crea cuando haya nombre.
+- La ronda 3 de nombres queda pendiente de elección.
+
+**Problemas:**
+- Falta confirmar el mapeo definitivo de los 12 países en las 24 mesas.
+- El nombre sigue sin decidirse.
+
+**Siguiente:**
+1. Elegir nombre de la ronda 3.
+2. Confirmar el mapeo de países por posición.
+3. Crear el repositorio remoto y subir.
+4. Preparar el scaffolding del monorepo.
+
+---
+
 ## Sesión 002 — 2026-10-22 — Revisión de las imágenes del tablero
 
 **Objetivo:** revisar las imágenes añadidas al directorio para usarlas como referencia del tablero real.
