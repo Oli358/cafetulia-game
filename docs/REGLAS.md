@@ -18,7 +18,7 @@
 
 **Los 12 países:** África, Alemania, China, Cuba, España, Estados Unidos, Francia, India, Inglaterra, Italia, Rusia y Turquía.
 
-> **Orden confirmado por el usuario (sentido horario desde arriba a la izquierda):** África, Italia, China, España, URS (Rusia), India, América, Alemania, Turquía, Cuba… **faltan 2 por confirmar** (probablemente Francia e Inglaterra).
+> **Orden confirmado por el usuario (sentido horario desde arriba a la izquierda):** África, Italia, China, España, URS (Rusia), India, América, Alemania, Turquía, Cuba, Inglaterra y Francia. Cada país tiene 2 mesas.
 
 > **Nota sobre el tablero físico:** las etiquetas y banderas impresas en el tablero pueden no coincidir con el país real (por ejemplo, aparece “CANADÁ” donde debe ser Inglaterra). Se ignoran las etiquetas impresas y se mapean los 12 países oficiales por la posición de cada mesa. Pendiente de confirmar el mapeo definitivo.
 

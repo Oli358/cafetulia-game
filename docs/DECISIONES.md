@@ -7,7 +7,7 @@ Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 | ID | Fecha | Decisión | Estado | Notas |
 |---|---|---|---|---|
 | D-001 | 2026-10-22 | Base del juego: *Café International* de Rudi Hoffmann (1989) | Cerrada | Edición española estándar |
-| D-002 | 2026-10-22 | Los 12 países son los del tablero físico, con “África” | Pendiente | Orden cíclico horario desde arriba a la izquierda (10 confirmados): África, Italia, China, España, URS (Rusia), India, América, Alemania, Turquía, Cuba. Faltan 2 por confirmar (probablemente Francia e Inglaterra) |
+| D-002 | 2026-10-22 | Los 12 países son los del tablero físico, con “África” | Cerrada | Orden cíclico horario desde arriba a la izquierda: África, Italia, China, España, URS (Rusia), India, América, Alemania, Turquía, Cuba, Inglaterra y Francia. Cada país tiene 2 mesas |
 | D-003 | 2026-10-22 | Regla base de máximo 2 hombres + 2 mujeres por mesa | Cerrada | Es la regla base, no una variante |
 | D-004 | 2026-10-22 | La variante de 4 del mismo sexo no se implementa por ahora | Cerrada | Se podrá añadir como opción en una versión futura |
 | D-005 | 2026-10-22 | Los comodines **no** pueden ir a la barra | Cerrada | Edición clásica |
@@ -55,4 +55,4 @@ Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 | D-047 | 2026-10-22 | Las fotos del tablero se guardan en `docs/referencias/` | Cerrada | `tablero-real-sin-fichas.png` y `tablero-real-con-fichas.jpg` |
 | D-048 | 2026-10-22 | Repositorio remoto de GitHub | Cerrada | <https://github.com/Oli358/cafetulia-game.git>; rama `main` subida |
 | D-049 | 2026-10-22 | Modelo de IA a probar: **Gemini 4 Argon** | Pendiente | Se probará en la prueba de estilo (arte y/o música); se evaluará su integración |
-| D-050 | 2026-10-22 | Orden cíclico de los países | Pendiente | El usuario indica 10 países en sentido horario desde arriba a la izquierda: África, Italia, China, España, URS (Rusia), India, América, Alemania, Turquía, Cuba. Faltan 2 por confirmar (probablemente Francia e Inglaterra) |
+| D-050 | 2026-10-22 | Orden cíclico de los países | Cerrada | 12 países confirmados: África, Italia, China, España, URS (Rusia), India, América, Alemania, Turquía, Cuba, Inglaterra y Francia. Cada país tiene 2 mesas |

@@ -5,6 +5,28 @@
 
 ---
 
+## Sesión 005 — 2026-10-22 — Confirmación de los 12 países
+
+**Objetivo:** cerrar la lista completa de países y su orden.
+
+**Hecho:**
+- Confirmados los dos que faltaban: **Inglaterra** y **Francia**.
+- Orden completo en sentido horario desde arriba a la izquierda: **África, Italia, China, España, URS (Rusia), India, América, Alemania, Turquía, Cuba, Inglaterra y Francia**.
+- Actualizados `REGLAS.md` y `DECISIONES.md` (D-002 y D-050).
+
+**Decisiones:**
+- La lista de 12 países y su orden cíclico quedan cerrados.
+
+**Problemas:**
+- Falta traducir ese orden a las 24 mesas concretas del tablero (2 por país).
+
+**Siguiente:**
+1. Preparar el mapeo de las 24 mesas por posición.
+2. Probar Gemini 4 Argon en la prueba de estilo.
+3. Preparar el scaffolding del monorepo (cuando el usuario dé el visto bueno).
+
+---
+
 ## Sesión 004 — 2026-10-22 — Nombre Cafetulia, repositorio remoto y países
 
 **Objetivo:** cerrar el nombre, conectar el repositorio remoto, registrar el orden de países y anotar el modelo de IA a probar.
