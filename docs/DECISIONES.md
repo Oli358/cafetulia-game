@@ -7,7 +7,7 @@ Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 | ID | Fecha | Decisión | Estado | Notas |
 |---|---|---|---|---|
 | D-001 | 2026-10-22 | Base del juego: *Café International* de Rudi Hoffmann (1989) | Cerrada | Edición española estándar |
-| D-002 | 2026-10-22 | Los 12 países son los del tablero físico, con “África” | Cerrada | África, Alemania, China, Cuba, España, EE. UU., Francia, India, Inglaterra, Italia, Rusia y Turquía |
+| D-002 | 2026-10-22 | Los 12 países son los del tablero físico, con “África” | Pendiente | Orden cíclico horario desde arriba a la izquierda (10 confirmados): África, Italia, China, España, URS (Rusia), India, América, Alemania, Turquía, Cuba. Faltan 2 por confirmar (probablemente Francia e Inglaterra) |
 | D-003 | 2026-10-22 | Regla base de máximo 2 hombres + 2 mujeres por mesa | Cerrada | Es la regla base, no una variante |
 | D-004 | 2026-10-22 | La variante de 4 del mismo sexo no se implementa por ahora | Cerrada | Se podrá añadir como opción en una versión futura |
 | D-005 | 2026-10-22 | Los comodines **no** pueden ir a la barra | Cerrada | Edición clásica |
@@ -46,10 +46,13 @@ Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 | D-038 | 2026-10-22 | v1.0 con 2–4 jugadores, bots y espectadores; cuentas, admin y asíncrono en v1.1 | Cerrada | Se revisará si la fecha aprieta |
 | D-039 | 2026-10-22 | Saldo negativo permitido en v1.0 | Cerrada | La eliminación por deuda será opción de sala en v1.1 |
 | D-040 | 2026-10-22 | Fin de partida: las 4 condiciones clásicas | Cerrada | Última silla, plaza 20 de barra, jugador sin fichas, robar la cuarta por el final |
-| D-041 | 2026-10-22 | Nombre comercial | Pendiente | Ver `NOMBRES.md`; se decidirá entre las opciones propuestas |
+| D-041 | 2026-10-22 | Nombre comercial: **Cafetulia** | Cerrada | Repositorio: <https://github.com/Oli358/cafetulia-game> |
 | D-042 | 2026-10-22 | Uptime del servidor para modo asíncrono | Aplazada | Depende del plan de Render; se revisa en v1.1 |
 | D-043 | 2026-10-22 | Licencia y monetización | Pendiente | Se decide antes de publicar; arte y nombre originales desde ya |
 | D-044 | 2026-10-22 | Las fotos del tablero son reales; las etiquetas impresas no son fiables | Cerrada | El tablero tiene 24 mesas y 12 países, 2 por país. Se ignoran los nombres/banderas erróneos (p. ej. “CANADÁ” donde debe ser Inglaterra) y se mapean los 12 países oficiales por posición |
 | D-045 | 2026-10-22 | Candidatos de nombre preseleccionados | Pendiente | Ronda 3: Cafetulia, Cafetopía, Mesabella, Café de Toda la Vida, Café de Barrio, Partidita, ¿Nos Sentamos?, Candilejas. Ver `NOMBRES.md` |
 | D-046 | 2026-10-22 | Repositorio Git local inicializado | Cerrada | Rama `main`, primer commit `d215a87`. Remoto de GitHub pendiente de nombre |
 | D-047 | 2026-10-22 | Las fotos del tablero se guardan en `docs/referencias/` | Cerrada | `tablero-real-sin-fichas.png` y `tablero-real-con-fichas.jpg` |
+| D-048 | 2026-10-22 | Repositorio remoto de GitHub | Cerrada | <https://github.com/Oli358/cafetulia-game.git>; rama `main` subida |
+| D-049 | 2026-10-22 | Modelo de IA a probar: **Gemini 4 Argon** | Pendiente | Se probará en la prueba de estilo (arte y/o música); se evaluará su integración |
+| D-050 | 2026-10-22 | Orden cíclico de los países | Pendiente | El usuario indica 10 países en sentido horario desde arriba a la izquierda: África, Italia, China, España, URS (Rusia), India, América, Alemania, Turquía, Cuba. Faltan 2 por confirmar (probablemente Francia e Inglaterra) |

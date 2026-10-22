@@ -1,7 +1,8 @@
-# Proyecto Café
+# Cafetulia
 
-> **Nombre comercial: pendiente de decisión** — ver `docs/NOMBRES.md`.
-> Nombre en clave del repositorio: `cafe-international`.
+> Juego digital cozy inspirado en *Café International* (Rudi Hoffmann, 1989).
+> Repositorio: <https://github.com/Oli358/cafetulia-game>
+> Nombre comercial decidido: **Cafetulia**.
 
 Juego digital cozy, online y para **2–4 jugadores**, basado en **Café International** (Rudi Hoffmann, 1989, Spiel des Jahres). La propuesta es un **diorama 2.5D**: tablero 2D fiel al original + fichas, sillas, mesas y barra en 3D tipo papercraft. PWA jugable en móvil y PC.
 

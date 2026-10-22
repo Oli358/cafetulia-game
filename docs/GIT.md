@@ -6,8 +6,9 @@
 ## 1. Estado actual
 
 - Repositorio **local** inicializado en `C:\Users\olive\Desktop\cafe-international`.
-- Remoto en GitHub: **pendiente** de elegir nombre.
+- Repositorio remoto: <https://github.com/Oli358/cafetulia-game.git>
 - Rama principal: `main`.
+- Nombre del proyecto: **Cafetulia**.
 
 ## 2. Crear el repositorio en GitHub (cuando tengamos nombre)
 

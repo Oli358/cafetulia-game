@@ -1,6 +1,20 @@
 # Brainstorming de nombres
 
-> Estado: **pendiente de decisión.** Última actualización: 2026-10-22.
+> Estado: **DECIDIDO — Cafetulia** (22-10-2026).
+> Repositorio: <https://github.com/Oli358/cafetulia-game>
+> Este documento se conserva como historial del proceso.
+
+## 0. Decisión final
+
+**Cafetulia** — café + tertulia. Inventado, español, cálido y memorable.
+Repositorio: `cafetulia-game`.
+
+Ideas de eslogan:
+- “Cafetulia — el café de las partidas.”
+- “Cafetulia — café, mesa y tertulia.”
+- “Cafetulia — donde siempre hay sitio.”
+
+---
 
 ## 1. Criterios
 

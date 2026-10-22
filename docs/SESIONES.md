@@ -5,6 +5,35 @@
 
 ---
 
+## Sesión 004 — 2026-10-22 — Nombre Cafetulia, repositorio remoto y países
+
+**Objetivo:** cerrar el nombre, conectar el repositorio remoto, registrar el orden de países y anotar el modelo de IA a probar.
+
+**Hecho:**
+- Nombre decidido: **Cafetulia**.
+- Repositorio remoto configurado: <https://github.com/Oli358/cafetulia-game.git>.
+- Rama `main` subida a GitHub.
+- Documentación actualizada con el nombre y el repositorio (`README.md`, `PLAN.md`, `NOMBRES.md`, `GIT.md`, `DECISIONES.md`, `REGLAS.md`).
+- Registrado el orden cíclico de países indicado por el usuario: África, Italia, China, España, URS (Rusia), India, América, Alemania, Turquía y Cuba (sentido horario desde arriba a la izquierda).
+- Anotado **Gemini 4 Argon** como modelo de IA a probar.
+
+**Decisiones:**
+- Nombre comercial: **Cafetulia** (D-041).
+- Repositorio remoto: `cafetulia-game` (D-048).
+- Modelo de IA a probar: Gemini 4 Argon (D-049).
+- Orden de países: 10 confirmados; faltan 2 (D-050).
+
+**Problemas:**
+- La lista de países tiene 10; el juego original tiene 12. Probablemente faltan Francia e Inglaterra.
+- Falta confirmar el mapeo definitivo de las 24 mesas.
+
+**Siguiente:**
+1. Confirmar los 2 países que faltan y el orden completo.
+2. Probar Gemini 4 Argon en la prueba de estilo.
+3. Preparar el scaffolding del monorepo (cuando el usuario dé el visto bueno).
+
+---
+
 ## Sesión 003 — 2026-10-22 — Corrección, Git y ronda 3 de nombres
 
 **Objetivo:** corregir la interpretación de las fotos, preparar el repositorio local y generar nombres más originales.

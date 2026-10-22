@@ -1,4 +1,4 @@
-# Plan maestro — Proyecto Café
+# Plan maestro — Cafetulia
 
 > Documento vivo. Última actualización: 2026-10-22.
 
