@@ -1,6 +1,16 @@
 {
   "$schema": "https://opencode.ai/config.json",
   // Modelo por defecto del proyecto: Gemini 4 Argon vía OpenCode Go.
-  // Alternativa directa de Google (si tienes proveedor Google): "google/gemini-4-argon".
-  "model": "opencode-go/gemini-4-argon-contributor"
+  // IMPORTANTE: usa la variante de OpenCode Go.
+  // La variante directa de Google ("google/gemini-4-argon") requiere facturación;
+  // la free tier tiene límite 0 para este modelo.
+  "model": "opencode-go/gemini-4-argon-contributor",
+  "agents": {
+    "argon": {
+      "description": "Programador principal de Cafetulia con Gemini 4 Argon (OpenCode Go)",
+      "mode": "primary",
+      "model": "opencode-go/gemini-4-argon-contributor#high",
+      "system": "Eres el programador principal de Cafetulia. Antes de empezar, lee AGENTS.md y docs/ARGON/00-contexto.md. Sigue las fases de docs/ARGON/ y actualiza docs/SESIONES.md y docs/DECISIONES.md al terminar cada sesión."
+    }
+  }
 }
