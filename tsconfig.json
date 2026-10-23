@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client", "node"],
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["./*"],
+      "@cafetulia/content": ["./packages/content/src/index.ts"],
+      "@cafetulia/engine": ["./packages/engine/src/index.ts"],
+      "@cafetulia/ui": ["./packages/ui/src/index.ts"]
+    },
+    "noEmit": true
+  },
+  "include": ["src/**/*", "apps/web/src/**/*", "packages/*/src/**/*", "vite.config.ts"],
+  "exclude": ["dist", "node_modules"]
+}

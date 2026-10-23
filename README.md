@@ -10,9 +10,25 @@ Juego digital cozy, online y para **2–4 jugadores**, basado en **Café Interna
 
 ## Estado actual
 
-- **Fase 0 — Documentación y estructura.**
-- Aún **no hay código**. Solo documentación y carpetas preparadas.
-- Próximo hito: cerrar el nombre, validar las reglas con la foto del tablero y crear el primer `board.json`.
+- **Fase 2 — Motor de reglas puro y tests completados.**
+- Monorepo configurado con pnpm workspaces, TypeScript estricto, ESLint, Prettier, Vitest y Playwright.
+- Motor de reglas determinista en `packages/engine`: **32 tests en verde** y **1.000 partidas simuladas** con `fast-check`.
+- `packages/content/board.json` validado: **24 mesas, 68 sillas, 28 compartidas y 20 plazas de barra**.
+- Cliente y servidor: esqueletos iniciales (UI mínima y `/health`), pendientes de las fases 3 y 4.
+- Próximo hito: **Fase 3 — Servidor online con salas, reconexión y persistencia**.
+
+## Comandos
+
+```bash
+npx pnpm install
+npx pnpm typecheck
+npx pnpm test
+npx pnpm build
+npx pnpm lint
+npx pnpm dev
+```
+
+> `pnpm` no está instalado globalmente en este equipo; usa `npx pnpm ...` o instala pnpm.
 
 ---
 

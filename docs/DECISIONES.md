@@ -60,3 +60,6 @@ Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 | D-052 | 2026-10-22 | Generado `packages/content/board.json` | Cerrada | Validado: 24 mesas, 68 sillas, 28 compartidas, 20 plazas de barra |
 | D-053 | 2026-10-22 | Instrucciones y prompts para Gemini 4 Argon | Cerrada | Ver `docs/ARGON/`; 8 fases listas para copiar y pegar |
 | D-054 | 2026-10-23 | Biblia visual completa | Cerrada | Ver `docs/ARTE_BIBLE.md`: paleta, cámara, materiales, personajes, UI, animaciones y criterios de aceptación |
+| D-055 | 2026-10-23 | Fase 2 completada e integrada | Cerrada | Motor de reglas de Argon integrado; 32 tests en verde y 1.000 partidas simuladas |
+| D-056 | 2026-10-23 | Test de simulación asíncrono y timeout de 300 s | Cerrada | Cede el event loop cada 20 partidas para evitar el timeout de Vitest |
+| D-057 | 2026-10-23 | ESLint permite non-null assertions en tests | Cerrada | Solo en `**/*.test.ts` y `**/tests/**/*.ts` |

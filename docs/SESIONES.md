@@ -5,6 +5,49 @@
 
 ---
 
+## Sesión 009 — 2026-10-23 — Integración del trabajo de Argon
+
+**Objetivo:** revisar el ZIP de Cafetulia generado por Gemini 4 Argon, evaluar su calidad e integrarlo en el repositorio.
+
+**Hecho:**
+- Extraído `cafetulia.zip` de Descargas y revisado su contenido.
+- Confirmado que Argon completó:
+  - Scaffolding del monorepo con pnpm workspaces.
+  - Motor de reglas puro en `packages/engine`.
+  - Tests unitarios, de tablero y de simulación con `fast-check`.
+  - Servidor base con `/health` y esqueletos de salas/persistencia.
+  - Cliente mínimo con React + Vite.
+- Integrado el código en el repositorio actual, conservando la documentación y el `board.json` más recientes.
+- Corregido el script de build del monorepo.
+- Corregido el test de 1.000 partidas: ahora es asíncrono y cede el event loop cada 20 partidas; `testTimeout` subido a 300 s.
+- Permitidas las aserciones non-null en tests desde ESLint.
+- Corregido el aviso de `__dirname` en `vite.config.ts`.
+- Corregido el arranque del servidor: `Server` se obtiene del export por defecto de Colyseus y la detección de módulo principal usa `pathToFileURL`.
+- Instaladas las dependencias con `npx pnpm install`.
+- Verificado:
+  - `npx pnpm typecheck` → todos los paquetes OK.
+  - `npx pnpm test` → **32 tests en verde**.
+  - `npx pnpm build` → cliente, servidor, paquetes y preview OK.
+  - `npx pnpm lint` → sin errores.
+  - `GET http://localhost:2567/health` → **200 `{"status":"ok"}`**.
+
+**Decisiones:**
+- El trabajo de Argon se considera **Fase 2 completada** (D-055).
+- El test de simulación se mantiene en 1.000 partidas, con timeout ampliado y yields (D-056).
+- ESLint permite non-null assertions en tests (D-057).
+
+**Problemas:**
+- El cliente es solo un esqueleto: muestra el título, sin tablero ni UI de juego.
+- El servidor solo tiene `/health`; las salas, la reconexión y la persistencia son placeholders.
+- `packages/ui`, `tools` y `e2e` son placeholders.
+
+**Siguiente:**
+1. Empezar la Fase 3: servidor online con Colyseus, salas, reconexión y persistencia.
+2. Después, Fase 4: cliente 2.5D y UI completa.
+3. Mantener el motor congelado salvo bugs.
+
+---
+
 ## Sesión 008 — 2026-10-23 — Biblia visual
 
 **Objetivo:** dejar el tipo visual del juego completamente descrito para que Argon no improvise.
