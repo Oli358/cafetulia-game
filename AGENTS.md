@@ -10,9 +10,10 @@ Lee, en este orden:
 2. `docs/REGLAS.md` — reglamento operativo y casos límite.
 3. `docs/ARQUITECTURA.md` — stack, estructura y despliegue.
 4. `docs/ARTE.md` — dirección de arte.
-5. `docs/ROADMAP.md` — alcance de la v1.0 y fases.
-6. `docs/DECISIONES.md` — decisiones cerradas y pendientes.
-7. `packages/content/board.json` — datos validados del tablero.
+5. `docs/ARTE_BIBLE.md` — biblia visual completa: paleta, cámara, materiales, personajes, UI y animaciones.
+6. `docs/ROADMAP.md` — alcance de la v1.0 y fases.
+7. `docs/DECISIONES.md` — decisiones cerradas y pendientes.
+8. `packages/content/board.json` — datos validados del tablero.
 
 Las fases de implementación están en `docs/ARGON/01-scaffolding.md` … `docs/ARGON/08-despliegue.md`.
 

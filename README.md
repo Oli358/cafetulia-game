@@ -26,6 +26,7 @@ Juego digital cozy, online y para **2–4 jugadores**, basado en **Café Interna
 | [`docs/SESIONES.md`](docs/SESIONES.md) | Registro de sesiones de trabajo |
 | [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md) | Stack, arquitectura, datos y despliegue |
 | [`docs/ARTE.md`](docs/ARTE.md) | Dirección de arte y pipeline de assets |
+| [`docs/ARTE_BIBLE.md`](docs/ARTE_BIBLE.md) | Biblia visual: paleta, cámara, materiales, personajes, UI y animaciones |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Versiones, fechas y alcance |
 | [`docs/NOMBRES.md`](docs/NOMBRES.md) | Brainstorming de nombres |
 | [`docs/ARGON/`](docs/ARGON/README.md) | Contexto y prompts para Gemini 4 Argon |

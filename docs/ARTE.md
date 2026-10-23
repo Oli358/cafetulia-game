@@ -1,6 +1,7 @@
 # Dirección de arte
 
 > Documento vivo. Última actualización: 2026-10-22.
+> **Biblia visual completa:** [`ARTE_BIBLE.md`](ARTE_BIBLE.md).
 
 ## 1. Concepto
 

@@ -5,6 +5,34 @@
 
 ---
 
+## Sesión 008 — 2026-10-23 — Biblia visual
+
+**Objetivo:** dejar el tipo visual del juego completamente descrito para que Argon no improvise.
+
+**Hecho:**
+- Creada `docs/ARTE_BIBLE.md` con:
+  - Concepto y referencias.
+  - Paleta base y acentos por país.
+  - Tipografía, espaciado, radios y sombras.
+  - Cámara, composición y tablero 2D.
+  - Piezas 3D, personajes y UI.
+  - Animación, sonido, iluminación y accesibilidad.
+  - Lista de assets, pipeline, criterios de aceptación y prompt de style test.
+- Actualizados `ARTE.md`, `README.md`, `AGENTS.md`, `ARGON/00-contexto.md` y `ARGON/04-cliente-2.5d.md` para enlazarla.
+
+**Decisiones:**
+- La biblia visual queda como referencia obligatoria para arte, UI y 3D (D-054).
+
+**Problemas:**
+- Quedan abiertas decisiones menores: proporción final de personajes, paleta definitiva por país, logo y modo noche.
+
+**Siguiente:**
+1. Arrancar la fase 1 con Argon.
+2. Hacer el style test de la fase 5 antes de producir los 28 personajes.
+3. Elegir logo y proporciones definitivas.
+
+---
+
 ## Sesión 007 — 2026-10-22 — board.json validado y prompts para Argon
 
 **Objetivo:** generar los datos definitivos del tablero y preparar las instrucciones de programación para Gemini 4 Argon.

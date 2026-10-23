@@ -5,7 +5,7 @@
 ```text
 TAREA: Implementa el cliente de Cafetulia en apps/web.
 
-Contexto: lee 00-contexto.md, docs/ARTE.md, docs/ARQUITECTURA.md y packages/content/board.json.
+Contexto: lee 00-contexto.md, docs/ARTE.md, docs/ARTE_BIBLE.md, docs/ARQUITECTURA.md y packages/content/board.json.
 
 BASE
 - Vite + React + TypeScript.

@@ -11,6 +11,7 @@ DOCUMENTOS QUE DEBES LEER ANTES DE PROGRAMAR
 - docs/REGLAS.md            Reglamento operativo y casos límite.
 - docs/ARQUITECTURA.md      Stack, estructura, datos y despliegue.
 - docs/ARTE.md              Dirección de arte 2.5D.
+- docs/ARTE_BIBLE.md        Biblia visual completa: paleta, cámara, materiales, personajes, UI y animaciones.
 - docs/ROADMAP.md           Alcance v1.0, v1.1 y calendario.
 - docs/DECISIONES.md        Decisiones cerradas y pendientes.
 - docs/referencias/mapeo-mesas.md  Mapeo de las 24 mesas.

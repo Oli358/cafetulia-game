@@ -59,3 +59,4 @@ Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 | D-051 | 2026-10-22 | Mapeo de las 24 mesas confirmado | Cerrada | Ver `docs/referencias/mapeo-mesas.md`; filas ajustadas para cuadrar con 24/68/28/20 |
 | D-052 | 2026-10-22 | Generado `packages/content/board.json` | Cerrada | Validado: 24 mesas, 68 sillas, 28 compartidas, 20 plazas de barra |
 | D-053 | 2026-10-22 | Instrucciones y prompts para Gemini 4 Argon | Cerrada | Ver `docs/ARGON/`; 8 fases listas para copiar y pegar |
+| D-054 | 2026-10-23 | Biblia visual completa | Cerrada | Ver `docs/ARTE_BIBLE.md`: paleta, cámara, materiales, personajes, UI, animaciones y criterios de aceptación |
