@@ -17,6 +17,13 @@ Lee, en este orden:
 
 Las fases de implementación están en `docs/ARGON/01-scaffolding.md` … `docs/ARGON/08-despliegue.md`.
 
+## Entorno
+
+- **Node 22.5+ obligatorio** (el servidor usa `node:sqlite`). Recomendado Node 24 LTS.
+- Si `pnpm` no está instalado globalmente, usa `npx pnpm ...`.
+- `npx pnpm dev` arranca el servidor full-stack (API + Vite) en <http://localhost:3000>.
+- `npx pnpm test:e2e` ejecuta Playwright; el `webServer` ya arranca la app.
+
 ## Reglas que no se negocian
 
 - **No cambiar las reglas** sin actualizar `docs/REGLAS.md` y `docs/DECISIONES.md`.

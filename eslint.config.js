@@ -23,8 +23,7 @@ export default tseslint.config(
     },
   },
   {
-    // En tests, las aserciones non-null son idiomáticas para fixtures y estados conocidos.
-    files: ['**/*.test.ts', '**/tests/**/*.ts'],
+    files: ['**/*.test.ts', '**/*.spec.ts', '**/*.node-test.ts'],
     rules: {
       '@typescript-eslint/no-non-null-assertion': 'off',
     },

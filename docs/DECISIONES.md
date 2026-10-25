@@ -63,3 +63,7 @@ Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 | D-055 | 2026-10-23 | Fase 2 completada e integrada | Cerrada | Motor de reglas de Argon integrado; 32 tests en verde y 1.000 partidas simuladas |
 | D-056 | 2026-10-23 | Test de simulación asíncrono y timeout de 300 s | Cerrada | Cede el event loop cada 20 partidas para evitar el timeout de Vitest |
 | D-057 | 2026-10-23 | ESLint permite non-null assertions en tests | Cerrada | Solo en `**/*.test.ts` y `**/tests/**/*.ts` |
+| D-058 | 2026-10-25 | v2 integrada; v1.0 implementada | Cerrada | 42 tests, build, lint, E2E y UI 2.5D verificados en local |
+| D-059 | 2026-10-25 | Node 22.5+ obligatorio; Node 24.20.0 LTS instalado | Cerrada | El servidor usa `node:sqlite`; Node 20 no lo soporta |
+| D-060 | 2026-10-25 | `npx pnpm dev` arranca el servidor full-stack | Cerrada | API + Vite en <http://localhost:3000>; Playwright usa el mismo comando |
+| D-061 | 2026-10-25 | Rejilla 2D con coordenadas 0–12 | Cerrada | Corrige el desplazamiento de filas/columnas del tablero |

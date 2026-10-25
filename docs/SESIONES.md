@@ -5,6 +5,54 @@
 
 ---
 
+## Sesión 010 — 2026-10-25 — Integración de la v2 completa
+
+**Objetivo:** analizar `cafetulia (1).zip`, integrar la nueva versión y comprobar si realmente funciona.
+
+**Hecho:**
+- Extraído y analizado el ZIP nuevo: incluye servidor Colyseus con salas, SQLite, bots, temporizador, reconexión, chat, revancha, UI 2.5D + 2D, audio, tutorial, PWA y CI.
+- Detectado que el `package.json` raíz venía vacío y que el servidor usa `node:sqlite` (Node 22.5+).
+- Instalado **Node 24.20.0 LTS** con `winget` (el sistema tenía Node 20.20.2).
+- Reconstruido el `package.json` raíz y actualizado el entorno.
+- Integrado el código de `apps/server`, `apps/web`, `packages/engine`, `packages/ui`, `e2e`, `server.ts`, `render.yaml` y `.github/workflows/ci.yml`.
+- Corregidos:
+  - Detección de módulo principal del servidor en Windows (`pathToFileURL`).
+  - Persistencia: lectura de `DATABASE_URL` además de `SQLITE_DB_PATH`.
+  - Rejilla 2D: filas/columnas de 0 a 12 (antes 1 a 13).
+  - Timeout del test de simulación (300 s).
+  - `playwright.config.ts`: `npx pnpm dev` en lugar de `pnpm dev`.
+  - Etiquetas de motivos de fin de partida.
+  - Aviso de `__dirname` en Vite.
+- Verificado:
+  - `npx pnpm typecheck` → OK.
+  - `npx pnpm test` → **42 tests en verde** (motor, servidor y helpers).
+  - `npx pnpm build` → OK.
+  - `npx pnpm lint` → sin errores.
+  - `npx playwright test` → **1 E2E en verde**.
+  - `npx pnpm dev` → UI completa en <http://localhost:3000>.
+  - `/health` → 200; `POST /rooms` → 201; partida rápida contra bot funcional.
+- Revisada la UI con captura real: portada y partida 2.5D + 2D se ven correctamente.
+
+**Decisiones:**
+- La v2 se considera integrada y la **v1.0 implementada** (D-058).
+- Node 24 LTS es el entorno local; Node 22.5+ mínimo (D-059).
+- `npx pnpm dev` arranca el servidor full-stack (D-060).
+- La rejilla 2D usa coordenadas 0–12 (D-061).
+
+**Problemas:**
+- El viewport 3D superior es pequeño y recorta parte del diorama; funciona como vista decorativa, pero hay que pulirlo.
+- El bundle principal pesa ~811 KB (Three.js incluido); conviene code-splitting.
+- Falta probar en iPhone/Android reales y desplegar en Render.
+- `node:sqlite` obliga a Node 22.5+; hay que documentarlo y fijarlo en Render.
+
+**Siguiente:**
+1. Desplegar en Render con `DATABASE_URL` y volumen persistente.
+2. Probar en móviles reales y ajustar la UI táctil.
+3. Pulir el diorama 3D y el code-splitting.
+4. Revisar el E2E con dos jugadores reales.
+
+---
+
 ## Sesión 009 — 2026-10-23 — Integración del trabajo de Argon
 
 **Objetivo:** revisar el ZIP de Cafetulia generado por Gemini 4 Argon, evaluar su calidad e integrarlo en el repositorio.

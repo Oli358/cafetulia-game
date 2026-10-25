@@ -10,12 +10,15 @@ Juego digital cozy, online y para **2–4 jugadores**, basado en **Café Interna
 
 ## Estado actual
 
-- **Fase 2 — Motor de reglas puro y tests completados.**
-- Monorepo configurado con pnpm workspaces, TypeScript estricto, ESLint, Prettier, Vitest y Playwright.
-- Motor de reglas determinista en `packages/engine`: **32 tests en verde** y **1.000 partidas simuladas** con `fast-check`.
+- **v1.0 implementada y verificada en local.**
+- Monorepo con pnpm workspaces, TypeScript estricto, ESLint, Prettier, Vitest y Playwright.
+- Motor de reglas determinista en `packages/engine`: **42 tests en verde** (motor + servidor + helpers) y **1.000 partidas simuladas** con `fast-check`.
 - `packages/content/board.json` validado: **24 mesas, 68 sillas, 28 compartidas y 20 plazas de barra**.
-- Cliente y servidor: esqueletos iniciales (UI mínima y `/health`), pendientes de las fases 3 y 4.
-- Próximo hito: **Fase 3 — Servidor online con salas, reconexión y persistencia**.
+- Servidor autoritativo con Colyseus: salas privadas de 6 caracteres, 2–4 jugadores, bots, reconexión de 15 s, temporizador, chat efímero, revancha y persistencia SQLite.
+- Cliente 2.5D papercraft + modo 2D: tablero de 13×13, 28 retratos, audio Web Audio, tutorial, reglamento, estadísticas locales, postal descargable y PWA.
+- Verificado en local: `typecheck`, `lint`, `build`, **42 tests**, E2E de Playwright, `/health` y creación de salas por API.
+- **Requiere Node 22.5+** (usa `node:sqlite`). Recomendado Node 24 LTS. En este equipo está instalado Node 24.20.0.
+- Próximo paso: desplegar en Render, probar en iPhone/Android reales y pulir el diorama 3D.
 
 ## Comandos
 
@@ -23,11 +26,13 @@ Juego digital cozy, online y para **2–4 jugadores**, basado en **Café Interna
 npx pnpm install
 npx pnpm typecheck
 npx pnpm test
+npx pnpm test:e2e
 npx pnpm build
 npx pnpm lint
 npx pnpm dev
 ```
 
+> `npx pnpm dev` arranca el servidor full-stack (API + Vite) en <http://localhost:3000>.
 > `pnpm` no está instalado globalmente en este equipo; usa `npx pnpm ...` o instala pnpm.
 
 ---

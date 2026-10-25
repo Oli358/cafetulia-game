@@ -160,6 +160,11 @@ export type MoveEvent =
       returnedTilesCount: number;
     }
   | {
+      type: 'turn_timeout_auto_move';
+      playerId: PlayerId;
+      move: Move;
+    }
+  | {
       type: 'turn_changed';
       playerId: PlayerId;
       turnNumber: number;

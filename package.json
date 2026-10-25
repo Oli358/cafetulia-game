@@ -3,8 +3,11 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.5.0"
+  },
   "scripts": {
-    "dev": "vite --port=3000 --host=0.0.0.0",
+    "dev": "tsx server.ts",
     "build": "pnpm --filter @cafetulia/content build && pnpm --filter @cafetulia/engine build && pnpm --filter @cafetulia/ui build && pnpm --filter @cafetulia/server build && pnpm --filter @cafetulia/web build && vite build",
     "preview": "vite preview --port=3000 --host=0.0.0.0",
     "test": "vitest run --exclude 'e2e/**'",

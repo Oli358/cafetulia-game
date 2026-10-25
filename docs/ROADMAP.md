@@ -1,5 +1,7 @@
 # Roadmap
 
+> **Estado 2026-10-25:** v1.0 implementada y verificada en local (42 tests, build, lint, E2E y UI 2.5D). Pendiente: despliegue en Render, pruebas en dispositivos reales y pulido visual.
+>
 > Fecha de referencia: 22 de octubre de 2026.
 > **Ventana objetivo del aniversario: 20–22 de noviembre de 2026.**
 > Estimación orientativa; se ajusta según el tiempo disponible.

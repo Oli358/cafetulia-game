@@ -1,0 +1,20 @@
+{
+  "id": "/",
+  "name": "Cafetulia — El café cosmopolita de sobremesa",
+  "short_name": "Cafetulia",
+  "description": "Juego digital cozy, online y para 2–4 jugadores, basado en Café International.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F7EEDF",
+  "theme_color": "#C96F4A",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -6,3 +6,4 @@ export * from './scoring.js';
 export * from './legal.js';
 export * from './moves.js';
 export * from './endgame.js';
+export * from './bot.js';
