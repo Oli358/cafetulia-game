@@ -440,6 +440,7 @@ function StatsContent({ onClose }: { onClose: () => void }): React.ReactElement 
 
 function SettingsContent({ onClose }: { onClose: () => void }): React.ReactElement {
   const [vols, setVols] = useState(soundEngine.getVolumes());
+  const [avatarOpen, setAvatarOpen] = useState(false);
   const avatarId = useGameStore((s) => s.avatarId);
   const setAvatarId = useGameStore((s) => s.setAvatarId);
   const nickname = useGameStore((s) => s.nickname);
@@ -449,9 +450,14 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
   const largeText = useGameStore((s) => s.largeText);
   const nightMode = useGameStore((s) => s.nightMode);
   const contextualHints = useGameStore((s) => s.contextualHints);
-  const eventSubtitles = useGameStore((s) => s.eventSubtitles);
+  const subtitleMode = useGameStore((s) => s.subtitleMode);
+  const subtitleStyle = useGameStore((s) => s.subtitleStyle);
+  const setSubtitleMode = useGameStore((s) => s.setSubtitleMode);
+  const setSubtitleStyle = useGameStore((s) => s.setSubtitleStyle);
   const toggleSetting = useGameStore((s) => s.toggleSetting);
   const setActiveModal = useGameStore((s) => s.setActiveModal);
+
+  const currentAvatar = PRESET_AVATARS.find((a) => a.id === avatarId) ?? PRESET_AVATARS[0];
 
   const handleInstallPwa = async () => {
     if (deferredInstallPrompt) {
@@ -476,52 +482,69 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
         </button>
       </div>
 
-      {/* Profile & Preset Avatars (16 pre-made avatars, no photo upload) */}
-      <div className="bg-[#F7EEDF] p-3.5 rounded-2xl space-y-2.5">
+      {/* Profile & Avatar Dropdown (16 pre-made avatars, no photo upload) */}
+      <div className="bg-[#F7EEDF] p-3.5 rounded-2xl space-y-2.5 relative">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="font-serif font-bold text-base">Tu perfil y avatar</h3>
           <div className="flex items-center gap-2">
-            <PlayerAvatar avatarId={avatarId} size={28} />
+            <button
+              type="button"
+              data-testid="settings-avatar-dropdown-btn"
+              aria-expanded={avatarOpen}
+              onClick={() => setAvatarOpen((v) => !v)}
+              className="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl bg-[#FFF9F0] border border-[#3E2F2A]/25 text-xs font-bold cursor-pointer hover:bg-[#FEF6E0]"
+            >
+              <PlayerAvatar avatarId={avatarId} size={24} />
+              <span>{currentAvatar?.label ?? 'Avatar'}</span>
+              <span aria-hidden="true" className="text-[10px]">
+                ▾
+              </span>
+            </button>
             <input
               type="text"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               maxLength={24}
               aria-label="Tu apodo"
-              className="px-2.5 py-1 rounded-lg bg-[#FFF9F0] border border-[#3E2F2A]/20 text-xs font-bold w-36"
+              className="px-2.5 py-1.5 rounded-xl bg-[#FFF9F0] border border-[#3E2F2A]/20 text-xs font-bold w-36"
             />
           </div>
         </div>
-        <div
-          className="grid grid-cols-8 gap-1.5"
-          role="radiogroup"
-          aria-label="Seleccionar avatar prehecho"
-        >
-          {PRESET_AVATARS.map((av) => {
-            const active = avatarId === av.id;
-            return (
-              <button
-                key={av.id}
-                type="button"
-                role="radio"
-                aria-checked={active}
-                data-testid={`settings-avatar-${av.id}`}
-                onClick={() => void setAvatarId(av.id)}
-                title={av.label}
-                className={`flex flex-col items-center justify-center p-1 rounded-xl border transition-transform cursor-pointer ${
-                  active
-                    ? 'bg-[#FFF9F0] border-[#C96F4A] ring-2 ring-[#C96F4A] scale-105'
-                    : 'bg-[#FFF9F0]/60 border-[#3E2F2A]/10 hover:bg-[#FFF9F0]'
-                }`}
-              >
-                <PlayerAvatar avatarId={av.id} size={28} />
-                <span className="text-[9px] font-semibold truncate w-full text-center mt-0.5">
-                  {av.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+        {avatarOpen && (
+          <div
+            className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 bg-[#FFF9F0] p-2.5 rounded-2xl border border-[#8B5E3C] shadow-md"
+            role="radiogroup"
+            aria-label="Seleccionar avatar prehecho"
+          >
+            {PRESET_AVATARS.map((av) => {
+              const active = avatarId === av.id;
+              return (
+                <button
+                  key={av.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  data-testid={`settings-avatar-${av.id}`}
+                  onClick={() => {
+                    void setAvatarId(av.id);
+                    setAvatarOpen(false);
+                  }}
+                  title={av.label}
+                  className={`flex flex-col items-center justify-center p-1 rounded-xl border transition-transform cursor-pointer ${
+                    active
+                      ? 'bg-[#FEF6E0] border-[#C96F4A] ring-2 ring-[#C96F4A] scale-105'
+                      : 'bg-[#F7EEDF]/60 border-[#3E2F2A]/10 hover:bg-[#F7EEDF]'
+                  }`}
+                >
+                  <PlayerAvatar avatarId={av.id} size={26} />
+                  <span className="text-[9px] font-semibold truncate w-full text-center mt-0.5">
+                    {av.label}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Sound Controls */}
@@ -586,19 +609,38 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
       </div>
 
       {/* Visual & Accessibility toggles */}
-      <div className="bg-[#F7EEDF] p-3.5 rounded-2xl space-y-2 text-xs sm:text-sm">
-        <h3 className="font-serif font-bold text-base mb-1">Avisos, pantalla y accesibilidad</h3>
+      <div className="bg-[#F7EEDF] p-3.5 rounded-2xl space-y-2.5 text-xs sm:text-sm">
+        <h3 className="font-serif font-bold text-base mb-1">Subtítulos, pantalla y accesibilidad</h3>
 
-        <label className="flex items-center justify-between py-1 cursor-pointer">
-          <span>Subtítulos grandes de eventos («¡EL JOKER!», «¡MESA COMPLETA!»)</span>
-          <input
-            type="checkbox"
-            data-testid="toggle-event-subtitles"
-            checked={eventSubtitles}
-            onChange={() => toggleSetting('eventSubtitles')}
-            className="w-4 h-4 accent-[#C96F4A]"
-          />
-        </label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-1">
+          <label className="block text-xs font-bold text-[#6F5A4E]">
+            Frecuencia de subtítulos
+            <select
+              data-testid="settings-subtitle-mode-select"
+              value={subtitleMode}
+              onChange={(e) => setSubtitleMode(e.target.value as 'off' | 'key' | 'all')}
+              className="mt-1 w-full h-9 px-2.5 rounded-xl bg-[#FFF9F0] border border-[#3E2F2A]/20 text-xs font-bold text-[#3E2F2A]"
+            >
+              <option value="off">Desactivados</option>
+              <option value="key">Solo momentos clave</option>
+              <option value="all">Todos</option>
+            </select>
+          </label>
+
+          <label className="block text-xs font-bold text-[#6F5A4E]">
+            Estilo visual de subtítulos
+            <select
+              data-testid="settings-subtitle-style-select"
+              value={subtitleStyle}
+              onChange={(e) => setSubtitleStyle(e.target.value as 'comic' | 'cafe' | 'arcade')}
+              className="mt-1 w-full h-9 px-2.5 rounded-xl bg-[#FFF9F0] border border-[#3E2F2A]/20 text-xs font-bold text-[#3E2F2A]"
+            >
+              <option value="comic">Cómic (bocadillo de tinta)</option>
+              <option value="cafe">Café (etiqueta de papel)</option>
+              <option value="arcade">Arcade (celebración)</option>
+            </select>
+          </label>
+        </div>
 
         <label className="flex items-center justify-between py-1 cursor-pointer">
           <span>Reducción de movimiento (sin giros ni rebotes)</span>

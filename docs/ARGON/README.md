@@ -15,6 +15,7 @@ Esta carpeta contiene el contexto y los prompts para que **Gemini 4 Argon** impl
    - [`06-pulido-pwa.md`](06-pulido-pwa.md)
    - [`07-tests-calidad.md`](07-tests-calidad.md)
    - [`08-despliegue.md`](08-despliegue.md)
+   - [`09-pulido-ui-v6.md`](09-pulido-ui-v6.md) — pulido de UI, cabecera, menús, final, cartas y movimiento
 4. Al terminar cada fase, Argon debe:
    - Ejecutar `pnpm typecheck`, `pnpm test` y `pnpm build`.
    - Actualizar `docs/SESIONES.md` con la sesión.
@@ -37,5 +38,5 @@ Esta carpeta contiene el contexto y los prompts para que **Gemini 4 Argon** impl
 
 - Nombre: **Cafetulia**.
 - Repositorio: <https://github.com/Oli358/cafetulia-game>.
-- Documentación y datos listos. Todavía no hay código.
+- Documentación y datos listos. Código v1.2 integrado; v1.3 en preparación con el prompt 09 de pulido de UI, pendiente de Render y pruebas en móviles reales.
 - Fecha objetivo de la v1.0: **20–22 de noviembre de 2026**.

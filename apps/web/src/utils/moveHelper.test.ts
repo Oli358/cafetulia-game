@@ -20,9 +20,9 @@ describe('moveHelper & UI v3 specifications', () => {
     expect(getNationName('joker')).toBe('Comodín');
   });
 
-  it('defines 24 named national characters + 2 jokers with MUJER/HOMBRE badges and short quotes', () => {
+  it('defines 24 named national characters + 4 harlequin jokers (2M + 2F) with MUJER/HOMBRE badges and short quotes', () => {
     const entries = Object.values(CHARACTER_ROSTER);
-    expect(entries.length).toBe(26);
+    expect(entries.length).toBe(28);
     for (const c of entries) {
       expect(['MUJER', 'HOMBRE']).toContain(c.genderBadge);
       expect(c.quote.length).toBeLessThanOrEqual(48);
@@ -34,6 +34,8 @@ describe('moveHelper & UI v3 specifications', () => {
     expect(getCharacterProfile('ch', 'F').name).toBe('Mei');
     expect(getCharacterProfile('cu', 'F').name).toBe('Rosa');
     expect(getCharacterProfile('joker', 'F', 'fr').countryName).toBe('Comodín (Francia)');
+    expect(getCharacterProfile('joker', 'F', undefined, 'joker-F-2').name).toBe('Arlequina');
+    expect(getCharacterProfile('joker', 'M', undefined, 'joker-M-2').name).toBe('Pierrot');
   });
 
   it('defines 16 pre-made selectable avatars without photo uploads', () => {

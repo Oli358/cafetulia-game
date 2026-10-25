@@ -11,6 +11,7 @@ export type PapercraftBoardProps = {
   seatInspections: Record<string, SeatInspectResult>;
   focusedTableId: string | null;
   viewMode: '3d' | '2d';
+  cameraPreset?: 'general' | 'tables' | 'bar';
   cameraAngleIndex: 0 | 1 | 2 | 3;
   cameraZoom: number;
   nightMode: boolean;
@@ -257,6 +258,7 @@ export function PapercraftBoard({
   draftPlacements,
   seatInspections,
   focusedTableId,
+  cameraPreset = 'general',
   cameraAngleIndex,
   cameraZoom,
   nightMode,
@@ -315,8 +317,8 @@ export function PapercraftBoard({
       scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
       pmrem.dispose();
 
-      const camera = new THREE.PerspectiveCamera(35, width / height, 0.1, 100);
-      camera.position.set(0, 20, 16);
+      const camera = new THREE.PerspectiveCamera(32, width / height, 0.1, 100);
+      camera.position.set(0, 14.2, 10.5);
       camera.lookAt(0, 0, 0.4);
       cameraRef.current = camera;
 
@@ -615,16 +617,20 @@ export function PapercraftBoard({
       if (!THREE || !dyn || !camera || !requestRender) return;
 
       const angleRad = (cameraAngleIndex * Math.PI) / 2;
-      const dist = 15.6 / cameraZoom;
-      const height = 20 / Math.sqrt(cameraZoom);
+      const baseDist =
+        cameraPreset === 'bar' ? 6.2 : cameraPreset === 'tables' ? 7.8 : 9.4;
+      const baseHeight =
+        cameraPreset === 'bar' ? 7.4 : cameraPreset === 'tables' ? 9.8 : 12.2;
+      const dist = baseDist / cameraZoom;
+      const height = baseHeight / Math.sqrt(cameraZoom);
       let targetX = 0;
-      let targetZ = 0.4;
+      let targetZ = cameraPreset === 'bar' ? 0 : 0.35;
       if (focusedTableId) {
         const fTable = gameState.tables.find((t) => t.id === focusedTableId);
         if (fTable) {
           const pos = gridToWorld(fTable.row, fTable.col);
-          targetX = pos.x * 0.65;
-          targetZ = pos.z * 0.65;
+          targetX = pos.x * 0.72;
+          targetZ = pos.z * 0.72;
         }
       }
       camera.position.set(
@@ -632,7 +638,7 @@ export function PapercraftBoard({
         height,
         targetZ + Math.cos(angleRad) * dist,
       );
-      camera.lookAt(targetX, 0, targetZ);
+      camera.lookAt(targetX, 0.25, targetZ);
 
       while (dyn.children.length > 0) {
         const child = dyn.children[0];
@@ -720,6 +726,7 @@ export function PapercraftBoard({
             tableWorld,
             { x, z },
           );
+          guestGroup.scale.setScalar(1.26);
           sGroup.add(guestGroup);
           nextSippers.push(sipper);
         } else {
@@ -789,7 +796,7 @@ export function PapercraftBoard({
             barOccupant.nation === 'joker' ? 'fr' : barOccupant.nation,
             (bIdx + 30) * 0.65,
           );
-          barGuest.scale.setScalar(0.84);
+          barGuest.scale.setScalar(1.04);
           barGuest.position.set(cx, 0.3, cz);
           dyn.add(barGuest);
           nextSippers.push(sipper);
@@ -807,6 +814,7 @@ export function PapercraftBoard({
     selectedTile,
     draftPlacements,
     seatInspections,
+    cameraPreset,
     cameraAngleIndex,
     cameraZoom,
     focusedTableId,
@@ -834,7 +842,7 @@ export function PapercraftBoard({
         className="pointer-events-none absolute bottom-2.5 right-3 text-xs font-serif text-[#3E2F2A] bg-[#C9A227]/30 border border-[#C9A227]/70 px-2.5 py-0.5 rounded-lg"
         title="Placa conmemorativa del café"
       >
-        Placa de latón · O &amp; C
+        Placa de latón · O &amp; A
       </div>
     </div>
   );

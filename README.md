@@ -10,7 +10,7 @@ Juego digital cozy, online y para **2–4 jugadores**, basado en **Café Interna
 
 ## Estado actual
 
-- **v1.2 — Bugs P0 y mejoras P1/P2 integrados y verificados en local.**
+- **v1.3 en preparación — v5 integrada y auditada; pendiente el pulido de cabecera, menús, final y movimiento.**
 - Monorepo con pnpm workspaces, TypeScript estricto, ESLint, Prettier, Vitest y Playwright.
 - Motor de reglas determinista en `packages/engine`: **46 tests en verde** (motor + servidor + helpers) y **1.000 partidas simuladas** con `fast-check`.
 - `packages/content/board.json` validado: **24 mesas, 68 sillas, 28 compartidas y 20 plazas de barra**.
@@ -18,7 +18,7 @@ Juego digital cozy, online y para **2–4 jugadores**, basado en **Café Interna
 - Cliente rediseñado:
   - **Portada, lobby y partida sin scroll** en 1280×800 y 390×844.
   - Tablero limpio: banderas solo en mesas y sillas compartidas.
-  - Cartas 2:3 con cinta de país, badge **MUJER/HOMBRE**, retrato, nombre y frase corta.
+  - Fichas 1:1 con bandera de fondo y caricatura original, sin texto impreso; el detalle (nombre, país y sexo) aparece al seleccionar.
   - **Monedas 1 negra, 5 roja, 10 azul**, pilas exactas y animación **coin flip** con arco y giro 3D.
   - **16 avatares prehechos** seleccionables, guardados en el dispositivo y visibles para todos.
   - **Subtítulos de eventos** tipo Rocket League («¡EL JOKER!», «¡MESA COMPLETA!») activables en Ajustes.
@@ -26,7 +26,7 @@ Juego digital cozy, online y para **2–4 jugadores**, basado en **Café Interna
   - PWA con service worker, menú directo y cajón de registro/chat.
 - Verificado: `typecheck`, `lint`, `build`, **46 tests**, E2E de Playwright, `/health`, salas y jugada real.
 - **Requiere Node 22.5+** (usa `node:sqlite`). Recomendado Node 24 LTS. En este equipo está instalado Node 24.20.0.
-- Pendiente: desplegar en Render, probar en iPhone/Android reales, acercar el zoom 3D por defecto y pulir el texto de las cartas pequeñas.
+- Pendiente: corregir el desbordamiento de la cabecera con puntuaciones altas, hacer mutuamente excluyentes los menús, escenificar el final, pulir transiciones y cartas, desplegar en Render y probar en iPhone/Android reales.
 
 ## Comandos
 

@@ -102,6 +102,7 @@ type CafetuliaClientState = {
 
   // Camera & Accessibility settings
   viewMode: '3d' | '2d';
+  cameraPreset: 'general' | 'tables' | 'bar';
   cameraAngleIndex: 0 | 1 | 2 | 3;
   cameraZoom: number;
   reducedMotion: boolean;
@@ -110,6 +111,8 @@ type CafetuliaClientState = {
   nightMode: boolean;
   contextualHints: boolean;
   eventSubtitles: boolean;
+  subtitleMode: 'off' | 'key' | 'all';
+  subtitleStyle: 'comic' | 'cafe' | 'arcade';
 
   // Actions
   setNickname: (name: string) => void;
@@ -118,10 +121,13 @@ type CafetuliaClientState = {
   setErrorBanner: (msg: string | null) => void;
   setWhyCannotBanner: (msg: string | null) => void;
   setViewMode: (mode: '3d' | '2d') => void;
+  setCameraPreset: (preset: 'general' | 'tables' | 'bar') => void;
   cycleCameraAngle: () => void;
   resetCamera: () => void;
   setCameraZoom: (zoom: number) => void;
   setFocusedTableId: (tableId: string | null) => void;
+  setSubtitleMode: (mode: 'off' | 'key' | 'all') => void;
+  setSubtitleStyle: (style: 'comic' | 'cafe' | 'arcade') => void;
   toggleSetting: (
     key:
       | 'reducedMotion'
@@ -189,13 +195,27 @@ function getInitialAvatarId(): string {
   }
 }
 
-function getInitialEventSubtitles(): boolean {
-  if (typeof window === 'undefined') return true;
+function getInitialSubtitleMode(): 'off' | 'key' | 'all' {
+  if (typeof window === 'undefined') return 'key';
   try {
-    const saved = window.localStorage.getItem('cafetulia_event_subtitles');
-    return saved === null ? true : saved === 'true';
+    const saved = window.localStorage.getItem('cafetulia_subtitle_mode');
+    if (saved === 'off' || saved === 'key' || saved === 'all') return saved;
+    const legacy = window.localStorage.getItem('cafetulia_event_subtitles');
+    if (legacy === 'false') return 'off';
+    return 'key';
   } catch {
-    return true;
+    return 'key';
+  }
+}
+
+function getInitialSubtitleStyle(): 'comic' | 'cafe' | 'arcade' {
+  if (typeof window === 'undefined') return 'comic';
+  try {
+    const saved = window.localStorage.getItem('cafetulia_subtitle_style');
+    if (saved === 'comic' || saved === 'cafe' || saved === 'arcade') return saved;
+    return 'comic';
+  } catch {
+    return 'comic';
   }
 }
 
@@ -223,14 +243,17 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   pendingNegativeConfirm: null,
 
   viewMode: '3d',
+  cameraPreset: 'general',
   cameraAngleIndex: 0,
-  cameraZoom: 1.0,
+  cameraZoom: 1.15,
   reducedMotion: false,
   highContrast: false,
   largeText: false,
   nightMode: false,
   contextualHints: true,
-  eventSubtitles: getInitialEventSubtitles(),
+  subtitleMode: getInitialSubtitleMode(),
+  subtitleStyle: getInitialSubtitleStyle(),
+  eventSubtitles: getInitialSubtitleMode() !== 'off',
 
   setNickname: (name: string) => {
     const clean = name.slice(0, 26);
@@ -272,28 +295,63 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   setErrorBanner: (msg) => set({ errorBanner: msg }),
   setWhyCannotBanner: (msg) => set({ whyCannotBanner: msg }),
   setViewMode: (mode) => set({ viewMode: mode }),
+  setCameraPreset: (preset) =>
+    set({
+      cameraPreset: preset,
+      focusedTableId: preset === 'bar' || preset === 'general' ? null : get().focusedTableId,
+      cameraZoom: preset === 'bar' ? 1.55 : preset === 'tables' ? 1.32 : 1.15,
+    }),
   cycleCameraAngle: () =>
     set((s) => ({
       cameraAngleIndex: ((s.cameraAngleIndex + 1) % 4) as 0 | 1 | 2 | 3,
     })),
-  resetCamera: () => set({ cameraAngleIndex: 0, cameraZoom: 1.0, focusedTableId: null }),
+  resetCamera: () =>
+    set({
+      cameraPreset: 'general',
+      cameraAngleIndex: 0,
+      cameraZoom: 1.15,
+      focusedTableId: null,
+    }),
   setCameraZoom: (zoom) =>
-    set({ cameraZoom: Math.min(1.6, Math.max(0.8, Number(zoom.toFixed(2)))) }),
+    set({ cameraZoom: Math.min(1.8, Math.max(0.85, Number(zoom.toFixed(2)))) }),
   setFocusedTableId: (tableId) =>
     set((s) => ({
       focusedTableId: tableId,
-      cameraZoom: tableId ? 1.35 : s.focusedTableId ? 1.0 : s.cameraZoom,
+      cameraPreset: tableId ? 'tables' : s.cameraPreset,
+      cameraZoom: tableId ? 1.42 : s.focusedTableId ? 1.15 : s.cameraZoom,
     })),
+
+  setSubtitleMode: (mode) => {
+    try {
+      window.localStorage.setItem('cafetulia_subtitle_mode', mode);
+      window.localStorage.setItem('cafetulia_event_subtitles', String(mode !== 'off'));
+    } catch {
+      // ignore
+    }
+    set({ subtitleMode: mode, eventSubtitles: mode !== 'off' });
+  },
+
+  setSubtitleStyle: (style) => {
+    try {
+      window.localStorage.setItem('cafetulia_subtitle_style', style);
+    } catch {
+      // ignore
+    }
+    set({ subtitleStyle: style });
+  },
 
   toggleSetting: (key) =>
     set((s) => {
       const nextVal = !s[key];
       if (key === 'eventSubtitles') {
+        const nextMode: 'off' | 'key' = nextVal ? 'key' : 'off';
         try {
           window.localStorage.setItem('cafetulia_event_subtitles', String(nextVal));
+          window.localStorage.setItem('cafetulia_subtitle_mode', nextMode);
         } catch {
           // ignore
         }
+        return { eventSubtitles: nextVal, subtitleMode: nextMode };
       }
       return { [key]: nextVal };
     }),

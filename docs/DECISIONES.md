@@ -75,3 +75,8 @@ Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 | D-067 | 2026-10-25 | Subtítulos de eventos tipo Rocket League | Cerrada | Activables en Ajustes; cola de avisos y sonido |
 | D-068 | 2026-10-25 | Monedas 1 negra / 5 roja / 10 azul y coin flip 3D | Cerrada | Pilas exactas, arco, giro y sombra; penalización inversa |
 | D-069 | 2026-10-25 | Café Vivo 3D con invitados y 20 posavasos | Cerrada | Carga diferida con `lazy` + `Suspense` |
+| D-070 | 2026-10-25 | La placa conmemorativa usa **O & A** | Cerrada | Inicial de Abril; corregida en tablero 2D y 3D. No volver a `O & C` |
+| D-071 | 2026-10-25 | Clic/tap es la interacción principal; arrastrar será opcional | Cerrada | Accesibilidad y móvil primero. El drag, si se añade, será una mejora P2 y nunca la única forma de jugar |
+| D-072 | 2026-10-25 | Sonido de moneda sintetizado, inspirado en el arcade clásico | Cerrada | Dos notas ascendentes y timbre brillante, sin samples ni melodías copiadas de Nintendo |
+| D-073 | 2026-10-25 | Cabecera en dos filas, menús mutuamente excluyentes y popovers dentro del viewport | Cerrada | El marcador no desplaza las acciones; un solo overlay abierto; cierre con Escape, clic fuera o cambio de pantalla |
+| D-074 | 2026-10-25 | Final escenificado por fases | Cerrada | Secuencia `¡FINAL!` → ganador → confeti → ranking → créditos, con botón de omitir y respeto a `prefers-reduced-motion` |

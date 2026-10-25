@@ -5,6 +5,47 @@
 
 ---
 
+## Sesión 016 — 2026-10-25 — Integración v5, auditoría de UI y preparación del pulido v6
+
+**Objetivo:** integrar la entrega v5 de Argon (claridad de tablero, fichas cuadradas, dock translúcido, desplegables y 3D cercano), comprobar sus afirmaciones y preparar el siguiente encargo con los nuevos errores detectados.
+
+**Hecho:**
+- Extraído y analizado `cafetulia (4).zip`.
+- Integrados `apps/web/src`, `packages/ui/src`, `e2e/tests/smoke.spec.ts` y `apps/web/src/main.tsx`, conservando las salvaguardas del proyecto (Node 24.20.0, `pathToFileURL`, `DATABASE_URL`/`SQLITE_DB_PATH`, timeout de Vitest, Playwright local, `lib: ["ES2022", "DOM"]` en e2e, `React.lazy` del 3D y service worker solo en producción).
+- Corregidos:
+  - Etiquetas de fin de partida (`player_empty_hand`, `bag_threshold_reached`, `last_player_standing`).
+  - Placa conmemorativa **O & A** en tablero 2D y 3D (antes `O & C`).
+- Verificado: `typecheck`, **46 tests**, `build`, `lint` y E2E completos en verde.
+- Auditoría específica con puntuaciones altas y menús abiertos:
+  - La cabecera pasa de una fila a **86 px** y los botones de acción bajan a una segunda fila (medido a 1920×900 y 1280×800); en 390×844 llega a **112 px** y las acciones bajan a `y=77`.
+  - La leyenda y «Manos» pueden quedar abiertos a la vez; el popover de «Manos» se ancla con `right-0` al botón desplazado a la izquierda y se recorta fuera de la pantalla.
+  - La pantalla final sigue siendo un modal genérico: no hay «¡FINAL!», ganador a gran escala, confeti, créditos ni revelación escalonada del ranking.
+  - Las cartas de la mano son cuadradas y sin texto, pero en el tablero las mesas-redondas con bandera dominan visualmente y las fichas sentadas quedan diminutas; la jerarquía aún no es inequívoca.
+  - El dock tiene `bg-[#FFF9F0]/65`, pero se percibe casi opaco; conviene aumentar la transparencia y el blur.
+  - El botón de cambiar comodín aparece sin explicación suficiente y compite con la acción principal.
+- Capturas de la auditoría en `docs/referencias/ui-v5-partida-1920.png`, `ui-v5-partida-1280.png`, `ui-v5-partida-movil.png`, `ui-v5-menus.png` y `ui-v5-final.png`.
+- Preparado el prompt `docs/ARGON/09-pulido-ui-v6.md` y el ZIP `cafetulia-ui-v6.zip` para la siguiente iteración de Argon.
+
+**Decisiones:**
+- La placa conmemorativa usa **O & A** (D-070).
+- La interacción principal será clic/tap; arrastrar será una mejora opcional, nunca la única forma (D-071).
+- El sonido de moneda será sintetizado e inspirado en el arcade clásico, sin samples de Nintendo (D-072).
+- Cabecera en dos filas, menús mutuamente excluyentes y popovers siempre dentro del viewport (D-073).
+- Final escenificado por fases: FINAL → ganador → confeti → ranking → créditos (D-074).
+
+**Problemas:**
+- Los bugs de cabecera, menús y final siguen abiertos; el siguiente ZIP debe corregirlos.
+- La UI todavía se percibe genérica y con pocas transiciones; falta un pase de movimiento global.
+- El cambio de comodín necesita explicación contextual y menos protagonismo.
+- Render y las pruebas en iPhone/Android reales siguen pendientes.
+
+**Siguiente:**
+1. Enviar `cafetulia-ui-v6.zip` y el prompt 09 a Argon.
+2. Integrar y verificar la v6 con puntuaciones altas, menús y final forzado.
+3. Desplegar en Render y probar en móviles reales.
+
+---
+
 ## Sesión 012 — 2026-10-25 — v1.2: bugs P0 y mejoras P1/P2
 
 **Objetivo:** integrar la cuarta versión de Argon con los bugs P0 corregidos y las mejoras de cartas, monedas, avatares, subtítulos, 3D y PWA.

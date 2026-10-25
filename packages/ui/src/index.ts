@@ -565,6 +565,17 @@ export const CHARACTER_ROSTER: Record<string, CharacterProfile> = {
     genderBadge: 'MUJER',
     quote: 'Brillo en cualquier mesa.',
   },
+  'joker:F:2': {
+    id: 'joker:F:2',
+    nation: 'joker',
+    gender: 'F',
+    name: 'Arlequina',
+    countryName: 'Comodín',
+    genderSymbol: '♀',
+    genderLabel: 'Dama',
+    genderBadge: 'MUJER',
+    quote: 'Un antifaz y mil tertulias.',
+  },
   'joker:M': {
     id: 'joker:M',
     nation: 'joker',
@@ -576,25 +587,40 @@ export const CHARACTER_ROSTER: Record<string, CharacterProfile> = {
     genderBadge: 'HOMBRE',
     quote: 'Donde falte pareja, allí estoy.',
   },
+  'joker:M:2': {
+    id: 'joker:M:2',
+    nation: 'joker',
+    gender: 'M',
+    name: 'Pierrot',
+    countryName: 'Comodín',
+    genderSymbol: '♂',
+    genderLabel: 'Caballero',
+    genderBadge: 'HOMBRE',
+    quote: 'Siempre guardo un as bajo la taza.',
+  },
 };
 
 export function getCharacterProfile(
   nation: string,
   gender: 'M' | 'F',
   jokerNation?: string,
+  tileId?: string,
 ): CharacterProfile {
-  const key = `${nation}:${gender}`;
-  const base: CharacterProfile = CHARACTER_ROSTER[key] ?? {
-    id: 'fr:F',
-    nation: 'fr',
-    gender: 'F',
-    name: 'Colette',
-    countryName: 'Francia',
-    genderSymbol: '♀',
-    genderLabel: 'Dama',
-    genderBadge: 'MUJER',
-    quote: 'El croissant se mira, no se toca.',
-  };
+  const isSecondJoker =
+    nation === 'joker' && tileId && (tileId.endsWith('-2') || tileId.endsWith('_2') || tileId.endsWith('4'));
+  const key = isSecondJoker ? `joker:${gender}:2` : `${nation}:${gender}`;
+  const base: CharacterProfile = CHARACTER_ROSTER[key] ??
+    CHARACTER_ROSTER[`${nation}:${gender}`] ?? {
+      id: 'fr:F',
+      nation: 'fr',
+      gender: 'F',
+      name: 'Colette',
+      countryName: 'Francia',
+      genderSymbol: '♀',
+      genderLabel: 'Dama',
+      genderBadge: 'MUJER',
+      quote: 'El croissant se mira, no se toca.',
+    };
   if (nation === 'joker' && jokerNation && NATION_VISUALS[jokerNation as NationKey]) {
     const repCountry = NATION_VISUALS[jokerNation as NationKey].name;
     return {
@@ -604,6 +630,21 @@ export function getCharacterProfile(
   }
   return base;
 }
+
+export type SubtitleMode = 'off' | 'key' | 'all';
+export type SubtitleStyle = 'comic' | 'cafe' | 'arcade';
+
+export const SUBTITLE_MODES: Array<{ id: SubtitleMode; label: string; desc: string }> = [
+  { id: 'off', label: 'Desactivados', desc: 'Sin avisos flotantes en pantalla' },
+  { id: 'key', label: 'Solo momentos clave', desc: 'Joker, mesa completa, penalización y victoria' },
+  { id: 'all', label: 'Todos', desc: 'Incluye cada pareja sentada y servicio en barra' },
+];
+
+export const SUBTITLE_STYLES: Array<{ id: SubtitleStyle; label: string; desc: string }> = [
+  { id: 'comic', label: 'Cómic', desc: 'Bocadillo artesanal de tinta y papel' },
+  { id: 'cafe', label: 'Café', desc: 'Etiqueta clásica de pizarra y latón' },
+  { id: 'arcade', label: 'Arcade', desc: 'Cartel vibrante de celebración' },
+];
 
 export type CoinStack = {
   denomination: 10 | 5 | 1;

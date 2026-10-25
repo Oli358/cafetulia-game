@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import {
   finalScores,
   getLegalMoves,
@@ -11,7 +11,8 @@ import {
   getCharacterProfile,
   NATION_VISUALS,
   PRESET_AVATARS,
-  type NationKey,
+  SUBTITLE_MODES,
+  SUBTITLE_STYLES,
 } from '@cafetulia/ui';
 import { soundEngine } from '../audio/soundEngine';
 import {
@@ -34,22 +35,257 @@ import {
 } from './CoinTray';
 import { IllustratedBoard, type ChairToastInfo } from './IllustratedBoard';
 
-const PapercraftBoard = lazy(() =>
-  import('./PapercraftBoard').then((module) => ({ default: module.PapercraftBoard })),
-);
+const LazyPapercraftBoard = React.lazy(() => import('./PapercraftBoard'));
 
 export type ArcadeCalloutEvent = {
   id: string;
   title: string;
   subtitle: string;
   tone: 'gold' | 'green' | 'red' | 'blue';
+  isKeyMoment: boolean;
 };
+
+/**
+ * Keyboard & ARIA accessible Avatar Dropdown / Bottom Sheet (P0.4)
+ */
+function AvatarDropdownPicker({ compact = false }: { compact?: boolean }): React.ReactElement {
+  const avatarId = useGameStore((s) => s.avatarId);
+  const setAvatarId = useGameStore((s) => s.setAvatarId);
+  const [open, setOpen] = useState(false);
+
+  const currentAvatar =
+    PRESET_AVATARS.find((a) => a.id === avatarId) ?? {
+      id: 'espresso',
+      label: 'Taza Espresso',
+      bg: '#C96F4A',
+      kind: 'icon' as const,
+    };
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  return (
+    <div className="relative" data-testid="title-avatar-picker">
+      <button
+        type="button"
+        data-testid="avatar-dropdown-btn"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className={`inline-flex items-center justify-between gap-2 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/25 text-[#3E2F2A] font-bold hover:bg-[#EAD9C0] transition-colors cursor-pointer ${
+          compact ? 'h-9 px-2.5 text-xs' : 'h-10 px-3 text-xs sm:text-sm w-full sm:w-auto'
+        }`}
+      >
+        <span className="inline-flex items-center gap-2 min-w-0">
+          <PlayerAvatar avatarId={avatarId} size={compact ? 22 : 26} />
+          <span className="truncate">{currentAvatar.label}</span>
+        </span>
+        <span aria-hidden="true" className="text-[10px] text-[#6F5A4E]">
+          ▾
+        </span>
+      </button>
+
+      {open && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-[#3E2F2A]/25"
+            onClick={() => setOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            role="radiogroup"
+            aria-label="Elige tu avatar"
+            data-testid="avatar-dropdown-popover"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[min(92vw,360px)] bg-[#FFF9F0] text-[#3E2F2A] rounded-2xl p-3 border-2 border-[#8B5E3C] shadow-[0_12px_32px_rgba(35,23,18,0.28)] space-y-2"
+          >
+            <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-1.5">
+              <span className="font-serif font-bold text-sm">Elige tu avatar (16)</span>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Cerrar selector de avatar"
+                className="px-2 py-0.5 rounded-lg bg-[#F7EEDF] text-xs font-bold text-[#6F5A4E] hover:text-[#3E2F2A] cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="grid grid-cols-4 gap-1.5 max-h-[55dvh] overflow-y-auto">
+              {PRESET_AVATARS.map((av) => {
+                const active = avatarId === av.id;
+                return (
+                  <button
+                    key={av.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    data-testid={`avatar-option-${av.id}`}
+                    onClick={() => {
+                      void setAvatarId(av.id);
+                      setOpen(false);
+                    }}
+                    title={av.label}
+                    className={`flex flex-col items-center justify-center p-1.5 rounded-xl border transition-transform cursor-pointer ${
+                      active
+                        ? 'bg-[#FEF6E0] border-[#C96F4A] ring-2 ring-[#C96F4A] scale-103'
+                        : 'bg-[#F7EEDF]/75 border-[#3E2F2A]/10 hover:bg-[#F7EEDF]'
+                    }`}
+                  >
+                    <PlayerAvatar avatarId={av.id} size={28} />
+                    <span className="text-[9px] font-bold truncate w-full text-center mt-1">
+                      {av.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Keyboard & ARIA accessible Subtitles Dropdown (Mode + Visual Style) (P0.4 & P1.2)
+ */
+function SubtitlesDropdownPicker({ compact = false }: { compact?: boolean }): React.ReactElement {
+  const subtitleMode = useGameStore((s) => s.subtitleMode);
+  const subtitleStyle = useGameStore((s) => s.subtitleStyle);
+  const setSubtitleMode = useGameStore((s) => s.setSubtitleMode);
+  const setSubtitleStyle = useGameStore((s) => s.setSubtitleStyle);
+  const [open, setOpen] = useState(false);
+
+  const modeMeta = SUBTITLE_MODES.find((m) => m.id === subtitleMode) ?? {
+    id: 'key' as const,
+    label: 'Solo momentos clave',
+    desc: '',
+  };
+  const styleMeta = SUBTITLE_STYLES.find((st) => st.id === subtitleStyle) ?? {
+    id: 'comic' as const,
+    label: 'Cómic',
+    desc: '',
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        data-testid="subtitles-dropdown-btn"
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className={`inline-flex items-center justify-between gap-1.5 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/20 text-[#3E2F2A] font-bold hover:bg-[#EAD9C0] transition-colors cursor-pointer ${
+          compact ? 'min-h-[34px] px-2 py-1 text-xs' : 'h-10 px-3 text-xs w-full sm:w-auto'
+        }`}
+      >
+        <span className="truncate">
+          {compact
+            ? `Subtítulos: ${styleMeta.label}`
+            : `Subtítulos: ${modeMeta.label} · ${styleMeta.label}`}
+        </span>
+        <span aria-hidden="true" className="text-[10px] text-[#6F5A4E]">
+          ▾
+        </span>
+      </button>
+
+      {open && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-[#3E2F2A]/25"
+            onClick={() => setOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            role="dialog"
+            aria-label="Configuración de subtítulos de eventos"
+            data-testid="subtitles-dropdown-popover"
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[min(92vw,340px)] bg-[#FFF9F0] text-[#3E2F2A] rounded-2xl p-3 border-2 border-[#8B5E3C] shadow-[0_12px_32px_rgba(35,23,18,0.28)] space-y-2.5 text-xs"
+          >
+            <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-1.5">
+              <span className="font-serif font-bold text-sm">Subtítulos de partida</span>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Cerrar opciones de subtítulos"
+                className="px-2 py-0.5 rounded-lg bg-[#F7EEDF] text-xs font-bold text-[#6F5A4E] hover:text-[#3E2F2A] cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-1">
+              <span className="font-bold text-[11px] text-[#6F5A4E] block">Frecuencia</span>
+              <div className="grid grid-cols-1 gap-1">
+                {SUBTITLE_MODES.map((m) => {
+                  const active = subtitleMode === m.id;
+                  return (
+                    <button
+                      key={m.id}
+                      type="button"
+                      data-testid={`subtitle-mode-${m.id}`}
+                      onClick={() => setSubtitleMode(m.id)}
+                      className={`text-left px-2.5 py-1.5 rounded-xl border cursor-pointer flex items-center justify-between ${
+                        active
+                          ? 'bg-[#FEF6E0] border-[#C96F4A] font-bold'
+                          : 'bg-[#F7EEDF]/70 border-[#3E2F2A]/10 hover:bg-[#F7EEDF]'
+                      }`}
+                    >
+                      <span>{m.label}</span>
+                      <span className="text-[10px] text-[#6F5A4E]">{active ? '✓' : ''}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <span className="font-bold text-[11px] text-[#6F5A4E] block">Estilo visual</span>
+              <div className="grid grid-cols-3 gap-1.5">
+                {SUBTITLE_STYLES.map((st) => {
+                  const active = subtitleStyle === st.id;
+                  return (
+                    <button
+                      key={st.id}
+                      type="button"
+                      data-testid={`subtitle-style-${st.id}`}
+                      onClick={() => setSubtitleStyle(st.id)}
+                      className={`px-2 py-1.5 rounded-xl border text-center cursor-pointer ${
+                        active
+                          ? 'bg-[#FEF6E0] border-[#C96F4A] font-bold ring-1 ring-[#C96F4A]'
+                          : 'bg-[#F7EEDF]/70 border-[#3E2F2A]/10 hover:bg-[#F7EEDF]'
+                      }`}
+                    >
+                      <span className="block font-bold">{st.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 export function TitleScreen(): React.ReactElement {
   const nickname = useGameStore((s) => s.nickname);
   const setNickname = useGameStore((s) => s.setNickname);
-  const avatarId = useGameStore((s) => s.avatarId);
-  const setAvatarId = useGameStore((s) => s.setAvatarId);
   const createRoom = useGameStore((s) => s.createRoom);
   const joinRoom = useGameStore((s) => s.joinRoom);
   const quickStartWithBots = useGameStore((s) => s.quickStartWithBots);
@@ -72,19 +308,16 @@ export function TitleScreen(): React.ReactElement {
         </p>
       </header>
 
-      {/* Main Direct Card: Nickname + Preset Avatar Picker + Direct Action Buttons */}
+      {/* Main Direct Card: Nickname + Avatar & Subtitles Dropdowns + Direct Action Buttons */}
       <div className="my-auto w-full max-w-xl mx-auto bg-[#FFF9F0] p-3.5 sm:p-5 rounded-[22px] border border-[#3E2F2A]/15 shadow-[0_8px_24px_rgba(62,47,42,0.1)] space-y-3">
-        {/* Profile row: Current avatar + Nickname input */}
-        <div className="flex items-center gap-2.5">
-          <div className="shrink-0 p-1 rounded-2xl bg-[#F7EEDF] border border-[#3E2F2A]/15">
-            <PlayerAvatar avatarId={avatarId} size={40} />
-          </div>
-          <div className="flex-1 min-w-0">
+        {/* Profile row: Nickname input + Avatar Dropdown + Subtitles Dropdown */}
+        <div className="space-y-2">
+          <div>
             <label
               htmlFor="nickname-input"
               className="block text-[11px] font-bold text-[#6F5A4E] mb-0.5"
             >
-              Tu nombre y avatar
+              Tu apodo, avatar y subtítulos
             </label>
             <input
               id="nickname-input"
@@ -96,36 +329,11 @@ export function TitleScreen(): React.ReactElement {
               className="w-full h-9 sm:h-10 px-3 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/25 text-sm text-[#3E2F2A] font-bold focus:outline-2 focus:outline-[#C96F4A]"
             />
           </div>
-        </div>
 
-        {/* Preset Avatars Strip (16 selectable avatars, scrollable horizontally on small screens) */}
-        <div
-          className="flex items-center gap-1.5 overflow-x-auto py-1 px-0.5"
-          role="radiogroup"
-          aria-label="Elige tu avatar"
-          data-testid="title-avatar-picker"
-        >
-          {PRESET_AVATARS.map((av) => {
-            const active = avatarId === av.id;
-            return (
-              <button
-                key={av.id}
-                type="button"
-                role="radio"
-                aria-checked={active}
-                data-testid={`avatar-option-${av.id}`}
-                onClick={() => void setAvatarId(av.id)}
-                title={av.label}
-                className={`shrink-0 p-1 rounded-xl border transition-transform cursor-pointer ${
-                  active
-                    ? 'bg-[#FEF6E0] border-[#C96F4A] ring-2 ring-[#C96F4A] scale-105'
-                    : 'bg-[#F7EEDF]/70 border-[#3E2F2A]/10 hover:bg-[#F7EEDF]'
-                }`}
-              >
-                <PlayerAvatar avatarId={av.id} size={26} />
-              </button>
-            );
-          })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <AvatarDropdownPicker />
+            <SubtitlesDropdownPicker />
+          </div>
         </div>
 
         {errorBanner && (
@@ -236,8 +444,6 @@ export function TitleScreen(): React.ReactElement {
 export function LobbyScreen(): React.ReactElement {
   const snapshot = useGameStore((s) => s.snapshot);
   const myPlayerId = useGameStore((s) => s.myPlayerId);
-  const avatarId = useGameStore((s) => s.avatarId);
-  const setAvatarId = useGameStore((s) => s.setAvatarId);
   const updateRoomConfig = useGameStore((s) => s.updateRoomConfig);
   const toggleReady = useGameStore((s) => s.toggleReady);
   const addBot = useGameStore((s) => s.addBot);
@@ -280,6 +486,7 @@ export function LobbyScreen(): React.ReactElement {
             </h1>
           </div>
           <div className="flex items-center gap-1.5">
+            <AvatarDropdownPicker compact />
             <button
               type="button"
               onClick={copyInvite}
@@ -312,31 +519,6 @@ export function LobbyScreen(): React.ReactElement {
             {errorBanner}
           </div>
         )}
-
-        {/* Quick Avatar Switcher in Lobby */}
-        <div className="shrink-0 flex items-center gap-2 bg-[#F7EEDF] px-3 py-1.5 rounded-xl">
-          <span className="text-[11px] font-bold text-[#6F5A4E] shrink-0">Tu avatar:</span>
-          <div className="flex items-center gap-1 overflow-x-auto py-0.5">
-            {PRESET_AVATARS.map((av) => {
-              const active = avatarId === av.id;
-              return (
-                <button
-                  key={av.id}
-                  type="button"
-                  onClick={() => void setAvatarId(av.id)}
-                  title={av.label}
-                  className={`shrink-0 p-0.5 rounded-lg border cursor-pointer ${
-                    active
-                      ? 'bg-[#FFF9F0] border-[#C96F4A] ring-1 ring-[#C96F4A]'
-                      : 'border-transparent opacity-75 hover:opacity-100'
-                  }`}
-                >
-                  <PlayerAvatar avatarId={av.id} size={22} />
-                </button>
-              );
-            })}
-          </div>
-        </div>
 
         {/* Center 2-column grid: Players + Short Options */}
         <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto pr-0.5">
@@ -500,11 +682,13 @@ export function PlayingScreen(): React.ReactElement {
   const draftPlacements = useGameStore((s) => s.draftPlacements);
   const preferredJokerNation = useGameStore((s) => s.preferredJokerNation);
   const focusedTableId = useGameStore((s) => s.focusedTableId);
+  const cameraPreset = useGameStore((s) => s.cameraPreset);
   const cameraAngleIndex = useGameStore((s) => s.cameraAngleIndex);
   const cameraZoom = useGameStore((s) => s.cameraZoom);
   const nightMode = useGameStore((s) => s.nightMode);
   const reducedMotion = useGameStore((s) => s.reducedMotion);
-  const eventSubtitles = useGameStore((s) => s.eventSubtitles);
+  const subtitleMode = useGameStore((s) => s.subtitleMode);
+  const subtitleStyle = useGameStore((s) => s.subtitleStyle);
   const errorBanner = useGameStore((s) => s.errorBanner);
 
   const selectTile = useGameStore((s) => s.selectTile);
@@ -514,6 +698,7 @@ export function PlayingScreen(): React.ReactElement {
   const setPendingNegativeConfirm = useGameStore((s) => s.setPendingNegativeConfirm);
   const setWhyCannotBanner = useGameStore((s) => s.setWhyCannotBanner);
   const setFocusedTableId = useGameStore((s) => s.setFocusedTableId);
+  const setCameraPreset = useGameStore((s) => s.setCameraPreset);
   const cycleCameraAngle = useGameStore((s) => s.cycleCameraAngle);
   const resetCamera = useGameStore((s) => s.resetCamera);
   const setCameraZoom = useGameStore((s) => s.setCameraZoom);
@@ -524,6 +709,7 @@ export function PlayingScreen(): React.ReactElement {
 
   const [cafeModalOpen, setCafeModalOpen] = useState(false);
   const [rivalHandsOpen, setRivalHandsOpen] = useState(false);
+  const [legendOpen, setLegendOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [sideTab, setSideTab] = useState<'log' | 'chat'>('log');
   const [chatInput, setChatInput] = useState('');
@@ -578,7 +764,7 @@ export function PlayingScreen(): React.ReactElement {
     return () => clearTimeout(t);
   }, [chairToast]);
 
-  // Pop Rocket League-style arcade callout queue every 1.45s
+  // Pop event callout queue every 1.45s
   useEffect(() => {
     if (calloutQueue.length === 0) return;
     soundEngine.playSfx('calloutSting');
@@ -630,6 +816,7 @@ export function PlayingScreen(): React.ReactElement {
             title: '¡EL JOKER!',
             subtitle: `${plName} sienta comodín (+${ev.pointsEarned} pts)`,
             tone: 'gold',
+            isKeyMoment: true,
           });
         }
         if (ev.pureTablesCompleted > 0) {
@@ -638,9 +825,9 @@ export function PlayingScreen(): React.ReactElement {
             title: '¡MESA COMPLETA!',
             subtitle: `${plName} completa mesa nacional`,
             tone: 'green',
+            isKeyMoment: true,
           });
         } else {
-          // Check if any table containing ev.seatId just reached 4/4 occupants
           const completedTable = gameState.tables.find(
             (t) =>
               t.seatIds.includes(ev.seatId) &&
@@ -652,6 +839,15 @@ export function PlayingScreen(): React.ReactElement {
               title: '¡MESA COMPLETA!',
               subtitle: `Mesa de ${NATION_VISUALS[completedTable.nation]?.name ?? completedTable.nation} (4/4)`,
               tone: 'green',
+              isKeyMoment: true,
+            });
+          } else if (ev.pointsEarned > 0) {
+            newCallouts.push({
+              id: `callout-seat-${Date.now()}-${i}`,
+              title: '¡INVITADO SENTADO!',
+              subtitle: `${plName} suma +${ev.pointsEarned} monedas`,
+              tone: 'green',
+              isKeyMoment: false,
             });
           }
         }
@@ -661,6 +857,7 @@ export function PlayingScreen(): React.ReactElement {
           title: '¡EL JOKER!',
           subtitle: `${plName} recupera el comodín de la mesa`,
           tone: 'gold',
+          isKeyMoment: true,
         });
       } else if (ev.type === 'tile_bar' && ev.pointsDelta !== 0) {
         if (ev.pointsDelta > 0) {
@@ -671,8 +868,14 @@ export function PlayingScreen(): React.ReactElement {
             sourceSelector: '[data-testid="bar-center-button"]',
             targetSelector: `[data-player-tray="${ev.playerId}"]`,
           });
+          newCallouts.push({
+            id: `callout-barpos-${Date.now()}-${i}`,
+            title: '¡SERVICIO EN BARRA!',
+            subtitle: `${plName} gana +${ev.pointsDelta} monedas`,
+            tone: 'blue',
+            isKeyMoment: false,
+          });
         } else {
-          // Reverse trajectory: from player's coin tray to the central bar
           flights.push({
             id: `flight-${Date.now()}-${i}`,
             playerId: ev.playerId,
@@ -685,6 +888,7 @@ export function PlayingScreen(): React.ReactElement {
             title: '¡PENALIZACIÓN!',
             subtitle: `${plName} sirve en la barra (${ev.pointsDelta} pts)`,
             tone: 'red',
+            isKeyMoment: true,
           });
         }
 
@@ -694,6 +898,7 @@ export function PlayingScreen(): React.ReactElement {
             title: '¡BARRA LLENA!',
             subtitle: `Posavasos ${ev.barIndex + 1}/20 ocupado`,
             tone: 'red',
+            isKeyMoment: true,
           });
         }
       } else if (ev.type === 'game_finished') {
@@ -702,6 +907,7 @@ export function PlayingScreen(): React.ReactElement {
           title: '¡VICTORIA!',
           subtitle: 'Cerrando recuento del café',
           tone: 'gold',
+          isKeyMoment: true,
         });
       }
     }
@@ -713,11 +919,18 @@ export function PlayingScreen(): React.ReactElement {
         title: '¡ÚLTIMA RONDA!',
         subtitle: `Quedan solo ${gameState.bag.length} fichas en la bolsa`,
         tone: 'blue',
+        isKeyMoment: true,
       });
     }
 
-    if (eventSubtitles && newCallouts.length > 0) {
-      setCalloutQueue((prev) => [...prev, ...newCallouts]);
+    if (subtitleMode !== 'off' && newCallouts.length > 0) {
+      const filtered =
+        subtitleMode === 'all'
+          ? newCallouts
+          : newCallouts.filter((c) => c.isKeyMoment);
+      if (filtered.length > 0) {
+        setCalloutQueue((prev) => [...prev, ...filtered]);
+      }
     }
 
     if (flights.length > 0) {
@@ -727,7 +940,7 @@ export function PlayingScreen(): React.ReactElement {
       const clearTimer = setTimeout(() => setCoinFlights([]), 1600);
       return () => clearTimeout(clearTimer);
     }
-  }, [gameState, gameState?.log.length, eventSubtitles]);
+  }, [gameState, gameState?.log.length, subtitleMode]);
 
   const activePlayerId = gameState?.turn ?? '';
   const isMyTurn = myRole === 'player' && activePlayerId === myPlayerId;
@@ -750,7 +963,12 @@ export function PlayingScreen(): React.ReactElement {
   const selectedProfile = useMemo(
     () =>
       selectedTile
-        ? getCharacterProfile(selectedTile.nation, selectedTile.gender, selectedTile.jokerNation)
+        ? getCharacterProfile(
+            selectedTile.nation,
+            selectedTile.gender,
+            selectedTile.jokerNation,
+            selectedTile.id,
+          )
         : null,
     [selectedTile],
   );
@@ -788,7 +1006,7 @@ export function PlayingScreen(): React.ReactElement {
   if (!snapshot || !gameState) return <div />;
 
   const activePlayerObj = gameState.players.find((p) => p.id === activePlayerId);
-  const activeCallout = eventSubtitles ? (calloutQueue[0] ?? null) : null;
+  const activeCallout = subtitleMode !== 'off' ? (calloutQueue[0] ?? null) : null;
 
   const showAnchoredToast = (row: number, col: number, text: string) => {
     setWhyCannotBanner(text);
@@ -809,7 +1027,7 @@ export function PlayingScreen(): React.ReactElement {
       showAnchoredToast(
         seat.row,
         seat.col,
-        'Primero elige una carta de tu mano en la parte inferior.',
+        'Primero elige una ficha de tu mano en la parte inferior.',
       );
       return;
     }
@@ -846,6 +1064,19 @@ export function PlayingScreen(): React.ReactElement {
     setFocusedTableId(focusedTableId === table.id ? null : table.id);
   };
 
+  const handleCycleFocusedTable3D = () => {
+    const occupiedTables = gameState.tables.filter((t) =>
+      t.seatIds.some((sid) => gameState.seats.find((s) => s.id === sid)?.occupant !== null),
+    );
+    const pool = occupiedTables.length > 0 ? occupiedTables : gameState.tables;
+    if (pool.length === 0) return;
+    const currentIdx = pool.findIndex((t) => t.id === focusedTableId);
+    const nextTable = pool[(currentIdx + 1) % pool.length];
+    if (nextTable) {
+      setFocusedTableId(nextTable.id);
+    }
+  };
+
   const handleBarClick = () => {
     if (!isMyTurn) {
       showAnchoredToast(6, 6, 'Solo puedes servir en la barra durante tu turno.');
@@ -860,7 +1091,7 @@ export function PlayingScreen(): React.ReactElement {
       return;
     }
     if (!selectedTile) {
-      showAnchoredToast(6, 6, 'Selecciona primero una carta natural de tu mano.');
+      showAnchoredToast(6, 6, 'Selecciona primero una ficha natural de tu mano.');
       return;
     }
     if (selectedTile.nation === 'joker') {
@@ -872,7 +1103,12 @@ export function PlayingScreen(): React.ReactElement {
     const nextBarIdx = gameState.bar.findIndex((b) => b === null);
     const barPoints = nextBarIdx >= 0 ? (gameState.barValues[nextBarIdx] ?? -14) : -14;
     const barMove = { type: 'bar' as const, tileId: selectedTile.id };
-    const profile = getCharacterProfile(selectedTile.nation, selectedTile.gender);
+    const profile = getCharacterProfile(
+      selectedTile.nation,
+      selectedTile.gender,
+      selectedTile.jokerNation,
+      selectedTile.id,
+    );
 
     if (barPoints < 0) {
       setPendingNegativeConfirm({
@@ -888,36 +1124,70 @@ export function PlayingScreen(): React.ReactElement {
 
   return (
     <div
-      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between px-1.5 py-1 sm:px-4 sm:py-2 gap-1 max-w-[1440px] mx-auto select-none"
+      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between px-1.5 py-1 sm:px-4 sm:py-1.5 gap-0.5 sm:gap-1 max-w-[1440px] mx-auto select-none"
       data-testid="playing-viewport"
     >
       {/* 3D Coin Flip Animation Overlay */}
       <FlyingCoinsLayer flights={coinFlights} reducedMotion={reducedMotion} />
 
-      {/* ROCKET LEAGUE STYLE EVENT CALLOUT OVERLAY (P1.3) */}
+      {/* ORIGINAL HANDCRAFTED EVENT SUBTITLE CALLOUT OVERLAY (P1.2: Cómic / Café / Arcade) */}
       {activeCallout && (
         <div
           role="status"
           aria-live="polite"
           data-testid="arcade-event-callout"
-          className={`pointer-events-none fixed top-14 left-1/2 -translate-x-1/2 z-50 px-5 py-2 rounded-2xl border-2 shadow-[0_12px_30px_rgba(0,0,0,0.35)] text-center ${
+          data-subtitle-style={subtitleStyle}
+          className={`pointer-events-none fixed top-14 left-1/2 -translate-x-1/2 z-50 text-center transition-transform ${
             reducedMotion ? '' : 'animate-bounce'
           } ${
-            activeCallout.tone === 'gold'
-              ? 'bg-[#3E2F2A] border-[#F2C14E] text-[#FFF9F0]'
-              : activeCallout.tone === 'green'
-                ? 'bg-[#224A36] border-[#8CE0B5] text-[#FFF9F0]'
-                : activeCallout.tone === 'red'
-                  ? 'bg-[#6E1B16] border-[#FFB4AB] text-[#FFF9F0]'
-                  : 'bg-[#1E4E8C] border-[#FFF9F0] text-[#FFF9F0]'
+            subtitleStyle === 'comic'
+              ? 'bg-[#FFF9F0] text-[#231712] border-[3px] border-[#231712] shadow-[5px_5px_0px_#231712] rounded-2xl px-5 py-2 -rotate-1'
+              : subtitleStyle === 'cafe'
+                ? 'bg-[#F7EEDF] text-[#3E2F2A] border-2 border-[#8B5E3C] ring-2 ring-inset ring-[#C9A227]/75 shadow-[0_10px_24px_rgba(62,47,42,0.28)] rounded-xl px-5 py-2'
+                : activeCallout.tone === 'gold'
+                  ? 'bg-[#3E2F2A] border-2 border-[#F2C14E] text-[#FFF9F0] rounded-2xl px-5 py-2 shadow-xl'
+                  : activeCallout.tone === 'green'
+                    ? 'bg-[#224A36] border-2 border-[#8CE0B5] text-[#FFF9F0] rounded-2xl px-5 py-2 shadow-xl'
+                    : activeCallout.tone === 'red'
+                      ? 'bg-[#6E1B16] border-2 border-[#FFB4AB] text-[#FFF9F0] rounded-2xl px-5 py-2 shadow-xl'
+                      : 'bg-[#1E4E8C] border-2 border-[#FFF9F0] text-[#FFF9F0] rounded-2xl px-5 py-2 shadow-xl'
           }`}
         >
-          <div className="font-serif font-extrabold text-lg sm:text-2xl tracking-wider uppercase text-[#F2C14E] drop-shadow">
+          <div
+            className={`font-serif font-extrabold text-lg sm:text-2xl tracking-wider uppercase ${
+              subtitleStyle === 'comic'
+                ? activeCallout.tone === 'red'
+                  ? 'text-[#A94438]'
+                  : activeCallout.tone === 'green'
+                    ? 'text-[#2E7D52]'
+                    : 'text-[#C96F4A]'
+                : subtitleStyle === 'cafe'
+                  ? 'text-[#3E2F2A]'
+                  : 'text-[#F2C14E]'
+            }`}
+          >
             {activeCallout.title}
           </div>
-          <div className="text-[11px] sm:text-xs font-bold text-[#FFF9F0]/95">
+          <div
+            className={`text-[11px] sm:text-xs font-bold ${
+              subtitleStyle === 'comic' || subtitleStyle === 'cafe'
+                ? 'text-[#6F5A4E]'
+                : 'text-[#FFF9F0]/95'
+            }`}
+          >
             {activeCallout.subtitle}
           </div>
+          {subtitleStyle === 'comic' && (
+            <svg
+              width="20"
+              height="12"
+              viewBox="0 0 20 12"
+              aria-hidden="true"
+              className="mx-auto -mb-4 mt-0.5"
+            >
+              <polygon points="2,0 18,0 10,11" fill="#FFF9F0" stroke="#231712" strokeWidth="3" />
+            </svg>
+          )}
         </div>
       )}
 
@@ -982,7 +1252,7 @@ export function PlayingScreen(): React.ReactElement {
                 />
                 <span
                   className="text-[10px] font-mono font-semibold text-[#6F5A4E] bg-[#FFF9F0] px-1 py-0.2 rounded border border-[#3E2F2A]/15 tabular-nums"
-                  title={`${pHandCount} cartas en mano`}
+                  title={`${pHandCount} fichas en mano`}
                 >
                   {pHandCount}c
                 </span>
@@ -998,8 +1268,90 @@ export function PlayingScreen(): React.ReactElement {
           </span>
         </div>
 
-        {/* Right: Rival Hands Dropdown, "Ver café" 3D Modal, Log/Chat Drawer, Settings */}
+        {/* Right: Legend '?', Rival Hands, Subtitles Dropdown, "Ver café" 3D Modal, Log/Chat Drawer, Settings */}
         <div className="flex items-center gap-1 text-xs relative">
+          {/* Board Legend '?' Button & Popover (P0.1) */}
+          <div className="relative">
+            <button
+              type="button"
+              data-testid="board-legend-btn"
+              onClick={() => setLegendOpen((v) => !v)}
+              aria-expanded={legendOpen}
+              aria-label="Leyenda del tablero"
+              title="Leyenda del tablero: mesa, silla, silla compartida, ficha y barra"
+              className="min-h-[34px] w-8 rounded-xl bg-[#FEF6E0] border border-[#C9A227] font-serif font-extrabold text-sm text-[#3E2F2A] hover:bg-[#F2C14E]/40 cursor-pointer"
+            >
+              ?
+            </button>
+
+            {legendOpen && (
+              <div
+                data-testid="board-legend-popover"
+                role="dialog"
+                aria-label="Leyenda visual del tablero"
+                className="fixed sm:absolute right-2 sm:right-0 top-13 sm:top-full mt-1 z-50 w-[min(92vw,330px)] bg-[#FFF9F0] text-[#3E2F2A] rounded-2xl p-3 border-2 border-[#8B5E3C] shadow-[0_12px_32px_rgba(62,47,42,0.28)] space-y-2 text-xs"
+              >
+                <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-1.5">
+                  <span className="font-serif font-bold text-sm">Cómo leer el tablero</span>
+                  <button
+                    type="button"
+                    onClick={() => setLegendOpen(false)}
+                    className="text-xs font-bold text-[#6F5A4E] hover:text-[#3E2F2A] px-1.5 cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <ul className="space-y-1.5 text-[11px] leading-snug">
+                  <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
+                    <span className="w-6 h-6 rounded-full bg-[#FFF9F0] border-2 border-[#3B5BA5] flex items-center justify-center shrink-0">
+                      <FlagBadge nation="fr" size={12} />
+                    </span>
+                    <div>
+                      <strong>Mesa nacional:</strong> mantel claro con su bandera en el centro.
+                      Tócala para activar el <em>Modo enfoque</em>.
+                    </div>
+                  </li>
+                  <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
+                    <span className="w-6 h-6 rounded-md bg-[#FFF9F0] border border-[#231712] flex items-center justify-center shrink-0 overflow-hidden">
+                      <CharacterPortrait nation="fr" gender="F" size={22} />
+                    </span>
+                    <div>
+                      <strong>Ficha sentada:</strong> mini-ficha cuadrada con bandera de fondo y
+                      caricatura del invitado.
+                    </div>
+                  </li>
+                  <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
+                    <span className="w-6 h-6 rounded-md bg-[#FFF9F0] border-2 border-[#5C3A21] flex items-center justify-center gap-0.5 shrink-0">
+                      <FlagBadge nation="fr" size={6} />
+                      <FlagBadge nation="en" size={6} />
+                    </span>
+                    <div>
+                      <strong>Silla compartida:</strong> cojín bicolor con 2 banderitas; puntúa en
+                      ambas mesas.
+                    </div>
+                  </li>
+                  <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
+                    <span className="w-6 h-6 rounded-md bg-[#8B5E3C] border border-[#5C3A21] flex items-center justify-center shrink-0">
+                      <span className="w-3.5 h-3.5 rounded-xs bg-[#F7EEDF]" />
+                    </span>
+                    <div>
+                      <strong>Silla vacía:</strong> madera y cojín neutro crema, sin bandera.
+                    </div>
+                  </li>
+                  <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
+                    <span className="w-6 h-6 rounded-full bg-[#F2C14E] border border-[#3E2F2A] font-mono font-bold text-[9px] flex items-center justify-center shrink-0">
+                      +1
+                    </span>
+                    <div>
+                      <strong>Barra central:</strong> 20 posavasos (+1 a +5 y luego -2 a -14).
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
+
           <div className="relative">
             <button
               type="button"
@@ -1042,19 +1394,25 @@ export function PlayingScreen(): React.ReactElement {
                           {p.score} pts · {pHand.length}c
                         </span>
                       </div>
-                      <div className="flex flex-wrap gap-1">
+                      <div className="flex flex-wrap gap-1.5">
                         {pHand.map((t) => {
-                          const prof = getCharacterProfile(t.nation, t.gender);
+                          const prof = getCharacterProfile(
+                            t.nation,
+                            t.gender,
+                            t.jokerNation,
+                            t.id,
+                          );
                           return (
                             <div
                               key={t.id}
-                              className="inline-flex items-center gap-1 bg-[#FFF9F0] px-1.5 py-0.5 rounded-lg border border-[#3E2F2A]/15 text-[10px]"
+                              aria-label={`${prof.name}, ${prof.countryName}, ${
+                                t.gender === 'F' ? 'Mujer' : 'Hombre'
+                              }`}
+                              title={`${prof.name} · ${prof.countryName} (${prof.genderBadge})`}
+                              className="inline-flex items-center gap-1 bg-[#FFF9F0] p-0.5 pr-1.5 rounded-lg border border-[#3E2F2A]/20 text-[10px]"
                             >
-                              <FlagBadge nation={t.nation} size={11} />
+                              <CharacterPortrait nation={t.nation} gender={t.gender} size={22} />
                               <span className="font-bold">{prof.name}</span>
-                              <span className="text-[#6F5A4E] font-semibold">
-                                {prof.genderBadge}
-                              </span>
                             </div>
                           );
                         })}
@@ -1064,6 +1422,10 @@ export function PlayingScreen(): React.ReactElement {
                 })}
               </div>
             )}
+          </div>
+
+          <div className="hidden md:block">
+            <SubtitlesDropdownPicker compact />
           </div>
 
           <button
@@ -1104,8 +1466,8 @@ export function PlayingScreen(): React.ReactElement {
         </div>
       </header>
 
-      {/* CENTER BOARD WORKSPACE (Takes remaining height, zero overflow, tight to header on mobile) */}
-      <div className="flex-1 min-h-0 w-full flex items-start pt-0.5 sm:items-center sm:pt-0 justify-center relative overflow-hidden">
+      {/* CENTER BOARD WORKSPACE (Row 2: Occupies its own dedicated row without overlapping hand dock) */}
+      <div className="flex-1 min-h-0 w-full flex items-center justify-center relative overflow-hidden">
         {errorBanner && (
           <div
             role="alert"
@@ -1131,26 +1493,56 @@ export function PlayingScreen(): React.ReactElement {
         />
       </div>
 
-      {/* BOTTOM FIXED HAND DOCK (Clear 2:3 Character Cards + Confirm Action) */}
+      {/* BOTTOM TRANSLUCENT HAND DOCK (Row 3:P0.2 & P0.3 — 5 Large Square Flag+Caricature Tiles with ZERO text on tiles + Detail Panel on selection) */}
       <section
         aria-label="Tu mano de invitados"
         data-testid="player-hand-dock"
-        className="shrink-0 bg-[#FFF9F0] rounded-2xl border border-[#3E2F2A]/15 px-2 py-1 sm:px-3.5 sm:py-1.5 shadow-[0_-4px_18px_rgba(62,47,42,0.08)] z-30 flex flex-col sm:flex-row items-center justify-between gap-1.5"
+        className="shrink-0 bg-[#FFF9F0]/65 backdrop-blur-md rounded-2xl border border-[#3E2F2A]/20 px-2 py-1 sm:px-3.5 sm:py-1.5 shadow-[0_-4px_18px_rgba(62,47,42,0.08)] z-30 flex flex-col sm:flex-row items-center justify-between gap-1.5"
       >
-        {/* Left / Top Mini Status & Joker Nation Selector */}
-        <div className="flex flex-wrap items-center justify-between w-full sm:w-auto gap-1.5">
-          <div className="text-xs min-w-0">
-            <span className="font-serif font-bold text-[#3E2F2A] block leading-tight">
-              Tu mano ({myHand.length}/{gameState.handSize[myPlayerId ?? activePlayerId] ?? 5})
-            </span>
-            <span className="text-[10px] sm:text-[11px] text-[#6F5A4E] truncate block max-w-[240px]">
-              {draftPlacements.length > 0
-                ? draftEvaluation.summaryText
-                : selectedProfile
-                  ? `${selectedProfile.name}: «${selectedProfile.quote}»`
-                  : 'Elige una carta para iluminar sus sillas'}
-            </span>
-          </div>
+        {/* Left / Top: Compact Selection Detail Panel (Text lives here, NOT on the square tiles) */}
+        <div className="flex flex-wrap items-center justify-between w-full sm:w-auto sm:min-w-[230px] sm:max-w-[290px] gap-1.5">
+          {selectedTile && selectedProfile ? (
+            <div
+              data-testid="selected-tile-detail"
+              className="flex items-center gap-2 bg-[#FFF9F0] px-2.5 py-1 rounded-xl border border-[#C96F4A] shadow-2xs w-full"
+            >
+              <FlagBadge nation={selectedTile.nation} size={20} />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-serif font-bold text-xs sm:text-sm text-[#3E2F2A] truncate">
+                    {selectedProfile.name}
+                  </span>
+                  <span className="text-[10px] font-bold text-[#6F5A4E] truncate">
+                    · {selectedProfile.countryName}
+                  </span>
+                  <span
+                    data-testid="selected-gender-badge"
+                    className={`ml-auto px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                      selectedTile.gender === 'F'
+                        ? 'bg-[#FDECEB] text-[#9E2A2B]'
+                        : 'bg-[#E6EEF8] text-[#1E4E8C]'
+                    }`}
+                  >
+                    {selectedProfile.genderBadge}
+                  </span>
+                </div>
+                <span className="block text-[10px] text-[#6F5A4E] italic truncate">
+                  «{selectedProfile.quote}»
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="text-xs min-w-0 px-1">
+              <span className="font-serif font-bold text-[#3E2F2A] block leading-tight">
+                Tu mano ({myHand.length}/{gameState.handSize[myPlayerId ?? activePlayerId] ?? 5})
+              </span>
+              <span className="text-[10px] sm:text-[11px] text-[#6F5A4E] truncate block max-w-[240px]">
+                {draftPlacements.length > 0
+                  ? draftEvaluation.summaryText
+                  : 'Toca una ficha cuadrada para ver su detalle y sillas'}
+              </span>
+            </div>
+          )}
 
           {selectedTile?.nation === 'joker' && (
             <label className="inline-flex items-center gap-1 text-[11px] font-bold text-[#6F5A4E]">
@@ -1163,7 +1555,7 @@ export function PlayingScreen(): React.ReactElement {
                     e.target.value ? (e.target.value as Nation) : undefined,
                   )
                 }
-                className="h-7 px-2 rounded-lg bg-[#F7EEDF] border border-[#3E2F2A]/25 text-xs font-bold text-[#3E2F2A]"
+                className="h-7 px-2 rounded-lg bg-[#FFF9F0] border border-[#3E2F2A]/25 text-xs font-bold text-[#3E2F2A]"
               >
                 <option value="">Automático</option>
                 {Object.values(NATION_VISUALS).map((n) => (
@@ -1176,85 +1568,49 @@ export function PlayingScreen(): React.ReactElement {
           )}
         </div>
 
-        {/* Center: Clear 2:3 Character Cards (P0.6: Top Country Ribbon + Large MUJER/HOMBRE Badge + Big Portrait) */}
-        <div className="grid grid-cols-5 gap-1 w-full sm:w-auto sm:flex sm:items-end sm:justify-center sm:gap-2 py-0.5">
-          {myHand.map((tile, idx) => {
+        {/* Center: 5 Opaque Square Rounded Tiles (Flag Background + Caricature, ZERO visible text) */}
+        <div
+          className="grid grid-cols-5 gap-1.5 w-full max-w-[360px] sm:max-w-none sm:w-auto sm:flex sm:items-center sm:justify-center sm:gap-2.5 py-0.5"
+          data-testid="hand-tiles-row"
+        >
+          {myHand.map((tile) => {
             const isSelected = selectedTileId === tile.id;
             const isInDraft = draftPlacements.some((d) => d.tileId === tile.id);
-            const profile = getCharacterProfile(tile.nation, tile.gender, tile.jokerNation);
-            const natVisual =
-              tile.nation === 'joker'
-                ? null
-                : (NATION_VISUALS[tile.nation as NationKey] ?? NATION_VISUALS.fr);
-            const ribbonBg = natVisual ? natVisual.primaryColor : '#8A3F5D';
-            const mid = (myHand.length - 1) / 2;
-            const fanAngle = reducedMotion ? 0 : (idx - mid) * 1.8;
-            const fanLift = reducedMotion ? 0 : Math.abs(idx - mid) * 1.2;
+            const profile = getCharacterProfile(
+              tile.nation,
+              tile.gender,
+              tile.jokerNation,
+              tile.id,
+            );
+            const genderWord = tile.gender === 'F' ? 'Mujer' : 'Hombre';
 
             return (
               <button
                 key={tile.id}
                 type="button"
                 data-tile-id={tile.id}
+                data-testid="hand-square-tile"
                 disabled={isInDraft}
                 onClick={() => selectTile(isSelected ? null : tile.id)}
-                aria-label={`Carta ${profile.name}, ${profile.countryName}, ${profile.genderBadge}`}
+                aria-label={`${profile.name}, ${profile.countryName}, ${genderWord}`}
+                title={`${profile.name} · ${profile.countryName} (${genderWord})`}
                 style={{
-                  transform: isSelected
-                    ? 'translateY(-6px) scale(1.04)'
-                    : `translateY(${fanLift}px) rotate(${fanAngle}deg)`,
+                  transform: isSelected && !reducedMotion ? 'translateY(-5px) scale(1.06)' : undefined,
                 }}
-                className={`group relative aspect-[2/3] w-full sm:w-[92px] sm:h-[134px] min-h-[96px] rounded-xl border-2 p-1 flex flex-col items-center justify-between text-center transition-all duration-150 cursor-pointer select-none shrink-0 overflow-hidden ${
+                className={`group relative aspect-square w-full sm:w-[74px] sm:h-[74px] rounded-[14px] p-0.5 flex items-center justify-center transition-all duration-150 cursor-pointer select-none shrink-0 ${
                   isInDraft
-                    ? 'opacity-35 bg-[#F7EEDF] border-[#3E2F2A]/20'
+                    ? 'opacity-35 bg-[#FFF9F0] ring-1 ring-[#3E2F2A]/20'
                     : isSelected
-                      ? 'bg-[#FEF6E0] border-[#C96F4A] shadow-[0_8px_18px_rgba(201,111,74,0.28)] z-20'
-                      : 'bg-[#FFF9F0] border-[#3E2F2A]/25 hover:border-[#3E2F2A] shadow-xs'
+                      ? 'bg-[#FFF9F0] ring-3 ring-[#C96F4A] shadow-[0_8px_18px_rgba(201,111,74,0.34)] z-20'
+                      : 'bg-[#FFF9F0] hover:scale-103 shadow-sm'
                 }`}
               >
-                {/* 1. TOP RIBBON: Flag + UPPERCASE COUNTRY NAME */}
-                <div
-                  style={{ backgroundColor: ribbonBg }}
-                  className="w-full rounded-md px-1 py-0.5 flex items-center justify-center gap-1 text-[#FFF9F0] shadow-2xs"
-                  data-testid="card-country-ribbon"
-                >
-                  <FlagBadge nation={tile.nation} size={11} />
-                  <span className="text-[8px] sm:text-[9px] font-extrabold uppercase tracking-tight truncate">
-                    {profile.countryName}
-                  </span>
-                </div>
-
-                {/* 2. LARGE GENDER BADGE ("MUJER" or "HOMBRE") */}
-                <span
-                  data-testid="card-gender-badge"
-                  className={`w-full rounded px-1 py-0.2 text-[8px] sm:text-[9px] font-extrabold tracking-wide uppercase leading-tight ${
-                    tile.gender === 'F'
-                      ? 'bg-[#FDECEB] text-[#9E2A2B] border border-[#9E2A2B]/25'
-                      : 'bg-[#E6EEF8] text-[#1E4E8C] border border-[#1E4E8C]/25'
-                  }`}
-                >
-                  {profile.genderBadge}
-                </span>
-
-                {/* 3. LARGER PORTRAIT */}
-                <div className="my-auto flex items-center justify-center">
-                  <CharacterPortrait
-                    nation={tile.nation}
-                    gender={tile.gender}
-                    size={40}
-                    sipping={isSelected}
-                  />
-                </div>
-
-                {/* 4. PROPER NAME + SHORT PERSONALITY QUOTE */}
-                <div className="w-full">
-                  <span className="block font-serif font-bold text-[10px] sm:text-xs text-[#3E2F2A] leading-none truncate">
-                    {profile.name}
-                  </span>
-                  <span className="hidden sm:block text-[8px] text-[#6F5A4E] italic leading-tight truncate mt-0.5">
-                    «{profile.quote}»
-                  </span>
-                </div>
+                <CharacterPortrait
+                  nation={tile.nation}
+                  gender={tile.gender}
+                  size={68}
+                  sipping={isSelected}
+                />
               </button>
             );
           })}
@@ -1267,7 +1623,7 @@ export function PlayingScreen(): React.ReactElement {
               <button
                 type="button"
                 onClick={clearDraft}
-                className="min-h-[44px] sm:min-h-[38px] px-3 py-1.5 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/20 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+                className="min-h-[40px] sm:min-h-[38px] px-3 py-1 rounded-xl bg-[#FFF9F0] border border-[#3E2F2A]/25 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
               >
                 Limpiar
               </button>
@@ -1284,7 +1640,7 @@ export function PlayingScreen(): React.ReactElement {
                     placements: second ? [first, second] : [first],
                   });
                 }}
-                className="min-h-[44px] sm:min-h-[38px] px-4 py-1.5 rounded-xl bg-[#3F5E4A] text-[#FFF9F0] text-xs font-bold shadow-sm hover:opacity-95 disabled:opacity-40 cursor-pointer whitespace-nowrap"
+                className="min-h-[40px] sm:min-h-[38px] px-4 py-1 rounded-xl bg-[#3F5E4A] text-[#FFF9F0] text-xs font-bold shadow-sm hover:opacity-95 disabled:opacity-40 cursor-pointer whitespace-nowrap"
               >
                 Confirmar (+{draftEvaluation.totalPoints})
               </button>
@@ -1296,7 +1652,7 @@ export function PlayingScreen(): React.ReactElement {
               key={`${sw.seatId}-${idx}`}
               type="button"
               onClick={() => void submitMove(sw)}
-              className="min-h-[44px] sm:min-h-[38px] px-3 py-1.5 rounded-xl bg-[#C9A227] text-[#3E2F2A] text-xs font-bold hover:opacity-95 cursor-pointer whitespace-nowrap"
+              className="min-h-[40px] sm:min-h-[38px] px-3 py-1 rounded-xl bg-[#C9A227] text-[#3E2F2A] text-xs font-bold hover:opacity-95 cursor-pointer whitespace-nowrap"
             >
               Canjear comodín
             </button>
@@ -1304,7 +1660,7 @@ export function PlayingScreen(): React.ReactElement {
         </div>
       </section>
 
-      {/* ON-DEMAND LAZY-LOADED "VER CAFÉ" 3D DIORAMA MODAL */}
+      {/* ON-DEMAND LAZY-LOADED "VER CAFÉ" 3D DIORAMA MODAL WITH CAMERA PRESETS (P1.1) */}
       {cafeModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-[#3E2F2A]/65 p-3 sm:p-6"
@@ -1323,11 +1679,56 @@ export function PlayingScreen(): React.ReactElement {
                   Invitados 3D tomando café en las 24 mesas y los 20 posavasos de la barra
                 </p>
               </div>
-              <div className="flex items-center gap-1.5 text-xs">
+              <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                {/* 3D Camera Presets: Plano general / Mesas / Barra / Enfocar mesa */}
+                <button
+                  type="button"
+                  data-testid="camera-preset-general"
+                  onClick={() => setCameraPreset('general')}
+                  className={`px-2.5 py-1.5 rounded-xl font-bold cursor-pointer ${
+                    cameraPreset === 'general' && !focusedTableId
+                      ? 'bg-[#3F5E4A] text-[#FFF9F0]'
+                      : 'bg-[#F7EEDF] text-[#3E2F2A] hover:bg-[#EAD9C0]'
+                  }`}
+                >
+                  Plano general
+                </button>
+                <button
+                  type="button"
+                  data-testid="camera-preset-tables"
+                  onClick={() => setCameraPreset('tables')}
+                  className={`px-2.5 py-1.5 rounded-xl font-bold cursor-pointer ${
+                    cameraPreset === 'tables'
+                      ? 'bg-[#3F5E4A] text-[#FFF9F0]'
+                      : 'bg-[#F7EEDF] text-[#3E2F2A] hover:bg-[#EAD9C0]'
+                  }`}
+                >
+                  Mesas
+                </button>
+                <button
+                  type="button"
+                  data-testid="camera-preset-bar"
+                  onClick={() => setCameraPreset('bar')}
+                  className={`px-2.5 py-1.5 rounded-xl font-bold cursor-pointer ${
+                    cameraPreset === 'bar'
+                      ? 'bg-[#3F5E4A] text-[#FFF9F0]'
+                      : 'bg-[#F7EEDF] text-[#3E2F2A] hover:bg-[#EAD9C0]'
+                  }`}
+                >
+                  Barra
+                </button>
+                <button
+                  type="button"
+                  data-testid="focus-table-3d-btn"
+                  onClick={handleCycleFocusedTable3D}
+                  className="px-2.5 py-1.5 rounded-xl bg-[#FEF6E0] border border-[#C9A227] font-bold text-[#3E2F2A] hover:bg-[#F2C14E]/35 cursor-pointer"
+                >
+                  Enfocar mesa
+                </button>
                 <button
                   type="button"
                   onClick={cycleCameraAngle}
-                  className="px-3 py-1.5 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+                  className="px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
                 >
                   Girar 90°
                 </button>
@@ -1350,7 +1751,7 @@ export function PlayingScreen(): React.ReactElement {
                 <button
                   type="button"
                   onClick={resetCamera}
-                  className="px-3 py-1.5 rounded-xl bg-[#F7EEDF] font-semibold text-[#6F5A4E] hover:text-[#3E2F2A] cursor-pointer"
+                  className="px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] font-semibold text-[#6F5A4E] hover:text-[#3E2F2A] cursor-pointer"
                 >
                   Centrar
                 </button>
@@ -1358,7 +1759,7 @@ export function PlayingScreen(): React.ReactElement {
                   type="button"
                   data-testid="close-3d-cafe-btn"
                   onClick={() => setCafeModalOpen(false)}
-                  className="px-4 py-1.5 rounded-xl bg-[#C96F4A] text-[#FFF9F0] font-bold cursor-pointer"
+                  className="px-3.5 py-1.5 rounded-xl bg-[#C96F4A] text-[#FFF9F0] font-bold cursor-pointer"
                 >
                   Volver al tablero
                 </button>
@@ -1367,18 +1768,22 @@ export function PlayingScreen(): React.ReactElement {
 
             <Suspense
               fallback={
-                <div className="h-[380px] sm:h-[480px] flex items-center justify-center bg-[#F7EEDF] rounded-2xl border border-[#3E2F2A]/15 text-sm font-bold text-[#6F5A4E]">
-                  Preparando el café en 3D…
+                <div
+                  className="w-full h-[360px] sm:h-[460px] rounded-2xl bg-[#F7EEDF] flex items-center justify-center text-sm font-serif font-bold text-[#6F5A4E]"
+                  data-testid="cafe-3d-diorama"
+                >
+                  Preparando el salón 3D del café...
                 </div>
               }
             >
-              <PapercraftBoard
+              <LazyPapercraftBoard
                 gameState={gameState}
                 selectedTile={selectedTile}
                 draftPlacements={draftPlacements}
                 seatInspections={seatInspections}
                 focusedTableId={focusedTableId}
                 viewMode="3d"
+                cameraPreset={cameraPreset}
                 cameraAngleIndex={cameraAngleIndex}
                 cameraZoom={cameraZoom}
                 nightMode={nightMode}
@@ -1459,12 +1864,18 @@ export function PlayingScreen(): React.ReactElement {
                           ev.tile.nation,
                           ev.tile.gender,
                           ev.tile.jokerNation,
+                          ev.tile.id,
                         );
                         pid = ev.playerId;
                         desc = `sentó a ${prof.name} (${prof.countryName})`;
                         delta = ev.pointsEarned;
                       } else if (ev.type === 'tile_bar') {
-                        const prof = getCharacterProfile(ev.tile.nation, ev.tile.gender);
+                        const prof = getCharacterProfile(
+                          ev.tile.nation,
+                          ev.tile.gender,
+                          ev.tile.jokerNation,
+                          ev.tile.id,
+                        );
                         pid = ev.playerId;
                         desc = `sirvió a ${prof.name} en la barra (#${ev.barIndex + 1})`;
                         delta = ev.pointsDelta;
