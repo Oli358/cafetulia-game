@@ -12,3 +12,10 @@ Fotos **reales** del tablero físico, aportadas por el usuario. No son imágenes
 - Se usarán los **12 países oficiales** (África, Alemania, China, Cuba, España, Estados Unidos, Francia, India, Inglaterra, Italia, Rusia y Turquía), mapeados por la **posición** de cada mesa.
 - Estas fotos son referencia de **topología y estilo**; no se usarán como textura final del tablero.
 - Pendiente: confirmar el mapeo definitivo de cada una de las 24 mesas.
+
+## Capturas de la v1.0 local
+
+- `ui-portada.png` — portada de Cafetulia.
+- `ui-partida.png` — partida 2.5D + 2D contra un bot, con mano pública, barra y registro.
+
+Las capturas se generaron con Playwright el 2026-10-25.
