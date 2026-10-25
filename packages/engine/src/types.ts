@@ -42,6 +42,7 @@ export type BarSlot = {
 export type Player = {
   id: PlayerId;
   nickname: string;
+  avatarId?: string;
   score: number;
   connected: boolean;
   isBot?: boolean;
@@ -54,6 +55,7 @@ export type GameConfig = {
   players: {
     id: PlayerId;
     nickname: string;
+    avatarId?: string;
     isBot?: boolean;
     botDifficulty?: 'basic' | 'medium' | 'hard';
   }[];

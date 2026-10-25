@@ -5,6 +5,56 @@
 
 ---
 
+## Sesión 012 — 2026-10-25 — v1.2: bugs P0 y mejoras P1/P2
+
+**Objetivo:** integrar la cuarta versión de Argon con los bugs P0 corregidos y las mejoras de cartas, monedas, avatares, subtítulos, 3D y PWA.
+
+**Hecho:**
+- Extraído y analizado `cafetulia (3).zip`.
+- Integrados:
+  - Colores de monedas 1 negra / 5 roja / 10 azul, pilas exactas y coin flip con arco, giro 3D y sombra.
+  - `AnimatedScore` corregido con ref y dependencias estables.
+  - Cartas con cinta de país, badge MUJER/HOMBRE, retrato grande, nombre y frase.
+  - Tablero limpio: banderas solo en mesas y sillas compartidas.
+  - 16 avatares prehechos con `avatarId` en cliente, servidor, API y tipos del motor.
+  - Subtítulos de eventos tipo Rocket League, activables en Ajustes.
+  - Café Vivo 3D con invitados sentados, tazas, sorbo idle y 20 posavasos.
+  - Service worker, carga diferida del 3D, code-splitting y `render.yaml` para plan free.
+- Conservadas nuestras correcciones: Node 24, `pathToFileURL`, `DATABASE_URL`, build script, timeout de tests y Playwright local.
+- Corregidos:
+  - Tipos de `e2e` con `lib: ["ES2022", "DOM"]`.
+  - Etiquetas de fin de partida.
+  - Cámara del modal 3D para que no se corte el tablero.
+  - Limpieza de monedas voladoras a 1600 ms para no cortar la animación.
+  - `PapercraftBoard` ahora se carga con `lazy` + `Suspense` (chunk propio).
+  - Service worker solo en producción.
+- Verificado:
+  - `typecheck`, `build`, `lint` → OK.
+  - **46 tests en verde**.
+  - E2E completo: portada, lobby y partida sin scroll en 1280×800 y 390×844; avatares; cartas; sillas; modal 3D.
+  - Jugada real con monedas y cartas nuevas.
+- Capturas nuevas en `docs/referencias/ui-portada.png`, `ui-portada-movil.png`, `ui-partida.png`, `ui-partida-movil.png` y `ui-cafe-3d.png`.
+
+**Decisiones:**
+- v1.2 integrada y verificada (D-065).
+- 16 avatares prehechos y `avatarId` compartido (D-066).
+- Subtítulos de eventos activables (D-067).
+- Monedas 1/5/10 con coin flip (D-068).
+- Café Vivo 3D con carga diferida (D-069).
+
+**Problemas:**
+- En el modal 3D las personas se ven pequeñas con el zoom por defecto; conviene acercar la cámara o añadir enfoque de mesa.
+- Las frases de las cartas pequeñas se recortan; habría que acortarlas o moverlas a un panel de detalle.
+- Render free usa SQLite en `/tmp` (efímero); para persistencia real haría falta un plan con disco o Postgres.
+- Falta probar en iPhone/Android reales y desplegar.
+
+**Siguiente:**
+1. Desplegar en Render y probar en móviles reales.
+2. Ajustar zoom 3D por defecto y legibilidad de cartas.
+3. QA final con la novia.
+
+---
+
 ## Sesión 011 — 2026-10-25 — Rediseño de UI v3
 
 **Objetivo:** integrar la nueva versión de Argon con el rediseño visual: pantalla única, tablero ilustrado, cartas con personalidad y monedas animadas.

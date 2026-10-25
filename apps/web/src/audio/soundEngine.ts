@@ -16,6 +16,7 @@ export type SfxKind =
   | 'coinClink'
   | 'coinPenalty'
   | 'bell'
+  | 'calloutSting'
   | 'victoryFanfare';
 
 class CafetuliaSoundEngine {
@@ -64,12 +65,11 @@ class CafetuliaSoundEngine {
 
   public startLoops(): void {
     if (!this.unlocked || this.volumes.muted || this.loopTimer) return;
-    // 76 BPM warm lo-fi chord step every ~1.58s
     const chords: number[][] = [
-      [261.63, 329.63, 392.0, 493.88], // Cmaj7
-      [220.0, 261.63, 329.63, 392.0], // Am7
-      [293.66, 349.23, 440.0, 523.25], // Dm7
-      [196.0, 246.94, 293.66, 349.23], // G7
+      [261.63, 329.63, 392.0, 493.88],
+      [220.0, 261.63, 329.63, 392.0],
+      [293.66, 349.23, 440.0, 523.25],
+      [196.0, 246.94, 293.66, 349.23],
     ];
 
     this.loopTimer = setInterval(() => {
@@ -94,7 +94,6 @@ class CafetuliaSoundEngine {
         }
       }
 
-      // Occasional subtle ceramic cup clink in ambience channel
       if (this.volumes.ambience > 0.01 && this.stepIndex % 3 === 1) {
         const osc = this.ctx.createOscillator();
         const gain = this.ctx.createGain();
@@ -174,6 +173,11 @@ class CafetuliaSoundEngine {
       case 'bell': {
         this.tone(880, 880, 0.28, vol * 0.75, 'sine', now);
         this.tone(1318.5, 1318.5, 0.22, vol * 0.4, 'sine', now + 0.02);
+        break;
+      }
+      case 'calloutSting': {
+        this.tone(587.33, 880, 0.14, vol * 0.75, 'triangle', now);
+        this.tone(880, 1174.66, 0.18, vol * 0.6, 'sine', now + 0.06);
         break;
       }
       case 'victoryFanfare': {

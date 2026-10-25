@@ -60,6 +60,7 @@ export function createGame(config: GameConfig, seed: number | string = 1): GameS
   const players: Player[] = config.players.map((p) => ({
     id: p.id,
     nickname: p.nickname,
+    avatarId: p.avatarId,
     score: 0,
     connected: true,
     isBot: p.isBot,

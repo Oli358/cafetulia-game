@@ -11,6 +11,27 @@ export default defineConfig(() => {
         '@': path.resolve(import.meta.dirname, '.'),
       },
     },
+    optimizeDeps: {
+      include: ['three', 'three/addons/environments/RoomEnvironment.js'],
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules/three')) {
+              return 'three-vendor';
+            }
+            if (
+              id.includes('node_modules/react') ||
+              id.includes('node_modules/react-dom') ||
+              id.includes('node_modules/zustand')
+            ) {
+              return 'react-vendor';
+            }
+          },
+        },
+      },
+    },
     server: {
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modify—file watching is disabled to prevent flickering during agent edits.

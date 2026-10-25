@@ -1,63 +1,63 @@
-import React, { useEffect, useState } from 'react';
-import { decomposeCoins } from '@cafetulia/ui';
+import React, { useEffect, useRef, useState } from 'react';
+import { COIN_DENOMINATION_STYLES, decomposeCoins } from '@cafetulia/ui';
 
 export function CoinChip({
   denomination,
-  size = 18,
+  size = 20,
   isNegative = false,
 }: {
   denomination: 10 | 5 | 1;
   size?: number;
   isNegative?: boolean;
 }): React.ReactElement {
-  const fill = isNegative
-    ? '#A94438'
-    : denomination === 10
-      ? '#C9A227'
-      : denomination === 5
-        ? '#C96F4A'
-        : '#B9855A';
-
-  const innerRing = isNegative
-    ? '#FDECEB'
-    : denomination === 10
-      ? '#FEF6E0'
-      : denomination === 5
-        ? '#FFF9F0'
-        : '#F7EEDF';
-
-  const textCol =
-    isNegative || denomination === 5 || denomination === 1 ? '#FFF9F0' : '#3E2F2A';
+  // P0.2: 1 = NEGRA (#1F1F1F), 5 = ROJA (#B3261E), 10 = AZUL (#1E4E8C), always cream text (#FFF9F0).
+  // When negative, keep the denomination color and add a red subtraction border/badge.
+  const style = COIN_DENOMINATION_STYLES[denomination];
 
   return (
     <svg
       width={size}
       height={size}
       viewBox="0 0 28 28"
-      aria-hidden="true"
-      className="inline-block shrink-0 select-none drop-shadow-[0_1px_2px_rgba(62,47,42,0.28)]"
+      data-denomination={denomination}
+      data-negative={isNegative ? 'true' : 'false'}
+      aria-label={`${style.label}${isNegative ? ' (resta)' : ''}`}
+      className="inline-block shrink-0 select-none drop-shadow-[0_1px_2px_rgba(31,31,31,0.35)]"
     >
-      <circle cx="14" cy="14" r="12.5" fill={fill} stroke="#3E2F2A" strokeWidth="2" />
       <circle
         cx="14"
         cy="14"
-        r="9.5"
+        r="12.5"
+        fill={style.fill}
+        stroke={isNegative ? '#E53935' : '#FFF9F0'}
+        strokeWidth={isNegative ? '2.4' : '1.6'}
+      />
+      <circle
+        cx="14"
+        cy="14"
+        r="9.6"
         fill="none"
-        stroke={innerRing}
-        strokeWidth="1.2"
+        stroke={style.ring}
+        strokeWidth="1.1"
         strokeDasharray={denomination === 10 ? '2.5 1.5' : undefined}
       />
       <text
         x="14"
         y="18"
         textAnchor="middle"
-        fill={textCol}
+        fill={style.text}
         fontSize={denomination === 10 ? '10' : '11'}
         fontWeight="800"
         fontFamily="monospace"
       >
         {denomination}
       </text>
+      {isNegative && (
+        <g transform="translate(21, 6)">
+          <circle cx="0" cy="0" r="4.5" fill="#B3261E" stroke="#FFF9F0" strokeWidth="1.1" />
+          <line x1="-2.3" y1="0" x2="2.3" y2="0" stroke="#FFF9F0" strokeWidth="1.6" />
+        </g>
+      )}
     </svg>
   );
 }
@@ -73,21 +73,28 @@ export function AnimatedScore({
 }): React.ReactElement {
   const [displayed, setDisplayed] = useState(value);
   const [pulse, setPulse] = useState<'up' | 'down' | null>(null);
+  // P0.4: Use a ref for the previous value and depend only on [value, reducedMotion]
+  const prevValueRef = useRef(value);
 
   useEffect(() => {
-    if (value === displayed) return;
-    const direction = value > displayed ? 'up' : 'down';
+    const start = prevValueRef.current;
+    if (value === start) {
+      setDisplayed(value);
+      return;
+    }
+
+    const direction = value > start ? 'up' : 'down';
     setPulse(direction);
 
     if (reducedMotion) {
+      prevValueRef.current = value;
       setDisplayed(value);
-      const t = setTimeout(() => setPulse(null), 250);
+      const t = setTimeout(() => setPulse(null), 220);
       return () => clearTimeout(t);
     }
 
-    const start = displayed;
     const diff = value - start;
-    const duration = Math.min(520, Math.max(200, Math.abs(diff) * 35));
+    const duration = Math.min(480, Math.max(180, Math.abs(diff) * 28));
     const startTime = performance.now();
     let rafId = 0;
 
@@ -95,22 +102,28 @@ export function AnimatedScore({
       const elapsed = now - startTime;
       const t = Math.min(1, elapsed / duration);
       const eased = 1 - Math.pow(1 - t, 3);
-      setDisplayed(Math.round(start + diff * eased));
+      const current = Math.round(start + diff * eased);
+      setDisplayed(current);
       if (t < 1) {
         rafId = requestAnimationFrame(step);
       } else {
+        prevValueRef.current = value;
         setDisplayed(value);
       }
     };
 
     rafId = requestAnimationFrame(step);
-    const clearPulse = setTimeout(() => setPulse(null), duration + 180);
+    const clearPulse = setTimeout(() => {
+      prevValueRef.current = value;
+      setPulse(null);
+    }, duration + 140);
 
     return () => {
       cancelAnimationFrame(rafId);
       clearTimeout(clearPulse);
+      prevValueRef.current = value;
     };
-  }, [value, displayed, reducedMotion]);
+  }, [value, reducedMotion]);
 
   return (
     <span
@@ -118,7 +131,7 @@ export function AnimatedScore({
         pulse === 'up'
           ? 'text-[#3F5E4A] scale-110'
           : pulse === 'down'
-            ? 'text-[#A94438] scale-110'
+            ? 'text-[#B3261E] scale-110'
             : ''
       } ${className}`}
     >
@@ -138,26 +151,44 @@ export function CoinTray({
   compact?: boolean;
   reducedMotion?: boolean;
 }): React.ReactElement {
+  // P0.3: Exact coin representation (stacks with ×count; 0 coins when score === 0)
   const breakdown = decomposeCoins(score);
-  const visibleChips = breakdown.chips.slice(0, compact ? 4 : 7);
 
   return (
     <div
       data-player-tray={playerId}
       data-testid={`coin-tray-${playerId}`}
-      className="inline-flex items-center gap-1.5"
-      title={`Bandeja de monedas: ${breakdown.tens} de 10, ${breakdown.fives} de 5 y ${breakdown.ones} de 1`}
+      className="inline-flex items-center gap-1"
+      title={
+        score === 0
+          ? 'Saldo: 0 puntos (sin monedas)'
+          : `Bandeja de monedas (${score < 0 ? 'resta ' : ''}${Math.abs(score)} pts): ${breakdown.tens}×10, ${breakdown.fives}×5, ${breakdown.ones}×1`
+      }
     >
-      <div className="flex items-center -space-x-1.5">
-        {visibleChips.map((denom, idx) => (
-          <CoinChip
-            key={`${denom}-${idx}`}
-            denomination={denom}
-            size={compact ? 16 : 20}
-            isNegative={breakdown.isNegative}
-          />
-        ))}
-      </div>
+      {breakdown.stacks.length > 0 && (
+        <div
+          className="inline-flex items-center gap-1"
+          data-testid={`coin-stacks-${playerId}`}
+        >
+          {breakdown.stacks.map((stack) => (
+            <span
+              key={stack.denomination}
+              className="inline-flex items-center gap-0.5 bg-[#FFF9F0]/90 px-1 py-0.2 rounded-full border border-[#3E2F2A]/15"
+            >
+              <CoinChip
+                denomination={stack.denomination}
+                size={compact ? 15 : 18}
+                isNegative={breakdown.isNegative}
+              />
+              {stack.count > 1 && (
+                <span className="font-mono font-extrabold text-[9px] sm:text-[10px] text-[#3E2F2A] tabular-nums leading-none">
+                  ×{stack.count}
+                </span>
+              )}
+            </span>
+          ))}
+        </div>
+      )}
       <span className="inline-flex items-baseline gap-0.5">
         <AnimatedScore
           value={score}
@@ -178,6 +209,124 @@ export type CoinFlightEvent = {
   targetSelector: string;
 };
 
+type FlyingCoinItem = {
+  key: string;
+  denomination: 10 | 5 | 1;
+  isPenalty: boolean;
+  startX: number;
+  startY: number;
+  endX: number;
+  endY: number;
+  delayMs: number;
+};
+
+function CoinFlipParticle({ item }: { item: FlyingCoinItem }): React.ReactElement {
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const spinRef = useRef<HTMLDivElement | null>(null);
+  const shadowRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    const spinner = spinRef.current;
+    const shadow = shadowRef.current;
+    if (!wrapper || !spinner) return;
+
+    const midX = (item.startX + item.endX) / 2;
+    const arcLift = Math.min(110, Math.max(55, Math.hypot(item.endX - item.startX, item.endY - item.startY) * 0.28));
+    const midY = Math.min(item.startY, item.endY) - arcLift;
+
+    const moveAnim = wrapper.animate(
+      [
+        {
+          transform: `translate3d(${item.startX - 14}px, ${item.startY - 14}px, 0) scale(0.95)`,
+          opacity: 1,
+          offset: 0,
+        },
+        {
+          transform: `translate3d(${midX - 14}px, ${midY - 14}px, 0) scale(1.24)`,
+          opacity: 1,
+          offset: 0.46,
+        },
+        {
+          transform: `translate3d(${item.endX - 14}px, ${item.endY - 14}px, 0) scale(0.86)`,
+          opacity: 1,
+          offset: 0.84,
+        },
+        {
+          transform: `translate3d(${item.endX - 14}px, ${item.endY - 18}px, 0) scale(1.06)`,
+          opacity: 0.98,
+          offset: 0.93,
+        },
+        {
+          transform: `translate3d(${item.endX - 14}px, ${item.endY - 14}px, 0) scale(0.92)`,
+          opacity: 0,
+          offset: 1,
+        },
+      ],
+      {
+        duration: 720,
+        delay: item.delayMs,
+        easing: 'cubic-bezier(0.22, 0.88, 0.32, 1)',
+        fill: 'forwards',
+      },
+    );
+
+    const flipAnim = spinner.animate(
+      [
+        { transform: 'perspective(400px) rotateY(0deg) rotateX(18deg)' },
+        { transform: 'perspective(400px) rotateY(540deg) rotateX(-14deg)', offset: 0.5 },
+        { transform: 'perspective(400px) rotateY(900deg) rotateX(8deg)', offset: 0.85 },
+        { transform: 'perspective(400px) rotateY(1080deg) rotateX(0deg)' },
+      ],
+      {
+        duration: 720,
+        delay: item.delayMs,
+        easing: 'cubic-bezier(0.25, 0.8, 0.25, 1)',
+        fill: 'forwards',
+      },
+    );
+
+    const shadowAnim = shadow?.animate(
+      [
+        { transform: 'translateY(4px) scale(0.9)', opacity: 0.35 },
+        { transform: 'translateY(28px) scale(0.55)', opacity: 0.16, offset: 0.46 },
+        { transform: 'translateY(3px) scale(1.05)', opacity: 0.45, offset: 0.85 },
+        { transform: 'translateY(4px) scale(0.8)', opacity: 0 },
+      ],
+      {
+        duration: 720,
+        delay: item.delayMs,
+        easing: 'ease-out',
+        fill: 'forwards',
+      },
+    );
+
+    return () => {
+      moveAnim.cancel();
+      flipAnim.cancel();
+      shadowAnim?.cancel();
+    };
+  }, [item]);
+
+  return (
+    <div
+      ref={wrapperRef}
+      style={{
+        transform: `translate3d(${item.startX - 14}px, ${item.startY - 14}px, 0)`,
+      }}
+      className="fixed top-0 left-0 w-7 h-7 pointer-events-none"
+    >
+      <div
+        ref={shadowRef}
+        className="absolute inset-x-1 bottom-0 h-2 rounded-full bg-black/35 blur-[1px]"
+      />
+      <div ref={spinRef} className="relative w-7 h-7 flex items-center justify-center">
+        <CoinChip denomination={item.denomination} size={26} isNegative={item.isPenalty} />
+      </div>
+    </div>
+  );
+}
+
 export function FlyingCoinsLayer({
   flights,
   reducedMotion,
@@ -185,26 +334,16 @@ export function FlyingCoinsLayer({
   flights: CoinFlightEvent[];
   reducedMotion: boolean;
 }): React.ReactElement | null {
-  const [renderedFlights, setRenderedFlights] = useState<
-    Array<{
-      id: string;
-      chips: Array<10 | 5 | 1>;
-      isPenalty: boolean;
-      startX: number;
-      startY: number;
-      endX: number;
-      endY: number;
-      active: boolean;
-    }>
-  >([]);
+  const [items, setItems] = useState<FlyingCoinItem[]>([]);
 
   useEffect(() => {
     if (flights.length === 0 || reducedMotion) {
-      setRenderedFlights([]);
+      setItems([]);
       return;
     }
 
-    const mapped = flights.map((f) => {
+    const built: FlyingCoinItem[] = [];
+    for (const f of flights) {
       const srcEl = document.querySelector(f.sourceSelector);
       const dstEl = document.querySelector(f.targetSelector);
       const srcRect = srcEl?.getBoundingClientRect();
@@ -216,28 +355,26 @@ export function FlyingCoinsLayer({
       const endY = dstRect ? dstRect.top + dstRect.height / 2 : 36;
 
       const { chips } = decomposeCoins(Math.abs(f.delta));
-      return {
-        id: f.id,
-        chips: chips.slice(0, 6),
-        isPenalty: f.delta < 0,
-        startX,
-        startY,
-        endX,
-        endY,
-        active: false,
-      };
-    });
+      const visualChips = chips.slice(0, 8);
+      visualChips.forEach((denom, idx) => {
+        const spread = (idx - (visualChips.length - 1) / 2) * 9;
+        built.push({
+          key: `${f.id}-${idx}`,
+          denomination: denom,
+          isPenalty: f.delta < 0,
+          startX: startX + spread,
+          startY: startY + (idx % 2) * 4,
+          endX: endX + spread * 0.35,
+          endY,
+          delayMs: idx * 55,
+        });
+      });
+    }
 
-    setRenderedFlights(mapped);
-
-    const raf = requestAnimationFrame(() => {
-      setRenderedFlights((prev) => prev.map((item) => ({ ...item, active: true })));
-    });
-
-    return () => cancelAnimationFrame(raf);
+    setItems(built);
   }, [flights, reducedMotion]);
 
-  if (renderedFlights.length === 0 || reducedMotion) return null;
+  if (items.length === 0 || reducedMotion) return null;
 
   return (
     <div
@@ -245,28 +382,9 @@ export function FlyingCoinsLayer({
       aria-hidden="true"
       data-testid="flying-coins-layer"
     >
-      {renderedFlights.map((flight) =>
-        flight.chips.map((denom, idx) => {
-          const offsetAngle = (idx - (flight.chips.length - 1) / 2) * 10;
-          const x = flight.active ? flight.endX : flight.startX + offsetAngle;
-          const y = flight.active ? flight.endY : flight.startY + idx * 3;
-          return (
-            <div
-              key={`${flight.id}-${idx}`}
-              style={{
-                transform: `translate3d(${x - 12}px, ${y - 12}px, 0) scale(${
-                  flight.active ? 0.92 : 1.15
-                })`,
-                transition: `transform 620ms cubic-bezier(0.2, 0.9, 0.25, 1) ${idx * 55}ms, opacity 620ms ease ${idx * 55}ms`,
-                opacity: flight.active ? 0.95 : 1,
-              }}
-              className="fixed top-0 left-0"
-            >
-              <CoinChip denomination={denom} size={24} isNegative={flight.isPenalty} />
-            </div>
-          );
-        }),
-      )}
+      {items.map((item) => (
+        <CoinFlipParticle key={item.key} item={item} />
+      ))}
     </div>
   );
 }

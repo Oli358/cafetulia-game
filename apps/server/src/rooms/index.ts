@@ -11,6 +11,7 @@ export type JoinOptions = {
   code?: string;
   token?: string;
   nickname?: string;
+  avatarId?: string;
   asSpectator?: boolean;
   config?: Partial<RoomConfigSettings>;
 };
@@ -30,6 +31,7 @@ export class CafetuliaColyseusRoom extends Room {
       this.controller = defaultRoomRegistry.createRoom({
         hostToken: options.token ?? `tok_${Date.now()}`,
         hostNickname: options.nickname ?? 'Anfitrión',
+        hostAvatarId: options.avatarId,
         config: options.config,
       });
     }
@@ -51,6 +53,12 @@ export class CafetuliaColyseusRoom extends Room {
       if (!res.ok) {
         client.send('error_message', { code: 'CONFIG_ERROR', message: res.message });
       }
+    });
+
+    this.onMessage('update_avatar', (client, payload: { avatarId?: string }) => {
+      const playerId = this.sessionToPlayerId.get(client.sessionId);
+      if (!playerId || !payload?.avatarId) return;
+      this.controller.updateAvatar(playerId, payload.avatarId);
     });
 
     this.onMessage('start_game', (client, payload?: { seed?: number | string }) => {
@@ -97,6 +105,7 @@ export class CafetuliaColyseusRoom extends Room {
     const joined = this.controller.joinOrReconnect({
       token,
       nickname,
+      avatarId: options.avatarId,
       asSpectator: options.asSpectator,
     });
 

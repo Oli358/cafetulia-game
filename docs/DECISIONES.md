@@ -70,3 +70,8 @@ Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 | D-062 | 2026-10-25 | Rediseño de UI v1.1 integrado | Cerrada | Pantalla única sin scroll, tablero ilustrado, cartas 2:3, modal 3D y cajón de registro/chat |
 | D-063 | 2026-10-25 | 24 personajes con nombre y frase + 2 comodines | Cerrada | `CHARACTER_ROSTER` en `packages/ui` |
 | D-064 | 2026-10-25 | Monedas 1/5/10 con animación de ida y vuelta | Cerrada | Al puntuar vuelan a la bandeja; al penalizar, a la barra |
+| D-065 | 2026-10-25 | v1.2 con bugs P0 y mejoras P1/P2 integrada | Cerrada | 46 tests, build, lint, E2E y jugada real verificados |
+| D-066 | 2026-10-25 | 16 avatares prehechos y `avatarId` compartido | Cerrada | Cliente, servidor, API y tipos del motor; sin subir fotos |
+| D-067 | 2026-10-25 | Subtítulos de eventos tipo Rocket League | Cerrada | Activables en Ajustes; cola de avisos y sonido |
+| D-068 | 2026-10-25 | Monedas 1 negra / 5 roja / 10 azul y coin flip 3D | Cerrada | Pilas exactas, arco, giro y sombra; penalización inversa |
+| D-069 | 2026-10-25 | Café Vivo 3D con invitados y 20 posavasos | Cerrada | Carga diferida con `lazy` + `Suspense` |

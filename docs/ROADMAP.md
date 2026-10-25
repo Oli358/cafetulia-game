@@ -1,6 +1,6 @@
 # Roadmap
 
-> **Estado 2026-10-25:** v1.1 con rediseño de UI integrado y verificado en local (44 tests, build, lint, E2E, sin scroll en escritorio y móvil). Pendiente: despliegue en Render, pruebas en dispositivos reales, service worker/offline y pulido del diorama 3D.
+> **Estado 2026-10-25:** v1.2 con bugs P0 y mejoras P1/P2 integrados (46 tests, build, lint, E2E, sin scroll, monedas correctas, avatares, subtítulos y Café Vivo 3D). Pendiente: despliegue en Render, pruebas en dispositivos reales y pulido del zoom 3D/cartas.
 >
 > Fecha de referencia: 22 de octubre de 2026.
 > **Ventana objetivo del aniversario: 20–22 de noviembre de 2026.**

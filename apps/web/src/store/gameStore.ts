@@ -13,6 +13,7 @@ import { recordFinishedGameLocally, type LocalPlayerStats, loadLocalStats } from
 export type RoomMemberInfo = {
   id: string;
   nickname: string;
+  avatarId: string;
   role: 'player' | 'bot' | 'spectator';
   botDifficulty?: 'basic' | 'medium' | 'hard';
   connected: boolean;
@@ -25,6 +26,7 @@ export type ChatMessage = {
   id: string;
   senderId: string;
   nickname: string;
+  avatarId?: string;
   text?: string;
   emote?: string;
   sentAt: number;
@@ -72,6 +74,7 @@ export type ActiveModal = 'rules' | 'tutorial' | 'stats' | 'settings' | 'ios_pwa
 
 type CafetuliaClientState = {
   nickname: string;
+  avatarId: string;
   guestToken: string;
   screen: 'title' | 'lobby' | 'playing' | 'finished';
   activeModal: ActiveModal;
@@ -106,9 +109,11 @@ type CafetuliaClientState = {
   largeText: boolean;
   nightMode: boolean;
   contextualHints: boolean;
+  eventSubtitles: boolean;
 
   // Actions
   setNickname: (name: string) => void;
+  setAvatarId: (avatarId: string) => Promise<void>;
   setActiveModal: (modal: ActiveModal) => void;
   setErrorBanner: (msg: string | null) => void;
   setWhyCannotBanner: (msg: string | null) => void;
@@ -118,7 +123,13 @@ type CafetuliaClientState = {
   setCameraZoom: (zoom: number) => void;
   setFocusedTableId: (tableId: string | null) => void;
   toggleSetting: (
-    key: 'reducedMotion' | 'highContrast' | 'largeText' | 'nightMode' | 'contextualHints',
+    key:
+      | 'reducedMotion'
+      | 'highContrast'
+      | 'largeText'
+      | 'nightMode'
+      | 'contextualHints'
+      | 'eventSubtitles',
   ) => void;
 
   // Hand & board selection actions
@@ -161,7 +172,7 @@ function getInitialToken(): string {
 }
 
 function getInitialNickname(): string {
-  if (typeof window === 'undefined') return 'tertuliano';
+  if (typeof window === 'undefined') return 'Cafetero';
   try {
     return window.localStorage.getItem('cafetulia_nickname') || 'Cafetero';
   } catch {
@@ -169,8 +180,28 @@ function getInitialNickname(): string {
   }
 }
 
+function getInitialAvatarId(): string {
+  if (typeof window === 'undefined') return 'moka';
+  try {
+    return window.localStorage.getItem('cafetulia_avatar_id') || 'moka';
+  } catch {
+    return 'moka';
+  }
+}
+
+function getInitialEventSubtitles(): boolean {
+  if (typeof window === 'undefined') return true;
+  try {
+    const saved = window.localStorage.getItem('cafetulia_event_subtitles');
+    return saved === null ? true : saved === 'true';
+  } catch {
+    return true;
+  }
+}
+
 export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   nickname: getInitialNickname(),
+  avatarId: getInitialAvatarId(),
   guestToken: getInitialToken(),
   screen: 'title',
   activeModal: null,
@@ -199,6 +230,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   largeText: false,
   nightMode: false,
   contextualHints: true,
+  eventSubtitles: getInitialEventSubtitles(),
 
   setNickname: (name: string) => {
     const clean = name.slice(0, 26);
@@ -207,6 +239,32 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
       window.localStorage.setItem('cafetulia_nickname', clean);
     } catch {
       // ignore
+    }
+  },
+
+  setAvatarId: async (avatarId: string) => {
+    const clean = avatarId.trim().slice(0, 24) || 'moka';
+    set({ avatarId: clean });
+    try {
+      window.localStorage.setItem('cafetulia_avatar_id', clean);
+    } catch {
+      // ignore
+    }
+    const { roomCode, myPlayerId } = get();
+    if (roomCode && myPlayerId) {
+      try {
+        const res = await fetch(`/rooms/${roomCode}/avatar`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ playerId: myPlayerId, avatarId: clean }),
+        });
+        const data = await res.json();
+        if (res.ok && data.snapshot) {
+          set({ snapshot: data.snapshot });
+        }
+      } catch {
+        // ignore transient network errors
+      }
     }
   },
 
@@ -227,7 +285,18 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
       cameraZoom: tableId ? 1.35 : s.focusedTableId ? 1.0 : s.cameraZoom,
     })),
 
-  toggleSetting: (key) => set((s) => ({ [key]: !s[key] })),
+  toggleSetting: (key) =>
+    set((s) => {
+      const nextVal = !s[key];
+      if (key === 'eventSubtitles') {
+        try {
+          window.localStorage.setItem('cafetulia_event_subtitles', String(nextVal));
+        } catch {
+          // ignore
+        }
+      }
+      return { [key]: nextVal };
+    }),
 
   selectTile: (tileId) => {
     soundEngine.playSfx('cardSelect');
@@ -260,7 +329,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   setPendingNegativeConfirm: (pending) => set({ pendingNegativeConfirm: pending }),
 
   createRoom: async (customConfig) => {
-    const { nickname, guestToken } = get();
+    const { nickname, avatarId, guestToken } = get();
     const trimmed = nickname.trim() || 'Anfitrión';
     set({ isBusy: true, errorBanner: null });
     try {
@@ -269,6 +338,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nickname: trimmed,
+          avatarId,
           token: guestToken,
           config: customConfig,
         }),
@@ -295,7 +365,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   },
 
   joinRoom: async (code, asSpectator = false) => {
-    const { nickname, guestToken } = get();
+    const { nickname, avatarId, guestToken } = get();
     const cleanCode = code.trim().toUpperCase();
     if (!cleanCode) {
       set({ errorBanner: 'Introduce un código de sala válido.' });
@@ -308,6 +378,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           nickname: nickname.trim() || 'Invitado',
+          avatarId,
           token: guestToken,
           asSpectator,
         }),

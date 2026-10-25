@@ -10,15 +10,23 @@ Juego digital cozy, online y para **2–4 jugadores**, basado en **Café Interna
 
 ## Estado actual
 
-- **v1.1 — Rediseño de UI integrado y verificado en local.**
+- **v1.2 — Bugs P0 y mejoras P1/P2 integrados y verificados en local.**
 - Monorepo con pnpm workspaces, TypeScript estricto, ESLint, Prettier, Vitest y Playwright.
-- Motor de reglas determinista en `packages/engine`: **44 tests en verde** (motor + servidor + helpers) y **1.000 partidas simuladas** con `fast-check`.
+- Motor de reglas determinista en `packages/engine`: **46 tests en verde** (motor + servidor + helpers) y **1.000 partidas simuladas** con `fast-check`.
 - `packages/content/board.json` validado: **24 mesas, 68 sillas, 28 compartidas y 20 plazas de barra**.
-- Servidor autoritativo con Colyseus: salas privadas de 6 caracteres, 2–4 jugadores, bots, reconexión de 15 s, temporizador, chat efímero, revancha y persistencia SQLite.
-- Cliente rediseñado: **pantalla única sin scroll**, tablero ilustrado de 13×13 con mesas, sillas y barra central, **24 personajes con nombre y frase**, cartas 2:3, fichas con retrato y bandera, **monedas 1/5/10** con vuelo al puntuar y al penalizar, modal **“Ver café”** 3D, cajón de registro/chat y PWA básica.
-- Verificado en local: `typecheck`, `lint`, `build`, **44 tests**, E2E de Playwright, `/health`, creación de salas y **sin scroll en 1280×800 y 390×844**.
+- Servidor autoritativo con Colyseus: salas privadas de 6 caracteres, 2–4 jugadores, bots, reconexión de 15 s, temporizador, chat efímero, revancha, persistencia SQLite y **avatares de perfil**.
+- Cliente rediseñado:
+  - **Portada, lobby y partida sin scroll** en 1280×800 y 390×844.
+  - Tablero limpio: banderas solo en mesas y sillas compartidas.
+  - Cartas 2:3 con cinta de país, badge **MUJER/HOMBRE**, retrato, nombre y frase corta.
+  - **Monedas 1 negra, 5 roja, 10 azul**, pilas exactas y animación **coin flip** con arco y giro 3D.
+  - **16 avatares prehechos** seleccionables, guardados en el dispositivo y visibles para todos.
+  - **Subtítulos de eventos** tipo Rocket League («¡EL JOKER!», «¡MESA COMPLETA!») activables en Ajustes.
+  - **Café Vivo 3D**: invitados sentados con taza y sorbo, 20 posavasos y carga diferida.
+  - PWA con service worker, menú directo y cajón de registro/chat.
+- Verificado: `typecheck`, `lint`, `build`, **46 tests**, E2E de Playwright, `/health`, salas y jugada real.
 - **Requiere Node 22.5+** (usa `node:sqlite`). Recomendado Node 24 LTS. En este equipo está instalado Node 24.20.0.
-- Pendiente: desplegar en Render, probar en iPhone/Android reales, añadir service worker/offline y reducir el bundle (~830 KB).
+- Pendiente: desplegar en Render, probar en iPhone/Android reales, acercar el zoom 3D por defecto y pulir el texto de las cartas pequeñas.
 
 ## Comandos
 

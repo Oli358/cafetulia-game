@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import type {
   FinalScoreSummary,
@@ -54,7 +56,21 @@ export class GamePersistenceStore {
   private readonly db: DatabaseSync;
 
   constructor(dbPath: string = ':memory:') {
-    this.db = new DatabaseSync(dbPath);
+    let resolvedPath = dbPath;
+    if (resolvedPath !== ':memory:') {
+      try {
+        const dir = path.dirname(resolvedPath);
+        if (dir && dir !== '.') {
+          fs.mkdirSync(dir, { recursive: true });
+        }
+        this.db = new DatabaseSync(resolvedPath);
+      } catch {
+        resolvedPath = ':memory:';
+        this.db = new DatabaseSync(':memory:');
+      }
+    } else {
+      this.db = new DatabaseSync(':memory:');
+    }
     this.initSchema();
   }
 
@@ -270,5 +286,5 @@ export class GamePersistenceStore {
 }
 
 export const defaultPersistenceStore = new GamePersistenceStore(
-  process.env.DATABASE_URL ?? process.env.SQLITE_DB_PATH ?? ':memory:',
+  process.env.SQLITE_DB_PATH ?? process.env.DATABASE_URL ?? ':memory:',
 );

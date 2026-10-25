@@ -71,6 +71,7 @@ export type RoomMember = {
   playerId: string;
   token: string;
   nickname: string;
+  avatarId: string;
   role: 'player' | 'spectator' | 'bot';
   connected: boolean;
   ready: boolean;
@@ -84,6 +85,7 @@ export type EphemeralChatMessage = {
   id: string;
   senderId: string;
   nickname: string;
+  avatarId?: string;
   text?: string;
   emote?: AllowedEmote;
   sentAt: number;
@@ -155,6 +157,7 @@ export class CafetuliaRoomController {
     code?: string;
     hostToken: string;
     hostNickname: string;
+    hostAvatarId?: string;
     config?: Partial<RoomConfigSettings>;
     store?: GamePersistenceStore;
     reconnectGraceMs?: number;
@@ -175,6 +178,7 @@ export class CafetuliaRoomController {
       playerId: hostId,
       token: options.hostToken,
       nickname: sanitizeNickname(options.hostNickname),
+      avatarId: options.hostAvatarId || 'espresso',
       role: 'player',
       connected: true,
       ready: true,
@@ -235,6 +239,7 @@ export class CafetuliaRoomController {
   public joinOrReconnect(params: {
     token: string;
     nickname: string;
+    avatarId?: string;
     asSpectator?: boolean;
   }): { playerId: string; role: 'player' | 'spectator'; snapshot: RoomSnapshot } {
     const cleanName = sanitizeNickname(params.nickname);
@@ -250,6 +255,9 @@ export class CafetuliaRoomController {
 
         member.connected = true;
         member.nickname = cleanName;
+        if (params.avatarId) {
+          member.avatarId = params.avatarId;
+        }
 
         // If they were kicked after 15s timeout, they can only return as spectator
         if (member.kickedFromMatch) {
@@ -258,6 +266,7 @@ export class CafetuliaRoomController {
           const gp = this.gameState.players.find((p) => p.id === member.playerId);
           if (gp) {
             gp.connected = true;
+            if (params.avatarId) gp.avatarId = params.avatarId;
           }
         }
 
@@ -287,6 +296,7 @@ export class CafetuliaRoomController {
       playerId,
       token: params.token,
       nickname: cleanName,
+      avatarId: params.avatarId || 'croissant',
       role,
       connected: true,
       ready: true,
@@ -302,6 +312,20 @@ export class CafetuliaRoomController {
       role,
       snapshot: this.getSnapshot(),
     };
+  }
+
+  public updateAvatar(playerId: string, avatarId: string): { ok: true; snapshot: RoomSnapshot } {
+    const member = this.members.get(playerId);
+    if (member && avatarId) {
+      member.avatarId = avatarId;
+      if (this.gameState) {
+        const gp = this.gameState.players.find((p) => p.id === playerId);
+        if (gp) gp.avatarId = avatarId;
+      }
+      this.persistRoom();
+      this.emitState([]);
+    }
+    return { ok: true, snapshot: this.getSnapshot() };
   }
 
   public updateConfig(
@@ -346,12 +370,14 @@ export class CafetuliaRoomController {
     }
 
     const botNames = ['Barista Bot', 'Moka Bot', 'Expreso Bot'];
+    const botAvatars = ['moka', 'gato', 'tetera'];
     for (let i = 0; i < this.config.botCount; i++) {
       const botId = `bot_${i + 1}`;
       this.members.set(botId, {
         playerId: botId,
         token: `bot_token_${i + 1}`,
         nickname: botNames[i] ?? `Bot ${i + 1}`,
+        avatarId: botAvatars[i] ?? 'moka',
         role: 'bot',
         connected: true,
         ready: true,
@@ -392,6 +418,7 @@ export class CafetuliaRoomController {
         players: seatedMembers.map((m) => ({
           id: m.playerId,
           nickname: m.nickname,
+          avatarId: m.avatarId,
           isBot: m.role === 'bot',
           botDifficulty: m.botDifficulty,
         })),
@@ -655,6 +682,7 @@ export class CafetuliaRoomController {
       id: `chat_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
       senderId,
       nickname: member.nickname,
+      avatarId: member.avatarId,
       text: parsed.data.text,
       emote: parsed.data.emote,
       sentAt: Date.now(),
@@ -836,6 +864,7 @@ export class RoomRegistry {
   public createRoom(params: {
     hostToken: string;
     hostNickname: string;
+    hostAvatarId?: string;
     config?: Partial<RoomConfigSettings>;
     reconnectGraceMs?: number;
     seed?: number | string;
@@ -849,6 +878,7 @@ export class RoomRegistry {
       code,
       hostToken: params.hostToken,
       hostNickname: params.hostNickname,
+      hostAvatarId: params.hostAvatarId,
       config: params.config,
       store: this.store,
       reconnectGraceMs: params.reconnectGraceMs,

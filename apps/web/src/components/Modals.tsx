@@ -1,9 +1,22 @@
-import React, { useState } from 'react';
-import { NATION_VISUALS, type NationKey } from '@cafetulia/ui';
+import React, { useEffect, useState } from 'react';
+import { NATION_VISUALS, PRESET_AVATARS, type NationKey } from '@cafetulia/ui';
 import { soundEngine } from '../audio/soundEngine';
-import { CharacterPortrait, FlagBadge } from '../art/CharacterPortrait';
+import { CharacterPortrait, FlagBadge, PlayerAvatar } from '../art/CharacterPortrait';
 import { useGameStore } from '../store/gameStore';
 import { getNationName } from '../utils/moveHelper';
+
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+};
+
+let deferredInstallPrompt: BeforeInstallPromptEvent | null = null;
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredInstallPrompt = e as BeforeInstallPromptEvent;
+  });
+}
 
 export function ActiveModalLayer(): React.ReactElement | null {
   const activeModal = useGameStore((s) => s.activeModal);
@@ -61,11 +74,11 @@ export function ActiveModalLayer(): React.ReactElement | null {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#3E2F2A]/55 p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[#3E2F2A]/55 p-3 sm:p-4 overflow-y-auto"
       role="dialog"
       aria-modal="true"
     >
-      <div className="w-full max-w-2xl rounded-[24px] bg-[#FFF9F0] text-[#3E2F2A] p-6 sm:p-8 shadow-[0_8px_24px_rgba(62,47,42,0.22)] border border-[#3E2F2A]/15 my-auto max-h-[90vh] overflow-y-auto">
+      <div className="w-full max-w-2xl rounded-[24px] bg-[#FFF9F0] text-[#3E2F2A] p-5 sm:p-7 shadow-[0_8px_24px_rgba(62,47,42,0.22)] border border-[#3E2F2A]/15 my-auto max-h-[90dvh] overflow-y-auto">
         {activeModal === 'tutorial' && <TutorialContent onClose={() => setActiveModal(null)} />}
         {activeModal === 'rules' && <RulesContent onClose={() => setActiveModal(null)} />}
         {activeModal === 'stats' && <StatsContent onClose={() => setActiveModal(null)} />}
@@ -82,7 +95,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
 
   return (
     <div>
-      <div className="flex items-center justify-between gap-2 border-b border-[#3E2F2A]/10 pb-4">
+      <div className="flex items-center justify-between gap-2 border-b border-[#3E2F2A]/10 pb-3">
         <div>
           <span className="text-xs font-semibold text-[#C96F4A]">
             Tutorial interactivo · Paso {step} de 3
@@ -98,11 +111,11 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
           onClick={onClose}
           className="px-3 py-1.5 rounded-xl bg-[#F7EEDF] text-xs font-semibold text-[#6F5A4E] hover:text-[#3E2F2A] border border-[#3E2F2A]/15 cursor-pointer"
         >
-          Ya sé jugar (saltar)
+          Cerrar
         </button>
       </div>
 
-      <div className="mt-5 space-y-4">
+      <div className="mt-4 space-y-4">
         {step === 1 && (
           <div className="bg-[#F7EEDF] p-4 rounded-2xl border border-[#3E2F2A]/10 space-y-3">
             <p className="text-sm text-[#3E2F2A] leading-relaxed">
@@ -114,7 +127,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
               <div className="flex items-center gap-2 bg-[#FFF9F0] px-3 py-2 rounded-xl border border-[#3E2F2A]/15">
                 <CharacterPortrait nation="fr" gender="M" size={44} />
                 <div className="text-xs">
-                  <div className="font-bold">Invitado Francia (H)</div>
+                  <div className="font-bold">Henri · Francia (HOMBRE)</div>
                   <div className="text-[#6F5A4E]">1ª ficha en mesa FR</div>
                 </div>
               </div>
@@ -122,7 +135,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
               <div className="flex items-center gap-2 bg-[#FFF9F0] px-3 py-2 rounded-xl border border-[#3E2F2A]/15">
                 <CharacterPortrait nation="fr" gender="F" size={44} />
                 <div className="text-xs">
-                  <div className="font-bold">Invitada Francia (M)</div>
+                  <div className="font-bold">Colette · Francia (MUJER)</div>
                   <div className="text-[#6F5A4E]">2ª ficha = ¡Mesa abierta (+4 pts)!</div>
                 </div>
               </div>
@@ -152,7 +165,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
             <div className="flex items-center justify-center gap-3 py-2">
               <FlagBadge nation="fr" size={28} />
               <span className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#FFF9F0] border border-[#3E2F2A]/20">
-                Silla compartida FR / EN · Suma puntos en ambas mesas
+                Silla compartida Francia / Inglaterra · Suma en ambas
               </span>
               <FlagBadge nation="en" size={28} />
             </div>
@@ -166,7 +179,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
             >
               {stepDone
                 ? '✓ ¡Silla compartida usada (+3 en Francia y +2 en Inglaterra = +5 pts)!'
-                : 'Probar: Sentar invitado en silla compartida FR/EN'}
+                : 'Probar: Sentar invitado en silla compartida'}
             </button>
           </div>
         )}
@@ -195,7 +208,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
         )}
       </div>
 
-      <div className="mt-6 flex items-center justify-between pt-4 border-t border-[#3E2F2A]/10">
+      <div className="mt-5 flex items-center justify-between pt-3 border-t border-[#3E2F2A]/10">
         <button
           type="button"
           disabled={step === 1}
@@ -224,7 +237,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
             onClick={onClose}
             className="px-5 py-2.5 rounded-xl bg-[#3F5E4A] text-[#FFF9F0] font-bold text-sm cursor-pointer"
           >
-            Terminar tutorial y jugar
+            Terminar tutorial
           </button>
         )}
       </div>
@@ -283,7 +296,7 @@ function RulesContent({ onClose }: { onClose: () => void }): React.ReactElement 
                 >
                   <FlagBadge nation={code} size={18} />
                   <span className="font-semibold">
-                    {idx + 1}. {meta.name} ({meta.shortCode})
+                    {idx + 1}. {meta.name}
                   </span>
                 </div>
               );
@@ -312,7 +325,7 @@ function RulesContent({ onClose }: { onClose: () => void }): React.ReactElement 
 
         <section className="bg-[#F7EEDF] p-3.5 rounded-2xl">
           <h3 className="font-serif font-bold text-base">
-            4. Puntuación, mesas puras, comodines y barra
+            4. Puntuación, monedas, comodines y barra
           </h3>
           <ul className="mt-1 list-disc list-inside text-xs sm:text-sm text-[#6F5A4E] space-y-1">
             <li>
@@ -320,12 +333,11 @@ function RulesContent({ onClose }: { onClose: () => void }): React.ReactElement 
               los ocupantes son de la nacionalidad de la mesa, ¡vale el doble (4, 6 u 8 pts)!
             </li>
             <li>
-              <strong>Mesa nacional completa (4/4 misma nación):</strong> tu tamaño máximo de mano
-              se reduce permanentemente en 1 ficha.
+              <strong>Monedas:</strong> ficha negra = 1, roja = 5, azul = 10.
             </li>
             <li>
-              <strong>Comodines:</strong> eligen nacionalidad al sentarse, nunca van a la barra y
-              pueden cambiarse desde el tablero si tienes en mano la ficha exacta que representan.
+              <strong>Mesa nacional completa (4/4 misma nación):</strong> tu tamaño máximo de mano
+              se reduce permanentemente en 1 ficha.
             </li>
             <li>
               <strong>Final de partida:</strong> al ocupar la última silla, la 20ª plaza de barra,
@@ -342,12 +354,17 @@ function RulesContent({ onClose }: { onClose: () => void }): React.ReactElement 
 function StatsContent({ onClose }: { onClose: () => void }): React.ReactElement {
   const localStats = useGameStore((s) => s.localStats);
   const recentMatches = useGameStore((s) => s.recentMatches);
+  const fetchHistory = useGameStore((s) => s.fetchHistory);
+
+  useEffect(() => {
+    void fetchHistory();
+  }, [fetchHistory]);
 
   const favNationEntry = Object.entries(localStats.favoriteNations).sort((a, b) => b[1] - a[1])[0];
   const topRivalEntry = Object.entries(localStats.frequentRivals).sort((a, b) => b[1] - a[1])[0];
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-3">
         <h2 className="font-serif font-bold text-2xl sm:text-3xl">
           Estadísticas locales e historial
@@ -394,8 +411,7 @@ function StatsContent({ onClose }: { onClose: () => void }): React.ReactElement 
         </h3>
         {recentMatches.length === 0 ? (
           <p className="text-sm text-[#6F5A4E] bg-[#F7EEDF] p-4 rounded-2xl">
-            Todavía no hay partidas finalizadas en este servidor. ¡Crea una mesa para inaugurar el
-            libro de visitas!
+            Todavía no hay partidas finalizadas en este servidor.
           </p>
         ) : (
           <div className="space-y-2">
@@ -424,19 +440,33 @@ function StatsContent({ onClose }: { onClose: () => void }): React.ReactElement 
 
 function SettingsContent({ onClose }: { onClose: () => void }): React.ReactElement {
   const [vols, setVols] = useState(soundEngine.getVolumes());
-  const viewMode = useGameStore((s) => s.viewMode);
-  const setViewMode = useGameStore((s) => s.setViewMode);
+  const avatarId = useGameStore((s) => s.avatarId);
+  const setAvatarId = useGameStore((s) => s.setAvatarId);
+  const nickname = useGameStore((s) => s.nickname);
+  const setNickname = useGameStore((s) => s.setNickname);
   const reducedMotion = useGameStore((s) => s.reducedMotion);
   const highContrast = useGameStore((s) => s.highContrast);
   const largeText = useGameStore((s) => s.largeText);
   const nightMode = useGameStore((s) => s.nightMode);
   const contextualHints = useGameStore((s) => s.contextualHints);
+  const eventSubtitles = useGameStore((s) => s.eventSubtitles);
   const toggleSetting = useGameStore((s) => s.toggleSetting);
+  const setActiveModal = useGameStore((s) => s.setActiveModal);
+
+  const handleInstallPwa = async () => {
+    if (deferredInstallPrompt) {
+      await deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+    } else {
+      setActiveModal('ios_pwa');
+    }
+  };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
       <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-3">
-        <h2 className="font-serif font-bold text-2xl sm:text-3xl">Ajustes de sonido y pantalla</h2>
+        <h2 className="font-serif font-bold text-2xl sm:text-3xl">Ajustes y perfil</h2>
         <button
           type="button"
           onClick={onClose}
@@ -446,8 +476,56 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
         </button>
       </div>
 
+      {/* Profile & Preset Avatars (16 pre-made avatars, no photo upload) */}
+      <div className="bg-[#F7EEDF] p-3.5 rounded-2xl space-y-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="font-serif font-bold text-base">Tu perfil y avatar</h3>
+          <div className="flex items-center gap-2">
+            <PlayerAvatar avatarId={avatarId} size={28} />
+            <input
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              maxLength={24}
+              aria-label="Tu apodo"
+              className="px-2.5 py-1 rounded-lg bg-[#FFF9F0] border border-[#3E2F2A]/20 text-xs font-bold w-36"
+            />
+          </div>
+        </div>
+        <div
+          className="grid grid-cols-8 gap-1.5"
+          role="radiogroup"
+          aria-label="Seleccionar avatar prehecho"
+        >
+          {PRESET_AVATARS.map((av) => {
+            const active = avatarId === av.id;
+            return (
+              <button
+                key={av.id}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                data-testid={`settings-avatar-${av.id}`}
+                onClick={() => void setAvatarId(av.id)}
+                title={av.label}
+                className={`flex flex-col items-center justify-center p-1 rounded-xl border transition-transform cursor-pointer ${
+                  active
+                    ? 'bg-[#FFF9F0] border-[#C96F4A] ring-2 ring-[#C96F4A] scale-105'
+                    : 'bg-[#FFF9F0]/60 border-[#3E2F2A]/10 hover:bg-[#FFF9F0]'
+                }`}
+              >
+                <PlayerAvatar avatarId={av.id} size={28} />
+                <span className="text-[9px] font-semibold truncate w-full text-center mt-0.5">
+                  {av.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Sound Controls */}
-      <div className="bg-[#F7EEDF] p-4 rounded-2xl space-y-3">
+      <div className="bg-[#F7EEDF] p-3.5 rounded-2xl space-y-2.5">
         <div className="flex items-center justify-between">
           <h3 className="font-serif font-bold text-base">Sonido del café</h3>
           <button
@@ -472,7 +550,7 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
             step="0.05"
             value={vols.music}
             onChange={(e) => setVols(soundEngine.setVolumes({ music: Number(e.target.value) }))}
-            className="w-44 accent-[#C96F4A]"
+            className="w-40 accent-[#C96F4A]"
           />
         </label>
 
@@ -485,7 +563,7 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
             step="0.05"
             value={vols.ambience}
             onChange={(e) => setVols(soundEngine.setVolumes({ ambience: Number(e.target.value) }))}
-            className="w-44 accent-[#C96F4A]"
+            className="w-40 accent-[#C96F4A]"
           />
         </label>
 
@@ -502,41 +580,28 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
               setVols(next);
               soundEngine.playSfx('cardSelect');
             }}
-            className="w-44 accent-[#C96F4A]"
+            className="w-40 accent-[#C96F4A]"
           />
         </label>
       </div>
 
       {/* Visual & Accessibility toggles */}
-      <div className="bg-[#F7EEDF] p-4 rounded-2xl space-y-2.5 text-sm">
-        <h3 className="font-serif font-bold text-base mb-2">Accesibilidad y visualización</h3>
-
-        <div className="flex items-center justify-between py-1">
-          <span>Modo de cámara del tablero</span>
-          <div className="flex items-center gap-1 bg-[#FFF9F0] p-1 rounded-xl border border-[#3E2F2A]/15">
-            <button
-              type="button"
-              onClick={() => setViewMode('3d')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
-                viewMode === '3d' ? 'bg-[#C96F4A] text-[#FFF9F0]' : 'text-[#6F5A4E]'
-              }`}
-            >
-              2.5D Papercraft
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewMode('2d')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
-                viewMode === '2d' ? 'bg-[#C96F4A] text-[#FFF9F0]' : 'text-[#6F5A4E]'
-              }`}
-            >
-              2D Plano
-            </button>
-          </div>
-        </div>
+      <div className="bg-[#F7EEDF] p-3.5 rounded-2xl space-y-2 text-xs sm:text-sm">
+        <h3 className="font-serif font-bold text-base mb-1">Avisos, pantalla y accesibilidad</h3>
 
         <label className="flex items-center justify-between py-1 cursor-pointer">
-          <span>Reducción de movimiento (sin rebotes)</span>
+          <span>Subtítulos grandes de eventos («¡EL JOKER!», «¡MESA COMPLETA!»)</span>
+          <input
+            type="checkbox"
+            data-testid="toggle-event-subtitles"
+            checked={eventSubtitles}
+            onChange={() => toggleSetting('eventSubtitles')}
+            className="w-4 h-4 accent-[#C96F4A]"
+          />
+        </label>
+
+        <label className="flex items-center justify-between py-1 cursor-pointer">
+          <span>Reducción de movimiento (sin giros ni rebotes)</span>
           <input
             type="checkbox"
             checked={reducedMotion}
@@ -576,7 +641,7 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
         </label>
 
         <label className="flex items-center justify-between py-1 cursor-pointer">
-          <span>Mostrar pistas contextuales y previsualización de puntos</span>
+          <span>Pistas contextuales y puntos previstos</span>
           <input
             type="checkbox"
             checked={contextualHints}
@@ -584,6 +649,26 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
             className="w-4 h-4 accent-[#C96F4A]"
           />
         </label>
+      </div>
+
+      {/* Secondary actions moved from TitleScreen per 1.1 */}
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+        <button
+          type="button"
+          data-testid="open-stats-from-settings"
+          onClick={() => setActiveModal('stats')}
+          className="flex-1 py-2.5 px-3 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/15 text-xs font-bold hover:bg-[#EAD9C0] cursor-pointer"
+        >
+          Estadísticas e historial
+        </button>
+        <button
+          type="button"
+          data-testid="install-pwa-btn"
+          onClick={() => void handleInstallPwa()}
+          className="flex-1 py-2.5 px-3 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/15 text-xs font-bold hover:bg-[#EAD9C0] cursor-pointer"
+        >
+          Instalar en móvil (PWA)
+        </button>
       </div>
     </div>
   );
@@ -612,8 +697,7 @@ function IosPwaContent({ onClose }: { onClose: () => void }): React.ReactElement
             Desliza hacia abajo y selecciona <strong>«Añadir a pantalla de inicio»</strong>.
           </li>
           <li>
-            Pulsa <strong>Añadir</strong> arriba a la derecha para abrir Cafetulia a pantalla
-            completa como aplicación nativa.
+            Pulsa <strong>Añadir</strong> arriba a la derecha para jugar a pantalla completa.
           </li>
         </ol>
       </div>

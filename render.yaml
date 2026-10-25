@@ -2,18 +2,25 @@ services:
   - type: web
     name: cafetulia
     runtime: node
-    plan: starter
-    buildCommand: pnpm install --frozen-lockfile=false && pnpm build
+    # Render Free plan (sin coste; usa /tmp para SQLite efímero porque Free no admite discos persistentes).
+    # Si se pasa a plan "starter" (de pago), descomentar el bloque "disk" y apuntar SQLITE_DB_PATH a /var/data/cafetulia.sqlite.
+    plan: free
+    buildCommand: npx pnpm install --frozen-lockfile=false && npx pnpm build
     startCommand: npx tsx server.ts
     healthCheckPath: /health
     envVars:
+      - key: NODE_VERSION
+        value: 24.20.0
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 3000
+      - key: SQLITE_DB_PATH
+        value: /tmp/cafetulia.sqlite
       - key: DATABASE_URL
-        value: /var/data/cafetulia.sqlite
-    disk:
-      name: cafetulia-sqlite-data
-      mountPath: /var/data
-      sizeGB: 1
+        value: /tmp/cafetulia.sqlite
+    # Para plan: starter con persistencia en disco:
+    # disk:
+    #   name: cafetulia-sqlite-data
+    #   mountPath: /var/data
+    #   sizeGB: 1

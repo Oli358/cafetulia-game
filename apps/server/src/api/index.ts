@@ -20,6 +20,7 @@ export function getHealthPayload(): HealthResponse {
 
 const CreateRoomRequestSchema = z.object({
   nickname: z.string().trim().min(1).max(30).default('Anfitrión'),
+  avatarId: z.string().trim().min(1).max(32).optional(),
   token: z.string().trim().min(4).max(64).optional(),
   config: RoomConfigSchema.partial().optional(),
   seed: z.union([z.number(), z.string()]).optional(),
@@ -27,6 +28,7 @@ const CreateRoomRequestSchema = z.object({
 
 const JoinRoomRequestSchema = z.object({
   nickname: z.string().trim().min(1).max(30).default('Invitado'),
+  avatarId: z.string().trim().min(1).max(32).optional(),
   token: z.string().trim().min(4).max(64),
   asSpectator: z.boolean().optional(),
 });
@@ -56,6 +58,7 @@ export function registerApiRoutes(
     const room = registry.createRoom({
       hostToken,
       hostNickname: parsed.data.nickname,
+      hostAvatarId: parsed.data.avatarId,
       config: parsed.data.config,
       seed: parsed.data.seed,
     });
@@ -192,6 +195,20 @@ export function registerApiRoutes(
     const ready = Boolean(req.body?.ready ?? true);
     room.setPlayerReady(playerId, ready);
     res.status(200).json({ ok: true, snapshot: room.getSnapshot() });
+  });
+
+  app.post('/rooms/:code/avatar', (req: Request, res: Response) => {
+    const rawCode = String(req.params.code ?? '').toUpperCase();
+    const room = registry.getRoom(rawCode);
+    if (!room) {
+      res.status(404).json({ error: 'ROOM_NOT_FOUND', message: 'Sala no encontrada.' });
+      return;
+    }
+
+    const playerId = String(req.body?.playerId ?? '');
+    const avatarId = String(req.body?.avatarId ?? 'espresso').slice(0, 32);
+    const result = room.updateAvatar(playerId, avatarId);
+    res.status(200).json(result);
   });
 
   app.post('/rooms/:code/bots', (req: Request, res: Response) => {

@@ -81,17 +81,21 @@ export function IllustratedBoard({
   }, [gameState.tables]);
 
   const focusedTable = focusedTableId ? (tableById.get(focusedTableId) ?? null) : null;
+  const focusedSeatSet = useMemo(() => {
+    if (!focusedTable) return null;
+    return new Set(focusedTable.seatIds);
+  }, [focusedTable]);
 
   return (
     <div
-      className="relative w-full h-full min-h-0 flex items-center justify-center p-0.5 sm:p-1.5 select-none"
+      className="relative w-full h-full min-h-0 flex items-center justify-center p-0 sm:p-1 select-none"
       data-testid="papercraft-board"
     >
       {/* Strictly 1:1 Square Illustrated Board Container */}
       <div
         role="region"
         aria-label="Tablero ilustrado de Cafetulia con 24 mesas, 68 sillas y barra central"
-        className={`relative aspect-square w-[min(96vw,calc(100dvh-235px))] h-[min(96vw,calc(100dvh-235px))] sm:w-[min(94vw,calc(100dvh-210px))] sm:h-[min(94vw,calc(100dvh-210px))] rounded-[20px] sm:rounded-[28px] border-2 shadow-[0_10px_28px_rgba(62,47,42,0.18)] overflow-hidden shrink-0 transition-colors ${
+        className={`relative aspect-square w-[min(97vw,calc(100dvh-212px))] h-[min(97vw,calc(100dvh-212px))] sm:w-[min(94vw,calc(100dvh-198px))] sm:h-[min(94vw,calc(100dvh-198px))] rounded-[20px] sm:rounded-[28px] border-2 shadow-[0_10px_28px_rgba(62,47,42,0.18)] overflow-hidden shrink-0 transition-colors ${
           nightMode
             ? 'bg-[#252A38] border-[#C9A227]/50 text-[#FFF9F0]'
             : 'bg-[#E8D5B7] border-[#8B5E3C] text-[#3E2F2A]'
@@ -143,6 +147,7 @@ export function IllustratedBoard({
             const tx = (table.col + 0.5) * 100;
             const ty = (table.row + 0.5) * 100;
             const meta = NATION_VISUALS[table.nation as NationKey] ?? NATION_VISUALS.fr;
+            const isTableFocused = !focusedTableId || focusedTableId === table.id;
             return table.seatIds.map((sid) => {
               const seat = gameState.seats.find((s) => s.id === sid);
               if (!seat) return null;
@@ -156,24 +161,32 @@ export function IllustratedBoard({
                   x2={sx}
                   y2={sy}
                   stroke={meta.primaryColor}
-                  strokeWidth="7"
+                  strokeWidth="6"
                   strokeLinecap="round"
-                  opacity={nightMode ? '0.4' : '0.3'}
+                  opacity={
+                    !isTableFocused
+                      ? '0.08'
+                      : nightMode
+                        ? '0.42'
+                        : '0.3'
+                  }
                 />
               );
             });
           })}
         </svg>
 
-        {/* INTEGRATED CENTRAL BAR (20 Coasters inside the clear central zone 34.5%..65.5%) */}
+        {/* INTEGRATED CENTRAL BAR (20 Coasters inside the clear central zone 34.8%..65.2%) */}
         <div
           style={{
-            left: '34.6%',
-            top: '34.6%',
-            width: '30.8%',
-            height: '30.8%',
+            left: '34.8%',
+            top: '34.8%',
+            width: '30.4%',
+            height: '30.4%',
           }}
-          className={`absolute z-10 rounded-[16px] sm:rounded-[22px] border-2 p-1 sm:p-2 flex flex-col justify-between shadow-[0_6px_18px_rgba(62,47,42,0.28)] ${
+          className={`absolute z-10 rounded-[16px] sm:rounded-[22px] border-2 p-1 sm:p-2 flex flex-col justify-between shadow-[0_6px_18px_rgba(62,47,42,0.28)] transition-opacity duration-200 ${
+            focusedTableId ? 'opacity-45' : 'opacity-100'
+          } ${
             nightMode
               ? 'bg-[#35261D] border-[#C9A227] text-[#FFF9F0]'
               : 'bg-[#6E472B] border-[#C9A227] text-[#FFF9F0]'
@@ -278,7 +291,7 @@ export function IllustratedBoard({
           </div>
         </div>
 
-        {/* 24 ILLUSTRATED ROUND TABLES (Larger circular tablecloths with central Flag medallion) */}
+        {/* 24 ILLUSTRATED ROUND TABLES (Larger 8.4% circular tablecloths with central Flag medallion) */}
         {gameState.tables.map((table) => {
           const meta = NATION_VISUALS[table.nation as NationKey] ?? NATION_VISUALS.fr;
           const occCount = table.seatIds.filter((sid) => {
@@ -286,6 +299,7 @@ export function IllustratedBoard({
             return s?.occupant !== null || draftPlacements.some((d) => d.seatId === sid);
           }).length;
           const isFocused = focusedTableId === table.id;
+          const isDimmedByFocus = Boolean(focusedTableId && focusedTableId !== table.id);
           const isComplete = celebratingTables[table.id] ?? false;
 
           return (
@@ -299,28 +313,30 @@ export function IllustratedBoard({
               style={{
                 left: `${cellPercent(table.col)}%`,
                 top: `${cellPercent(table.row)}%`,
-                width: '7.8%',
-                height: '7.8%',
+                width: '8.4%',
+                height: '8.4%',
                 backgroundColor: meta.primaryColor,
                 borderColor: isComplete ? '#C9A227' : '#3E2F2A',
               }}
-              className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 shadow-[0_4px_10px_rgba(62,47,42,0.32)] flex flex-col items-center justify-center cursor-pointer transition-transform z-20 ${
+              className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 shadow-[0_5px_12px_rgba(62,47,42,0.34)] flex flex-col items-center justify-center cursor-pointer transition-all duration-200 z-20 ${
                 isFocused
                   ? 'ring-3 ring-[#C96F4A] scale-115 z-30'
-                  : isComplete && !reducedMotion
-                    ? 'ring-2 ring-[#F2C14E] scale-105'
-                    : 'hover:scale-108'
+                  : isDimmedByFocus
+                    ? 'opacity-30 saturate-50 scale-95'
+                    : isComplete && !reducedMotion
+                      ? 'ring-2 ring-[#F2C14E] scale-105'
+                      : 'hover:scale-106'
               }`}
             >
               {/* Scalloped inner tablecloth ring */}
               <span
-                className="pointer-events-none absolute inset-[2.5px] rounded-full border border-dashed opacity-80"
+                className="pointer-events-none absolute inset-[2.5px] rounded-full border border-dashed opacity-85"
                 style={{ borderColor: meta.accentColor }}
               />
 
               {/* Central Cream Medallion with Country Flag SVG */}
-              <div className="relative z-10 w-[62%] h-[62%] rounded-full bg-[#FFF9F0] border border-[#3E2F2A]/40 flex items-center justify-center shadow-2xs">
-                <FlagBadge nation={table.nation} size={13} />
+              <div className="relative z-10 w-[64%] h-[64%] rounded-full bg-[#FFF9F0] border border-[#3E2F2A]/45 flex items-center justify-center shadow-2xs">
+                <FlagBadge nation={table.nation} size={14} />
               </div>
 
               {/* 4 occupancy pips */}
@@ -338,7 +354,7 @@ export function IllustratedBoard({
           );
         })}
 
-        {/* 68 PHYSICAL ILLUSTRATED CHAIRS (Rounded wooden chairs with backrest & bicolor cushion) */}
+        {/* 68 PHYSICAL ILLUSTRATED CHAIRS (Smaller 5.1% wooden chairs; flags ONLY on shared chairs) */}
         {gameState.seats.map((seat) => {
           const inspect = seatInspections[seat.id];
           const draftItem = draftPlacements.find((d) => d.seatId === seat.id);
@@ -359,6 +375,7 @@ export function IllustratedBoard({
           const metaA = NATION_VISUALS[natA as NationKey] ?? NATION_VISUALS.fr;
           const metaB = natB ? NATION_VISUALS[natB as NationKey] : null;
           const isShared = Boolean(metaB);
+          const isDimmedByFocus = Boolean(focusedSeatSet && !focusedSeatSet.has(seat.id));
 
           const isLegalComplete = inspect?.status === 'legal_complete';
           const isLegalPair = inspect?.status === 'legal_needs_pair';
@@ -381,6 +398,7 @@ export function IllustratedBoard({
               key={seat.id}
               type="button"
               data-seat-id={seat.id}
+              data-seat-shared={isShared ? 'true' : 'false'}
               onClick={() => onSeatClick(seat)}
               onMouseEnter={() => setHoveredSeatId(seat.id)}
               onMouseLeave={() => setHoveredSeatId((prev) => (prev === seat.id ? null : prev))}
@@ -393,71 +411,88 @@ export function IllustratedBoard({
               style={{
                 left: `${cellPercent(seat.col)}%`,
                 top: `${cellPercent(seat.row)}%`,
-                width: '5.9%',
-                height: '5.9%',
+                width: '5.1%',
+                height: '5.1%',
               }}
-              className={`group absolute -translate-x-1/2 -translate-y-1/2 rounded-[10px] sm:rounded-[12px] flex flex-col items-center justify-center transition-all cursor-pointer select-none ${
-                occupant
-                  ? isSelectedDraft
-                    ? 'z-30 ring-3 ring-[#C9A227] scale-112 shadow-md'
-                    : 'z-20 shadow-sm hover:scale-105'
-                  : isLegalComplete
-                    ? 'z-30 ring-3 ring-[#3F8F6B] bg-[#E6F4EA] scale-115 shadow-[0_0_12px_rgba(63,143,107,0.65)]'
-                    : isLegalPair
-                      ? 'z-30 ring-3 ring-[#C9A227] bg-[#FEF6E0] scale-112 shadow-[0_0_12px_rgba(201,162,39,0.65)]'
-                      : selectedTile
-                        ? 'z-10 opacity-65 hover:opacity-100'
-                        : 'z-15 hover:scale-105'
+              className={`group absolute -translate-x-1/2 -translate-y-1/2 rounded-[9px] sm:rounded-[11px] flex flex-col items-center justify-center transition-all duration-200 cursor-pointer select-none ${
+                isDimmedByFocus
+                  ? 'z-10 opacity-25 saturate-50 scale-95'
+                  : occupant
+                    ? isSelectedDraft
+                      ? 'z-30 ring-3 ring-[#C9A227] scale-112 shadow-md'
+                      : 'z-20 shadow-sm hover:scale-105'
+                    : isLegalComplete
+                      ? 'z-30 ring-3 ring-[#3F8F6B] bg-[#E6F4EA] scale-115 shadow-[0_0_12px_rgba(63,143,107,0.65)]'
+                      : isLegalPair
+                        ? 'z-30 ring-3 ring-[#C9A227] bg-[#FEF6E0] scale-112 shadow-[0_0_12px_rgba(201,162,39,0.65)]'
+                        : selectedTile
+                          ? 'z-10 opacity-65 hover:opacity-100'
+                          : 'z-15 hover:scale-105'
               }`}
             >
               {/* Physical Chair Top Wooden Backrest Bar */}
               <span
                 aria-hidden="true"
-                className="pointer-events-none absolute -top-[3px] left-[14%] right-[14%] h-[4px] rounded-t-full bg-[#6E472B] border border-[#3E2F2A]"
+                className="pointer-events-none absolute -top-[3px] left-[14%] right-[14%] h-[3.5px] rounded-t-full bg-[#6E472B] border border-[#3E2F2A]"
               />
 
-              {/* Chair Cushion Frame (Bicolor for Shared Chairs, Solid for Single Chairs) */}
+              {/* Chair Wood Rim + Cushion (Bicolor for Shared Chairs, Country Color for Single Chairs) */}
               <div
-                className="relative w-full h-full rounded-[9px] sm:rounded-[11px] border-2 border-[#5C3A21] shadow-inner overflow-hidden flex items-center justify-center"
+                className="relative w-full h-full rounded-[8px] sm:rounded-[10px] border-2 border-[#5C3A21] shadow-inner overflow-hidden flex items-center justify-center"
                 style={{
                   background: metaB
                     ? `linear-gradient(135deg, ${metaA.primaryColor} 0%, ${metaA.primaryColor} 50%, ${metaB.primaryColor} 50%, ${metaB.primaryColor} 100%)`
-                    : metaA.primaryColor,
+                    : '#7A4E2D',
                 }}
               >
-                {/* Inner Cream Cushion Pad */}
+                {/* Inner Cushion Pad */}
                 <div
-                  className={`w-[76%] h-[76%] rounded-[6px] sm:rounded-[8px] flex items-center justify-center overflow-hidden ${
+                  className={`w-[78%] h-[78%] rounded-[5px] sm:rounded-[7px] flex items-center justify-center overflow-hidden ${
                     occupant
                       ? 'bg-[#FFF9F0] rounded-full'
                       : isLegalComplete
                         ? 'bg-[#E6F4EA]'
                         : isLegalPair
                           ? 'bg-[#FEF6E0]'
-                          : 'bg-[#FFF9F0]/92'
+                          : isShared
+                            ? 'bg-[#FFF9F0]/92'
+                            : ''
                   }`}
+                  style={
+                    !occupant && !isLegalComplete && !isLegalPair && !isShared
+                      ? { backgroundColor: metaA.primaryColor }
+                      : undefined
+                  }
                 >
                   {occupant && occupantProfile ? (
                     <div className="relative w-full h-full flex items-center justify-center">
                       <CharacterPortrait
                         nation={occupant.nation === 'joker' ? 'joker' : occupant.nation}
                         gender={occupant.gender}
-                        size={26}
+                        size={23}
                       />
                     </div>
                   ) : selectedTile && (isLegalComplete || isLegalPair) && isHovered ? (
-                    <div className="opacity-65 scale-95 flex items-center justify-center">
+                    <div className="opacity-70 scale-95 flex items-center justify-center">
                       <CharacterPortrait
                         nation={selectedTile.nation}
                         gender={selectedTile.gender}
-                        size={24}
+                        size={21}
                       />
                     </div>
-                  ) : (
+                  ) : isShared && natB ? (
+                    /* Shared chairs keep their two mini flags */
                     <div className="flex items-center justify-center gap-0.5">
-                      <FlagBadge nation={natA} size={isShared ? 8 : 11} />
-                      {natB && <FlagBadge nation={natB} size={8} />}
+                      <FlagBadge nation={natA} size={7} />
+                      <FlagBadge nation={natB} size={7} />
                     </div>
+                  ) : (
+                    /* Normal empty chairs: wood + country color cushion + subtle upholstery button, NO flag */
+                    <span
+                      aria-hidden="true"
+                      className="w-1.5 h-1.5 rounded-full border border-[#3E2F2A]/35 shadow-2xs"
+                      style={{ backgroundColor: metaA.accentColor }}
+                    />
                   )}
                 </div>
               </div>
