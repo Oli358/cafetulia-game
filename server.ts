@@ -33,8 +33,9 @@ async function startServer(): Promise<void> {
 
   const httpServer = createServer(app);
   const port = Number(process.env.PORT ?? 3000);
-  httpServer.listen(port, '0.0.0.0', () => {
-    console.log(`Cafetulia full-stack server running on http://0.0.0.0:${port}`);
+  const host = process.env.HOST ?? '0.0.0.0';
+  httpServer.listen(port, host, () => {
+    console.log(`Cafetulia full-stack server running on http://${host}:${port}`);
   });
 }
 

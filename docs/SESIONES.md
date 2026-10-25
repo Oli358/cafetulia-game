@@ -5,6 +5,29 @@
 
 ---
 
+## Sesión 022 — 2026-10-25 — Cierre del puerto LAN y túnel HTTPS activo
+
+**Objetivo:** dejar de exponer el puerto local en la Wi-Fi y mantener la web accesible por HTTPS para la prueba en teléfono.
+
+**Hecho:**
+- `server.ts` acepta `HOST` (por defecto `0.0.0.0` para Render).
+- Servidor de producción reiniciado con `HOST=127.0.0.1`: el puerto `3000` ya no escucha en la LAN.
+- `http://172.20.10.6:3000` queda cerrado; `http://127.0.0.1:3000` sigue funcionando para el túnel.
+- Cloudflare Tunnel sigue activo: `https://logging-pretty-flow-expression.trycloudflare.com`.
+- Verificado `/health` por localhost y por el túnel; la LAN devuelve conexión rechazada.
+
+**Decisiones:**
+- El túnel HTTPS se mantiene mientras el PC y `cloudflared` estén encendidos; el acceso directo por LAN queda cerrado.
+
+**Problemas:**
+- Si se apaga el PC o se reinicia `cloudflared`, la URL temporal deja de estar disponible.
+
+**Siguiente:**
+1. Probar la v7 en el teléfono con la URL HTTPS.
+2. Continuar mañana con los ajustes que salgan de la prueba.
+
+---
+
 ## Sesión 021 — 2026-10-25 — Integración v7, mano centrada y montaje PWA local
 
 **Objetivo:** integrar la entrega v7, corregir el descentrado de la mano que se ve en la captura del usuario y dejar una versión de producción montada en local para instalar la PWA desde el teléfono.
