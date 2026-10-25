@@ -282,6 +282,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
 
   setAvatarId: async (avatarId: string) => {
     const clean = avatarId.trim().slice(0, 24) || 'moka';
+    soundEngine.playSfx('uiAvatar');
     set({ avatarId: clean });
     try {
       window.localStorage.setItem('cafetulia_avatar_id', clean);
@@ -306,21 +307,34 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
     }
   },
 
-  setActiveModal: (modal) =>
+  setActiveModal: (modal) => {
+    if (modal === 'tutorial') soundEngine.playSfx('uiTutorial');
+    else if (modal === 'rules') soundEngine.playSfx('uiRules');
+    else if (modal === 'settings') soundEngine.playSfx('uiSettings');
+    else if (modal) soundEngine.playSfx('uiOpen');
+    else if (get().activeModal) soundEngine.playSfx('uiClose');
     set({
       activeModal: modal,
       activeOverlay: modal ? null : get().activeOverlay,
-    }),
-  setActiveOverlay: (overlay) =>
+    });
+  },
+  setActiveOverlay: (overlay) => {
+    if (overlay) soundEngine.playSfx('uiOpen');
+    else if (get().activeOverlay) soundEngine.playSfx('uiClose');
     set({
       activeOverlay: overlay,
       activeModal: overlay ? null : get().activeModal,
-    }),
+    });
+  },
   toggleOverlay: (overlay) =>
-    set((s) => ({
-      activeOverlay: s.activeOverlay === overlay ? null : overlay,
-      activeModal: s.activeOverlay === overlay ? s.activeModal : null,
-    })),
+    set((s) => {
+      const next = s.activeOverlay === overlay ? null : overlay;
+      soundEngine.playSfx(next ? 'uiOpen' : 'uiClose');
+      return {
+        activeOverlay: next,
+        activeModal: next ? null : s.activeModal,
+      };
+    }),
   setErrorBanner: (msg) => set({ errorBanner: msg }),
   setWhyCannotBanner: (msg) => set({ whyCannotBanner: msg }),
   setViewMode: (mode) => set({ viewMode: mode }),
@@ -351,6 +365,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
     })),
 
   setSubtitleMode: (mode) => {
+    soundEngine.playSfx('uiAvatar');
     try {
       window.localStorage.setItem('cafetulia_subtitle_mode', mode);
       window.localStorage.setItem('cafetulia_event_subtitles', String(mode !== 'off'));
@@ -361,6 +376,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   },
 
   setSubtitleStyle: (style) => {
+    soundEngine.playSfx('uiAvatar');
     try {
       window.localStorage.setItem('cafetulia_subtitle_style', style);
     } catch {
@@ -371,6 +387,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
 
   toggleSetting: (key) =>
     set((s) => {
+      soundEngine.playSfx('uiToggle');
       const nextVal = !s[key];
       if (key === 'eventSubtitles') {
         const nextMode: 'off' | 'key' = nextVal ? 'key' : 'off';
@@ -432,10 +449,11 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
       });
       const data = await res.json();
       if (!res.ok) {
+        soundEngine.playSfx('uiError');
         set({ isBusy: false, errorBanner: data.message ?? 'No se pudo crear la sala.' });
         return false;
       }
-      soundEngine.playSfx('bell');
+      soundEngine.playSfx('uiCreateRoom');
       set({
         isBusy: false,
         roomCode: data.code,
@@ -448,6 +466,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
       });
       return true;
     } catch {
+      soundEngine.playSfx('uiError');
       set({ isBusy: false, errorBanner: 'Error de conexión con el servidor.' });
       return false;
     }
@@ -457,6 +476,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
     const { nickname, avatarId, guestToken } = get();
     const cleanCode = code.trim().toUpperCase();
     if (!cleanCode) {
+      soundEngine.playSfx('uiError');
       set({ errorBanner: 'Introduce un código de sala válido.' });
       return false;
     }
@@ -474,10 +494,11 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
       });
       const data = await res.json();
       if (!res.ok) {
+        soundEngine.playSfx('uiError');
         set({ isBusy: false, errorBanner: data.message ?? 'Sala no encontrada.' });
         return false;
       }
-      soundEngine.playSfx('bell');
+      soundEngine.playSfx('uiJoinRoom');
       const phase = data.snapshot.phase as 'lobby' | 'playing' | 'finished';
       set({
         isBusy: false,
@@ -491,12 +512,14 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
       });
       return true;
     } catch {
+      soundEngine.playSfx('uiError');
       set({ isBusy: false, errorBanner: 'No se pudo conectar a la sala.' });
       return false;
     }
   },
 
   quickStartWithBots: async (botCount = 1, difficulty = 'medium') => {
+    soundEngine.playSfx('uiPlay');
     const clampedMax = Math.min(4, Math.max(2, botCount + 1)) as 2 | 3 | 4;
     const created = await get().createRoom({
       maxPlayers: clampedMax,
@@ -513,6 +536,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   updateRoomConfig: async (patch) => {
     const { roomCode, myPlayerId } = get();
     if (!roomCode || !myPlayerId) return;
+    soundEngine.playSfx('uiToggle');
     const res = await fetch(`/rooms/${roomCode}/config`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -527,6 +551,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   toggleReady: async (ready) => {
     const { roomCode, myPlayerId } = get();
     if (!roomCode || !myPlayerId) return;
+    soundEngine.playSfx('uiReady');
     const res = await fetch(`/rooms/${roomCode}/ready`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -548,8 +573,10 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
     });
     const data = await res.json();
     if (res.ok && data.snapshot) {
+      soundEngine.playSfx('botJoin');
       set({ snapshot: data.snapshot });
     } else if (data.message) {
+      soundEngine.playSfx('uiError');
       set({ errorBanner: data.message });
     }
   },
@@ -557,6 +584,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   removeBot: async (botId) => {
     const { roomCode, myPlayerId } = get();
     if (!roomCode || !myPlayerId) return;
+    soundEngine.playSfx('uiLeave');
     const res = await fetch(`/rooms/${roomCode}/bots/${botId}?playerId=${myPlayerId}`, {
       method: 'DELETE',
     });
@@ -576,10 +604,11 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
     });
     const data = await res.json();
     if (!res.ok) {
+      soundEngine.playSfx('uiError');
       set({ errorBanner: data.message ?? 'No se pudo iniciar la partida.' });
       return false;
     }
-    soundEngine.playSfx('bell');
+    soundEngine.playSfx('uiStart');
     set({
       snapshot: data.snapshot,
       screen: data.snapshot.phase,
@@ -722,7 +751,8 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
     }
   },
 
-  leaveRoom: () =>
+  leaveRoom: () => {
+    soundEngine.playSfx('uiLeave');
     set({
       screen: 'title',
       roomCode: null,
@@ -737,10 +767,16 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
       pendingNegativeConfirm: null,
       activeOverlay: null,
       activeModal: null,
-    }),
+    });
+  },
 }));
 
-if (typeof window !== 'undefined') {
+if (
+  typeof window !== 'undefined' &&
+  (import.meta.env.DEV ||
+    import.meta.env.MODE !== 'production' ||
+    (typeof navigator !== 'undefined' && navigator.webdriver))
+) {
   (window as unknown as { __CAFETULIA_STORE__?: typeof useGameStore }).__CAFETULIA_STORE__ =
     useGameStore;
 }

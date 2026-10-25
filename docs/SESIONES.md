@@ -5,6 +5,71 @@
 
 ---
 
+## Sesión 021 — 2026-10-25 — Integración v7, mano centrada y montaje PWA local
+
+**Objetivo:** integrar la entrega v7, corregir el descentrado de la mano que se ve en la captura del usuario y dejar una versión de producción montada en local para instalar la PWA desde el teléfono.
+
+**Hecho:**
+- Extraído e integrado `cafetulia (6).zip`: `apps/web/src`, `packages/ui/src` y E2E. No se copiaron `.aistudio`, `metadata.json` ni ZIPs antiguos.
+- Verificado: `typecheck`, **49 tests**, `build`, `lint` y E2E completos en verde.
+- Corregido el **mazo/mano descentrado**: el dock usa una rejilla `minmax(0,1fr) auto minmax(0,1fr)` en escritorio; la fila de fichas queda exactamente en el centro del dock, tanto con 3 como con 5 cartas.
+  - Medido: dock centro `960` / mano centro `960` a 1920×900; dock centro `640` / mano centro `640` a 1280×800.
+  - Capturas: `docs/referencias/ui-v7-mano-centrada-1920.png` y `ui-v7-mano-centrada-1280.png`.
+- Corregido el **service worker de producción**: el entry real del build es `src/main.tsx` (raíz), que no registraba `/sw.js`; ahora sí lo hace solo en `PROD`.
+- Añadidos iconos PWA reales: `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` y `apple-touch-icon.png`; actualizado `manifest.webmanifest`, `index.html`, `sw.js` (`cafetulia-shell-v4`) y cabeceras de iconos.
+- Añadido fallback de copiado al portapapeles para HTTP/móvil, evitando el `NotAllowedError` de `navigator.clipboard`.
+- Montado build de producción en `0.0.0.0:3000` y túnel HTTPS de Cloudflare:
+  - LAN: `http://172.20.10.6:3000` (Wi-Fi; puerto 3000).
+  - PWA HTTPS: `https://logging-pretty-flow-expression.trycloudflare.com`.
+  - Comprobado con CDP: `Page.getInstallabilityErrors` devuelve `[]`; manifest e iconos sirven 200; service worker activo.
+- La PWA se puede instalar desde el túnel HTTPS; el HTTP local sirve para jugar en la misma Wi-Fi, pero no para service worker/PWA en móvil.
+
+**Decisiones:**
+- La mano se centra siempre respecto al dock completo, no respecto al espacio que deja el panel de detalle (D-081).
+- Para probar la PWA en teléfono se usa un túnel HTTPS temporal y iconos PNG 192/512/maskable; el túnel no es permanente (D-082).
+
+**Problemas:**
+- El túnel de Cloudflare es temporal y cambia si se reinicia; depende de que el PC y el proceso sigan encendidos.
+- Queda la prueba real en iPhone/Android: audio tras el primer toque, safe areas, táctil y rendimiento.
+- El aviso de chunk `three-vendor` de 683 kB sigue ahí, aunque el 3D es lazy.
+
+**Siguiente:**
+1. Que el usuario pruebe la v7 en el teléfono con la URL HTTPS.
+2. Corregir lo que salga de la prueba real.
+3. Desplegar en Render.
+
+---
+
+## Sesión 020 — 2026-10-25 — Implementación y verificación completa de Cafetulia v7 (`10-menu-sonido-musica.md`)
+
+**Objetivo:** aplicar al completo el encargo `docs/ARGON/10-menu-sonido-musica.md` sobre la base v6 verificada: convertir la portada y el lobby en una escena viva de café, añadir SFX de UI diferenciados por acción, evolucionar la música lo-fi a una progresión de 24 compases con capas y crossfades, y dejar lista la entrega para probar en iPhone/Android.
+
+**Hecho:**
+- **P0 — Portada, Lobby, Ajustes «Sonido del café» y transiciones (`Screens.tsx`, `Modals.tsx`, `App.tsx`, `packages/ui`):**
+  - Portada rediseñada con escena ilustrada en SVG (`CafeCornerIllustration`: ventana arqueada, planta colgante, gato dormido, tocadiscos con vinilo, mesa con taza humeante y placa `O & A`), avatar protagonista en la barra (`title-hero-avatar`) que abre el selector de avatares, saludo horario personalizado (`getCafeGreeting`), frase rotatoria de pizarra (`CAFE_DAILY_PHRASES`) y carta de menú (`title-menu-card`) con iconos SVG, microcopy y áreas táctiles `>= 44 px`.
+  - Lobby rediseñado como mesa preparada con 4 sillas (`lobby-table-scene`, `lobby-seat-0..3`), código de sala en servilleta con sello de copiado (`lobby-napkin-code`), sello visual de «Listo en mesa» (`lobby-ready-stamp`), entrada animada de bots y controles táctiles segmentados para sillas y reloj (`lobby-maxplayers-control`, `lobby-timer-control`).
+  - Modal de Ajustes ampliado con la sección «Sonido del café» (`settings-sound-section`): botón único de `Silenciar todo`, `Probar sonido`, selector de atmósfera (`Tertulia / Lluvia / Noche`), sliders con tick cerámico de vista previa y ajuste de vibración háptica.
+  - Transición de vapor de café / papel (`250 ms`) entre pantallas con `motion/react` y `AnimatePresence`, respetando `reducedMotion`.
+- **P1 — SFX de UI diferenciados y música lo-fi de 24 compases (`soundEngine.ts`, `gameStore.ts`):**
+  - Añadidos 20 SFX de UI diferenciados (`uiPlay`, `uiCreateRoom`, `uiJoinRoom`, `uiTutorial`, `uiRules`, `uiSettings`, `uiCopy`, `uiReady`, `uiStart`, `uiLeave`, `uiOpen`, `uiClose`, `uiConfirm`, `uiCancel`, `uiToggle`, `uiAvatar`, `uiSlider`, `uiError`, `uiHover`, `botJoin`) junto a los 12 SFX de partida.
+  - Motor musical con scheduler Web Audio (lookahead de `0.25 s` cada `85 ms`), progresión de 24 compases (~80 s por vuelta) con secciones A1/A2/B/A3 y orden alterno en vueltas impares, 5 capas sintetizadas (contrabajo, Rhodes, escobillas, trompeta con sordina en sección B y ambiente de vinilo/lluvia/tazas), crossfade entre pantallas (`setScreenTheme`) y ducking automático (`duckMusic`).
+  - Limitada la exposición de `window.__CAFETULIA_STORE__` a desarrollo/test (`import.meta.env.DEV || navigator.webdriver`).
+- **Verificación y capturas:**
+  - `npx pnpm typecheck`, `npx pnpm test` (**49 tests** + 1.000 partidas simuladas), `npx pnpm lint`, `npx pnpm build` y `npx pnpm test:e2e` en verde.
+  - Generadas y verificadas visualmente las 5 capturas requeridas en `docs/referencias/ui-v7-portada-1920.png`, `ui-v7-portada-1280.png`, `ui-v7-portada-movil.png`, `ui-v7-lobby.png` y `ui-v7-ajustes-sonido.png`.
+
+**Decisiones:**
+- Se cierran e implementan en código D-075 (portada y lobby como escena de café), D-076 (20 SFX de UI diferenciados con ducking y háptica opcional), D-077 (música lo-fi de 24 compases con scheduler Web Audio y 3 atmósferas) y D-080 (`window.__CAFETULIA_STORE__` restringido a desarrollo/test).
+
+**Problemas:**
+- Queda pendiente la validación física en un iPhone/Android real y el despliegue final en Render (el entorno de CI/Playwright ejecuta Chromium sin hardware de audio físico, por lo que se incluye checklist manual en `CAMBIOS.md`).
+
+**Siguiente:**
+1. Probar `cafetulia-v7.zip` en iPhone/Android real con la checklist manual de `CAMBIOS.md`.
+2. Desplegar en Render.
+
+---
+
 ## Sesión 019 — 2026-10-25 — Preparación del encargo v7: menú, sonido y música
 
 **Objetivo:** cerrar el alcance del siguiente pase de Argon y preparar un ZIP limpio y un prompt corto para copiar y pegar, sin hacerle leer documentación larga.

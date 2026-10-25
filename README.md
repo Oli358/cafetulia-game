@@ -10,24 +10,20 @@ Juego digital cozy, online y para **2–4 jugadores**, basado en **Café Interna
 
 ## Estado actual
 
-- **v1.3 integrada y verificada (entrega v6): cabecera estable en dos filas, menús exclusivos en portal dentro del viewport, `Cambiar comodín` explicado, final escenificado con confeti y créditos `O & A`, caricaturas 3/4 y dock translúcido. Próximo pase: menú personalizado, SFX de UI y música con variación.**
+- **v1.4 integrada y verificada (entrega v7): portada y lobby como escena viva de café, 20 SFX de interfaz diferenciados, música lo-fi de 24 compases con 5 capas, crossfades y ducking, más todas las mejoras de la v6 (cabecera en dos filas, menús exclusivos, `Cambiar comodín`, final escenificado y placa `O & A`).**
 - Monorepo con pnpm workspaces, TypeScript estricto, ESLint, Prettier, Vitest y Playwright.
-- Motor de reglas determinista en `packages/engine`: **48 tests en verde** (motor + servidor + helpers) y **1.000 partidas simuladas** con `fast-check`.
+- Motor de reglas determinista en `packages/engine`: **49 tests en verde** (motor + servidor + helpers v6/v7) y **1.000 partidas simuladas** con `fast-check`.
 - `packages/content/board.json` validado: **24 mesas, 68 sillas, 28 compartidas y 20 plazas de barra**.
 - Servidor autoritativo con Colyseus: salas privadas de 6 caracteres, 2–4 jugadores, bots, reconexión de 15 s, temporizador, chat efímero, revancha, persistencia SQLite y **avatares de perfil**.
-- Cliente rediseñado (v6):
+- Cliente rediseñado (v6 + v7):
   - **Portada, lobby, partida y pantalla final sin scroll** en 1920×900, 1280×800 y 390×844.
-  - **Cabecera estable en dos filas**: acciones fijas en una sola fila superior y marcador compacto con `formatScoreEs` (`1.234`, `9.999`) en la segunda fila.
-  - **Menús mutuamente excluyentes (`activeOverlay`)** y popovers renderizados en portal siempre dentro del viewport (`<AnchoredPopover>`).
-  - **Jerarquía clara del tablero**: banderas de mesa discretas (`14px`) frente a fichas sentadas cuadradas prominentes (`6.5%`), sillas compartidas bicolores y sillas vacías neutras.
-  - **Fichas 1:1 con bandera de fondo y caricatura 3/4 original**, sin texto impreso; el detalle aparece al seleccionar; clic/tap como interacción principal + drag opcional.
-  - **Cambiar comodín** explicado paso a paso en popover contextual con confirmación.
-  - **Pantalla final escenificada (`FinishedScreen`)**: sello `¡FINAL!`, ganador destacado, lluvia de confeti de papel, clasificación escalonada, créditos y dedicatoria **O & A**.
-  - **Monedas 1 negra, 5 roja, 10 azul**, pilas exactas, animación **coin flip** 3D y sonido arcade sintetizado de dos notas ascendentes.
-  - **16 avatares prehechos**, **subtítulos de eventos** (Cómic, Café, Arcade) y **Café Vivo 3D** con carga diferida (`React.lazy` + `Suspense`).
-- Verificado: `typecheck`, `lint`, `build`, **48 tests**, E2E de Playwright y 6 capturas `docs/referencias/ui-v6-*.png`.
+  - **Portada como escena de café**: ventana arqueada, planta, gato dormido, tocadiscos, taza humeante, avatar sentado en la barra, saludo horario personalizado, frase del día y carta de menú con iconos SVG y microcopy.
+  - **Lobby como mesa preparada**: 4 sillas alrededor del mantel, código de sala en servilleta con sello de copiado, sello de «Listo en mesa» y controles táctiles segmentados.
+  - **Sonido del café y música viva**: 20 SFX de UI diferenciados + 12 SFX de juego, progresión lo-fi de 24 compases con scheduler Web Audio, 3 atmósferas (`Tertulia`, `Lluvia`, `Noche`), crossfade por pantalla y ducking automático.
+  - **Cabecera estable en dos filas**, **menús mutuamente excluyentes (`activeOverlay`)**, **jerarquía clara del tablero**, **fichas 1:1 con caricatura 3/4**, **Cambiar comodín explicado** y **pantalla final escenificada (`FinishedScreen`)** con placa **O & A**.
+- Verificado: `typecheck`, `lint`, `build`, **49 tests**, E2E de Playwright y capturas `docs/referencias/ui-v7-*.png`.
 - **Requiere Node 22.5+** (usa `node:sqlite`). Recomendado Node 24 LTS.
-- Pendiente: convertir la portada/lobby en una escena de café personalizada, añadir SFX diferenciados por acción, ampliar la música lo-fi con capas y variación, probar en iPhone/Android reales y desplegar en Render.
+- Montaje local de producción con PWA instalable mediante HTTPS temporal; mano centrada, iconos 192/512 y service worker corregido. Pendiente: prueba física en iPhone/Android real con la checklist de `CAMBIOS.md` y despliegue en Render.
 
 ## Comandos
 

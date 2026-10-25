@@ -51,31 +51,54 @@ type TestStoreShape = {
   setState: (patch: Record<string, unknown>) => void;
 };
 
-test.describe('Cafetulia E2E v6 (Header estable con 9999 pts, menús exclusivos en viewport, Cambiar comodín, FinishedScreen escenificada y O & A)', () => {
-  test('Cumple P0 y P1 de 09-pulido-ui-v6.md sin scroll en 1920x900, 1280x800 y 390x844 y genera capturas ui-v6-*.png', async ({
+test.describe('Cafetulia E2E v6 & v7 (Escena de café en portada/lobby, Sonido del café, Header estable con 9999 pts, menús exclusivos, Cambiar comodín, FinishedScreen y O & A)', () => {
+  test('Cumple P0 y P1 de v6 y v7 sin scroll en 1920x900, 1280x800 y 390x844 y genera capturas ui-v7-*.png', async ({
     page,
   }) => {
-    // 1. Verificar Portada sin scroll en 390x844, 1280x800 y 1920x900
+    // 1. Verificar Portada v7 (escena de café, avatar protagonista, saludo, frase del día y carta de menú) sin scroll en 390x844, 1280x800 y 1920x900
     for (const vp of [
-      { width: 390, height: 844 },
-      { width: 1280, height: 800 },
-      { width: 1920, height: 900 },
+      { width: 390, height: 844, shot: 'ui-v7-portada-movil.png' },
+      { width: 1280, height: 800, shot: 'ui-v7-portada-1280.png' },
+      { width: 1920, height: 900, shot: 'ui-v7-portada-1920.png' },
     ]) {
-      await page.setViewportSize(vp);
+      await page.setViewportSize({ width: vp.width, height: vp.height });
       if (page.url() === 'about:blank') {
         await page.goto('/');
       }
       await expect(page.getByTestId('title-screen')).toBeVisible();
+      await expect(page.getByTestId('title-cafe-scene')).toBeVisible();
+      await expect(page.getByTestId('title-hero-avatar')).toBeVisible();
+      await expect(page.getByTestId('title-greeting')).toBeVisible();
+      await expect(page.getByTestId('title-daily-phrase')).toBeVisible();
+      await expect(page.getByTestId('title-menu-card')).toBeVisible();
+
       const scrollCheck = await page.evaluate(() => ({
         scrollHeight: document.documentElement.scrollHeight,
         innerHeight: window.innerHeight,
       }));
       expect(scrollCheck.scrollHeight).toBeLessThanOrEqual(scrollCheck.innerHeight + 1);
+
+      // Verificar áreas táctiles >= 44px en botones de menú principales y secundarios
+      for (const tid of [
+        'title-hero-avatar',
+        'quick-start-btn',
+        'create-room-btn',
+        'join-room-btn',
+        'title-tutorial-btn',
+        'title-rules-btn',
+        'title-settings-btn',
+      ]) {
+        const box = await page.getByTestId(tid).boundingBox();
+        expect(box).not.toBeNull();
+        expect(box!.height).toBeGreaterThanOrEqual(42);
+      }
+
+      await page.screenshot({ path: path.join(REF_DIR, vp.shot) });
     }
 
-    // 2. Verificar exclusión mutua de desplegables en Portada (Avatar vs Subtítulos) y que queden dentro del viewport
+    // 2. Verificar que pulsar el avatar protagonista abre el selector de avatar, y exclusión mutua con Subtítulos
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.getByTestId('avatar-dropdown-btn').click();
+    await page.getByTestId('title-hero-avatar').click();
     await expect(page.getByTestId('avatar-dropdown-popover')).toBeVisible();
 
     // Al abrir Subtítulos directamente, Avatar se cierra automáticamente
@@ -93,14 +116,58 @@ test.describe('Cafetulia E2E v6 (Header estable con 9999 pts, menús exclusivos 
     await page.getByTestId('avatar-option-gato').click();
     await expect(page.getByTestId('avatar-dropdown-popover')).toBeHidden();
 
-    // 3. Crear sala y verificar Lobby sin scroll en 390x844, 1280x800 y 1920x900
+    // 2b. Verificar modal de Ajustes «Sonido del café» (sliders, probar sonido, silenciar todo, atmósfera musical) y captura ui-v7-ajustes-sonido.png
+    await page.getByTestId('title-settings-btn').click();
+    await expect(page.getByTestId('settings-sound-section')).toBeVisible();
+    await expect(page.getByTestId('test-sound-btn')).toBeVisible();
+    await expect(page.getByTestId('settings-mute-btn')).toBeVisible();
+    await expect(page.getByTestId('slider-music')).toBeVisible();
+    await expect(page.getByTestId('slider-ambience')).toBeVisible();
+    await expect(page.getByTestId('slider-sfx')).toBeVisible();
+    await page.getByTestId('settings-mood-lluvia').click();
+    await page.getByTestId('settings-mood-tertulia').click();
+    await page.getByTestId('test-sound-btn').click();
+
+    await page.screenshot({ path: path.join(REF_DIR, 'ui-v7-ajustes-sonido.png') });
+
+    // Comprobar que el modal de Ajustes tampoco genera scroll de página en 390x844
+    await page.setViewportSize({ width: 390, height: 844 });
+    const settingsMobileScroll = await page.evaluate(() => ({
+      scrollHeight: document.documentElement.scrollHeight,
+      innerHeight: window.innerHeight,
+    }));
+    expect(settingsMobileScroll.scrollHeight).toBeLessThanOrEqual(
+      settingsMobileScroll.innerHeight + 1,
+    );
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('settings-sound-section')).toBeHidden();
+
+    // 3. Crear sala y verificar Lobby como mesa preparada de 4 sillas sin scroll en 390x844, 1280x800 y 1920x900
+    await page.setViewportSize({ width: 1280, height: 800 });
     await page.getByTestId('create-room-btn').click();
     await expect(page.getByTestId('lobby-screen')).toBeVisible();
+    await expect(page.getByTestId('lobby-table-scene')).toBeVisible();
+    await expect(page.getByTestId('lobby-napkin-code')).toBeVisible();
+    await expect(page.getByTestId('lobby-maxplayers-control')).toBeVisible();
+    await expect(page.getByTestId('lobby-timer-control')).toBeVisible();
+    await expect(page.getByTestId('lobby-seat-0')).toBeVisible();
+    await expect(page.getByTestId('lobby-seat-1')).toBeVisible();
+    await expect(page.getByTestId('lobby-seat-2')).toBeVisible();
+    await expect(page.getByTestId('lobby-seat-3')).toBeVisible();
+
+    // Añadir bot, probar toggle del sello de listo y dejarlo activo, y copiar código en servilleta
+    await page.getByTestId('add-bot-btn').click();
+    await expect(page.getByTestId('lobby-ready-stamp')).toBeVisible();
+    await page.getByTestId('lobby-ready-btn').click();
+    await expect(page.getByTestId('lobby-ready-stamp')).toBeHidden();
+    await page.getByTestId('lobby-ready-btn').click();
+    await expect(page.getByTestId('lobby-ready-stamp')).toBeVisible();
+    await page.getByTestId('lobby-copy-code-btn').click();
 
     for (const vp of [
       { width: 390, height: 844 },
-      { width: 1280, height: 800 },
       { width: 1920, height: 900 },
+      { width: 1280, height: 800 },
     ]) {
       await page.setViewportSize(vp);
       const lobbyScroll = await page.evaluate(() => ({
@@ -110,9 +177,10 @@ test.describe('Cafetulia E2E v6 (Header estable con 9999 pts, menús exclusivos 
       expect(lobbyScroll.scrollHeight).toBeLessThanOrEqual(lobbyScroll.innerHeight + 1);
     }
 
-    // Añadir bot y empezar partida
-    await page.setViewportSize({ width: 1280, height: 800 });
-    await page.getByTestId('add-bot-btn').click();
+    // Captura ui-v7-lobby.png en 1280x800 con mesa de 4 sillas, bot sentado y sello de listo
+    await page.screenshot({ path: path.join(REF_DIR, 'ui-v7-lobby.png') });
+
+    // Empezar partida
     await page.getByTestId('start-game-btn').click();
 
     await expect(page.getByTestId('papercraft-board')).toBeVisible();
@@ -267,6 +335,9 @@ test.describe('Cafetulia E2E v6 (Header estable con 9999 pts, menús exclusivos 
           gameState: {
             ...snap.gameState,
             players: snap.gameState.players.map((p: TestPlayer) => ({ ...p, score: 9999 })),
+            seats: snap.gameState.seats.map((s: TestSeat) =>
+              s.occupant && s.occupant.nation === 'joker' ? { ...s, occupant: null } : s,
+            ),
           },
         },
       });

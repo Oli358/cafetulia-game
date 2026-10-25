@@ -1,7 +1,13 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
-import { NATION_VISUALS, PRESET_AVATARS, type NationKey } from '@cafetulia/ui';
+import {
+  MUSIC_MOODS,
+  NATION_VISUALS,
+  PRESET_AVATARS,
+  type MusicMoodId,
+  type NationKey,
+} from '@cafetulia/ui';
 import { soundEngine } from '../audio/soundEngine';
 import { CharacterPortrait, FlagBadge, PlayerAvatar } from '../art/CharacterPortrait';
 import { useGameStore } from '../store/gameStore';
@@ -236,7 +242,10 @@ export function ActiveModalLayer(): React.ReactElement | null {
           <div className="mt-6 flex items-center justify-end gap-3">
             <button
               type="button"
-              onClick={() => setPendingNegativeConfirm(null)}
+              onClick={() => {
+                soundEngine.playSfx('uiCancel');
+                setPendingNegativeConfirm(null);
+              }}
               className="px-4 py-2.5 rounded-xl bg-[#F7EEDF] text-[#3E2F2A] font-semibold text-sm border border-[#231712]/25 hover:bg-[#EAD9C0] cursor-pointer"
             >
               Cancelar
@@ -245,6 +254,7 @@ export function ActiveModalLayer(): React.ReactElement | null {
               type="button"
               data-testid="confirm-negative-move-btn"
               onClick={() => {
+                soundEngine.playSfx('uiConfirm');
                 const move = pendingNegativeConfirm.move;
                 setPendingNegativeConfirm(null);
                 void submitMove(move);
@@ -767,33 +777,106 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
         )}
       </div>
 
-      {/* Sound Controls */}
-      <div className="bg-[#F7EEDF] p-3.5 rounded-2xl space-y-2.5">
-        <div className="flex items-center justify-between">
-          <h3 className="font-serif font-bold text-base">Sonido del café</h3>
-          <button
-            type="button"
-            onClick={() => setVols(soundEngine.setVolumes({ muted: !vols.muted }))}
-            className={`px-3 py-1 rounded-xl text-xs font-bold cursor-pointer ${
-              vols.muted
-                ? 'bg-[#A94438] text-[#FFF9F0]'
-                : 'bg-[#FFF9F0] text-[#3E2F2A] border border-[#3E2F2A]/20'
-            }`}
+      {/* Sound Controls ("Sonido del café") */}
+      <div
+        data-testid="settings-sound-section"
+        className="bg-[#F7EEDF] p-3.5 rounded-2xl space-y-3 border border-[#231712]/12"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h3 className="font-serif font-bold text-base">Sonido del café</h3>
+            <p className="text-[11px] text-[#6F5A4E]">
+              Música lo-fi de 24 compases, ambiente de salón y efectos táctiles
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              data-testid="test-sound-btn"
+              onClick={() => {
+                if (vols.muted) {
+                  setVols(soundEngine.setVolumes({ muted: false }));
+                }
+                soundEngine.playSfx('uiPlay');
+              }}
+              className="min-h-[36px] px-3 py-1.5 rounded-xl bg-[#FEF6E0] text-[#3E2F2A] border border-[#C9A227] text-xs font-bold hover:bg-[#F2C14E]/35 cursor-pointer"
+            >
+              Probar sonido
+            </button>
+            <button
+              type="button"
+              data-testid="settings-mute-btn"
+              aria-pressed={vols.muted}
+              onClick={() => {
+                const nextMuted = !vols.muted;
+                const next = soundEngine.setVolumes({ muted: nextMuted });
+                setVols(next);
+                if (!nextMuted) {
+                  soundEngine.playSfx('uiToggle');
+                }
+              }}
+              className={`min-h-[36px] px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer border ${
+                vols.muted
+                  ? 'bg-[#A94438] text-[#FFF9F0] border-[#231712]'
+                  : 'bg-[#FFF9F0] text-[#3E2F2A] border-[#3E2F2A]/25 hover:bg-[#EAD9C0]'
+              }`}
+            >
+              {vols.muted ? 'Silenciado (activar)' : 'Silenciar todo'}
+            </button>
+          </div>
+        </div>
+
+        {/* Music Mood Selector: Tertulia / Lluvia / Noche */}
+        <div className="space-y-1">
+          <span className="text-xs font-bold text-[#6F5A4E] block">Ambiente musical</span>
+          <div
+            className="grid grid-cols-3 gap-1.5"
+            role="radiogroup"
+            aria-label="Ambiente musical del café"
           >
-            {vols.muted ? 'Sonido silenciado (activar)' : 'Silenciar todo'}
-          </button>
+            {MUSIC_MOODS.map((m) => {
+              const active = vols.mood === m.id;
+              return (
+                <button
+                  key={m.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  data-testid={`settings-mood-${m.id}`}
+                  onClick={() => {
+                    const next = soundEngine.setVolumes({ mood: m.id as MusicMoodId });
+                    setVols(next);
+                    soundEngine.playSfx('uiToggle');
+                  }}
+                  title={m.desc}
+                  className={`min-h-[38px] px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-colors cursor-pointer ${
+                    active
+                      ? 'bg-[#FEF6E0] border-[#C96F4A] text-[#231712] ring-1 ring-[#C96F4A]'
+                      : 'bg-[#FFF9F0] border-[#3E2F2A]/15 text-[#6F5A4E] hover:text-[#3E2F2A]'
+                  }`}
+                >
+                  {m.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <label className="flex items-center justify-between gap-4 text-xs font-semibold">
           <span>Música lo-fi ({Math.round(vols.music * 100)}%)</span>
           <input
             type="range"
+            data-testid="slider-music"
             min="0"
             max="1"
             step="0.05"
             value={vols.music}
-            onChange={(e) => setVols(soundEngine.setVolumes({ music: Number(e.target.value) }))}
-            className="w-40 accent-[#C96F4A]"
+            onChange={(e) => {
+              const next = soundEngine.setVolumes({ music: Number(e.target.value) });
+              setVols(next);
+              soundEngine.playSfx('uiSlider');
+            }}
+            className="w-40 accent-[#C96F4A] cursor-pointer"
           />
         </label>
 
@@ -801,19 +884,25 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
           <span>Ambiente de cafetería ({Math.round(vols.ambience * 100)}%)</span>
           <input
             type="range"
+            data-testid="slider-ambience"
             min="0"
             max="1"
             step="0.05"
             value={vols.ambience}
-            onChange={(e) => setVols(soundEngine.setVolumes({ ambience: Number(e.target.value) }))}
-            className="w-40 accent-[#C96F4A]"
+            onChange={(e) => {
+              const next = soundEngine.setVolumes({ ambience: Number(e.target.value) });
+              setVols(next);
+              soundEngine.playSfx('uiSlider');
+            }}
+            className="w-40 accent-[#C96F4A] cursor-pointer"
           />
         </label>
 
         <label className="flex items-center justify-between gap-4 text-xs font-semibold">
-          <span>Efectos de fichas y tazas ({Math.round(vols.sfx * 100)}%)</span>
+          <span>Efectos de interfaz y fichas ({Math.round(vols.sfx * 100)}%)</span>
           <input
             type="range"
+            data-testid="slider-sfx"
             min="0"
             max="1"
             step="0.05"
@@ -821,9 +910,24 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
             onChange={(e) => {
               const next = soundEngine.setVolumes({ sfx: Number(e.target.value) });
               setVols(next);
-              soundEngine.playSfx('cardSelect');
+              soundEngine.playSfx('uiSlider');
             }}
-            className="w-40 accent-[#C96F4A]"
+            className="w-40 accent-[#C96F4A] cursor-pointer"
+          />
+        </label>
+
+        <label className="flex items-center justify-between py-0.5 text-xs font-semibold cursor-pointer">
+          <span>Vibración háptica suave en móvil (confirmar / aviso)</span>
+          <input
+            type="checkbox"
+            data-testid="settings-haptics-toggle"
+            checked={vols.haptics}
+            onChange={() => {
+              const next = soundEngine.setVolumes({ haptics: !vols.haptics });
+              setVols(next);
+              soundEngine.playSfx('uiToggle');
+            }}
+            className="w-4 h-4 accent-[#C96F4A]"
           />
         </label>
       </div>

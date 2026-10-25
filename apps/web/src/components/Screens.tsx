@@ -9,7 +9,9 @@ import {
   type Tile,
 } from '@cafetulia/engine';
 import {
+  CAFE_DAILY_PHRASES,
   formatScoreEs,
+  getCafeGreeting,
   getCharacterProfile,
   NATION_VISUALS,
   PRESET_AVATARS,
@@ -83,7 +85,7 @@ function AvatarDropdownPicker({ compact = false }: { compact?: boolean }): React
         aria-controls="avatar-dropdown-popover"
         onClick={() => toggleOverlay('avatar')}
         className={`inline-flex items-center justify-between gap-2 rounded-xl bg-[#F7EEDF] border border-[#231712]/25 text-[#3E2F2A] font-bold hover:bg-[#EAD9C0] transition-colors cursor-pointer ${
-          compact ? 'h-9 px-2.5 text-xs' : 'h-10 px-3 text-xs sm:text-sm w-full sm:w-auto'
+          compact ? 'min-h-[38px] px-2.5 text-xs' : 'min-h-[44px] px-3 text-xs sm:text-sm w-full'
         }`}
       >
         <span className="inline-flex items-center gap-2 min-w-0">
@@ -215,7 +217,7 @@ function SubtitlesDropdownPicker({ compact = false }: { compact?: boolean }): Re
         aria-controls="subtitles-dropdown-popover"
         onClick={() => toggleOverlay('subtitles')}
         className={`inline-flex items-center justify-between gap-1.5 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 text-[#3E2F2A] font-bold hover:bg-[#EAD9C0] transition-colors cursor-pointer ${
-          compact ? 'min-h-[32px] px-2 py-1 text-xs' : 'h-10 px-3 text-xs w-full sm:w-auto'
+          compact ? 'min-h-[32px] px-2 py-1 text-xs' : 'min-h-[44px] px-3 text-xs w-full'
         }`}
       >
         <span className="truncate">
@@ -293,7 +295,24 @@ function SubtitlesDropdownPicker({ compact = false }: { compact?: boolean }): Re
                     }`}
                   >
                     <span>{m.label}</span>
-                    <span className="text-[10px] text-[#6F5A4E]">{active ? '✓' : ''}</span>
+                    {active && (
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 12 12"
+                        fill="none"
+                        aria-hidden="true"
+                        className="text-[#3F5E4A] shrink-0"
+                      >
+                        <path
+                          d="M2.2 6.2L4.8 8.8L9.8 3.2"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    )}
                   </button>
                 );
               })}
@@ -329,154 +348,715 @@ function SubtitlesDropdownPicker({ compact = false }: { compact?: boolean }): Re
   );
 }
 
+/**
+ * SVG Illustration of the Cafetulia corner scene:
+ * Arched window with warm light, hanging plant, vinyl turntable, sleeping cat,
+ * wooden café table, steaming porcelain cup, and O & A brass plaque.
+ */
+function CafeCornerIllustration({
+  reducedMotion,
+  compact = false,
+}: {
+  reducedMotion: boolean;
+  compact?: boolean;
+}): React.ReactElement {
+  return (
+    <svg
+      viewBox="0 0 360 190"
+      aria-hidden="true"
+      className={
+        compact
+          ? 'w-28 sm:w-36 h-16 sm:h-20 shrink-0 rounded-xl border border-[#231712]/20 bg-[#F4E6D0]'
+          : 'w-full h-36 xl:h-44 rounded-2xl border border-[#231712]/20 bg-[#F4E6D0] shadow-inner'
+      }
+    >
+      <defs>
+        <linearGradient id="cafeWallGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#F8EDD9" />
+          <stop offset="100%" stopColor="#E6D2B5" />
+        </linearGradient>
+        <linearGradient id="windowSkyGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FCE7B2" />
+          <stop offset="60%" stopColor="#F5C483" />
+          <stop offset="100%" stopColor="#D99B66" />
+        </linearGradient>
+      </defs>
+
+      {/* Warm paper wall */}
+      <rect x="0" y="0" width="360" height="190" fill="url(#cafeWallGrad)" />
+
+      {/* Wainscoting / wood paneling */}
+      <rect x="0" y="132" width="360" height="58" fill="#6F4E37" opacity="0.22" />
+      <line x1="0" y1="132" x2="360" y2="132" stroke="#3E2F2A" strokeWidth="1.5" opacity="0.35" />
+
+      {/* Arched Café Window (Left-Center) */}
+      <g transform="translate(26, 16)">
+        <path
+          d="M0 105 L0 44 A48 44 0 0 1 96 44 L96 105 Z"
+          fill="url(#windowSkyGrad)"
+          stroke="#3E2F2A"
+          strokeWidth="3"
+        />
+        {/* Distant rooftops & sun */}
+        <circle cx="68" cy="36" r="11" fill="#FFF6D6" opacity="0.85" />
+        <path d="M4 103 L24 80 L44 103 Z" fill="#8C583A" opacity="0.35" />
+        <path d="M36 103 L64 74 L92 103 Z" fill="#5C3A28" opacity="0.35" />
+        {/* Window muntins */}
+        <line x1="48" y1="2" x2="48" y2="105" stroke="#3E2F2A" strokeWidth="2" />
+        <line x1="2" y1="56" x2="94" y2="56" stroke="#3E2F2A" strokeWidth="2" />
+
+        {/* Sleeping Cat on the windowsill */}
+        <g transform="translate(56, 86)">
+          {/* Cat body curled */}
+          <ellipse cx="16" cy="11" rx="14" ry="8" fill="#3E2F2A" />
+          {/* Cat head */}
+          <circle cx="7" cy="9" r="6" fill="#3E2F2A" />
+          {/* Ears */}
+          <polygon points="3,4 5,0 8,4" fill="#3E2F2A" />
+          <polygon points="8,4 11,0 13,4" fill="#3E2F2A" />
+          {/* Closed eye */}
+          <path d="M4 9 Q6 11 8 9" stroke="#F7EEDF" strokeWidth="1.2" fill="none" />
+          {/* Tail */}
+          <path
+            d="M28 13 Q35 15 32 20"
+            stroke="#3E2F2A"
+            strokeWidth="3"
+            strokeLinecap="round"
+            fill="none"
+          />
+          {/* Subtle Zzz */}
+          <text
+            x="14"
+            y="-1"
+            fill="#6F5A4E"
+            fontSize="8"
+            fontFamily="serif"
+            fontWeight="bold"
+          >
+            z
+          </text>
+        </g>
+
+        {/* Windowsill */}
+        <rect
+          x="-5"
+          y="103"
+          width="106"
+          height="6"
+          rx="2"
+          fill="#6F4E37"
+          stroke="#231712"
+          strokeWidth="1.5"
+        />
+      </g>
+
+      {/* Hanging Botanical Plant (Top Center-Right) */}
+      <g transform="translate(152, 0)">
+        <line x1="18" y1="0" x2="18" y2="24" stroke="#3E2F2A" strokeWidth="1.5" />
+        <path
+          d="M8 24 L28 24 L25 38 L11 38 Z"
+          fill="#C96F4A"
+          stroke="#231712"
+          strokeWidth="1.5"
+        />
+        {/* Trailing leaves */}
+        <ellipse cx="6" cy="30" rx="7" ry="4" transform="rotate(-25 6 30)" fill="#3F5E4A" />
+        <ellipse cx="30" cy="30" rx="7" ry="4" transform="rotate(25 30 30)" fill="#3F5E4A" />
+        <ellipse cx="18" cy="22" rx="6" ry="4" fill="#4E735B" />
+        <path
+          d="M12 38 Q6 48 10 58"
+          stroke="#3F5E4A"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+        />
+        <circle cx="9" cy="50" r="3.5" fill="#3F5E4A" />
+        <circle cx="11" cy="58" r="3" fill="#4E735B" />
+      </g>
+
+      {/* Brass O & A Plaque on the café wall */}
+      <g transform="translate(142, 74)">
+        <rect
+          x="0"
+          y="0"
+          width="54"
+          height="22"
+          rx="4"
+          fill="#FEF6E0"
+          stroke="#C9A227"
+          strokeWidth="2"
+        />
+        <text
+          x="27"
+          y="14"
+          textAnchor="middle"
+          fill="#3E2F2A"
+          fontSize="9.5"
+          fontFamily="serif"
+          fontWeight="bold"
+        >
+          O &amp; A
+        </text>
+      </g>
+
+      {/* Side Shelf with Spinning Vinyl Turntable (Right) */}
+      <g transform="translate(242, 62)">
+        {/* Shelf */}
+        <rect
+          x="-6"
+          y="46"
+          width="102"
+          height="6"
+          rx="2"
+          fill="#6F4E37"
+          stroke="#231712"
+          strokeWidth="1.5"
+        />
+        {/* Turntable Wooden Plinth */}
+        <rect
+          x="6"
+          y="30"
+          width="76"
+          height="16"
+          rx="3"
+          fill="#8C583A"
+          stroke="#231712"
+          strokeWidth="1.6"
+        />
+        {/* Vinyl Platter / Record */}
+        <g transform="translate(40, 26)">
+          <ellipse
+            cx="0"
+            cy="0"
+            rx="26"
+            ry="7"
+            fill="#231712"
+            stroke="#3E2F2A"
+            strokeWidth="1"
+          />
+          <ellipse cx="0" cy="0" rx="9" ry="2.6" fill="#C96F4A" />
+          <circle cx="0" cy="0" r="1.5" fill="#FFF9F0" />
+        </g>
+        {/* Tonearm */}
+        <line
+          x1="68"
+          y1="22"
+          x2="50"
+          y2="27"
+          stroke="#C9A227"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        {/* Floating musical notes */}
+        <text
+          x="16"
+          y="12"
+          fill="#C96F4A"
+          fontSize="12"
+          fontWeight="bold"
+          className={reducedMotion ? '' : 'animate-pulse'}
+        >
+          ♪
+        </text>
+        <text
+          x="58"
+          y="6"
+          fill="#3F5E4A"
+          fontSize="11"
+          fontWeight="bold"
+          className={reducedMotion ? '' : 'animate-pulse'}
+        >
+          ♫
+        </text>
+      </g>
+
+      {/* Foreground Café Table & Steaming Cup */}
+      <g transform="translate(0, 134)">
+        {/* Table top */}
+        <path
+          d="M16 18 L344 18 L356 56 L4 56 Z"
+          fill="#8C583A"
+          stroke="#231712"
+          strokeWidth="2"
+        />
+        {/* Table runner / menu mat */}
+        <path
+          d="M112 22 L248 22 L256 52 L104 52 Z"
+          fill="#FFF9F0"
+          stroke="#C9A227"
+          strokeWidth="1.5"
+        />
+
+        {/* Steaming Porcelain Cup */}
+        <g transform="translate(178, 4)">
+          {/* Steam wisps */}
+          <path
+            d="M-6 -4 Q-10 -14 -4 -22"
+            stroke="#FFF9F0"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            fill="none"
+            opacity="0.85"
+          />
+          <path
+            d="M4 -2 Q8 -12 2 -20"
+            stroke="#FFF9F0"
+            strokeWidth="2"
+            strokeLinecap="round"
+            fill="none"
+            opacity="0.75"
+          />
+          {/* Saucer */}
+          <ellipse
+            cx="0"
+            cy="24"
+            rx="20"
+            ry="5.5"
+            fill="#FFF9F0"
+            stroke="#231712"
+            strokeWidth="1.6"
+          />
+          {/* Cup body */}
+          <path
+            d="M-13 8 L13 8 L10 22 C10 25 -10 25 -10 22 Z"
+            fill="#C96F4A"
+            stroke="#231712"
+            strokeWidth="1.6"
+          />
+          {/* Cup rim coffee */}
+          <ellipse
+            cx="0"
+            cy="8"
+            rx="13"
+            ry="3.5"
+            fill="#3E2F2A"
+            stroke="#231712"
+            strokeWidth="1.4"
+          />
+          {/* Handle */}
+          <path
+            d="M12 11 C18 11 18 19 11 19"
+            stroke="#C96F4A"
+            strokeWidth="2.6"
+            fill="none"
+          />
+        </g>
+      </g>
+    </svg>
+  );
+}
+
 export function TitleScreen(): React.ReactElement {
   const nickname = useGameStore((s) => s.nickname);
   const setNickname = useGameStore((s) => s.setNickname);
+  const avatarId = useGameStore((s) => s.avatarId);
   const createRoom = useGameStore((s) => s.createRoom);
   const joinRoom = useGameStore((s) => s.joinRoom);
   const quickStartWithBots = useGameStore((s) => s.quickStartWithBots);
   const setActiveModal = useGameStore((s) => s.setActiveModal);
+  const toggleOverlay = useGameStore((s) => s.toggleOverlay);
   const errorBanner = useGameStore((s) => s.errorBanner);
   const isBusy = useGameStore((s) => s.isBusy);
+  const reducedMotion = useGameStore((s) => s.reducedMotion);
 
   const [joinCodeInput, setJoinCodeInput] = useState('');
+  const [phraseIndex, setPhraseIndex] = useState(0);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const timer = window.setInterval(() => {
+      setPhraseIndex((prev) => (prev + 1) % CAFE_DAILY_PHRASES.length);
+    }, 5200);
+    return () => window.clearInterval(timer);
+  }, [reducedMotion]);
+
+  const greetingText = useMemo(() => getCafeGreeting(nickname), [nickname]);
+  const dailyPhrase = CAFE_DAILY_PHRASES[phraseIndex] ?? CAFE_DAILY_PHRASES[0];
+  const currentAvatar =
+    PRESET_AVATARS.find((a) => a.id === avatarId) ?? {
+      id: 'espresso',
+      label: 'Taza Espresso',
+      bg: '#C96F4A',
+      kind: 'icon' as const,
+    };
 
   return (
     <div
-      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between px-3 py-2.5 sm:px-6 sm:py-5 max-w-4xl mx-auto select-none"
+      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between px-3 py-2 sm:px-6 sm:py-4 max-w-6xl mx-auto select-none"
       data-testid="title-screen"
     >
-      {/* Top compact header: Logo + 1 short phrase */}
-      <header className="shrink-0 flex flex-col items-center text-center pt-0.5 sm:pt-2">
-        <CafetuliaLogo />
-        <p className="text-xs sm:text-sm text-[#6F5A4E] font-medium mt-1">
-          Sienta parejas de 12 países en las mesas sin llenar la barra central.
-        </p>
+      {/* Top compact Café Header */}
+      <header className="shrink-0 flex flex-wrap items-center justify-between gap-2 pt-0.5">
+        <div className="flex items-center gap-2.5">
+          <CafetuliaLogo />
+          <span className="hidden md:inline-block text-xs text-[#6F5A4E] font-medium border-l border-[#3E2F2A]/20 pl-2.5">
+            Tertulia internacional de mesa y café · O &amp; A
+          </span>
+        </div>
+
+        {/* Discreet rotating chalkboard phrase */}
+        <button
+          type="button"
+          data-testid="title-daily-phrase"
+          onClick={() => {
+            soundEngine.playSfx('uiToggle');
+            setPhraseIndex((prev) => (prev + 1) % CAFE_DAILY_PHRASES.length);
+          }}
+          title="Cambiar nota de la pizarra del día"
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#231712] text-[#FEF6E0] border border-[#C9A227]/60 text-[11px] sm:text-xs font-serif italic shadow-2xs hover:bg-[#3E2F2A] transition-colors cursor-pointer"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-[#C9A227] shrink-0" aria-hidden="true" />
+          <span>«{dailyPhrase}»</span>
+        </button>
       </header>
 
-      {/* Main Direct Card: Paper & Ink tactile card */}
-      <div className="my-auto w-full max-w-xl mx-auto bg-[#FFF9F0] p-3.5 sm:p-5 rounded-[22px] border-2 border-[#231712] ring-1 ring-inset ring-[#C9A227]/40 shadow-[0_10px_26px_rgba(35,23,18,0.14)] space-y-3">
-        {/* Profile row: Nickname input + Avatar Dropdown + Subtitles Dropdown */}
-        <div className="space-y-2">
-          <div>
-            <label
-              htmlFor="nickname-input"
-              className="block text-[11px] font-bold text-[#6F5A4E] mb-0.5"
-            >
-              Tu apodo, avatar y subtítulos
-            </label>
-            <input
-              id="nickname-input"
-              type="text"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              placeholder="Tu apodo"
-              maxLength={24}
-              className="w-full h-9 sm:h-10 px-3 rounded-xl bg-[#F7EEDF] border border-[#231712]/30 text-sm text-[#3E2F2A] font-bold focus:outline-2 focus:outline-[#C96F4A]"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <AvatarDropdownPicker />
-            <SubtitlesDropdownPicker />
-          </div>
-        </div>
-
-        {errorBanner && (
-          <div
-            role="alert"
-            className="p-2 rounded-xl bg-[#FDECEB] border border-[#A94438]/40 text-xs font-semibold text-[#A94438]"
-          >
-            {errorBanner}
-          </div>
-        )}
-
-        {/* Primary Play Buttons: "Jugar contra bot" & "Crear sala" */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          <button
-            type="button"
-            data-start="true"
-            data-testid="quick-start-btn"
-            disabled={isBusy}
-            onClick={() => {
-              soundEngine.unlock();
-              void quickStartWithBots(1, 'medium');
-            }}
-            className="w-full h-11 rounded-xl bg-[#C96F4A] text-[#FFF9F0] font-bold text-sm sm:text-base border border-[#231712] shadow-[0_2px_0_#231712] hover:opacity-95 transition-opacity cursor-pointer disabled:opacity-50"
-          >
-            Jugar contra bot
-          </button>
-
-          <button
-            type="button"
-            data-testid="create-room-btn"
-            disabled={isBusy}
-            onClick={() => {
-              soundEngine.unlock();
-              void createRoom();
-            }}
-            className="w-full h-11 rounded-xl bg-[#F7EEDF] text-[#3E2F2A] border border-[#231712]/35 font-bold text-sm hover:bg-[#EAD9C0] transition-colors cursor-pointer disabled:opacity-50"
-          >
-            Crear sala
-          </button>
-        </div>
-
-        {/* Join Room Form: "Unirse" */}
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            soundEngine.unlock();
-            void joinRoom(joinCodeInput, false);
-          }}
-          className="flex gap-2 pt-0.5"
+      {/* Main Café Scene + Menu Card Grid */}
+      <div className="my-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-4 items-stretch min-h-0">
+        {/* Left / Top Column: Living Café Scene + Seated Protagonist Avatar */}
+        <section
+          data-testid="title-cafe-scene"
+          aria-label="Escena del salón de Cafetulia"
+          className="lg:col-span-5 bg-[#FFF9F0] rounded-[22px] border-2 border-[#231712] ring-1 ring-inset ring-[#C9A227]/40 p-2.5 sm:p-4 shadow-[0_8px_24px_rgba(35,23,18,0.12)] flex flex-col justify-between gap-2"
         >
-          <input
-            id="room-code-input"
-            type="text"
-            aria-label="Código de sala"
-            value={joinCodeInput}
-            onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
-            placeholder="CÓDIGO DE SALA"
-            maxLength={8}
-            className="flex-1 h-10 px-3 rounded-xl bg-[#F7EEDF] border border-[#231712]/30 text-xs sm:text-sm text-[#3E2F2A] font-mono font-bold uppercase tracking-wider focus:outline-2 focus:outline-[#C96F4A]"
-          />
-          <button
-            type="submit"
-            data-testid="join-room-btn"
-            disabled={isBusy}
-            className="px-5 h-10 rounded-xl bg-[#3F5E4A] text-[#FFF9F0] font-bold text-xs sm:text-sm border border-[#231712] shadow-[0_2px_0_#231712] hover:opacity-95 cursor-pointer disabled:opacity-50"
-          >
-            Unirse
-          </button>
-        </form>
+          {/* Responsive Café Corner SVG (compact on mobile portrait, full on lg+) */}
+          <div className="flex lg:flex-col items-center lg:items-stretch gap-2.5">
+            <div className="hidden lg:block w-full">
+              <CafeCornerIllustration reducedMotion={reducedMotion} compact={false} />
+            </div>
+            <div className="block lg:hidden shrink-0">
+              <CafeCornerIllustration reducedMotion={reducedMotion} compact />
+            </div>
 
-        {/* Secondary Direct Buttons: "Tutorial", "Reglas", "Ajustes" */}
-        <div className="grid grid-cols-3 gap-2 pt-1 border-t border-[#3E2F2A]/10">
-          <button
-            type="button"
-            data-testid="title-tutorial-btn"
-            onClick={() => setActiveModal('tutorial')}
-            className="h-9 rounded-xl bg-[#F7EEDF] border border-[#231712]/15 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+            {/* Seated Protagonist Avatar at the Counter + Time-of-day Greeting */}
+            <div className="flex-1 min-w-0 flex items-center gap-2.5 sm:gap-3 bg-[#F7EEDF] p-2 sm:p-3 rounded-2xl border border-[#231712]/15">
+              <button
+                type="button"
+                data-testid="title-hero-avatar"
+                onClick={() => {
+                  soundEngine.unlock();
+                  toggleOverlay('avatar');
+                }}
+                aria-label={`Cambiar avatar actual (${currentAvatar.label})`}
+                title="Pulsa para cambiar tu avatar"
+                className="relative group shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#FFF9F0] border-2 border-[#231712] shadow-[0_2px_0_#231712] flex items-center justify-center hover:scale-103 active:scale-97 transition-transform cursor-pointer focus:outline-2 focus:outline-[#C96F4A]"
+              >
+                <PlayerAvatar avatarId={avatarId} size={38} />
+                <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-md bg-[#C96F4A] text-[#FFF9F0] text-[9px] font-extrabold border border-[#231712] shadow-2xs">
+                  Editar
+                </span>
+              </button>
+
+              <div className="min-w-0 flex-1">
+                <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#C96F4A] block">
+                  Tu sitio en la barra
+                </span>
+                <h1
+                  data-testid="title-greeting"
+                  className="font-serif font-bold text-sm sm:text-lg text-[#231712] leading-tight truncate"
+                >
+                  {greetingText}
+                </h1>
+                <p className="text-[11px] text-[#6F5A4E] truncate mt-0.5">
+                  Sienta parejas de 12 países sin llenar la barra central.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Profile strip integrated at the counter base */}
+          <div className="space-y-1.5 pt-1 border-t border-[#3E2F2A]/10">
+            <div className="flex items-center gap-2">
+              <label
+                htmlFor="nickname-input"
+                className="text-[11px] font-bold text-[#6F5A4E] shrink-0"
+              >
+                Apodo:
+              </label>
+              <input
+                id="nickname-input"
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder="Tu apodo en la mesa"
+                maxLength={24}
+                className="flex-1 min-h-[40px] sm:min-h-[44px] px-3 rounded-xl bg-[#F7EEDF] border border-[#231712]/30 text-xs sm:text-sm text-[#3E2F2A] font-bold focus:outline-2 focus:outline-[#C96F4A]"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <AvatarDropdownPicker />
+              <SubtitlesDropdownPicker />
+            </div>
+          </div>
+        </section>
+
+        {/* Right / Bottom Column: Carta del Café Menu Card */}
+        <section
+          data-testid="title-menu-card"
+          aria-label="Carta de menú del café"
+          className="lg:col-span-7 bg-[#FFF9F0] rounded-[22px] border-2 border-[#231712] ring-1 ring-inset ring-[#C9A227]/45 p-3 sm:p-5 shadow-[0_10px_26px_rgba(35,23,18,0.14)] flex flex-col justify-between gap-2.5"
+        >
+          {/* Menu Card Header */}
+          <div className="flex items-center justify-between border-b border-[#3E2F2A]/15 pb-1.5">
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#C96F4A] block">
+                Carta de la casa · Servicio continuo
+              </span>
+              <h2 className="font-serif font-bold text-base sm:text-xl text-[#231712] leading-tight">
+                Elige tu mesa para hoy
+              </h2>
+            </div>
+            <span className="px-2.5 py-0.5 rounded-full bg-[#FEF6E0] border border-[#C9A227] text-[10px] font-bold text-[#3E2F2A]">
+              2–4 jugadores
+            </span>
+          </div>
+
+          {errorBanner && (
+            <div
+              role="alert"
+              className="p-2 rounded-xl bg-[#FDECEB] border border-[#A94438]/40 text-xs font-semibold text-[#A94438]"
+            >
+              {errorBanner}
+            </div>
+          )}
+
+          {/* Primary Menu Dishes: Jugar contra bot & Crear sala */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {/* Primary 1: Jugar contra bot (with warm steam/shimmer) */}
+            <button
+              type="button"
+              data-start="true"
+              data-testid="quick-start-btn"
+              disabled={isBusy}
+              onMouseEnter={() => soundEngine.playHover()}
+              onClick={() => {
+                soundEngine.unlock();
+                void quickStartWithBots(1, 'medium');
+              }}
+              className="group relative overflow-hidden w-full min-h-[54px] sm:min-h-[64px] px-3.5 py-2 rounded-2xl bg-[#C96F4A] text-[#FFF9F0] border-2 border-[#231712] shadow-[0_3px_0_#231712] hover:bg-[#B85F3B] active:translate-y-0.5 transition-all cursor-pointer disabled:opacity-50 text-left flex items-center gap-3 focus:outline-2 focus:outline-[#231712]"
+            >
+              <span
+                aria-hidden="true"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#231712]/20 border border-[#FFF9F0]/30 flex items-center justify-center shrink-0"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M6 3C6 4.5 7.5 5 7.5 6.5M11 2.5C11 4 12.5 4.5 12.5 6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M4 9h12v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V9Z"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M16 10h2a2.5 2.5 0 0 1 0 5h-2"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-serif font-extrabold text-sm sm:text-base leading-tight">
+                  Jugar contra bot
+                </span>
+                <span className="block text-[11px] text-[#FFF9F0]/90 truncate">
+                  Mesa rápida · Café recién servido
+                </span>
+              </span>
+            </button>
+
+            {/* Primary 2: Crear sala */}
+            <button
+              type="button"
+              data-testid="create-room-btn"
+              disabled={isBusy}
+              onMouseEnter={() => soundEngine.playHover()}
+              onClick={() => {
+                soundEngine.unlock();
+                void createRoom();
+              }}
+              className="group w-full min-h-[54px] sm:min-h-[64px] px-3.5 py-2 rounded-2xl bg-[#F7EEDF] text-[#3E2F2A] border-2 border-[#231712]/40 shadow-[0_3px_0_rgba(35,23,18,0.2)] hover:bg-[#EAD9C0] active:translate-y-0.5 transition-all cursor-pointer disabled:opacity-50 text-left flex items-center gap-3 focus:outline-2 focus:outline-[#C96F4A]"
+            >
+              <span
+                aria-hidden="true"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#FFF9F0] border border-[#231712]/25 flex items-center justify-center shrink-0 text-[#C96F4A]"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <rect
+                    x="4"
+                    y="5"
+                    width="16"
+                    height="14"
+                    rx="3"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  />
+                  <path
+                    d="M8 10h8M8 14h5"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-serif font-extrabold text-sm sm:text-base leading-tight">
+                  Crear sala
+                </span>
+                <span className="block text-[11px] text-[#6F5A4E] truncate">
+                  Reserva mesa para amigos o bots
+                </span>
+              </span>
+            </button>
+          </div>
+
+          {/* Integrated Join Room Ticket Form */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              soundEngine.unlock();
+              void joinRoom(joinCodeInput, false);
+            }}
+            className="bg-[#F7EEDF] p-2 sm:p-2.5 rounded-2xl border border-[#231712]/20 flex flex-wrap sm:flex-nowrap items-center gap-2"
           >
-            Tutorial
-          </button>
-          <button
-            type="button"
-            data-testid="title-rules-btn"
-            onClick={() => setActiveModal('rules')}
-            className="h-9 rounded-xl bg-[#F7EEDF] border border-[#231712]/15 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
-          >
-            Reglas
-          </button>
-          <button
-            type="button"
-            data-testid="title-settings-btn"
-            onClick={() => setActiveModal('settings')}
-            className="h-9 rounded-xl bg-[#F7EEDF] border border-[#231712]/15 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
-          >
-            Ajustes
-          </button>
-        </div>
+            <div className="flex items-center gap-2 flex-1 min-w-[150px]">
+              <span
+                aria-hidden="true"
+                className="w-8 h-8 rounded-xl bg-[#FFF9F0] border border-[#231712]/20 flex items-center justify-center text-[#3F5E4A] shrink-0"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="8" cy="12" r="4" stroke="currentColor" strokeWidth="2" />
+                  <path
+                    d="M12 12h9m-3 0v3m-3-3v2"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </span>
+              <input
+                id="room-code-input"
+                type="text"
+                aria-label="Código de sala"
+                value={joinCodeInput}
+                onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
+                placeholder="CÓDIGO DE SALA"
+                maxLength={8}
+                className="w-full min-h-[44px] px-3 rounded-xl bg-[#FFF9F0] border border-[#231712]/30 text-xs sm:text-sm text-[#3E2F2A] font-mono font-bold uppercase tracking-wider focus:outline-2 focus:outline-[#C96F4A]"
+              />
+            </div>
+            <button
+              type="submit"
+              data-testid="join-room-btn"
+              disabled={isBusy}
+              onMouseEnter={() => soundEngine.playHover()}
+              className="px-4 min-h-[44px] rounded-xl bg-[#3F5E4A] text-[#FFF9F0] font-bold text-xs sm:text-sm border border-[#231712] shadow-[0_2px_0_#231712] hover:opacity-95 active:translate-y-0.5 transition-all cursor-pointer disabled:opacity-50 inline-flex items-center gap-1.5 shrink-0"
+            >
+              <span>Unirse</span>
+              <span className="text-[10px] opacity-80 hidden sm:inline">· Con código</span>
+            </button>
+          </form>
+
+          {/* Secondary Menu Actions: Tutorial, Reglas, Ajustes (with SVG icons & microcopy) */}
+          <div className="grid grid-cols-3 gap-2 pt-1 border-t border-[#3E2F2A]/10">
+            <button
+              type="button"
+              data-testid="title-tutorial-btn"
+              onMouseEnter={() => soundEngine.playHover()}
+              onClick={() => setActiveModal('tutorial')}
+              className="min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 hover:bg-[#EAD9C0] active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-2 text-left"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+                className="text-[#C96F4A] shrink-0"
+              >
+                <path
+                  d="M4 6h16M4 12h16M4 18h10"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span className="min-w-0">
+                <span className="block text-xs font-bold text-[#3E2F2A] truncate">Tutorial</span>
+                <span className="hidden sm:block text-[10px] text-[#6F5A4E] truncate">
+                  3 pasos rápidos
+                </span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              data-testid="title-rules-btn"
+              onMouseEnter={() => soundEngine.playHover()}
+              onClick={() => setActiveModal('rules')}
+              className="min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 hover:bg-[#EAD9C0] active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-2 text-left"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+                className="text-[#3F5E4A] shrink-0"
+              >
+                <path
+                  d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4Z"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                />
+                <path d="M9 8h6M9 12h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+              <span className="min-w-0">
+                <span className="block text-xs font-bold text-[#3E2F2A] truncate">Reglas</span>
+                <span className="hidden sm:block text-[10px] text-[#6F5A4E] truncate">
+                  Manual del café
+                </span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              data-testid="title-settings-btn"
+              onMouseEnter={() => soundEngine.playHover()}
+              onClick={() => setActiveModal('settings')}
+              className="min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 hover:bg-[#EAD9C0] active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-2 text-left"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+                className="text-[#6F5A4E] shrink-0"
+              >
+                <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="2" />
+                <path
+                  d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span className="min-w-0">
+                <span className="block text-xs font-bold text-[#3E2F2A] truncate">Ajustes</span>
+                <span className="hidden sm:block text-[10px] text-[#6F5A4E] truncate">
+                  Sonido y vista
+                </span>
+              </span>
+            </button>
+          </div>
+        </section>
       </div>
 
       {/* Minimal footer */}
@@ -490,6 +1070,7 @@ export function TitleScreen(): React.ReactElement {
 export function LobbyScreen(): React.ReactElement {
   const snapshot = useGameStore((s) => s.snapshot);
   const myPlayerId = useGameStore((s) => s.myPlayerId);
+  const reducedMotion = useGameStore((s) => s.reducedMotion);
   const updateRoomConfig = useGameStore((s) => s.updateRoomConfig);
   const toggleReady = useGameStore((s) => s.toggleReady);
   const addBot = useGameStore((s) => s.addBot);
@@ -510,47 +1091,115 @@ export function LobbyScreen(): React.ReactElement {
     (m) => m.role === 'player' || m.role === 'bot',
   );
 
-  const copyInvite = () => {
+  const copyInvite = async () => {
+    soundEngine.playSfx('uiCopy');
     const url = `${window.location.origin}/?room=${snapshot.code}`;
-    void navigator.clipboard?.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    let copiedOk = false;
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(url);
+        copiedOk = true;
+      }
+    } catch {
+      copiedOk = false;
+    }
+    if (!copiedOk) {
+      try {
+        const area = document.createElement('textarea');
+        area.value = url;
+        area.setAttribute('readonly', '');
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        copiedOk = document.execCommand('copy');
+        area.remove();
+      } catch {
+        copiedOk = false;
+      }
+    }
+    if (copiedOk) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2200);
+    }
   };
+
+  const chairSlots = [0, 1, 2, 3].map((idx) => {
+    const member = activeSeatMembers[idx] ?? null;
+    const isLocked = idx >= snapshot.config.maxPlayers;
+    return { idx, member, isLocked };
+  });
+
+  const currentTimerVal = snapshot.config.timerEnabled ? snapshot.config.timerSeconds : 0;
 
   return (
     <div
-      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden p-2.5 sm:p-6 max-w-4xl mx-auto flex flex-col justify-center select-none"
+      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden p-2 sm:p-5 max-w-5xl mx-auto flex flex-col justify-center select-none"
       data-testid="lobby-screen"
     >
-      <div className="bg-[#FFF9F0] rounded-[22px] border-2 border-[#231712] ring-1 ring-inset ring-[#C9A227]/40 p-3.5 sm:p-6 shadow-[0_10px_28px_rgba(35,23,18,0.16)] flex flex-col justify-between max-h-[95dvh] overflow-hidden space-y-3">
-        {/* Top Lobby Bar */}
-        <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 border-b border-[#3E2F2A]/10 pb-2.5">
-          <div>
-            <span className="text-[11px] font-bold text-[#6F5A4E]">Sala</span>
-            <h1 className="font-serif font-bold text-2xl sm:text-3xl text-[#3E2F2A] leading-none">
-              #{snapshot.code}
-            </h1>
+      <div className="bg-[#FFF9F0] rounded-[24px] border-2 border-[#231712] ring-1 ring-inset ring-[#C9A227]/45 p-3 sm:p-5 shadow-[0_12px_30px_rgba(35,23,18,0.16)] flex flex-col justify-between max-h-[96dvh] overflow-hidden gap-2.5">
+        {/* Top Lobby Bar: Napkin Room Code Card + Quick Actions */}
+        <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 border-b border-[#3E2F2A]/10 pb-2">
+          {/* Paper Napkin / Coaster Room Code Card */}
+          <div
+            data-testid="lobby-napkin-code"
+            className="flex items-center gap-2.5 bg-[#FEF6E0] px-3 py-1.5 rounded-2xl border-2 border-dashed border-[#C9A227] shadow-2xs"
+          >
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#6F5A4E] block">
+                Servilleta de mesa
+              </span>
+              <div className="flex items-center gap-2">
+                <h1 className="font-mono font-extrabold text-xl sm:text-2xl text-[#231712] tracking-wider leading-none">
+                  #{snapshot.code}
+                </h1>
+                <button
+                  type="button"
+                  data-testid="lobby-copy-code-btn"
+                  onClick={() => void copyInvite()}
+                  className={`min-h-[36px] px-2.5 py-1 rounded-xl text-xs font-bold border transition-all cursor-pointer inline-flex items-center gap-1 ${
+                    copied
+                      ? 'bg-[#3F5E4A] text-[#FFF9F0] border-[#231712]'
+                      : 'bg-[#FFF9F0] text-[#3E2F2A] border-[#231712]/25 hover:bg-[#EAD9C0]'
+                  }`}
+                >
+                  {copied && (
+                    <svg
+                      width="12"
+                      height="12"
+                      viewBox="0 0 12 12"
+                      fill="none"
+                      aria-hidden="true"
+                      className="shrink-0"
+                    >
+                      <path
+                        d="M2.2 6.2L4.8 8.8L9.8 3.2"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                  <span>{copied ? 'Sello copiado' : 'Copiar invitación'}</span>
+                </button>
+              </div>
+            </div>
           </div>
+
           <div className="flex items-center gap-1.5">
             <AvatarDropdownPicker compact />
             <button
               type="button"
-              onClick={copyInvite}
-              className="px-3 py-1.5 rounded-xl bg-[#F7EEDF] border border-[#231712]/25 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
-            >
-              {copied ? '✓ Copiado' : 'Invitar'}
-            </button>
-            <button
-              type="button"
               onClick={() => setActiveModal('settings')}
-              className="px-3 py-1.5 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+              className="min-h-[38px] px-3 py-1.5 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
             >
               Ajustes
             </button>
             <button
               type="button"
               onClick={leaveRoom}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold text-[#A94438] hover:bg-[#FDECEB] cursor-pointer"
+              className="min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-bold text-[#A94438] hover:bg-[#FDECEB] cursor-pointer"
             >
               Salir
             </button>
@@ -566,31 +1215,52 @@ export function LobbyScreen(): React.ReactElement {
           </div>
         )}
 
-        {/* Center 2-column grid: Players + Short Options */}
-        <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-3 overflow-y-auto pr-0.5">
-          {/* Players column */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h2 className="font-serif font-bold text-base">
-                Jugadores ({activeSeatMembers.length}/{snapshot.config.maxPlayers})
-              </h2>
+        {/* Center 2-column grid: Prepared 4-Chair Table Scene + Tactile Room Controls */}
+        <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-3 overflow-y-auto pr-0.5 items-center">
+          {/* Left 7 cols: Prepared Café Table with 4 Chairs */}
+          <div
+            data-testid="lobby-table-scene"
+            className="lg:col-span-7 bg-[#F7EEDF] p-3 sm:p-4 rounded-2xl border border-[#231712]/15 flex flex-col justify-between gap-2.5"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 className="font-serif font-bold text-sm sm:text-base text-[#231712]">
+                  Mesa reservada ({activeSeatMembers.length}/{snapshot.config.maxPlayers} sillas)
+                </h2>
+                <p className="text-[11px] text-[#6F5A4E]">
+                  Cada comensal toma asiento alrededor del mantel antes de servir.
+                </p>
+              </div>
+
               {isHost && activeSeatMembers.length < snapshot.config.maxPlayers && (
-                <div className="flex items-center gap-1">
-                  <select
-                    aria-label="Nivel del bot"
-                    value={botDiff}
-                    onChange={(e) => setBotDiff(e.target.value as 'basic' | 'medium' | 'hard')}
-                    className="h-8 px-2 rounded-lg bg-[#F7EEDF] border border-[#231712]/25 text-xs font-semibold"
-                  >
-                    <option value="basic">Básico</option>
-                    <option value="medium">Medio</option>
-                    <option value="hard">Difícil</option>
-                  </select>
+                <div className="flex items-center gap-1 bg-[#FFF9F0] p-1 rounded-xl border border-[#231712]/20">
+                  {(['basic', 'medium', 'hard'] as const).map((diff) => {
+                    const label =
+                      diff === 'basic' ? 'Básico' : diff === 'medium' ? 'Medio' : 'Difícil';
+                    const active = botDiff === diff;
+                    return (
+                      <button
+                        key={diff}
+                        type="button"
+                        onClick={() => {
+                          soundEngine.playSfx('uiToggle');
+                          setBotDiff(diff);
+                        }}
+                        className={`px-2 py-1 rounded-lg text-[11px] font-bold cursor-pointer ${
+                          active
+                            ? 'bg-[#231712] text-[#FFF9F0]'
+                            : 'text-[#6F5A4E] hover:text-[#231712]'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
                   <button
                     type="button"
                     data-testid="add-bot-btn"
                     onClick={() => void addBot(botDiff)}
-                    className="px-2.5 h-8 rounded-lg bg-[#3F5E4A] text-[#FFF9F0] text-xs font-bold border border-[#231712] cursor-pointer"
+                    className="ml-1 px-2.5 py-1 min-h-[32px] rounded-lg bg-[#3F5E4A] text-[#FFF9F0] text-xs font-bold border border-[#231712] hover:opacity-95 cursor-pointer"
                   >
                     + Bot
                   </button>
@@ -598,108 +1268,234 @@ export function LobbyScreen(): React.ReactElement {
               )}
             </div>
 
-            <div className="space-y-1.5">
-              {activeSeatMembers.map((m) => (
-                <div
-                  key={m.id}
-                  className="flex items-center justify-between bg-[#F7EEDF] px-3 py-2 rounded-xl border border-[#231712]/15"
-                >
-                  <div className="flex items-center gap-2 min-w-0">
-                    <PlayerAvatar avatarId={m.avatarId} size={28} />
-                    <div className="min-w-0">
-                      <span className="font-bold text-xs sm:text-sm text-[#3E2F2A] block truncate">
-                        {m.nickname}
-                        {m.id === snapshot.hostId ? ' (Anfitrión)' : ''}
-                        {m.id === myPlayerId ? ' · Tú' : ''}
-                      </span>
-                      <span className="block text-[11px] text-[#6F5A4E]">
-                        {m.role === 'bot'
-                          ? `Bot ${
-                              m.botDifficulty === 'hard'
-                                ? 'Difícil'
-                                : m.botDifficulty === 'medium'
-                                  ? 'Medio'
-                                  : 'Básico'
-                            }`
-                          : m.ready
-                            ? 'Listo'
-                            : 'En espera'}
-                      </span>
-                    </div>
-                  </div>
-                  {isHost && m.role === 'bot' && (
-                    <button
-                      type="button"
-                      onClick={() => void removeBot(m.id)}
-                      className="text-xs font-bold text-[#A94438] hover:underline cursor-pointer"
-                    >
-                      Quitar
-                    </button>
-                  )}
-                </div>
-              ))}
+            {/* 4 Chairs Arranged Around the Central Café Table Emblem */}
+            <div className="relative grid grid-cols-2 gap-2.5 sm:gap-3 pt-1">
+              {chairSlots.map(({ idx, member, isLocked }) => {
+                const isMe = member?.id === myPlayerId;
+                const isBot = member?.role === 'bot';
+                return (
+                  <motion.div
+                    key={member ? member.id : `empty-seat-${idx}`}
+                    data-testid={`lobby-seat-${idx}`}
+                    initial={
+                      reducedMotion || !member
+                        ? false
+                        : { scale: 0.92, opacity: 0, y: isBot ? -8 : 6 }
+                    }
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    transition={{ duration: reducedMotion ? 0 : 0.22 }}
+                    className={`relative min-h-[68px] sm:min-h-[78px] p-2.5 rounded-2xl border-2 flex items-center justify-between gap-2 transition-all ${
+                      member
+                        ? isMe
+                          ? 'bg-[#FFF9F0] border-[#C96F4A] shadow-2xs'
+                          : 'bg-[#FFF9F0] border-[#231712]/25'
+                        : isLocked
+                          ? 'bg-[#EAD9C0]/45 border-dashed border-[#3E2F2A]/15 opacity-55'
+                          : 'bg-[#FFF9F0]/60 border-dashed border-[#3E2F2A]/30'
+                    }`}
+                  >
+                    {member ? (
+                      <>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <div className="relative shrink-0">
+                            <PlayerAvatar avatarId={member.avatarId} size={34} />
+                            <span className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-[#231712] text-[#FFF9F0] text-[9px] font-mono font-bold flex items-center justify-center">
+                              {idx + 1}
+                            </span>
+                          </div>
+                          <div className="min-w-0">
+                            <span className="font-bold text-xs sm:text-sm text-[#231712] block truncate">
+                              {member.nickname}
+                              {member.id === snapshot.hostId ? ' · Anfitrión' : ''}
+                              {isMe ? ' (Tú)' : ''}
+                            </span>
+                            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                              {isBot ? (
+                                <span className="px-1.5 py-0.2 rounded bg-[#FEF6E0] border border-[#C9A227] text-[10px] font-bold text-[#3E2F2A]">
+                                  Autómata{' '}
+                                  {member.botDifficulty === 'hard'
+                                    ? 'Difícil'
+                                    : member.botDifficulty === 'medium'
+                                      ? 'Medio'
+                                      : 'Básico'}
+                                </span>
+                              ) : member.ready ? (
+                                <span
+                                  data-testid={isMe ? 'lobby-ready-stamp' : undefined}
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-[#E6F4EA] border border-[#3F5E4A] text-[10px] font-extrabold text-[#3F5E4A] uppercase tracking-wider"
+                                >
+                                  <svg
+                                    width="10"
+                                    height="10"
+                                    viewBox="0 0 12 12"
+                                    fill="none"
+                                    aria-hidden="true"
+                                    className="shrink-0"
+                                  >
+                                    <path
+                                      d="M2.2 6.2L4.8 8.8L9.8 3.2"
+                                      stroke="currentColor"
+                                      strokeWidth="2"
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                  <span>Listo en mesa</span>
+                                </span>
+                              ) : (
+                                <span className="text-[11px] text-[#6F5A4E]">Mirando la carta…</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {isHost && isBot && (
+                          <button
+                            type="button"
+                            onClick={() => void removeBot(member.id)}
+                            className="px-2 py-1 rounded-lg bg-[#FDECEB] text-[11px] font-bold text-[#A94438] hover:underline cursor-pointer shrink-0"
+                          >
+                            Quitar
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <div className="flex items-center gap-2 text-xs text-[#6F5A4E]">
+                        <span className="w-7 h-7 rounded-full border border-dashed border-[#6F5A4E]/50 flex items-center justify-center font-mono text-[11px] font-bold">
+                          {idx + 1}
+                        </span>
+                        <span>{isLocked ? 'Silla retirada' : 'Silla libre · Esperando'}</span>
+                      </div>
+                    )}
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Direct Room Options column */}
-          <div className="bg-[#F7EEDF] p-3 rounded-2xl border border-[#231712]/12 space-y-2.5 self-start">
-            <h2 className="font-serif font-bold text-base">Opciones</h2>
+          {/* Right 5 cols: Tactile Segmented Controls for Players & Turn Clock */}
+          <div className="lg:col-span-5 bg-[#F7EEDF] p-3 sm:p-4 rounded-2xl border border-[#231712]/15 space-y-3 self-stretch flex flex-col justify-between">
+            <div className="space-y-3">
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#C96F4A] block">
+                  Servicio de mesa
+                </span>
+                <h2 className="font-serif font-bold text-base text-[#231712]">
+                  Opciones de la tertulia
+                </h2>
+              </div>
 
-            <label className="block text-xs font-semibold text-[#6F5A4E]">
-              Jugadores
-              <select
-                disabled={!isHost}
-                value={snapshot.config.maxPlayers}
-                onChange={(e) =>
-                  void updateRoomConfig({
-                    maxPlayers: Number(e.target.value) as 2 | 3 | 4,
-                  })
-                }
-                className="mt-1 w-full h-9 px-2.5 rounded-xl bg-[#FFF9F0] border border-[#231712]/25 text-xs sm:text-sm text-[#3E2F2A] font-semibold"
-              >
-                <option value={2}>2 jugadores</option>
-                <option value={3}>3 jugadores</option>
-                <option value={4}>4 jugadores</option>
-              </select>
-            </label>
+              {/* Tactile Max Players Control */}
+              <div className="space-y-1" data-testid="lobby-maxplayers-control">
+                <span className="block text-xs font-bold text-[#3E2F2A]">
+                  Sillas en la mesa
+                </span>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {([2, 3, 4] as const).map((count) => {
+                    const active = snapshot.config.maxPlayers === count;
+                    return (
+                      <button
+                        key={count}
+                        type="button"
+                        disabled={!isHost}
+                        data-testid={`lobby-maxplayers-${count}`}
+                        onClick={() => {
+                          soundEngine.playSfx('uiToggle');
+                          void updateRoomConfig({ maxPlayers: count });
+                        }}
+                        className={`min-h-[40px] px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer disabled:opacity-60 ${
+                          active
+                            ? 'bg-[#231712] text-[#FFF9F0] border-[#231712] shadow-2xs'
+                            : 'bg-[#FFF9F0] text-[#3E2F2A] border-[#231712]/20 hover:bg-[#EAD9C0]'
+                        }`}
+                      >
+                        {count} sillas
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
-            <label className="block text-xs font-semibold text-[#6F5A4E]">
-              Tiempo por turno
-              <select
-                disabled={!isHost}
-                value={snapshot.config.timerEnabled ? snapshot.config.timerSeconds : 0}
-                onChange={(e) => {
-                  const val = Number(e.target.value);
-                  void updateRoomConfig({
-                    timerEnabled: val > 0,
-                    timerSeconds: val > 0 ? val : 60,
-                  });
-                }}
-                className="mt-1 w-full h-9 px-2.5 rounded-xl bg-[#FFF9F0] border border-[#231712]/25 text-xs sm:text-sm text-[#3E2F2A] font-semibold"
-              >
-                <option value={0}>Sin reloj</option>
-                <option value={30}>30 s</option>
-                <option value={60}>60 s</option>
-                <option value={90}>90 s</option>
-                <option value={120}>120 s</option>
-              </select>
-            </label>
+              {/* Tactile Turn Clock Control */}
+              <div className="space-y-1" data-testid="lobby-timer-control">
+                <span className="block text-xs font-bold text-[#3E2F2A]">
+                  Reloj por turno
+                </span>
+                <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-3 gap-1.5">
+                  {[
+                    { val: 0, label: 'Sin reloj' },
+                    { val: 30, label: '30 s' },
+                    { val: 60, label: '60 s' },
+                    { val: 90, label: '90 s' },
+                    { val: 120, label: '120 s' },
+                  ].map((opt) => {
+                    const active = currentTimerVal === opt.val;
+                    return (
+                      <button
+                        key={opt.val}
+                        type="button"
+                        disabled={!isHost}
+                        data-testid={`lobby-timer-${opt.val}`}
+                        onClick={() => {
+                          soundEngine.playSfx('uiToggle');
+                          void updateRoomConfig({
+                            timerEnabled: opt.val > 0,
+                            timerSeconds: opt.val > 0 ? opt.val : 60,
+                          });
+                        }}
+                        className={`min-h-[38px] px-2 py-1 rounded-xl border text-xs font-bold transition-all cursor-pointer disabled:opacity-60 ${
+                          active
+                            ? 'bg-[#C96F4A] text-[#FFF9F0] border-[#231712] shadow-2xs'
+                            : 'bg-[#FFF9F0] text-[#3E2F2A] border-[#231712]/20 hover:bg-[#EAD9C0]'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-[#3E2F2A]/10 text-[11px] text-[#6F5A4E] flex items-center justify-between">
+              <span>Bolsa: 100 fichas · 24 mesas</span>
+              <span className="font-serif font-bold text-[#3E2F2A]">O &amp; A</span>
+            </div>
           </div>
         </div>
 
-        {/* Bottom Action Bar */}
-        <div className="shrink-0 pt-2.5 border-t border-[#3E2F2A]/10 flex items-center justify-between gap-2">
+        {/* Bottom Action Bar: Ready Stamp + Café Service Bell Start */}
+        <div className="shrink-0 pt-2 border-t border-[#3E2F2A]/10 flex items-center justify-between gap-2">
           {me && me.role === 'player' && (
             <button
               type="button"
+              data-testid="lobby-ready-btn"
               onClick={() => void toggleReady(!me.ready)}
-              className={`px-4 h-10 rounded-xl font-bold text-xs sm:text-sm cursor-pointer ${
+              className={`px-4 min-h-[44px] rounded-xl font-bold text-xs sm:text-sm cursor-pointer transition-all inline-flex items-center gap-2 ${
                 me.ready
-                  ? 'bg-[#3F5E4A] text-[#FFF9F0] border border-[#231712]'
-                  : 'bg-[#F7EEDF] text-[#3E2F2A] border border-[#231712]/30'
+                  ? 'bg-[#3F5E4A] text-[#FFF9F0] border-2 border-[#231712] shadow-[0_2px_0_#231712]'
+                  : 'bg-[#F7EEDF] text-[#3E2F2A] border-2 border-[#231712]/30 hover:bg-[#EAD9C0]'
               }`}
             >
-              {me.ready ? '✓ Listo' : 'Estoy listo'}
+              {me.ready && (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  aria-hidden="true"
+                  className="shrink-0"
+                >
+                  <path
+                    d="M2.2 6.2L4.8 8.8L9.8 3.2"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              )}
+              <span>{me.ready ? 'Sello: Listo' : 'Marcar como listo'}</span>
             </button>
           )}
 
@@ -709,9 +1505,18 @@ export function LobbyScreen(): React.ReactElement {
               data-testid="start-game-btn"
               disabled={activeSeatMembers.length < 2}
               onClick={() => void startGame()}
-              className="px-5 h-10 sm:h-11 rounded-xl bg-[#C96F4A] text-[#FFF9F0] font-bold text-xs sm:text-sm border border-[#231712] shadow-[0_2px_0_#231712] hover:opacity-95 disabled:opacity-45 cursor-pointer ml-auto"
+              className="px-5 min-h-[44px] rounded-xl bg-[#C96F4A] text-[#FFF9F0] font-bold text-xs sm:text-sm border-2 border-[#231712] shadow-[0_3px_0_#231712] hover:bg-[#B85F3B] active:translate-y-0.5 disabled:opacity-45 cursor-pointer ml-auto inline-flex items-center gap-2"
             >
-              Empezar partida ({activeSeatMembers.length})
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M12 4v2m-7 11h14a7 7 0 0 0-14 0Zm-2 3h18"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span>Empezar partida ({activeSeatMembers.length})</span>
             </button>
           )}
         </div>
@@ -1830,10 +2635,10 @@ export function PlayingScreen(): React.ReactElement {
       <section
         aria-label="Tu mano de invitados"
         data-testid="player-hand-dock"
-        className="shrink-0 bg-[#FFF9F0]/45 backdrop-blur-lg rounded-2xl border-2 border-[#231712]/25 px-2 py-1 sm:px-3.5 sm:py-1.5 shadow-[0_-4px_18px_rgba(35,23,18,0.1)] z-30 flex flex-col sm:flex-row items-center justify-between gap-1.5"
+        className="shrink-0 bg-[#FFF9F0]/45 backdrop-blur-lg rounded-2xl border-2 border-[#231712]/25 px-2 py-1 sm:px-3.5 sm:py-1.5 shadow-[0_-4px_18px_rgba(35,23,18,0.1)] z-30 flex flex-col sm:grid sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center justify-between sm:justify-normal gap-1.5"
       >
         {/* Left / Top: Compact Selection Detail Panel or Opaque Contrast Pill */}
-        <div className="flex flex-wrap items-center justify-between w-full sm:w-auto sm:min-w-[230px] sm:max-w-[295px] gap-1.5">
+        <div className="flex flex-wrap items-center justify-between w-full sm:w-full sm:min-w-0 sm:max-w-[295px] gap-1.5 sm:justify-self-start">
           {selectedTile && selectedProfile ? (
             <div
               data-testid="selected-tile-detail"
@@ -1903,7 +2708,7 @@ export function PlayingScreen(): React.ReactElement {
 
         {/* Center: 5 Opaque Square Rounded Tiles (Flag Background + Caricature, ZERO visible text) */}
         <div
-          className="grid grid-cols-5 gap-1.5 w-full max-w-[356px] sm:max-w-none sm:w-auto sm:flex sm:items-center sm:justify-center sm:gap-2.5 py-0.5"
+          className="grid grid-cols-5 gap-1.5 w-full max-w-[356px] sm:max-w-none sm:w-auto sm:flex sm:items-center sm:justify-center sm:justify-self-center sm:gap-2.5 py-0.5"
           data-testid="hand-tiles-row"
         >
           {myHand.map((tile) => {
@@ -1955,12 +2760,15 @@ export function PlayingScreen(): React.ReactElement {
         </div>
 
         {/* Right: Confirm Move / Clear Draft / Contextual Deprioritized "Cambiar comodín" (P0.5) */}
-        <div className="flex items-center justify-end gap-1.5 w-full sm:w-auto">
+        <div className="flex items-center justify-end gap-1.5 w-full sm:w-auto sm:justify-self-end">
           {draftPlacements.length > 0 && (
             <>
               <button
                 type="button"
-                onClick={clearDraft}
+                onClick={() => {
+                  soundEngine.playSfx('uiCancel');
+                  clearDraft();
+                }}
                 className="min-h-[38px] px-3 py-1 rounded-xl bg-[#FFF9F0] border border-[#231712]/30 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
               >
                 Limpiar
@@ -1970,6 +2778,7 @@ export function PlayingScreen(): React.ReactElement {
                 data-testid="confirm-move-btn"
                 disabled={!draftEvaluation.isValidCompleteMove}
                 onClick={() => {
+                  soundEngine.playSfx('uiConfirm');
                   const first = draftPlacements[0];
                   if (!first) return;
                   const second = draftPlacements[1];

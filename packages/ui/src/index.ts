@@ -769,3 +769,38 @@ export function getPresetAvatar(avatarId?: string): PresetAvatarMeta {
   };
 }
 
+export type MusicMoodId = 'tertulia' | 'lluvia' | 'noche';
+
+export const MUSIC_MOODS: Array<{ id: MusicMoodId; label: string; desc: string }> = [
+  { id: 'tertulia', label: 'Tertulia', desc: 'Rhodes cálido, contrabajo y murmullo de tarde' },
+  { id: 'lluvia', label: 'Lluvia', desc: 'Acordes suaves tras el cristal con lluvia fina' },
+  { id: 'noche', label: 'Noche', desc: 'Jazz lento de cierre a la luz de las velas' },
+];
+
+export const CAFE_DAILY_PHRASES: readonly string[] = [
+  'Hoy el café está fuerte',
+  'La casa invita',
+  'Mesa para dos',
+  'Recién molido para la tertulia',
+] as const;
+
+/**
+ * Returns a localized Spanish greeting according to the hour of day (0-23) and optional nickname.
+ * Never uses real names—only the player's game nickname or a generic welcome if empty.
+ */
+export function getCafeGreeting(nickname?: string, hour: number = new Date().getHours()): string {
+  const clean = (nickname ?? '').trim();
+  const normalizedHour = ((Math.floor(hour) % 24) + 24) % 24;
+  const salutation =
+    normalizedHour >= 6 && normalizedHour < 13
+      ? 'Buenos días'
+      : normalizedHour >= 13 && normalizedHour < 21
+        ? 'Buenas tardes'
+        : 'Buenas noches';
+
+  if (!clean) {
+    return `${salutation}, pasa a tomar asiento`;
+  }
+  return `${salutation}, ${clean}`;
+}
+

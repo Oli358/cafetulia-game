@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { createGame } from '@cafetulia/engine';
 import {
+  CAFE_DAILY_PHRASES,
   CHARACTER_ROSTER,
   COIN_DENOMINATION_STYLES,
   decomposeCoins,
   formatScoreEs,
+  getCafeGreeting,
   getCharacterProfile,
+  MUSIC_MOODS,
   PRESET_AVATARS,
 } from '@cafetulia/ui';
 import { useGameStore } from '../store/gameStore';
@@ -15,7 +18,7 @@ import {
   inspectSeatsForSelectedTile,
 } from './moveHelper';
 
-describe('moveHelper & UI v6 specifications', () => {
+describe('moveHelper & UI v6/v7 specifications', () => {
   it('returns Spanish nation names', () => {
     expect(getNationName('fr')).toBe('Francia');
     expect(getNationName('es')).toBe('España');
@@ -42,6 +45,17 @@ describe('moveHelper & UI v6 specifications', () => {
     expect(useGameStore.getState().activeOverlay).toBeNull();
     expect(useGameStore.getState().activeModal).toBe('settings');
     store.setActiveModal(null);
+  });
+
+  it('formats time-of-day Spanish café greetings with and without nickname (v7)', () => {
+    expect(getCafeGreeting('Clara', 9)).toBe('Buenos días, Clara');
+    expect(getCafeGreeting('Clara', 16)).toBe('Buenas tardes, Clara');
+    expect(getCafeGreeting('Clara', 22)).toBe('Buenas noches, Clara');
+    expect(getCafeGreeting('   ', 17)).toBe('Buenas tardes, pasa a tomar asiento');
+    expect(CAFE_DAILY_PHRASES).toContain('Hoy el café está fuerte');
+    expect(CAFE_DAILY_PHRASES).toContain('La casa invita');
+    expect(CAFE_DAILY_PHRASES).toContain('Mesa para dos');
+    expect(MUSIC_MOODS.map((m) => m.id)).toEqual(['tertulia', 'lluvia', 'noche']);
   });
 
   it('defines 24 named national characters + 4 harlequin jokers (2M + 2F) with MUJER/HOMBRE badges and short quotes', () => {
