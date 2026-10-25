@@ -699,6 +699,17 @@ export function decomposeCoins(score: number): CoinBreakdown {
   };
 }
 
+/**
+ * Formats integer scores in standard Spanish notation with dot thousands separator (e.g. 1.234, -9.999)
+ */
+export function formatScoreEs(score: number): string {
+  const rounded = Math.round(score);
+  const sign = rounded < 0 ? '-' : '';
+  const absStr = Math.abs(rounded).toString();
+  return sign + absStr.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+
 export type PresetAvatarId =
   | 'espresso'
   | 'croissant'

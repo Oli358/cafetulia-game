@@ -139,14 +139,14 @@ export function IllustratedBoard({
       <div
         role="region"
         aria-label="Tablero ilustrado de Cafetulia con 24 mesas, 68 sillas y barra central"
-        className={`relative aspect-square w-[min(97vw,calc(100dvh-206px))] h-[min(97vw,calc(100dvh-206px))] sm:w-[min(94vw,calc(100dvh-194px))] sm:h-[min(94vw,calc(100dvh-194px))] rounded-[20px] sm:rounded-[26px] border-2 shadow-[0_8px_24px_rgba(62,47,42,0.16)] overflow-hidden shrink-0 transition-colors ${
+        className={`relative aspect-square w-[min(96vw,calc(100dvh-218px))] h-[min(96vw,calc(100dvh-218px))] sm:w-[min(93vw,calc(100dvh-204px))] sm:h-[min(93vw,calc(100dvh-204px))] rounded-[20px] sm:rounded-[26px] border-2 shadow-[0_8px_24px_rgba(35,23,18,0.18)] overflow-hidden shrink-0 transition-colors ${
           nightMode
-            ? 'bg-[#282D3A] border-[#C9A227]/50 text-[#FFF9F0]'
-            : 'bg-[#EFE3CE] border-[#8B5E3C] text-[#3E2F2A]'
+            ? 'bg-[#282D3A] border-[#C9A227]/55 text-[#FFF9F0]'
+            : 'bg-[#EFE3CE] border-[#231712] text-[#3E2F2A]'
         }`}
       >
         {/* Mobile Zoom / Pan Quick Toggle (Top-Right Corner of Board) */}
-        <div className="sm:hidden absolute top-1.5 right-1.5 z-40 flex items-center gap-1 bg-[#FFF9F0]/90 backdrop-blur-xs px-1.5 py-0.5 rounded-xl border border-[#3E2F2A]/20 shadow-xs">
+        <div className="sm:hidden absolute top-1.5 right-1.5 z-40 flex items-center gap-1 bg-[#FFF9F0]/92 backdrop-blur-xs px-1.5 py-0.5 rounded-xl border border-[#231712]/30 shadow-xs">
           <button
             type="button"
             data-testid="mobile-board-zoom-btn"
@@ -224,7 +224,7 @@ export function IllustratedBoard({
                   d="M0 65 H130 M65 0 V65 M32.5 65 V130 M97.5 65 V130"
                   stroke={nightMode ? '#323846' : '#E5D5BC'}
                   strokeWidth="1.2"
-                  opacity="0.55"
+                  opacity="0.5"
                 />
               </pattern>
               <radialGradient id="floor-vignette" cx="50%" cy="50%" r="58%">
@@ -246,7 +246,7 @@ export function IllustratedBoard({
               stroke="#C9A227"
               strokeWidth="2"
               strokeDasharray="10 8"
-              opacity="0.38"
+              opacity="0.35"
             />
 
             {/* Subtle connection spokes from each table to its 4 chairs */}
@@ -269,7 +269,7 @@ export function IllustratedBoard({
                     x2={sx}
                     y2={sy}
                     stroke={isTableFocused ? '#C96F4A' : meta.primaryColor}
-                    strokeWidth={isTableFocused ? '7' : '4.5'}
+                    strokeWidth={isTableFocused ? '7' : '4.2'}
                     strokeLinecap="round"
                     opacity={
                       isDimmed
@@ -277,8 +277,8 @@ export function IllustratedBoard({
                         : isTableFocused
                           ? '0.72'
                           : nightMode
-                            ? '0.28'
-                            : '0.2'
+                            ? '0.26'
+                            : '0.18'
                     }
                   />
                 );
@@ -294,7 +294,16 @@ export function IllustratedBoard({
               width: '29.6%',
               height: '29.6%',
             }}
-            className={`absolute z-10 rounded-[16px] sm:rounded-[20px] border-2 p-1 sm:p-1.5 flex flex-col justify-between shadow-[0_4px_14px_rgba(62,47,42,0.22)] transition-opacity duration-200 ${
+            onDragOver={(e) => {
+              if (selectedTile && selectedTile.nation !== 'joker') {
+                e.preventDefault();
+              }
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              onBarClick();
+            }}
+            className={`absolute z-10 rounded-[16px] sm:rounded-[20px] border-2 p-1 sm:p-1.5 flex flex-col justify-between shadow-[0_4px_14px_rgba(35,23,18,0.24)] transition-opacity duration-200 ${
               focusedTableId ? 'opacity-25' : 'opacity-100'
             } ${
               nightMode
@@ -303,7 +312,7 @@ export function IllustratedBoard({
             }`}
             data-testid="bar-strip"
           >
-            {/* Bar Counter Top Header + Sleeping Cat + Action Button */}
+            {/* Bar Counter Top Header + Sleeping Cat + Action Button + O & A Plaque */}
             <div className="flex items-center justify-between gap-0.5 border-b border-[#C9A227]/30 pb-0.5">
               <button
                 type="button"
@@ -336,23 +345,25 @@ export function IllustratedBoard({
                 </span>
               </button>
 
-              {selectedTile && selectedTile.nation !== 'joker' ? (
-                <button
-                  type="button"
-                  data-testid="send-to-bar-btn"
-                  onClick={onBarClick}
-                  className="px-1 py-0.5 rounded bg-[#C96F4A] text-[#FFF9F0] text-[7px] sm:text-[9px] font-bold shadow-xs hover:opacity-95 cursor-pointer whitespace-nowrap"
-                >
-                  Servir ({nextBarValue !== null ? (nextBarValue > 0 ? `+${nextBarValue}` : nextBarValue) : 'llena'})
-                </button>
-              ) : (
+              <div className="flex items-center gap-1">
+                {selectedTile && selectedTile.nation !== 'joker' && (
+                  <button
+                    type="button"
+                    data-testid="send-to-bar-btn"
+                    onClick={onBarClick}
+                    className="px-1 py-0.5 rounded bg-[#C96F4A] text-[#FFF9F0] text-[7px] sm:text-[9px] font-bold shadow-xs hover:opacity-95 cursor-pointer whitespace-nowrap"
+                  >
+                    Servir ({nextBarValue !== null ? (nextBarValue > 0 ? `+${nextBarValue}` : nextBarValue) : 'llena'})
+                  </button>
+                )}
                 <span
-                  className="text-[7px] sm:text-[8px] font-serif text-[#F2C14E] bg-[#3E2F2A]/45 px-1 py-0.2 rounded border border-[#C9A227]/40"
-                  title="Placa conmemorativa del café"
+                  data-testid="bar-plaque-oa"
+                  className="text-[7px] sm:text-[8px] font-serif text-[#F2C14E] bg-[#3E2F2A]/55 px-1 py-0.2 rounded border border-[#C9A227]/45 whitespace-nowrap"
+                  title="Placa conmemorativa del café: O & A"
                 >
                   O &amp; A
                 </span>
-              )}
+              </div>
             </div>
 
             {/* 20 Coasters Grid (5 cols x 4 rows) inside the central bar */}
@@ -384,7 +395,7 @@ export function IllustratedBoard({
                     }
                     className={`relative flex items-center justify-center rounded-md border transition-transform select-none overflow-hidden ${
                       occ
-                        ? 'bg-[#FFF9F0] border-[#3E2F2A] shadow-2xs p-0'
+                        ? 'bg-[#FFF9F0] border-[#231712] shadow-2xs p-0'
                         : isNext
                           ? 'bg-[#F2C14E] text-[#3E2F2A] border-[#FFF9F0] border font-extrabold scale-105 cursor-pointer rounded-full'
                           : val > 0
@@ -393,7 +404,12 @@ export function IllustratedBoard({
                     }`}
                   >
                     {occ ? (
-                      <CharacterPortrait nation={occ.nation} gender={occ.gender} size={18} />
+                      <CharacterPortrait
+                        nation={occ.nation}
+                        gender={occ.gender}
+                        tileId={occ.id}
+                        size={18}
+                      />
                     ) : (
                       <span className="font-mono font-bold text-[7px] sm:text-[9px] tabular-nums leading-none">
                         {val > 0 ? `+${val}` : val}
@@ -405,7 +421,7 @@ export function IllustratedBoard({
             </div>
           </div>
 
-          {/* 24 ILLUSTRATED ROUND TABLES (Hierarchy #1: Larger 8.9% tables with light cream tablecloth & centered Flag) */}
+          {/* 24 ILLUSTRATED ROUND TABLES (Hierarchy #1: Cream tablecloth + discreet 14px centered flag badge) */}
           {gameState.tables.map((table) => {
             const meta = NATION_VISUALS[table.nation as NationKey] ?? NATION_VISUALS.fr;
             const occCount = table.seatIds.filter((sid) => {
@@ -427,15 +443,15 @@ export function IllustratedBoard({
                 style={{
                   left: `${cellPercent(table.col)}%`,
                   top: `${cellPercent(table.row)}%`,
-                  width: '8.9%',
-                  height: '8.9%',
+                  width: '8.7%',
+                  height: '8.7%',
                   borderColor: isFocused
                     ? '#C96F4A'
                     : isComplete
                       ? '#C9A227'
                       : meta.primaryColor,
                 }}
-                className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#FFF9F0] border-[3px] shadow-[0_5px_12px_rgba(62,47,42,0.26)] flex flex-col items-center justify-center cursor-pointer transition-all duration-200 z-20 after:content-[''] after:absolute after:-inset-1.5 ${
+                className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#FFF9F0] border-[3px] shadow-[0_5px_12px_rgba(35,23,18,0.26)] flex flex-col items-center justify-center cursor-pointer transition-all duration-200 z-20 after:content-[''] after:absolute after:-inset-1.5 ${
                   isFocused
                     ? 'ring-4 ring-[#C96F4A]/80 scale-115 z-35'
                     : isDimmedByFocus
@@ -445,19 +461,25 @@ export function IllustratedBoard({
                         : 'hover:scale-106'
                 }`}
               >
-                {/* Colored inner rim matching the country table */}
+                {/* Warm wood/cloth inner rim matching the country table */}
                 <span
-                  className="pointer-events-none absolute inset-[2px] rounded-full border-2 opacity-85"
+                  className="pointer-events-none absolute inset-[2.5px] rounded-full border-[1.8px] opacity-80"
                   style={{ borderColor: meta.primaryColor }}
                 />
 
-                {/* Centered National Flag on the light tablecloth */}
+                {/* Subtle inner tablecloth stitch ring */}
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-[6px] rounded-full border border-dashed border-[#8B5E3C]/25"
+                />
+
+                {/* Discreet 14px National Flag medallion in the center of the cream tablecloth (P1.1) */}
                 <div className="relative z-10 flex items-center justify-center">
-                  <FlagBadge nation={table.nation} size={19} />
+                  <FlagBadge nation={table.nation} size={14} />
                 </div>
 
                 {/* 4 tiny occupancy dots */}
-                <div className="absolute -bottom-1 flex items-center gap-0.5 bg-[#3E2F2A] px-1 py-0.2 rounded-full">
+                <div className="absolute -bottom-1 flex items-center gap-0.5 bg-[#231712] px-1 py-0.2 rounded-full">
                   {[0, 1, 2, 3].map((pipIdx) => (
                     <span
                       key={pipIdx}
@@ -471,7 +493,7 @@ export function IllustratedBoard({
             );
           })}
 
-          {/* 68 PHYSICAL CHAIRS & SEATED MINI-TILES (Hierarchy: Seated Tile > Shared Chair > Empty Neutral Chair) */}
+          {/* 68 PHYSICAL CHAIRS & SEATED MINI-TILES (Hierarchy: Seated Tile 6.5% > Shared Chair 4.7% > Empty Chair 4.2%) */}
           {gameState.seats.map((seat) => {
             const inspect = seatInspections[seat.id];
             const draftItem = draftPlacements.find((d) => d.seatId === seat.id);
@@ -519,17 +541,14 @@ export function IllustratedBoard({
                     .map((n) => getNationName(n))
                     .join(' y ')}`;
 
-            // Visual hierarchy sizing:
-            // Seated tile: 5.5% (mini square tile with flag + face)
-            // Shared chair: 4.8% (bicolor cushion + 2 mini flags)
-            // Empty regular chair: 4.3% (neutral wood/cream, no flag)
+            // P1.1 Hierarchy: Seated tile is 6.5% with bold square card frame & shadow
             const chairSizePct = occupant
-              ? '5.5%'
+              ? '6.5%'
               : isLegalComplete || isLegalPair
-                ? '5.2%'
+                ? '5.3%'
                 : isShared
-                  ? '4.8%'
-                  : '4.3%';
+                  ? '4.7%'
+                  : '4.2%';
 
             return (
               <button
@@ -541,6 +560,20 @@ export function IllustratedBoard({
                 onClick={() => onSeatClick(seat)}
                 onMouseEnter={() => setHoveredSeatId(seat.id)}
                 onMouseLeave={() => setHoveredSeatId((prev) => (prev === seat.id ? null : prev))}
+                onDragOver={(e) => {
+                  if (selectedTile && (isLegalComplete || isLegalPair)) {
+                    e.preventDefault();
+                    setHoveredSeatId(seat.id);
+                  }
+                }}
+                onDragLeave={() => {
+                  setHoveredSeatId((prev) => (prev === seat.id ? null : prev));
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setHoveredSeatId(null);
+                  onSeatClick(seat);
+                }}
                 aria-label={seatLabel}
                 title={
                   inspect?.status === 'illegal' && selectedTile
@@ -560,8 +593,8 @@ export function IllustratedBoard({
                       ? 'z-30 ring-2 ring-[#C96F4A] scale-110 shadow-md'
                       : occupant
                         ? isSelectedDraft
-                          ? 'z-30 ring-3 ring-[#C9A227] scale-112 shadow-md'
-                          : 'z-25 shadow-[0_3px_8px_rgba(35,23,18,0.3)] hover:scale-108'
+                          ? 'z-30 ring-3 ring-[#C9A227] scale-112 shadow-[0_5px_12px_rgba(35,23,18,0.45)]'
+                          : 'z-25 shadow-[0_4px_10px_rgba(35,23,18,0.38)] hover:scale-108'
                         : isLegalComplete
                           ? 'z-30 ring-3 ring-[#3F8F6B] bg-[#E6F4EA] scale-115 shadow-[0_0_12px_rgba(63,143,107,0.65)]'
                           : isLegalPair
@@ -575,20 +608,21 @@ export function IllustratedBoard({
                 {!occupant && (
                   <span
                     aria-hidden="true"
-                    className="pointer-events-none absolute -top-[2.5px] left-[16%] right-[16%] h-[3px] rounded-t-full bg-[#6E472B] border border-[#3E2F2A]"
+                    className="pointer-events-none absolute -top-[2.5px] left-[16%] right-[16%] h-[3px] rounded-t-full bg-[#6E472B] border border-[#231712]"
                   />
                 )}
 
                 {occupant ? (
-                  /* SEATED GUEST: Mini Square Tile with Flag Background + Caricature Face (ZERO text labels!) */
+                  /* SEATED GUEST: Prominent Square Tile with Flag Background + Caricature Face (ZERO text labels!) */
                   <div
-                    className="w-full h-full flex items-center justify-center rounded-[7px] overflow-hidden"
+                    className="w-full h-full flex items-center justify-center rounded-[8px] bg-[#FFF9F0] p-[1px] border border-[#231712] overflow-hidden"
                     data-testid="seated-mini-tile"
                   >
                     <CharacterPortrait
                       nation={occupant.nation === 'joker' ? 'joker' : occupant.nation}
                       gender={occupant.gender}
-                      size={40}
+                      tileId={occupant.id}
+                      size={48}
                     />
                   </div>
                 ) : (
@@ -618,7 +652,8 @@ export function IllustratedBoard({
                           <CharacterPortrait
                             nation={selectedTile.nation}
                             gender={selectedTile.gender}
-                            size={28}
+                            tileId={selectedTile.id}
+                            size={30}
                           />
                         </div>
                       ) : isShared && natB ? (
@@ -644,7 +679,7 @@ export function IllustratedBoard({
                     className={`pointer-events-none absolute -top-2.5 left-1/2 -translate-x-1/2 z-35 px-1 py-0 rounded-full text-[7px] sm:text-[9px] font-mono font-extrabold tabular-nums shadow-xs whitespace-nowrap ${
                       isLegalComplete
                         ? 'bg-[#3F5E4A] text-[#FFF9F0] border border-[#FFF9F0]'
-                        : 'bg-[#C9A227] text-[#3E2F2A] border border-[#3E2F2A]'
+                        : 'bg-[#C9A227] text-[#3E2F2A] border border-[#231712]'
                     }`}
                   >
                     {isLegalComplete ? `+${inspect.pointsDelta}` : 'Pareja'}
@@ -679,9 +714,16 @@ export function IllustratedBoard({
                 type="button"
                 onClick={onDismissToast}
                 aria-label="Cerrar aviso"
-                className="text-[#FFF9F0]/70 hover:text-[#FFF9F0] font-bold px-1 cursor-pointer"
+                className="text-[#FFF9F0]/70 hover:text-[#FFF9F0] font-bold px-1 py-0.5 cursor-pointer inline-flex items-center justify-center"
               >
-                ✕
+                <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+                  <path
+                    d="M1.5 1.5l7 7M8.5 1.5l-7 7"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
               </button>
             </div>
           </div>
@@ -694,7 +736,7 @@ export function IllustratedBoard({
             className="absolute bottom-2 left-1/2 -translate-x-1/2 z-40 w-[94%] max-w-md bg-[#FFF9F0]/95 backdrop-blur-xs text-[#3E2F2A] rounded-2xl px-3 py-2 border-2 border-[#C96F4A] shadow-lg flex items-center justify-between gap-2 text-xs"
           >
             <div className="flex items-center gap-2 min-w-0">
-              <FlagBadge nation={focusedTable.nation} size={24} />
+              <FlagBadge nation={focusedTable.nation} size={22} />
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span className="font-serif font-bold text-sm leading-none truncate">

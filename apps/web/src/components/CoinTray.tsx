@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { COIN_DENOMINATION_STYLES, decomposeCoins } from '@cafetulia/ui';
+import { COIN_DENOMINATION_STYLES, decomposeCoins, formatScoreEs } from '@cafetulia/ui';
 
 export function CoinChip({
   denomination,
@@ -135,7 +135,7 @@ export function AnimatedScore({
             : ''
       } ${className}`}
     >
-      {displayed}
+      {formatScoreEs(displayed)}
     </span>
   );
 }
@@ -144,50 +144,64 @@ export function CoinTray({
   score,
   playerId,
   compact = false,
+  summaryOnly = false,
   reducedMotion = false,
 }: {
   score: number;
   playerId: string;
   compact?: boolean;
+  summaryOnly?: boolean;
   reducedMotion?: boolean;
 }): React.ReactElement {
-  // P0.3: Exact coin representation (stacks with ×count; 0 coins when score === 0)
+  // P0.3 & P0.1: Exact coin breakdown in tooltip and full view; compact 1-coin summary in header so 4-digit scores never widen the header
   const breakdown = decomposeCoins(score);
+  const topDenom: 10 | 5 | 1 =
+    breakdown.tens > 0 ? 10 : breakdown.fives > 0 ? 5 : 1;
+  const tooltipText =
+    score === 0
+      ? 'Saldo: 0 puntos (sin monedas)'
+      : `Bandeja de monedas (${score < 0 ? 'resta ' : ''}${formatScoreEs(Math.abs(score))} pts): 10×${breakdown.tens}, 5×${breakdown.fives}, 1×${breakdown.ones}`;
 
   return (
     <div
       data-player-tray={playerId}
       data-testid={`coin-tray-${playerId}`}
-      className="inline-flex items-center gap-1"
-      title={
-        score === 0
-          ? 'Saldo: 0 puntos (sin monedas)'
-          : `Bandeja de monedas (${score < 0 ? 'resta ' : ''}${Math.abs(score)} pts): ${breakdown.tens}×10, ${breakdown.fives}×5, ${breakdown.ones}×1`
-      }
+      className="inline-flex items-center gap-1 shrink-0 whitespace-nowrap"
+      title={tooltipText}
     >
-      {breakdown.stacks.length > 0 && (
-        <div
-          className="inline-flex items-center gap-1"
-          data-testid={`coin-stacks-${playerId}`}
-        >
-          {breakdown.stacks.map((stack) => (
-            <span
-              key={stack.denomination}
-              className="inline-flex items-center gap-0.5 bg-[#FFF9F0]/90 px-1 py-0.2 rounded-full border border-[#3E2F2A]/15"
-            >
-              <CoinChip
-                denomination={stack.denomination}
-                size={compact ? 15 : 18}
-                isNegative={breakdown.isNegative}
-              />
-              {stack.count > 1 && (
-                <span className="font-mono font-extrabold text-[9px] sm:text-[10px] text-[#3E2F2A] tabular-nums leading-none">
-                  ×{stack.count}
-                </span>
-              )}
-            </span>
-          ))}
-        </div>
+      {summaryOnly ? (
+        score !== 0 && (
+          <CoinChip
+            denomination={topDenom}
+            size={compact ? 15 : 18}
+            isNegative={breakdown.isNegative}
+          />
+        )
+      ) : (
+        breakdown.stacks.length > 0 && (
+          <div
+            className="inline-flex items-center gap-1"
+            data-testid={`coin-stacks-${playerId}`}
+          >
+            {breakdown.stacks.map((stack) => (
+              <span
+                key={stack.denomination}
+                className="inline-flex items-center gap-0.5 bg-[#FFF9F0]/90 px-1 py-0.2 rounded-full border border-[#3E2F2A]/15"
+              >
+                <CoinChip
+                  denomination={stack.denomination}
+                  size={compact ? 15 : 18}
+                  isNegative={breakdown.isNegative}
+                />
+                {stack.count > 1 && (
+                  <span className="font-mono font-extrabold text-[9px] sm:text-[10px] text-[#3E2F2A] tabular-nums leading-none">
+                    ×{stack.count}
+                  </span>
+                )}
+              </span>
+            ))}
+          </div>
+        )
       )}
       <span className="inline-flex items-baseline gap-0.5">
         <AnimatedScore

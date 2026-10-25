@@ -10,23 +10,24 @@ Juego digital cozy, online y para **2–4 jugadores**, basado en **Café Interna
 
 ## Estado actual
 
-- **v1.3 en preparación — v5 integrada y auditada; pendiente el pulido de cabecera, menús, final y movimiento.**
+- **v1.3 integrada y verificada (entrega v6): cabecera estable en dos filas, menús exclusivos en portal dentro del viewport, `Cambiar comodín` explicado, final escenificado con confeti y créditos `O & A`, caricaturas 3/4 y dock translúcido. Próximo pase: menú personalizado, SFX de UI y música con variación.**
 - Monorepo con pnpm workspaces, TypeScript estricto, ESLint, Prettier, Vitest y Playwright.
-- Motor de reglas determinista en `packages/engine`: **46 tests en verde** (motor + servidor + helpers) y **1.000 partidas simuladas** con `fast-check`.
+- Motor de reglas determinista en `packages/engine`: **48 tests en verde** (motor + servidor + helpers) y **1.000 partidas simuladas** con `fast-check`.
 - `packages/content/board.json` validado: **24 mesas, 68 sillas, 28 compartidas y 20 plazas de barra**.
 - Servidor autoritativo con Colyseus: salas privadas de 6 caracteres, 2–4 jugadores, bots, reconexión de 15 s, temporizador, chat efímero, revancha, persistencia SQLite y **avatares de perfil**.
-- Cliente rediseñado:
-  - **Portada, lobby y partida sin scroll** en 1280×800 y 390×844.
-  - Tablero limpio: banderas solo en mesas y sillas compartidas.
-  - Fichas 1:1 con bandera de fondo y caricatura original, sin texto impreso; el detalle (nombre, país y sexo) aparece al seleccionar.
-  - **Monedas 1 negra, 5 roja, 10 azul**, pilas exactas y animación **coin flip** con arco y giro 3D.
-  - **16 avatares prehechos** seleccionables, guardados en el dispositivo y visibles para todos.
-  - **Subtítulos de eventos** tipo Rocket League («¡EL JOKER!», «¡MESA COMPLETA!») activables en Ajustes.
-  - **Café Vivo 3D**: invitados sentados con taza y sorbo, 20 posavasos y carga diferida.
-  - PWA con service worker, menú directo y cajón de registro/chat.
-- Verificado: `typecheck`, `lint`, `build`, **46 tests**, E2E de Playwright, `/health`, salas y jugada real.
-- **Requiere Node 22.5+** (usa `node:sqlite`). Recomendado Node 24 LTS. En este equipo está instalado Node 24.20.0.
-- Pendiente: corregir el desbordamiento de la cabecera con puntuaciones altas, hacer mutuamente excluyentes los menús, escenificar el final, pulir transiciones y cartas, desplegar en Render y probar en iPhone/Android reales.
+- Cliente rediseñado (v6):
+  - **Portada, lobby, partida y pantalla final sin scroll** en 1920×900, 1280×800 y 390×844.
+  - **Cabecera estable en dos filas**: acciones fijas en una sola fila superior y marcador compacto con `formatScoreEs` (`1.234`, `9.999`) en la segunda fila.
+  - **Menús mutuamente excluyentes (`activeOverlay`)** y popovers renderizados en portal siempre dentro del viewport (`<AnchoredPopover>`).
+  - **Jerarquía clara del tablero**: banderas de mesa discretas (`14px`) frente a fichas sentadas cuadradas prominentes (`6.5%`), sillas compartidas bicolores y sillas vacías neutras.
+  - **Fichas 1:1 con bandera de fondo y caricatura 3/4 original**, sin texto impreso; el detalle aparece al seleccionar; clic/tap como interacción principal + drag opcional.
+  - **Cambiar comodín** explicado paso a paso en popover contextual con confirmación.
+  - **Pantalla final escenificada (`FinishedScreen`)**: sello `¡FINAL!`, ganador destacado, lluvia de confeti de papel, clasificación escalonada, créditos y dedicatoria **O & A**.
+  - **Monedas 1 negra, 5 roja, 10 azul**, pilas exactas, animación **coin flip** 3D y sonido arcade sintetizado de dos notas ascendentes.
+  - **16 avatares prehechos**, **subtítulos de eventos** (Cómic, Café, Arcade) y **Café Vivo 3D** con carga diferida (`React.lazy` + `Suspense`).
+- Verificado: `typecheck`, `lint`, `build`, **48 tests**, E2E de Playwright y 6 capturas `docs/referencias/ui-v6-*.png`.
+- **Requiere Node 22.5+** (usa `node:sqlite`). Recomendado Node 24 LTS.
+- Pendiente: convertir la portada/lobby en una escena de café personalizada, añadir SFX diferenciados por acción, ampliar la música lo-fi con capas y variación, probar en iPhone/Android reales y desplegar en Render.
 
 ## Comandos
 

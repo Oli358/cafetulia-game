@@ -80,3 +80,8 @@ Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 | D-072 | 2026-10-25 | Sonido de moneda sintetizado, inspirado en el arcade clásico | Cerrada | Dos notas ascendentes y timbre brillante, sin samples ni melodías copiadas de Nintendo |
 | D-073 | 2026-10-25 | Cabecera en dos filas, menús mutuamente excluyentes y popovers dentro del viewport | Cerrada | El marcador no desplaza las acciones; un solo overlay abierto; cierre con Escape, clic fuera o cambio de pantalla |
 | D-074 | 2026-10-25 | Final escenificado por fases | Cerrada | Secuencia `¡FINAL!` → ganador → confeti → ranking → créditos, con botón de omitir y respeto a `prefers-reduced-motion` |
+| D-075 | 2026-10-25 | La portada será una escena de café personalizada, no un formulario estático | Cerrada | Avatar y saludo según apodo/hora, escena ilustrada, botones con personalidad y microinteracciones; misma dirección en lobby y ajustes |
+| D-076 | 2026-10-25 | SFX diferenciados por acción de UI | Cerrada | Sonidos cortos y sutiles para abrir/cerrar, confirmar, cancelar, cambiar de pestaña, listo, copiar, empezar y ajustes; mute global y volumen bajo |
+| D-077 | 2026-10-25 | Música lo-fi con capas, melodía y variación | Cerrada | Mantener el estilo de café, pero con progresión más larga, secciones, transiciones entre pantallas y ducking; sin samples con copyright |
+| D-078 | 2026-10-25 | Los ZIPs antiguos no se incluyen en `public/` ni en el build | Cerrada | El ZIP de Argon trajo `public/assets/aistudio/*.zip`; se excluyen y se añaden a `.gitignore` |
+| D-079 | 2026-10-25 | Probar en teléfono real antes del siguiente despliegue | Cerrada | Validar audio, safe areas, PWA, táctil y rendimiento en iPhone/Android antes de Render |

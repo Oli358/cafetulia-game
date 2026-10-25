@@ -42,3 +42,7 @@ yarn-error.log*
 tmp/
 temp/
 *.tmp
+references/
+public/assets/aistudio/
+.aistudio/
+bun.lock

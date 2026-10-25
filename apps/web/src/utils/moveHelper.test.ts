@@ -4,20 +4,44 @@ import {
   CHARACTER_ROSTER,
   COIN_DENOMINATION_STYLES,
   decomposeCoins,
+  formatScoreEs,
   getCharacterProfile,
   PRESET_AVATARS,
 } from '@cafetulia/ui';
+import { useGameStore } from '../store/gameStore';
 import {
   evaluateDraftPlacements,
   getNationName,
   inspectSeatsForSelectedTile,
 } from './moveHelper';
 
-describe('moveHelper & UI v3 specifications', () => {
+describe('moveHelper & UI v6 specifications', () => {
   it('returns Spanish nation names', () => {
     expect(getNationName('fr')).toBe('Francia');
     expect(getNationName('es')).toBe('España');
     expect(getNationName('joker')).toBe('Comodín');
+  });
+
+  it('formats high and negative scores deterministically in Spanish locale', () => {
+    expect(formatScoreEs(0)).toBe('0');
+    expect(formatScoreEs(12)).toBe('12');
+    expect(formatScoreEs(987)).toBe('987');
+    expect(formatScoreEs(1234)).toBe('1.234');
+    expect(formatScoreEs(9999)).toBe('9.999');
+    expect(formatScoreEs(-14)).toBe('-14');
+    expect(formatScoreEs(-1234)).toBe('-1.234');
+  });
+
+  it('enforces mutually exclusive activeOverlay and activeModal state', () => {
+    const store = useGameStore.getState();
+    store.setActiveOverlay('legend');
+    expect(useGameStore.getState().activeOverlay).toBe('legend');
+    store.toggleOverlay('hands');
+    expect(useGameStore.getState().activeOverlay).toBe('hands');
+    store.setActiveModal('settings');
+    expect(useGameStore.getState().activeOverlay).toBeNull();
+    expect(useGameStore.getState().activeModal).toBe('settings');
+    store.setActiveModal(null);
   });
 
   it('defines 24 named national characters + 4 harlequin jokers (2M + 2F) with MUJER/HOMBRE badges and short quotes', () => {

@@ -5,6 +5,96 @@
 
 ---
 
+## Sesión 018 — 2026-10-25 — Integración v6, verificación y auditoría de menú, sonido y música
+
+**Objetivo:** integrar la entrega v6 de Argon, comprobar que los P0/P1 del prompt 09 están realmente resueltos y detectar lo que falta para el siguiente pase centrado en menú, sonido y música.
+
+**Hecho:**
+- Extraído y analizado `cafetulia (5).zip`.
+- Integrados `apps/web/src`, `packages/ui/src`, `apps/web/package.json`, `e2e/tests/smoke.spec.ts` y `.gitignore`, conservando las salvaguardas del proyecto.
+- **No** se han integrado los artefactos accidentales del ZIP: `.aistudio/`, `metadata.json` ni `public/assets/aistudio/*.zip` (5,9 MB de ZIPs antiguos). Se ha añadido su exclusión a `.gitignore`.
+- Verificado:
+  - `typecheck` ✅
+  - **48 tests** + simulación de 1.000 partidas ✅
+  - `build` ✅ (aviso de chunk `three-vendor` de 683 kB, pero carga diferida)
+  - `lint` ✅
+  - E2E ✅ en 1920×900, 1280×800 y 390×844, sin scroll.
+- Comprobado visualmente:
+  - La cabecera ya es estable en dos filas con 1.234/987/9.999 puntos.
+  - Los overlays son mutuamente excluyentes y los popovers quedan dentro del viewport.
+  - La pantalla final ya tiene «¡FINAL!», ganador grande, confeti, ranking, créditos y O & A.
+  - El tablero tiene mejor jerarquía: banderas de mesa pequeñas y fichas sentadas cuadradas más grandes.
+  - El dock es más translúcido y no pisa el tablero.
+  - El cambio de comodín está contextualizado y explicado.
+- Auditoría de lo nuevo que pide el usuario:
+  - La portada sigue siendo un formulario central estático sobre un fondo crema vacío; no hay escena de café, saludo personalizado, avatar protagonista ni botones con personalidad.
+  - El lobby es una tarjeta estática; añadir bots, copiar código y empezar no tienen sonido propio ni animación específica.
+  - Los botones de menú no reproducen SFX; solo algunos botones de juego y el desbloqueo de audio.
+  - La música sigue siendo el mismo bucle de 4 acordes cada 1,58 s, sin melodía, capas, variación ni transición entre pantallas.
+  - El confeti final es escaso (24 piezas, muchas fuera del primer plano) y los créditos aparecen de golpe; se puede escenificar mejor.
+  - `window.__CAFETULIA_STORE__` queda expuesto también en producción; conviene limitarlo a desarrollo/test.
+- Capturas nuevas en `docs/referencias/ui-v6-desktop.png`, `ui-v6-mobile.png`, `ui-v6-high-scores.png`, `ui-v6-menus.png`, `ui-v6-joker-swap.png` y `ui-v6-finished.png`.
+
+**Decisiones:**
+- El menú dejará de ser un formulario estático y pasará a ser una escena de café personalizada (D-075).
+- Cada acción de UI tendrá un SFX corto y diferenciado, con volumen bajo y mute global (D-076).
+- La música mantendrá el estilo lo-fi de café, pero con capas, melodía, variación y transiciones; no un bucle de cuatro acordes (D-077).
+- Los ZIPs de entregas anteriores no deben viajar dentro de `public/assets/aistudio` ni acabar en el build (D-078).
+- Antes del siguiente encargo se probará la v6 en teléfono real (D-079).
+
+**Problemas:**
+- El menú, el lobby y los ajustes se perciben estáticos y poco personalizados.
+- No hay sonido de UI por acción; la experiencia táctil queda muda.
+- La música es repetitiva y no cambia entre portada, lobby, partida y final.
+- Falta probar en iPhone/Android reales y desplegar en Render.
+- El ZIP de Argon incluyó artefactos antiguos que habría que borrar si se copiara entero.
+
+**Siguiente:**
+1. Decidir el alcance del pase v7 (menú, sonido, música y pruebas en teléfono).
+2. Preparar el prompt y el ZIP con solo los archivos necesarios.
+3. Integrar la v7 y probar en móvil real antes de Render.
+
+---
+
+## Sesión 017 — 2026-10-25 — Implementación y verificación completa del pulido UI v6 (`09-pulido-ui-v6.md`)
+
+**Objetivo:** aplicar al completo el encargo `docs/ARGON/09-pulido-ui-v6.md` (P0 bugs de cabecera, menús, pantalla final, placa `O & A` y `Cambiar comodín`; P1 jerarquía del tablero, caricaturas 3/4, dock translúcido, transiciones `motion/react`, sonido arcade de monedas y drag opcional; P2 salvaguardas y verificación E2E).
+
+**Hecho:**
+- **P0.1 — Cabecera estable en dos filas (`Screens.tsx`, `CoinTray.tsx`, `packages/ui`):**
+  - Separada la fila 1 de acciones (`flex-nowrap`, altura fija) de la fila 2 del marcador compacto (`avatar + apodo + 1 icono de moneda + saldo formateado con formatScoreEs + cartas` y `Bolsa: N`).
+  - Probado con puntuaciones de `1234`, `987` y `9999`: la cabecera no cambia de altura ni empuja los botones a una segunda línea.
+- **P0.2 — Menús mutuamente excluyentes y popovers siempre dentro del viewport (`gameStore.ts`, `Modals.tsx`, `Screens.tsx`):**
+  - Añadido `activeOverlay` global en Zustand; abrir cualquier menú/popover/modal cierra el anterior automáticamente y cambiar de pantalla limpia todos los overlays.
+  - Creado `<AnchoredPopover>` con `createPortal` y cálculo dinámico de coordenadas con clamp estricto dentro de `[8, innerWidth - 8]` y `[8, innerHeight - 8]`, soporte de `Escape`, clic fuera y hoja inferior en móvil.
+- **P0.3 — Pantalla final escenificada a pantalla completa (`Screens.tsx`):**
+  - `FinishedScreen` rediseñada con sello `¡FINAL!`, hero del ganador (`Gana [nombre]` / `¡Victoria compartida!`), lluvia de confeti de papel, clasificación escalonada con bots, bloque de créditos con `Dedicatoria: O & A` y botones `Generar postal`, `Volver a la portada`, `Votar revancha` y `Saltar`.
+- **P0.4 — Placa `O & A`:**
+  - Verificada en la barra 2D (`bar-plaque-oa`), en el Café Vivo 3D y en los créditos finales (`final-credits-oa`), sin rastro de `O & C`.
+- **P0.5 — `Cambiar comodín` explicado y contextual (`Screens.tsx`, `Modals.tsx`):**
+  - Unificado el término `Cambiar comodín` en toda la interfaz; botón secundario contextual (`Cambiar comodín por [nombre]`) que abre un popover explicativo con confirmación antes de enviar la jugada.
+- **P1.1 a P1.5 — Jerarquía del tablero, caricaturas 3/4, dock translúcido, `motion/react`, sonido arcade de dos notas y drag opcional:**
+  - Mesas con bandera central de `14px` y fichas sentadas cuadradas al `6.5%` del tablero.
+  - `CharacterPortrait.tsx` con caricaturas originales en 3/4 expresivo para los 24 personajes y los 4 comodines (`tileId`), sin texto impreso.
+  - Dock de mano con `bg-[#FFF9F0]/45 backdrop-blur-lg` y fichas 100% opacas.
+  - Transiciones con `motion/react` en pantallas, modales y popovers, respetando `reducedMotion`.
+  - Sonido de moneda arcade de dos notas ascendentes (`B5 → E6`) en `soundEngine.ts`.
+  - Soporte opcional de arrastrar y soltar fichas hacia sillas legales y barra central.
+- **Verificación y capturas:**
+  - `npx pnpm typecheck`, `npx pnpm test` (**48 tests** + 1.000 partidas simuladas), `npx pnpm lint`, `npx pnpm build` y `npx pnpm test:e2e` en verde.
+  - Generadas y revisadas las 6 capturas en `docs/referencias/ui-v6-desktop.png`, `ui-v6-mobile.png`, `ui-v6-high-scores.png`, `ui-v6-menus.png`, `ui-v6-joker-swap.png` y `ui-v6-finished.png`.
+
+**Decisiones:**
+- Se consolidan e implementan en código D-070 (`O & A`), D-071 (clic/tap principal + drag opcional), D-072 (sonido arcade de dos notas), D-073 (cabecera en dos filas + `activeOverlay` exclusivo + `<AnchoredPopover>` con clamp de viewport) y D-074 (`FinishedScreen` escenificada por fases).
+
+**Problemas:**
+- Ninguno en local: todos los tests unitarios, de servidor, de simulación y E2E están en verde.
+
+**Siguiente:**
+1. Desplegar en Render y verificar en iPhone/Android reales.
+
+---
+
 ## Sesión 016 — 2026-10-25 — Integración v5, auditoría de UI y preparación del pulido v6
 
 **Objetivo:** integrar la entrega v5 de Argon (claridad de tablero, fichas cuadradas, dock translúcido, desplegables y 3D cercano), comprobar sus afirmaciones y preparar el siguiente encargo con los nuevos errores detectados.

@@ -152,22 +152,28 @@ class CafetuliaSoundEngine {
         break;
       }
       case 'barPositive': {
-        this.tone(440, 587.33, 0.15, vol * 0.8, 'triangle', now);
+        this.tone(523.25, 659.25, 0.11, vol * 0.72, 'triangle', now);
+        this.tone(659.25, 783.99, 0.13, vol * 0.58, 'sine', now + 0.065);
         break;
       }
       case 'barNegative': {
-        this.tone(260, 195, 0.22, vol * 0.8, 'sawtooth', now);
+        this.tone(293.66, 220.0, 0.12, vol * 0.68, 'sawtooth', now);
+        this.tone(220.0, 164.81, 0.16, vol * 0.62, 'triangle', now + 0.075);
         break;
       }
       case 'coinClink': {
-        this.tone(1740, 2180, 0.08, vol * 0.65, 'triangle', now);
-        this.tone(2350, 2640, 0.09, vol * 0.5, 'sine', now + 0.055);
-        this.tone(1980, 2420, 0.07, vol * 0.4, 'triangle', now + 0.11);
+        // P1.4: Arcade-inspired synthesized 2-note ascending coin chime (~988 Hz -> 1318.5 Hz, 60-120 ms) + final shimmer
+        this.tone(987.77, 987.77, 0.048, vol * 0.68, 'triangle', now);
+        this.tone(987.77, 987.77, 0.042, vol * 0.24, 'square', now);
+        this.tone(1318.51, 1318.51, 0.068, vol * 0.72, 'triangle', now + 0.044);
+        this.tone(1318.51, 1318.51, 0.056, vol * 0.22, 'square', now + 0.044);
+        this.tone(2637.02, 2793.83, 0.032, vol * 0.26, 'sine', now + 0.088);
         break;
       }
       case 'coinPenalty': {
-        this.tone(980, 620, 0.11, vol * 0.6, 'triangle', now);
-        this.tone(740, 460, 0.14, vol * 0.55, 'sine', now + 0.07);
+        // Dry descending two-step penalty sound
+        this.tone(659.25, 587.33, 0.055, vol * 0.6, 'triangle', now);
+        this.tone(493.88, 392.0, 0.08, vol * 0.55, 'sawtooth', now + 0.05);
         break;
       }
       case 'bell': {
@@ -181,10 +187,12 @@ class CafetuliaSoundEngine {
         break;
       }
       case 'victoryFanfare': {
-        const notes = [523.25, 659.25, 783.99, 1046.5];
+        // Warm café arpeggio
+        const notes = [523.25, 659.25, 783.99, 987.77, 1046.5];
         notes.forEach((n, idx) => {
-          this.tone(n, n, 0.24, vol * 0.85, 'triangle', now + idx * 0.09);
+          this.tone(n, n, 0.22, vol * 0.78, 'triangle', now + idx * 0.08);
         });
+        this.tone(523.25, 523.25, 0.35, vol * 0.45, 'sine', now + 0.32);
         break;
       }
     }

@@ -72,12 +72,24 @@ export type MatchHistoryEntry = {
 
 export type ActiveModal = 'rules' | 'tutorial' | 'stats' | 'settings' | 'ios_pwa' | null;
 
+export type ActiveOverlay =
+  | 'legend'
+  | 'hands'
+  | 'subtitles'
+  | 'avatar'
+  | 'cafe3d'
+  | 'drawer'
+  | 'joker_swap'
+  | 'more_menu'
+  | null;
+
 type CafetuliaClientState = {
   nickname: string;
   avatarId: string;
   guestToken: string;
   screen: 'title' | 'lobby' | 'playing' | 'finished';
   activeModal: ActiveModal;
+  activeOverlay: ActiveOverlay;
   roomCode: string | null;
   myPlayerId: string | null;
   myRole: 'player' | 'spectator';
@@ -118,6 +130,8 @@ type CafetuliaClientState = {
   setNickname: (name: string) => void;
   setAvatarId: (avatarId: string) => Promise<void>;
   setActiveModal: (modal: ActiveModal) => void;
+  setActiveOverlay: (overlay: ActiveOverlay) => void;
+  toggleOverlay: (overlay: Exclude<ActiveOverlay, null>) => void;
   setErrorBanner: (msg: string | null) => void;
   setWhyCannotBanner: (msg: string | null) => void;
   setViewMode: (mode: '3d' | '2d') => void;
@@ -225,6 +239,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   guestToken: getInitialToken(),
   screen: 'title',
   activeModal: null,
+  activeOverlay: null,
   roomCode: null,
   myPlayerId: null,
   myRole: 'player',
@@ -291,7 +306,21 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
     }
   },
 
-  setActiveModal: (modal) => set({ activeModal: modal }),
+  setActiveModal: (modal) =>
+    set({
+      activeModal: modal,
+      activeOverlay: modal ? null : get().activeOverlay,
+    }),
+  setActiveOverlay: (overlay) =>
+    set({
+      activeOverlay: overlay,
+      activeModal: overlay ? null : get().activeModal,
+    }),
+  toggleOverlay: (overlay) =>
+    set((s) => ({
+      activeOverlay: s.activeOverlay === overlay ? null : overlay,
+      activeModal: s.activeOverlay === overlay ? s.activeModal : null,
+    })),
   setErrorBanner: (msg) => set({ errorBanner: msg }),
   setWhyCannotBanner: (msg) => set({ whyCannotBanner: msg }),
   setViewMode: (mode) => set({ viewMode: mode }),
@@ -414,6 +443,8 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
         myRole: 'player',
         snapshot: data.snapshot,
         screen: data.snapshot.phase === 'playing' ? 'playing' : 'lobby',
+        activeOverlay: null,
+        activeModal: null,
       });
       return true;
     } catch {
@@ -455,6 +486,8 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
         myRole: data.role,
         snapshot: data.snapshot,
         screen: phase,
+        activeOverlay: null,
+        activeModal: null,
       });
       return true;
     } catch {
@@ -553,6 +586,8 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
       selectedTileId: null,
       draftPlacements: [],
       errorBanner: null,
+      activeOverlay: null,
+      activeModal: null,
     });
     return true;
   },
@@ -615,6 +650,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
       errorBanner: null,
       whyCannotBanner: null,
       localStats: nextLocalStats,
+      activeOverlay: snap.phase === 'finished' || move.type === 'swap' ? null : get().activeOverlay,
     });
     return true;
   },
@@ -648,6 +684,8 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
         screen: data.snapshot.phase,
         selectedTileId: null,
         draftPlacements: [],
+        activeOverlay: null,
+        activeModal: null,
       });
     }
   },
@@ -661,11 +699,12 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
       const data = await res.json();
       if (data.snapshot) {
         const nextPhase = data.snapshot.phase as 'lobby' | 'playing' | 'finished';
-        set({
+        set((s) => ({
           snapshot: data.snapshot,
           shareResult: data.shareResult ?? null,
           screen: nextPhase,
-        });
+          activeOverlay: nextPhase !== s.screen ? null : s.activeOverlay,
+        }));
       }
     } catch {
       // ignore transient network errors during poll
@@ -696,5 +735,12 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
       errorBanner: null,
       whyCannotBanner: null,
       pendingNegativeConfirm: null,
+      activeOverlay: null,
+      activeModal: null,
     }),
 }));
+
+if (typeof window !== 'undefined') {
+  (window as unknown as { __CAFETULIA_STORE__?: typeof useGameStore }).__CAFETULIA_STORE__ =
+    useGameStore;
+}

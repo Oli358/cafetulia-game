@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'motion/react';
 import { NATION_VISUALS, PRESET_AVATARS, type NationKey } from '@cafetulia/ui';
 import { soundEngine } from '../audio/soundEngine';
 import { CharacterPortrait, FlagBadge, PlayerAvatar } from '../art/CharacterPortrait';
@@ -18,22 +20,209 @@ if (typeof window !== 'undefined') {
   });
 }
 
+export type AnchoredPopoverProps = {
+  open: boolean;
+  onClose: () => void;
+  anchorRef: React.RefObject<HTMLElement | null>;
+  id?: string;
+  role?: 'dialog' | 'radiogroup' | 'menu';
+  ariaLabel: string;
+  testId?: string;
+  maxWidth?: number;
+  preferPlacement?: 'bottom-end' | 'bottom-start' | 'top-end';
+  children: React.ReactNode;
+};
+
+/**
+ * Portal-rendered popover/bottom-sheet that measures its trigger button and its own box,
+ * clamping coordinates so it NEVER overflows the viewport (0..innerWidth, 0..innerHeight).
+ * Restores focus to the trigger button on close and supports Escape & outside click.
+ */
+export function AnchoredPopover({
+  open,
+  onClose,
+  anchorRef,
+  id,
+  role = 'dialog',
+  ariaLabel,
+  testId,
+  maxWidth = 340,
+  preferPlacement = 'bottom-end',
+  children,
+}: AnchoredPopoverProps): React.ReactElement | null {
+  const reducedMotion = useGameStore((s) => s.reducedMotion);
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const [coords, setCoords] = useState<{
+    left: number;
+    top: number;
+    width: number;
+    isMobileSheet: boolean;
+  }>({
+    left: 12,
+    top: 56,
+    width: Math.min(maxWidth, typeof window !== 'undefined' ? window.innerWidth - 16 : maxWidth),
+    isMobileSheet: false,
+  });
+
+  const updatePosition = () => {
+    if (typeof window === 'undefined') return;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const margin = 8;
+    const width = Math.min(maxWidth, vw - margin * 2);
+    const isMobile = vw < 640;
+    const panelHeight = panelRef.current?.offsetHeight || 290;
+
+    if (isMobile) {
+      const left = Math.max(margin, Math.round((vw - width) / 2));
+      const top = Math.max(margin, Math.min(vh - panelHeight - margin, vh - panelHeight - 12));
+      setCoords({ left, top, width, isMobileSheet: true });
+      return;
+    }
+
+    const anchorEl = anchorRef.current;
+    if (!anchorEl) {
+      const left = Math.max(margin, Math.round((vw - width) / 2));
+      const top = Math.max(margin, Math.round((vh - panelHeight) / 2));
+      setCoords({ left, top, width, isMobileSheet: false });
+      return;
+    }
+
+    const rect = anchorEl.getBoundingClientRect();
+    let desiredLeft =
+      preferPlacement === 'bottom-start' ? rect.left : rect.right - width;
+    desiredLeft = Math.max(margin, Math.min(vw - width - margin, Math.round(desiredLeft)));
+
+    let desiredTop =
+      preferPlacement === 'top-end' ? rect.top - panelHeight - 6 : rect.bottom + 6;
+    if (desiredTop + panelHeight + margin > vh) {
+      const aboveTop = rect.top - panelHeight - 6;
+      if (aboveTop >= margin) {
+        desiredTop = aboveTop;
+      } else {
+        desiredTop = Math.max(margin, vh - panelHeight - margin);
+      }
+    }
+    desiredTop = Math.max(margin, Math.round(desiredTop));
+
+    setCoords({
+      left: desiredLeft,
+      top: desiredTop,
+      width,
+      isMobileSheet: false,
+    });
+  };
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    updatePosition();
+    const raf = window.requestAnimationFrame(updatePosition);
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [open, maxWidth, preferPlacement]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        onClose();
+        anchorRef.current?.focus();
+      }
+    };
+    const onPointerDown = (e: PointerEvent) => {
+      const target = e.target as Node | null;
+      if (!target) return;
+      if (panelRef.current?.contains(target)) return;
+      if (anchorRef.current?.contains(target)) return;
+      // If clicking another overlay/modal trigger button, let that button's onClick switch the state directly
+      if (
+        target instanceof Element &&
+        target.closest(
+          '[data-testid="board-legend-btn"], [data-testid="rival-hands-btn"], [data-testid="subtitles-dropdown-btn"], [data-testid="avatar-dropdown-btn"], [data-testid="open-3d-cafe-btn"], [data-testid="open-drawer-btn"], [data-testid="header-settings-btn"], [data-testid="header-more-btn"], [data-testid="joker-swap-btn"]',
+        )
+      ) {
+        return;
+      }
+      onClose();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    document.addEventListener('pointerdown', onPointerDown, true);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      document.removeEventListener('pointerdown', onPointerDown, true);
+    };
+  }, [open, onClose, anchorRef]);
+
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <AnimatePresence>
+      {open && (
+        <div className="fixed inset-0 z-50 pointer-events-none">
+          <motion.div
+            ref={panelRef}
+            id={id}
+            role={role}
+            aria-label={ariaLabel}
+            data-testid={testId}
+            initial={
+              reducedMotion
+                ? { opacity: 1 }
+                : { opacity: 0, y: coords.isMobileSheet ? 16 : -6, scale: 0.97 }
+            }
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={
+              reducedMotion
+                ? { opacity: 0 }
+                : { opacity: 0, y: coords.isMobileSheet ? 12 : -4, scale: 0.97 }
+            }
+            transition={{ duration: reducedMotion ? 0 : 0.16, ease: 'easeOut' }}
+            style={{
+              position: 'fixed',
+              left: `${coords.left}px`,
+              top: `${coords.top}px`,
+              width: `${coords.width}px`,
+              maxHeight: 'calc(100dvh - 16px)',
+            }}
+            className="pointer-events-auto overflow-y-auto bg-[#FFF9F0] text-[#3E2F2A] rounded-2xl p-3 border-2 border-[#231712] ring-1 ring-inset ring-[#C9A227]/45 shadow-[0_12px_28px_rgba(35,23,18,0.28)] text-xs"
+          >
+            {children}
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>,
+    document.body,
+  );
+}
+
 export function ActiveModalLayer(): React.ReactElement | null {
   const activeModal = useGameStore((s) => s.activeModal);
   const setActiveModal = useGameStore((s) => s.setActiveModal);
   const pendingNegativeConfirm = useGameStore((s) => s.pendingNegativeConfirm);
   const setPendingNegativeConfirm = useGameStore((s) => s.setPendingNegativeConfirm);
   const submitMove = useGameStore((s) => s.submitMove);
+  const reducedMotion = useGameStore((s) => s.reducedMotion);
 
   if (pendingNegativeConfirm) {
     return (
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-[#3E2F2A]/60 p-4"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-[#231712]/60 p-4"
         role="dialog"
         aria-modal="true"
         aria-labelledby="neg-confirm-title"
       >
-        <div className="w-full max-w-md rounded-[24px] bg-[#FFF9F0] text-[#3E2F2A] p-6 shadow-[0_8px_24px_rgba(62,47,42,0.22)] border border-[#3E2F2A]/15">
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, scale: 0.95, y: 8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: reducedMotion ? 0 : 0.16 }}
+          className="w-full max-w-md rounded-[22px] bg-[#FFF9F0] text-[#3E2F2A] p-6 shadow-[0_12px_28px_rgba(35,23,18,0.3)] border-2 border-[#231712]"
+        >
           <h3 id="neg-confirm-title" className="font-serif font-bold text-2xl text-[#A94438]">
             Confirmar jugada con puntos negativos
           </h3>
@@ -48,7 +237,7 @@ export function ActiveModalLayer(): React.ReactElement | null {
             <button
               type="button"
               onClick={() => setPendingNegativeConfirm(null)}
-              className="px-4 py-2.5 rounded-xl bg-[#F7EEDF] text-[#3E2F2A] font-semibold text-sm border border-[#3E2F2A]/20 hover:bg-[#EAD9C0] cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-[#F7EEDF] text-[#3E2F2A] font-semibold text-sm border border-[#231712]/25 hover:bg-[#EAD9C0] cursor-pointer"
             >
               Cancelar
             </button>
@@ -60,32 +249,52 @@ export function ActiveModalLayer(): React.ReactElement | null {
                 setPendingNegativeConfirm(null);
                 void submitMove(move);
               }}
-              className="px-4 py-2.5 rounded-xl bg-[#A94438] text-[#FFF9F0] font-bold text-sm hover:opacity-95 cursor-pointer"
+              className="px-4 py-2.5 rounded-xl bg-[#A94438] text-[#FFF9F0] font-bold text-sm border border-[#231712] shadow-[0_2px_0_#231712] hover:opacity-95 cursor-pointer"
             >
               Sí, asumir {pendingNegativeConfirm.points} pts
             </button>
           </div>
-        </div>
+        </motion.div>
       </div>
     );
   }
 
-  if (!activeModal) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-[#3E2F2A]/55 p-3 sm:p-4 overflow-y-auto"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div className="w-full max-w-2xl rounded-[24px] bg-[#FFF9F0] text-[#3E2F2A] p-5 sm:p-7 shadow-[0_8px_24px_rgba(62,47,42,0.22)] border border-[#3E2F2A]/15 my-auto max-h-[90dvh] overflow-y-auto">
-        {activeModal === 'tutorial' && <TutorialContent onClose={() => setActiveModal(null)} />}
-        {activeModal === 'rules' && <RulesContent onClose={() => setActiveModal(null)} />}
-        {activeModal === 'stats' && <StatsContent onClose={() => setActiveModal(null)} />}
-        {activeModal === 'settings' && <SettingsContent onClose={() => setActiveModal(null)} />}
-        {activeModal === 'ios_pwa' && <IosPwaContent onClose={() => setActiveModal(null)} />}
-      </div>
-    </div>
+    <AnimatePresence>
+      {activeModal && (
+        <motion.div
+          key={activeModal}
+          initial={reducedMotion ? { opacity: 1 } : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
+          transition={{ duration: reducedMotion ? 0 : 0.15 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#231712]/55 p-3 sm:p-4 overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setActiveModal(null);
+          }}
+        >
+          <motion.div
+            initial={reducedMotion ? false : { opacity: 0, scale: 0.96, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
+            transition={{ duration: reducedMotion ? 0 : 0.18, ease: 'easeOut' }}
+            className="w-full max-w-2xl rounded-[24px] bg-[#FFF9F0] text-[#3E2F2A] p-5 sm:p-7 shadow-[0_14px_34px_rgba(35,23,18,0.3)] border-2 border-[#231712] ring-1 ring-inset ring-[#C9A227]/40 my-auto max-h-[90dvh] overflow-y-auto"
+          >
+            {activeModal === 'tutorial' && (
+              <TutorialContent onClose={() => setActiveModal(null)} />
+            )}
+            {activeModal === 'rules' && <RulesContent onClose={() => setActiveModal(null)} />}
+            {activeModal === 'stats' && <StatsContent onClose={() => setActiveModal(null)} />}
+            {activeModal === 'settings' && (
+              <SettingsContent onClose={() => setActiveModal(null)} />
+            )}
+            {activeModal === 'ios_pwa' && <IosPwaContent onClose={() => setActiveModal(null)} />}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -325,7 +534,7 @@ function RulesContent({ onClose }: { onClose: () => void }): React.ReactElement 
 
         <section className="bg-[#F7EEDF] p-3.5 rounded-2xl">
           <h3 className="font-serif font-bold text-base">
-            4. Puntuación, monedas, comodines y barra
+            4. Puntuación, monedas, cambiar comodín y barra
           </h3>
           <ul className="mt-1 list-disc list-inside text-xs sm:text-sm text-[#6F5A4E] space-y-1">
             <li>
@@ -334,6 +543,10 @@ function RulesContent({ onClose }: { onClose: () => void }): React.ReactElement 
             </li>
             <li>
               <strong>Monedas:</strong> ficha negra = 1, roja = 5, azul = 10.
+            </li>
+            <li>
+              <strong>Cambiar comodín:</strong> entregas una ficha natural que podría ocupar esa
+              silla y recuperas el comodín. No puntúas y no robas. Úsalo solo si te conviene.
             </li>
             <li>
               <strong>Mesa nacional completa (4/4 misma nación):</strong> tu tamaño máximo de mano
@@ -496,9 +709,16 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
             >
               <PlayerAvatar avatarId={avatarId} size={24} />
               <span>{currentAvatar?.label ?? 'Avatar'}</span>
-              <span aria-hidden="true" className="text-[10px]">
-                ▾
-              </span>
+              <svg width="9" height="6" viewBox="0 0 10 6" aria-hidden="true">
+                <path
+                  d="M1 1l4 4 4-4"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
             </button>
             <input
               type="text"

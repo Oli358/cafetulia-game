@@ -164,7 +164,7 @@ function renderAuthenticFlag(nation: TileNation): React.ReactElement {
           <polygon points="50,0 100,0 75,32" fill="#C83E31" />
           <polygon points="0,64 50,64 25,32" fill="#2E7D52" />
           <polygon points="50,64 100,64 75,32" fill="#1E4E8C" />
-          <polygon points="25,32 50,0 75,32 50,64" fill="#8A3F5D" opacity="0.85" />
+          <polygon points="25,32 50,0 75,32 50,64" fill="#8A3F5D" opacity="0.88" />
         </g>
       );
   }
@@ -204,10 +204,93 @@ export function FlagBadge({
 }
 
 /**
- * Original-style Square Tile Illustration (inspired by classic Café International tiles):
- * - Rounded square wooden/pastel frame
+ * Returns varied 3/4 caricature head silhouettes (pear, square-jaw, elongated oval, wide round)
+ * so every guest has a distinct comic personality.
+ */
+function getCaricatureHeadPath(nation: TileNation, isFemale: boolean): string {
+  if (isFemale) {
+    switch (nation) {
+      case 'fr':
+      case 'it':
+      case 'en':
+        // Slender oval 3/4 face with sculpted cheekbones
+        return 'M31 44 Q31 27 50 27 Q68 27 69 44 Q68 61 58 68 Q50 72 42 68 Q32 61 31 44 Z';
+      case 'al':
+      case 'ru':
+      case 'am':
+        // Cheerful fuller cheeks & rounded chin
+        return 'M29 45 Q29 27 50 27 Q71 27 71 45 Q72 66 50 70 Q28 66 29 45 Z';
+      default:
+        // Warm heart-shaped caricature head
+        return 'M30 44 Q30 27 50 28 Q70 27 70 44 Q69 65 50 70 Q31 65 30 44 Z';
+    }
+  }
+  switch (nation) {
+    case 'al':
+    case 'cu':
+    case 'ru':
+    case 'am':
+      // Broad square-jawed caricature head
+      return 'M27 42 Q27 25 50 25 Q73 25 73 42 L71 63 Q69 71 50 71 Q31 71 29 63 Z';
+    case 'fr':
+    case 'es':
+    case 'en':
+      // Elongated aristocratic / ironic caricature head
+      return 'M30 42 Q30 24 50 24 Q70 24 70 42 Q69 69 50 72 Q31 69 30 42 Z';
+    case 'it':
+    case 'tu':
+    case 'in':
+      // Pear-shaped expressive lower cheeks
+      return 'M30 41 Q31 25 50 25 Q69 25 70 41 Q74 65 50 71 Q26 65 30 41 Z';
+    default:
+      return 'M28 43 Q28 26 50 26 Q72 26 72 43 Q72 68 50 71 Q28 68 28 43 Z';
+  }
+}
+
+/**
+ * Returns expressive asymmetric 3/4 caricature nose paths.
+ */
+function getCaricatureNosePath(nation: TileNation, isFemale: boolean): string {
+  if (isFemale) {
+    switch (nation) {
+      case 'fr':
+      case 'en':
+        // Upturned pert French/English nose
+        return 'M50 44 Q55 51 48 53';
+      case 'it':
+      case 'es':
+      case 'tu':
+        // Sculpted aquiline profile nose
+        return 'M49 43 Q56 49 52 54 Q49 55 47 53';
+      default:
+        // Soft button caricature nose
+        return 'M50 45 Q54 51 49 54';
+    }
+  }
+  switch (nation) {
+    case 'fr':
+    case 'it':
+    case 'tu':
+      // Prominent Roman / Gallic bulb nose in 3/4 view
+      return 'M49 42 Q59 49 54 55 Q49 56 46 53';
+    case 'al':
+    case 'ru':
+    case 'cu':
+      // Wide rounded potato caricature nose
+      return 'M48 44 Q58 51 52 56 Q46 56 45 52';
+    default:
+      // Classic comic hooked nose
+      return 'M50 43 Q57 51 48 55';
+  }
+}
+
+/**
+ * Original-style Square Tile Illustration (P1.1 v6):
+ * - Rounded square wooden/cardstock frame with ink border
  * - Full-width rectangular national flag filling the upper background
- * - Expressive ink-outlined cartoon character on top with unmistakable gender & nationality traits
+ * - Expressive 3/4 ink-outlined caricature character on top with unmistakable gender,
+ *   varied head shapes, asymmetric noses, ironic brows/mouths, and props
+ * - 4 distinct Harlequin Jokers (2M + 2F)
  * - ZERO visible text inside the tile
  */
 export function CharacterPortrait({
@@ -215,13 +298,16 @@ export function CharacterPortrait({
   gender,
   size = 64,
   sipping = false,
+  tileId,
 }: {
   nation: TileNation;
   gender: Gender;
   size?: number;
   sipping?: boolean;
+  tileId?: string;
 }): React.ReactElement {
   const isFemale = gender === 'F';
+  const isAltJoker = Boolean(tileId && (tileId.endsWith('_2') || tileId.endsWith('4')));
   const frameBg = TILE_FRAME_COLORS[(nation as NationKey) ?? 'fr'] ?? '#F4F1EA';
   const meta =
     nation === 'joker'
@@ -236,6 +322,8 @@ export function CharacterPortrait({
         ? meta.skinToneF
         : meta.skinToneM;
   const ink = '#231712';
+  const headPath = getCaricatureHeadPath(nation, isFemale);
+  const nosePath = getCaricatureNosePath(nation, isFemale);
 
   return (
     <svg
@@ -254,9 +342,9 @@ export function CharacterPortrait({
         rx="16"
         fill={frameBg}
         stroke={ink}
-        strokeWidth="3.5"
+        strokeWidth="3.8"
       />
-      {/* Subtle inner highlight bevel */}
+      {/* Subtle inner highlight bevel + warm bottom cardstock shade */}
       <rect
         x="5"
         y="5"
@@ -265,24 +353,24 @@ export function CharacterPortrait({
         rx="13"
         fill="none"
         stroke="#FFF9F0"
-        strokeWidth="1.5"
-        opacity="0.55"
+        strokeWidth="1.6"
+        opacity="0.6"
       />
 
-      {/* 2. LARGE FULL-WIDTH BACKGROUND FLAG (Upper-middle 80x50 banner behind bust) */}
-      <g transform="translate(10, 11)">
-        <svg width="80" height="50" viewBox="0 0 100 64" overflow="hidden">
+      {/* 2. LARGE FULL-WIDTH BACKGROUND FLAG (Upper-middle 82x51 banner behind bust) */}
+      <g transform="translate(9, 10)">
+        <svg width="82" height="51" viewBox="0 0 100 64" overflow="hidden">
           {renderAuthenticFlag(nation)}
         </svg>
         <rect
           x="0"
           y="0"
-          width="80"
-          height="50"
+          width="82"
+          height="51"
           rx="3"
           fill="none"
           stroke={ink}
-          strokeWidth="2.8"
+          strokeWidth="3"
         />
       </g>
 
@@ -291,12 +379,12 @@ export function CharacterPortrait({
         <g>
           {nation === 'af' && (
             /* Big voluminous round afro */
-            <circle cx="50" cy="48" r="24" fill="#1E1410" stroke={ink} strokeWidth="3" />
+            <circle cx="50" cy="47" r="24.5" fill="#1E1410" stroke={ink} strokeWidth="3" />
           )}
           {nation === 'es' && (
             /* Long wavy flamenco hair */
             <path
-              d="M22 44 Q18 68 26 92 L74 92 Q82 68 78 44 Q74 26 50 26 Q26 26 22 44 Z"
+              d="M21 44 Q17 68 25 92 L75 92 Q83 68 79 44 Q74 26 50 26 Q26 26 21 44 Z"
               fill="#1E1410"
               stroke={ink}
               strokeWidth="2.8"
@@ -305,7 +393,7 @@ export function CharacterPortrait({
           {nation === 'cu' && (
             /* Shoulder-length lush curls */
             <path
-              d="M24 46 Q20 66 28 80 L72 80 Q80 66 76 46 Z"
+              d="M23 45 Q19 66 27 81 L73 81 Q81 66 77 45 Z"
               fill="#241813"
               stroke={ink}
               strokeWidth="2.8"
@@ -314,7 +402,7 @@ export function CharacterPortrait({
           {nation === 'am' && (
             /* Glamorous blonde waves */
             <path
-              d="M23 42 Q18 62 28 76 L72 76 Q82 62 77 42 Q72 25 50 25 Q28 25 23 42 Z"
+              d="M22 42 Q17 63 27 78 L73 78 Q83 63 78 42 Q72 25 50 25 Q28 25 22 42 Z"
               fill="#F2C84B"
               stroke={ink}
               strokeWidth="2.8"
@@ -323,16 +411,16 @@ export function CharacterPortrait({
           {(nation === 'fr' || nation === 'ch') && (
             /* Sleek chin-length bob */
             <path
-              d="M27 40 Q24 58 31 68 L69 68 Q76 58 73 40 Z"
+              d="M26 40 Q23 58 30 68 L70 68 Q77 58 74 40 Z"
               fill="#1E1614"
               stroke={ink}
               strokeWidth="2.8"
             />
           )}
           {nation === 'tu' && (
-            /* Patterned yellow headscarf drape */
+            /* Patterned yellow silk headscarf drape */
             <path
-              d="M24 38 Q22 68 30 88 L70 88 Q78 68 76 38 Q68 25 50 25 Q32 25 24 38 Z"
+              d="M23 38 Q21 68 29 88 L71 88 Q79 68 77 38 Q68 25 50 25 Q32 25 23 38 Z"
               fill="#F2C14E"
               stroke={ink}
               strokeWidth="2.8"
@@ -342,15 +430,15 @@ export function CharacterPortrait({
             /* High bun / updo silhouette */
             <>
               <circle
-                cx={nation === 'in' || nation === 'ru' ? 68 : 50}
-                cy={nation === 'in' || nation === 'ru' ? 52 : 24}
-                r="10"
+                cx={nation === 'in' || nation === 'ru' ? 69 : 50}
+                cy={nation === 'in' || nation === 'ru' ? 52 : 23}
+                r="10.5"
                 fill={nation === 'al' ? '#9C6228' : nation === 'en' ? '#7D3B22' : '#231712'}
                 stroke={ink}
                 strokeWidth="2.6"
               />
               <path
-                d="M29 44 Q27 60 34 68 L66 68 Q73 60 71 44 Z"
+                d="M28 44 Q26 60 33 68 L67 68 Q74 60 72 44 Z"
                 fill={nation === 'al' ? '#9C6228' : nation === 'en' ? '#7D3B22' : '#231712'}
                 stroke={ink}
                 strokeWidth="2.6"
@@ -364,21 +452,31 @@ export function CharacterPortrait({
       {nation === 'joker' ? (
         <g>
           <path
-            d="M16 96 Q24 72 50 72 Q76 72 84 96 Z"
-            fill={isFemale ? '#C83E31' : '#1E4E8C'}
+            d="M15 96 Q23 71 50 71 Q77 71 85 96 Z"
+            fill={
+              isFemale
+                ? isAltJoker
+                  ? '#8A3F5D'
+                  : '#C83E31'
+                : isAltJoker
+                  ? '#2E7D52'
+                  : '#1E4E8C'
+            }
             stroke={ink}
             strokeWidth="3"
           />
-          {/* Harlequin ruffled collar */}
-          <polygon points="26,75 36,90 45,74" fill="#F2C14E" stroke={ink} strokeWidth="2.4" />
-          <polygon points="45,74 55,90 64,74" fill="#FFF9F0" stroke={ink} strokeWidth="2.4" />
-          <polygon points="56,74 66,90 75,75" fill="#F2C14E" stroke={ink} strokeWidth="2.4" />
+          {/* Harlequin diamond collar */}
+          <polygon points="24,75 35,91 45,74" fill="#F2C14E" stroke={ink} strokeWidth="2.4" />
+          <polygon points="45,74 55,91 65,74" fill="#FFF9F0" stroke={ink} strokeWidth="2.4" />
+          <polygon points="56,74 67,91 76,75" fill="#F2C14E" stroke={ink} strokeWidth="2.4" />
+          <circle cx="35" cy="90" r="2.2" fill="#FFF9F0" stroke={ink} strokeWidth="1.4" />
+          <circle cx="67" cy="90" r="2.2" fill="#FFF9F0" stroke={ink} strokeWidth="1.4" />
         </g>
       ) : isFemale ? (
         /* FEMALE OUTFITS: Elegant necklines, turtleneck, sari, dirndl, pearl necklace */
         <g>
           <path
-            d="M18 96 Q25 73 50 73 Q75 73 82 96 Z"
+            d="M17 96 Q24 72 50 72 Q76 72 83 96 Z"
             fill={
               nation === 'fr'
                 ? '#E8B4B8'
@@ -411,12 +509,12 @@ export function CharacterPortrait({
             strokeWidth="2.6"
           />
           {/* Pearl necklace or gold collar on females */}
-          {(nation === 'it' || nation === 'en' || nation === 'am' || nation === 'af') && (
+          {(nation === 'it' || nation === 'en' || nation === 'am' || nation === 'af' || nation === 'in') && (
             <g>
-              <circle cx="41" cy="76" r="2.6" fill={nation === 'af' ? '#F2C14E' : '#FFF9F0'} stroke={ink} strokeWidth="1.5" />
-              <circle cx="47" cy="78" r="2.6" fill={nation === 'af' ? '#F2C14E' : '#FFF9F0'} stroke={ink} strokeWidth="1.5" />
-              <circle cx="53" cy="78" r="2.6" fill={nation === 'af' ? '#F2C14E' : '#FFF9F0'} stroke={ink} strokeWidth="1.5" />
-              <circle cx="59" cy="76" r="2.6" fill={nation === 'af' ? '#F2C14E' : '#FFF9F0'} stroke={ink} strokeWidth="1.5" />
+              <circle cx="40" cy="76" r="2.6" fill={nation === 'af' || nation === 'in' ? '#F2C14E' : '#FFF9F0'} stroke={ink} strokeWidth="1.5" />
+              <circle cx="46.5" cy="78" r="2.6" fill={nation === 'af' || nation === 'in' ? '#F2C14E' : '#FFF9F0'} stroke={ink} strokeWidth="1.5" />
+              <circle cx="53.5" cy="78" r="2.6" fill={nation === 'af' || nation === 'in' ? '#F2C14E' : '#FFF9F0'} stroke={ink} strokeWidth="1.5" />
+              <circle cx="60" cy="76" r="2.6" fill={nation === 'af' || nation === 'in' ? '#F2C14E' : '#FFF9F0'} stroke={ink} strokeWidth="1.5" />
             </g>
           )}
           {nation === 'fr' && (
@@ -446,7 +544,7 @@ export function CharacterPortrait({
         /* MALE OUTFITS: Broad shoulders, lapels, suit & tie, checkered shirt, military/tunic collar */
         <g>
           <path
-            d="M14 96 Q21 71 50 71 Q79 71 86 96 Z"
+            d="M13 96 Q20 70 50 70 Q80 70 87 96 Z"
             fill={
               nation === 'af'
                 ? '#4A6FA5'
@@ -498,50 +596,50 @@ export function CharacterPortrait({
               />
             </g>
           )}
+          {nation === 'fr' && (
+            /* Red café neckerchief */
+            <path
+              d="M39 71 Q50 79 61 71 L56 85 L44 85 Z"
+              fill="#C83E31"
+              stroke={ink}
+              strokeWidth="2.2"
+            />
+          )}
         </g>
       )}
 
       {/* 5. EARS & EARRINGS (Large hoops/pearls for females, single hoop for Spanish male) */}
-      <circle cx="29" cy="52" r="4.5" fill={skin} stroke={ink} strokeWidth="2.5" />
-      <circle cx="71" cy="52" r="4.5" fill={skin} stroke={ink} strokeWidth="2.5" />
+      <circle cx="28.5" cy="52" r="4.8" fill={skin} stroke={ink} strokeWidth="2.6" />
+      <circle cx="71.5" cy="52" r="4.8" fill={skin} stroke={ink} strokeWidth="2.6" />
       {isFemale && (
         <>
           {nation === 'af' || nation === 'es' || nation === 'cu' ? (
             <>
-              <circle cx="28" cy="59" r="5" fill="none" stroke="#F2C14E" strokeWidth="2.8" />
-              <circle cx="72" cy="59" r="5" fill="none" stroke="#F2C14E" strokeWidth="2.8" />
+              <circle cx="27.5" cy="59.5" r="5.2" fill="none" stroke="#F2C14E" strokeWidth="2.8" />
+              <circle cx="72.5" cy="59.5" r="5.2" fill="none" stroke="#F2C14E" strokeWidth="2.8" />
             </>
           ) : (
             <>
-              <circle cx="28" cy="57" r="2.8" fill="#FFF9F0" stroke={ink} strokeWidth="1.8" />
-              <circle cx="72" cy="57" r="2.8" fill="#FFF9F0" stroke={ink} strokeWidth="1.8" />
+              <circle cx="27.5" cy="57.5" r="3" fill="#FFF9F0" stroke={ink} strokeWidth="1.8" />
+              <circle cx="72.5" cy="57.5" r="3" fill="#FFF9F0" stroke={ink} strokeWidth="1.8" />
             </>
           )}
         </>
       )}
       {!isFemale && nation === 'es' && (
-        <circle cx="28" cy="58" r="3.8" fill="none" stroke="#F2C14E" strokeWidth="2.4" />
+        <circle cx="27.5" cy="58.5" r="4" fill="none" stroke="#F2C14E" strokeWidth="2.4" />
       )}
 
-      {/* 6. CARICATURE HEAD SHAPE */}
-      <path
-        d={
-          isFemale
-            ? 'M31 46 Q31 28 50 28 Q69 28 69 46 Q69 68 50 70 Q31 68 31 46 Z'
-            : 'M29 44 Q29 26 50 26 Q71 26 71 44 Q72 69 50 71 Q28 69 29 44 Z'
-        }
-        fill={skin}
-        stroke={ink}
-        strokeWidth="3"
-      />
+      {/* 6. CARICATURE HEAD SHAPE (Varied silhouettes per character) */}
+      <path d={headPath} fill={skin} stroke={ink} strokeWidth="3.2" />
 
-      {/* Rosy cheeks */}
-      <circle cx="37" cy="55" r="3.8" fill="#E88D8A" opacity="0.55" />
-      <circle cx="63" cy="55" r="3.8" fill="#E88D8A" opacity="0.55" />
+      {/* Warm caricature cheek blush */}
+      <circle cx="36.5" cy="55" r="4.2" fill="#E88D8A" opacity="0.58" />
+      <circle cx="63.5" cy="55" r="4.2" fill="#E88D8A" opacity="0.58" />
 
       {/* Indian Bindi for Priya */}
       {isFemale && nation === 'in' && (
-        <circle cx="50" cy="39" r="2.5" fill="#C83E31" stroke={ink} strokeWidth="1.2" />
+        <circle cx="50" cy="39" r="2.6" fill="#C83E31" stroke={ink} strokeWidth="1.3" />
       )}
 
       {/* 7. EYES, EYEBROWS & SUNGLASSES */}
@@ -549,81 +647,83 @@ export function CharacterPortrait({
         /* Harlequin mask */
         <g>
           <path
-            d="M32 42 Q41 36 50 43 Q59 36 68 42 Q64 52 54 49 Q50 47 46 49 Q36 52 32 42 Z"
+            d="M31 42 Q41 35 50 43 Q59 35 69 42 Q64 52 54 49 Q50 47 46 49 Q36 52 31 42 Z"
             fill={isFemale ? '#8A3F5D' : '#231712'}
             stroke={ink}
-            strokeWidth="2"
+            strokeWidth="2.2"
           />
-          <circle cx="41" cy="44" r="2.5" fill="#FFF9F0" />
-          <circle cx="59" cy="44" r="2.5" fill="#FFF9F0" />
+          <circle cx="41" cy="44" r="2.6" fill="#FFF9F0" />
+          <circle cx="59" cy="44" r="2.6" fill="#FFF9F0" />
+          {/* Harlequin cheek diamond */}
+          <polygon points="62,53 65,56 62,59 59,56" fill="#C83E31" />
         </g>
       ) : nation === 'cu' || (!isFemale && nation === 'am') ? (
         /* Cool dark sunglasses (Cuba M/F & America Cowboy M) */
         <g>
-          <rect x="33" y="42" width="15" height="10" rx="3" fill="#1E242B" stroke={ink} strokeWidth="2.4" />
-          <rect x="52" y="42" width="15" height="10" rx="3" fill="#1E242B" stroke={ink} strokeWidth="2.4" />
-          <line x1="48" y1="45" x2="52" y2="45" stroke={ink} strokeWidth="2.4" />
-          <line x1="35" y1="44" x2="40" y2="49" stroke="#FFF9F0" strokeWidth="1.6" />
-          <line x1="54" y1="44" x2="59" y2="49" stroke="#FFF9F0" strokeWidth="1.6" />
+          <rect x="32.5" y="41.5" width="15.5" height="10.5" rx="3" fill="#1E242B" stroke={ink} strokeWidth="2.5" />
+          <rect x="52" y="41.5" width="15.5" height="10.5" rx="3" fill="#1E242B" stroke={ink} strokeWidth="2.5" />
+          <line x1="48" y1="45" x2="52" y2="45" stroke={ink} strokeWidth="2.5" />
+          <line x1="35" y1="44" x2="40" y2="49" stroke="#FFF9F0" strokeWidth="1.7" />
+          <line x1="54" y1="44" x2="59" y2="49" stroke="#FFF9F0" strokeWidth="1.7" />
         </g>
       ) : isFemale && nation === 'am' ? (
         /* Pink Cat-Eye Sunglasses for American Female */
         <g>
           <path
-            d="M30 41 L47 44 L45 51 L33 50 Z"
+            d="M29.5 40.5 L47 44 L45 51 L32.5 50 Z"
             fill="#F48FB1"
             stroke={ink}
-            strokeWidth="2.2"
+            strokeWidth="2.3"
           />
           <path
-            d="M70 41 L53 44 L55 51 L67 50 Z"
+            d="M70.5 40.5 L53 44 L55 51 L67.5 50 Z"
             fill="#F48FB1"
             stroke={ink}
-            strokeWidth="2.2"
+            strokeWidth="2.3"
           />
           <circle cx="39" cy="47" r="2" fill={ink} />
           <circle cx="61" cy="47" r="2" fill={ink} />
         </g>
       ) : (
-        /* Expressive Cartoon Eyes with scleras, pupils & eyelashes/brows */
+        /* Expressive 3/4 Cartoon Eyes with scleras, side-glancing pupils & eyelashes/brows */
         <g>
-          <ellipse cx="42" cy="46" rx="4.5" ry="5.2" fill="#FFF9F0" stroke={ink} strokeWidth="2.2" />
-          <ellipse cx="58" cy="46" rx="4.5" ry="5.2" fill="#FFF9F0" stroke={ink} strokeWidth="2.2" />
-          {/* Half-lidded ironic eyelids for French/Italian/Russian/African */}
-          {(nation === 'fr' || nation === 'it' || nation === 'ru') && (
+          <ellipse cx="41.5" cy="46" rx="4.7" ry="5.4" fill="#FFF9F0" stroke={ink} strokeWidth="2.3" />
+          <ellipse cx="58.5" cy="46" rx="4.7" ry="5.4" fill="#FFF9F0" stroke={ink} strokeWidth="2.3" />
+          {/* Half-lidded ironic eyelids for French/Italian/Russian/English */}
+          {(nation === 'fr' || nation === 'it' || nation === 'ru' || nation === 'en') && (
             <>
-              <path d="M37.5 45 H46.5" stroke={ink} strokeWidth="2.2" />
-              <path d="M53.5 45 H62.5" stroke={ink} strokeWidth="2.2" />
+              <path d="M37 44.8 H46.2" stroke={ink} strokeWidth="2.3" />
+              <path d="M53.8 44.8 H63" stroke={ink} strokeWidth="2.3" />
             </>
           )}
-          <circle cx="42.5" cy="47" r="2.3" fill={ink} />
-          <circle cx="57.5" cy="47" r="2.3" fill={ink} />
-          <circle cx="43.3" cy="46.2" r="0.8" fill="#FFF9F0" />
-          <circle cx="58.3" cy="46.2" r="0.8" fill="#FFF9F0" />
+          <circle cx="42.4" cy="46.8" r="2.4" fill={ink} />
+          <circle cx="58.2" cy="46.8" r="2.4" fill={ink} />
+          <circle cx="43.2" cy="46" r="0.9" fill="#FFF9F0" />
+          <circle cx="59" cy="46" r="0.9" fill="#FFF9F0" />
 
           {isFemale ? (
-            /* Prominent Female Eyelashes + Arched Brows */
+            /* Prominent Female Eyelashes + Arched Expressive Brows */
             <>
-              <path d="M37 43 L34 40 M39 41 L37 38" stroke={ink} strokeWidth="2" strokeLinecap="round" />
-              <path d="M63 43 L66 40 M61 41 L63 38" stroke={ink} strokeWidth="2" strokeLinecap="round" />
-              <path d="M36 38 Q42 34 47 38" fill="none" stroke={ink} strokeWidth="2.2" strokeLinecap="round" />
-              <path d="M53 38 Q58 34 64 38" fill="none" stroke={ink} strokeWidth="2.2" strokeLinecap="round" />
+              <path d="M36.5 43 L33.5 39.5 M38.8 41 L36.8 37.8" stroke={ink} strokeWidth="2.1" strokeLinecap="round" />
+              <path d="M63.5 43 L66.5 39.5 M61.2 41 L63.2 37.8" stroke={ink} strokeWidth="2.1" strokeLinecap="round" />
+              <path d="M35.5 37.8 Q41.5 33.2 47 38" fill="none" stroke={ink} strokeWidth="2.3" strokeLinecap="round" />
+              <path d="M53 38 Q58.5 33 64.5 37.5" fill="none" stroke={ink} strokeWidth="2.3" strokeLinecap="round" />
             </>
           ) : (
-            /* Thick Expressive Male Eyebrows */
+            /* Thick Asymmetric Expressive Male Eyebrows */
             <>
               <path
-                d="M35 38 Q42 35 47 39"
+                d="M34.5 38.2 Q41.5 34.2 47 39"
                 fill="none"
                 stroke={nation === 'al' || nation === 'en' ? '#FFF9F0' : ink}
-                strokeWidth="3.4"
+                strokeWidth="3.6"
                 strokeLinecap="round"
               />
               <path
-                d="M53 39 Q58 35 65 38"
+                d="M53 38.5 Q59 33.5 65.5 37.5"
                 fill="none"
                 stroke={nation === 'al' || nation === 'en' ? '#FFF9F0' : ink}
-                strokeWidth="3.4"
+                strokeWidth="3.6"
                 strokeLinecap="round"
               />
             </>
@@ -631,26 +731,27 @@ export function CharacterPortrait({
         </g>
       )}
 
-      {/* 8. CARTOON NOSE */}
+      {/* 8. EXPRESSIVE ASYMMETRIC 3/4 CARICATURE NOSE */}
       <path
-        d={isFemale ? 'M50 46 Q53 52 49 54' : 'M50 44 Q56 52 48 55'}
-        fill="none"
+        d={nosePath}
+        fill={skin}
         stroke={ink}
-        strokeWidth="2.5"
+        strokeWidth="2.6"
         strokeLinecap="round"
+        strokeLinejoin="round"
       />
 
       {/* 9. MOUTH, RUBY LIPS (FEMALE) OR BEARDS/MUSTACHES/CIGARS/PIPES (MALE) */}
       {isFemale ? (
-        /* Distinct Female Painted Lips & Smile */
+        /* Distinct Female Painted Lips & Ironic Café Smile */
         <g>
           <path
-            d="M42 60 Q46 57 50 59 Q54 57 58 60 Q50 66 42 60 Z"
+            d="M41.5 60 Q46 56.8 50 58.8 Q54 56.8 58.5 60 Q50 66.5 41.5 60 Z"
             fill="#C83E31"
             stroke={ink}
-            strokeWidth="2"
+            strokeWidth="2.1"
           />
-          <path d="M43 60 Q50 62 57 60" fill="none" stroke="#FFF9F0" strokeWidth="1.2" />
+          <path d="M43 60 Q50 62.2 57 60" fill="none" stroke="#FFF9F0" strokeWidth="1.3" />
         </g>
       ) : (
         /* Distinct Male Beards, Mustaches, Cigars & Pipes */
@@ -658,64 +759,64 @@ export function CharacterPortrait({
           {nation === 'al' && (
             /* Full fluffy white Bavarian beard & mustache */
             <path
-              d="M31 53 Q28 73 50 76 Q72 73 69 53 Q60 58 50 55 Q40 58 31 53 Z"
+              d="M30 53 Q27 74 50 77 Q73 74 70 53 Q60 58 50 55 Q40 58 30 53 Z"
               fill="#FFF9F0"
               stroke={ink}
-              strokeWidth="2.6"
+              strokeWidth="2.7"
             />
           )}
           {nation === 'cu' && (
-            /* Full dark Cuban beard + big cigar */
+            /* Full dark Cuban beard + big lit cigar */
             <>
               <path
-                d="M31 52 Q30 73 50 75 Q70 73 69 52 Q59 56 50 54 Q41 56 31 52 Z"
+                d="M30 52 Q29 73 50 75 Q71 73 70 52 Q59 56 50 54 Q41 56 30 52 Z"
                 fill="#231712"
                 stroke={ink}
-                strokeWidth="2.4"
+                strokeWidth="2.5"
               />
-              <rect x="20" y="57" width="22" height="5.5" rx="2" fill="#5C3A21" stroke={ink} strokeWidth="2" />
-              <circle cx="20" cy="59.7" r="2.2" fill="#E67E22" />
+              <rect x="19" y="56.5" width="23" height="5.8" rx="2" fill="#5C3A21" stroke={ink} strokeWidth="2.1" />
+              <circle cx="19" cy="59.4" r="2.4" fill="#E67E22" />
             </>
           )}
           {nation === 'in' && (
-            /* Groomed black beard + curled mustache */
+            /* Groomed black beard + curled maharaja mustache */
             <>
               <path
-                d="M33 53 Q34 71 50 73 Q66 71 67 53 Q58 62 50 62 Q42 62 33 53 Z"
+                d="M32 53 Q33 71 50 73 Q67 71 68 53 Q58 62 50 62 Q42 62 32 53 Z"
                 fill="#1E1410"
                 stroke={ink}
-                strokeWidth="2.2"
+                strokeWidth="2.3"
               />
               <path
-                d="M37 56 Q44 52 50 56 Q56 52 63 56"
+                d="M35 56 Q43 51 50 56 Q57 51 65 56"
                 fill="none"
                 stroke="#1E1410"
-                strokeWidth="3.5"
+                strokeWidth="3.6"
                 strokeLinecap="round"
               />
             </>
           )}
           {(nation === 'fr' || nation === 'it' || nation === 'es' || nation === 'tu' || nation === 'joker') && (
-            /* Distinct Mustaches + Smiles */
+            /* Distinct Handlebar / Pencil Mustaches + Smirks */
             <>
               <path
                 d={
                   nation === 'es'
-                    ? 'M35 58 Q43 52 50 57 Q57 52 65 58'
+                    ? 'M34 58 Q43 51.5 50 57 Q57 51.5 66 58'
                     : nation === 'tu'
-                      ? 'M34 57 Q43 53 50 56 Q57 53 66 57'
-                      : 'M38 57 Q44 54 50 57 Q56 54 62 57'
+                      ? 'M33 57 Q43 52 50 56 Q57 52 67 57'
+                      : 'M37 57 Q44 53.5 50 57 Q56 53.5 63 57'
                 }
                 fill="none"
                 stroke={ink}
-                strokeWidth={nation === 'es' || nation === 'tu' ? '4.2' : '3'}
+                strokeWidth={nation === 'es' || nation === 'tu' ? '4.3' : '3.2'}
                 strokeLinecap="round"
               />
               <path
-                d="M43 62 Q50 66 57 62"
+                d="M42.5 62 Q50 66.5 58 61.5"
                 fill="none"
                 stroke={ink}
-                strokeWidth="2.3"
+                strokeWidth="2.4"
                 strokeLinecap="round"
               />
             </>
@@ -724,34 +825,35 @@ export function CharacterPortrait({
             /* White walrus mustache + curved briar pipe */
             <>
               <path
-                d="M36 57 Q44 52 50 57 Q56 52 64 57"
+                d="M35 57 Q44 51.5 50 57 Q56 51.5 65 57"
                 fill="none"
                 stroke="#FFF9F0"
-                strokeWidth="5"
+                strokeWidth="5.2"
                 strokeLinecap="round"
               />
               <path
-                d="M36 57 Q44 52 50 57 Q56 52 64 57"
+                d="M35 57 Q44 51.5 50 57 Q56 51.5 65 57"
                 fill="none"
                 stroke={ink}
-                strokeWidth="1.8"
+                strokeWidth="1.9"
                 strokeLinecap="round"
               />
-              <path d="M42 61 Q28 65 26 57" fill="none" stroke="#5C3A21" strokeWidth="3.5" strokeLinecap="round" />
-              <rect x="21" y="51" width="7" height="9" rx="2" fill="#5C3A21" stroke={ink} strokeWidth="2" />
+              <path d="M42 61 Q27 65 25 57" fill="none" stroke="#5C3A21" strokeWidth="3.6" strokeLinecap="round" />
+              <rect x="20" y="50.5" width="7.5" height="9.5" rx="2" fill="#5C3A21" stroke={ink} strokeWidth="2.1" />
             </>
           )}
           {(nation === 'af' || nation === 'ch' || nation === 'am' || nation === 'ru') && (
-            /* Big toothy grin (plus cigar for American cowboy) */
+            /* Big expressive toothy grin (plus cigar for American cowboy) */
             <>
               <path
-                d="M39 57 Q50 67 61 57 Z"
+                d="M38.5 57 Q50 67.5 61.5 57 Z"
                 fill="#FFF9F0"
                 stroke={ink}
-                strokeWidth="2.4"
+                strokeWidth="2.5"
               />
+              <line x1="44" y1="60" x2="56" y2="60" stroke={ink} strokeWidth="1.4" />
               {nation === 'am' && (
-                <rect x="22" y="58" width="20" height="5" rx="2" fill="#5C3A21" stroke={ink} strokeWidth="2" />
+                <rect x="21" y="58" width="20" height="5.2" rx="2" fill="#5C3A21" stroke={ink} strokeWidth="2" />
               )}
             </>
           )}
@@ -760,17 +862,25 @@ export function CharacterPortrait({
 
       {/* 10. HATS, HAIR TOPS & ICONIC HEADGEAR */}
       {nation === 'joker' ? (
-        /* Harlequin Jester Hat / Carnival Crown */
+        /* Harlequin Jester Hat / Carnival Crown (distinct for 2M + 2F) */
         <g>
           <path
-            d="M24 34 Q14 10 38 22 Q50 6 62 22 Q86 10 76 34 Z"
-            fill={isFemale ? '#E0A526' : '#C83E31'}
+            d="M23 34 Q13 9 38 22 Q50 5 62 22 Q87 9 77 34 Z"
+            fill={
+              isFemale
+                ? isAltJoker
+                  ? '#8A3F5D'
+                  : '#E0A526'
+                : isAltJoker
+                  ? '#1E4E8C'
+                  : '#C83E31'
+            }
             stroke={ink}
-            strokeWidth="2.8"
+            strokeWidth="2.9"
           />
-          <circle cx="20" cy="15" r="4.5" fill="#F2C14E" stroke={ink} strokeWidth="2.2" />
-          <circle cx="50" cy="10" r="4.5" fill="#2E7D52" stroke={ink} strokeWidth="2.2" />
-          <circle cx="80" cy="15" r="4.5" fill="#1E4E8C" stroke={ink} strokeWidth="2.2" />
+          <circle cx="19" cy="14.5" r="4.6" fill="#F2C14E" stroke={ink} strokeWidth="2.2" />
+          <circle cx="50" cy="9.5" r="4.6" fill="#2E7D52" stroke={ink} strokeWidth="2.2" />
+          <circle cx="81" cy="14.5" r="4.6" fill="#1E4E8C" stroke={ink} strokeWidth="2.2" />
         </g>
       ) : isFemale ? (
         /* FEMALE HATS & HAIRSTYLES */
@@ -780,72 +890,77 @@ export function CharacterPortrait({
             <>
               <path d="M31 35 Q50 29 69 35 L67 40 Q50 36 33 40 Z" fill="#1E1614" stroke={ink} strokeWidth="2.2" />
               <path
-                d="M24 31 Q44 14 74 26 Q66 36 28 34 Z"
+                d="M23 31 Q44 13 75 26 Q66 36 27 34 Z"
                 fill="#E8999E"
                 stroke={ink}
                 strokeWidth="2.8"
               />
-              <path d="M50 19 L54 14" stroke={ink} strokeWidth="2.6" strokeLinecap="round" />
+              <path d="M50 18.5 L54 13.5" stroke={ink} strokeWidth="2.6" strokeLinecap="round" />
             </>
           )}
           {nation === 'ch' && (
             /* Olive cap with red star over bangs */
             <>
               <path
-                d="M27 32 Q50 18 73 32 L69 37 Q50 33 31 37 Z"
+                d="M26 32 Q50 17 74 32 L69 37 Q50 33 31 37 Z"
                 fill="#264E42"
                 stroke={ink}
                 strokeWidth="2.8"
               />
-              <circle cx="50" cy="27" r="3.5" fill="#C83E31" />
+              <circle cx="50" cy="26.5" r="3.6" fill="#C83E31" />
             </>
           )}
           {nation === 'cu' && (
             /* Olive cap over curls */
             <path
-              d="M28 31 L33 20 L67 20 L72 31 Z"
+              d="M27 31 L32 19.5 L68 19.5 L73 31 Z"
               fill="#6E5A38"
               stroke={ink}
               strokeWidth="2.8"
             />
           )}
           {nation === 'es' && (
-            /* Wavy parted hair + big red flamenco rose */
+            /* Wavy parted hair + big red flamenco rose + peineta */
             <>
+              <path d="M43 16 L57 16 L55 28 L45 28 Z" fill="#C9A227" stroke={ink} strokeWidth="2" />
               <path d="M30 38 Q42 25 50 33 Q58 25 70 38" fill="#1E1410" stroke={ink} strokeWidth="2.6" />
-              <circle cx="34" cy="30" r="7" fill="#C83E31" stroke={ink} strokeWidth="2.4" />
-              <circle cx="34" cy="30" r="2.8" fill="#F2C14E" />
+              <circle cx="33.5" cy="30" r="7.2" fill="#C83E31" stroke={ink} strokeWidth="2.4" />
+              <circle cx="33.5" cy="30" r="2.8" fill="#F2C14E" />
             </>
           )}
           {nation === 'ru' && (
-            /* Plush dark fur hat */
-            <rect
-              x="27"
-              y="18"
-              width="46"
-              height="18"
-              rx="8"
-              fill="#3B2820"
-              stroke={ink}
-              strokeWidth="2.8"
-            />
+            /* Plush dark fur hat with gold pin */
+            <>
+              <rect
+                x="26"
+                y="17.5"
+                width="48"
+                height="18.5"
+                rx="8"
+                fill="#3B2820"
+                stroke={ink}
+                strokeWidth="2.8"
+              />
+              <circle cx="50" cy="26.5" r="3" fill="#F2C14E" stroke={ink} strokeWidth="1.5" />
+            </>
           )}
           {nation === 'en' && (
-            /* Classic British cloche tea hat */
+            /* Classic British cloche tea hat with ribbon */
             <>
               <path
-                d="M27 33 Q50 15 73 33 Z"
+                d="M26 33 Q50 14 74 33 Z"
                 fill="#232931"
                 stroke={ink}
                 strokeWidth="2.8"
               />
-              <line x1="21" y1="33" x2="79" y2="33" stroke={ink} strokeWidth="4" strokeLinecap="round" />
+              <line x1="20" y1="33" x2="80" y2="33" stroke={ink} strokeWidth="4.2" strokeLinecap="round" />
+              <circle cx="64" cy="29" r="3.5" fill="#C83E31" stroke={ink} strokeWidth="1.5" />
             </>
           )}
           {nation === 'am' && (
             /* Curly blonde hair top */
             <path
-              d="M26 36 Q32 18 46 24 Q56 16 68 25 Q76 30 72 38 Q56 32 30 36 Z"
+              d="M25 36 Q32 17 46 23 Q56 15 68 24 Q77 30 72 38 Q56 32 29 36 Z"
               fill="#F2C84B"
               stroke={ink}
               strokeWidth="2.6"
@@ -854,7 +969,7 @@ export function CharacterPortrait({
           {(nation === 'af' || nation === 'al' || nation === 'in' || nation === 'it' || nation === 'tu') && (
             /* Parted hair top */
             <path
-              d="M31 38 Q40 24 50 31 Q60 24 69 38 Q58 31 50 34 Q42 31 31 38 Z"
+              d="M30 38 Q40 23.5 50 31 Q60 23.5 70 38 Q58 31 50 34 Q42 31 30 38 Z"
               fill={nation === 'al' ? '#9C6228' : '#1E1410'}
               stroke={ink}
               strokeWidth="2.6"
@@ -867,7 +982,7 @@ export function CharacterPortrait({
           {nation === 'af' && (
             /* High flat-top dark hair */
             <path
-              d="M28 38 L29 20 Q50 17 71 20 L72 38 Q50 32 28 38 Z"
+              d="M27 38 L28 19.5 Q50 16.5 72 19.5 L73 38 Q50 32 27 38 Z"
               fill="#1E1410"
               stroke={ink}
               strokeWidth="2.8"
@@ -877,7 +992,7 @@ export function CharacterPortrait({
             /* Green peaked cap with red star */
             <>
               <path
-                d="M27 32 Q50 16 73 32 L69 37 Q50 32 31 37 Z"
+                d="M26 32 Q50 15.5 74 32 L69 37 Q50 32 31 37 Z"
                 fill="#264E42"
                 stroke={ink}
                 strokeWidth="2.8"
@@ -888,7 +1003,7 @@ export function CharacterPortrait({
           {nation === 'cu' && (
             /* Olive military/field cap */
             <path
-              d="M27 32 L32 19 L68 19 L73 32 Z"
+              d="M26 32 L31 18.5 L69 18.5 L74 32 Z"
               fill="#6E5A38"
               stroke={ink}
               strokeWidth="2.8"
@@ -898,49 +1013,49 @@ export function CharacterPortrait({
             /* Classic black French beret tilted */
             <>
               <path
-                d="M25 31 Q48 13 75 26 Q66 36 28 34 Z"
+                d="M24 31 Q48 12.5 76 26 Q66 36 27 34 Z"
                 fill="#1E242B"
                 stroke={ink}
                 strokeWidth="2.8"
               />
-              <path d="M51 18 L55 13" stroke={ink} strokeWidth="2.6" strokeLinecap="round" />
+              <path d="M51 17.5 L55 12.5" stroke={ink} strokeWidth="2.6" strokeLinecap="round" />
             </>
           )}
           {nation === 'al' && (
             /* Bavarian Tyrolean hat with white feather */
             <>
-              <path d="M29 31 L36 16 L64 16 L71 31 Z" fill="#2D3B36" stroke={ink} strokeWidth="2.8" />
-              <line x1="22" y1="31" x2="78" y2="31" stroke={ink} strokeWidth="3.8" strokeLinecap="round" />
-              <path d="M62 24 Q70 12 66 8" fill="none" stroke="#FFF9F0" strokeWidth="3.5" strokeLinecap="round" />
+              <path d="M28 31 L35 15.5 L65 15.5 L72 31 Z" fill="#2D3B36" stroke={ink} strokeWidth="2.8" />
+              <line x1="21" y1="31" x2="79" y2="31" stroke={ink} strokeWidth="3.8" strokeLinecap="round" />
+              <path d="M62 24 Q70 11.5 66 7.5" fill="none" stroke="#FFF9F0" strokeWidth="3.6" strokeLinecap="round" />
             </>
           )}
           {nation === 'in' && (
-            /* Large pleated magenta/pink Indian turban */
+            /* Large pleated magenta/pink Indian turban with jewel */
             <>
               <path
-                d="M22 36 Q24 14 50 16 Q76 14 78 36 Q64 28 50 33 Q36 28 22 36 Z"
+                d="M21 36 Q23 13.5 50 15.5 Q77 13.5 79 36 Q64 28 50 33 Q36 28 21 36 Z"
                 fill="#C84B73"
                 stroke={ink}
                 strokeWidth="2.8"
               />
-              <circle cx="50" cy="25" r="3.5" fill="#F2C14E" stroke={ink} strokeWidth="1.8" />
+              <circle cx="50" cy="24.5" r="3.8" fill="#F2C14E" stroke={ink} strokeWidth="1.8" />
             </>
           )}
           {nation === 'it' && (
-            /* Stylish Italian fedora hat */
+            /* Stylish Italian Borsalino fedora hat */
             <>
-              <path d="M29 31 L35 16 L65 16 L71 31 Z" fill="#3B444B" stroke={ink} strokeWidth="2.8" />
-              <rect x="32" y="26" width="36" height="4" fill="#EED9B8" />
-              <line x1="20" y1="31" x2="80" y2="31" stroke={ink} strokeWidth="4" strokeLinecap="round" />
+              <path d="M28 31 L34 15.5 L66 15.5 L72 31 Z" fill="#3B444B" stroke={ink} strokeWidth="2.8" />
+              <rect x="31" y="26" width="38" height="4" fill="#EED9B8" />
+              <line x1="19" y1="31" x2="81" y2="31" stroke={ink} strokeWidth="4.2" strokeLinecap="round" />
             </>
           )}
           {nation === 'ru' && (
             /* Tall brown fur ushanka hat */
             <rect
-              x="27"
-              y="15"
-              width="46"
-              height="20"
+              x="26"
+              y="14.5"
+              width="48"
+              height="20.5"
               rx="6"
               fill="#4E3429"
               stroke={ink}
@@ -950,42 +1065,59 @@ export function CharacterPortrait({
           {nation === 'es' && (
             /* Wide flat-brimmed Spanish Cordoban hat */
             <>
-              <rect x="34" y="17" width="32" height="13" rx="2" fill="#5C2D24" stroke={ink} strokeWidth="2.6" />
-              <ellipse cx="50" cy="31" rx="33" ry="5" fill="#5C2D24" stroke={ink} strokeWidth="2.8" />
+              <rect x="33" y="16.5" width="34" height="13.5" rx="2" fill="#5C2D24" stroke={ink} strokeWidth="2.6" />
+              <ellipse cx="50" cy="31" rx="34" ry="5.2" fill="#5C2D24" stroke={ink} strokeWidth="2.8" />
             </>
           )}
           {nation === 'tu' && (
             /* Red Turkish Fez hat with black tassel */
             <>
-              <polygon points="36,32 40,15 60,15 64,32" fill="#C83E31" stroke={ink} strokeWidth="2.8" />
-              <path d="M60 16 Q68 20 67 28" fill="none" stroke={ink} strokeWidth="2.8" strokeLinecap="round" />
+              <polygon points="35,32 39.5,14.5 60.5,14.5 65,32" fill="#C83E31" stroke={ink} strokeWidth="2.8" />
+              <path d="M60.5 15.5 Q68.5 19.5 67.5 28" fill="none" stroke={ink} strokeWidth="2.8" strokeLinecap="round" />
             </>
           )}
           {nation === 'en' && (
             /* Classic English Bowler Hat */
             <>
-              <path d="M31 30 Q31 14 50 14 Q69 14 69 30 Z" fill="#1E242B" stroke={ink} strokeWidth="2.8" />
-              <line x1="24" y1="30" x2="76" y2="30" stroke={ink} strokeWidth="4" strokeLinecap="round" />
+              <path d="M30 30 Q30 13.5 50 13.5 Q70 13.5 70 30 Z" fill="#1E242B" stroke={ink} strokeWidth="2.8" />
+              <line x1="23" y1="30" x2="77" y2="30" stroke={ink} strokeWidth="4.2" strokeLinecap="round" />
             </>
           )}
           {nation === 'am' && (
             /* Big Texan Cowboy Stetson Hat */
             <>
               <path
-                d="M31 30 L37 15 L50 19 L63 15 L69 30 Z"
+                d="M30 30 L36.5 14.5 L50 18.5 L63.5 14.5 L70 30 Z"
                 fill="#7D8892"
                 stroke={ink}
                 strokeWidth="2.6"
               />
               <path
-                d="M16 28 Q50 36 84 28"
+                d="M15 28 Q50 36.5 85 28"
                 fill="none"
                 stroke={ink}
-                strokeWidth="4.5"
+                strokeWidth="4.6"
                 strokeLinecap="round"
               />
             </>
           )}
+        </g>
+      )}
+
+      {/* 11. FOREGROUND CAFÉ PROPS (Fan for Spanish lady, espresso cup for Italian/French/Turkish, newspaper corner for English) */}
+      {isFemale && nation === 'es' && !sipping && (
+        <path
+          d="M62 88 L79 74 A16 16 0 0 1 86 90 Z"
+          fill="#C83E31"
+          stroke={ink}
+          strokeWidth="2.2"
+        />
+      )}
+      {!isFemale && nation === 'fr' && !sipping && (
+        <g transform="translate(68, 76)">
+          <rect x="0" y="0" width="16" height="12" rx="2" fill="#FFF9F0" stroke={ink} strokeWidth="2" />
+          <line x1="3" y1="4" x2="13" y2="4" stroke={ink} strokeWidth="1.5" />
+          <line x1="3" y1="8" x2="11" y2="8" stroke={ink} strokeWidth="1.5" />
         </g>
       )}
 
@@ -1131,10 +1263,10 @@ export function PlayerAvatar({
 
 export function CafetuliaLogo({ compact = false }: { compact?: boolean }): React.ReactElement {
   return (
-    <div className="inline-flex items-center gap-2.5 select-none">
+    <div className="inline-flex items-center gap-2 select-none">
       <svg
-        width={compact ? 32 : 44}
-        height={compact ? 32 : 44}
+        width={compact ? 28 : 42}
+        height={compact ? 28 : 42}
         viewBox="0 0 64 64"
         aria-hidden="true"
         className="shrink-0"
@@ -1145,20 +1277,20 @@ export function CafetuliaLogo({ compact = false }: { compact?: boolean }): React
           rx="24"
           ry="6"
           fill="#C9A227"
-          stroke="#3E2F2A"
+          stroke="#231712"
           strokeWidth="2.8"
         />
         <path
           d="M14 24 L50 24 L46 46 Q44 52 32 52 Q20 52 18 46 Z"
           fill="#FFF9F0"
-          stroke="#3E2F2A"
+          stroke="#231712"
           strokeWidth="3"
         />
         <path d="M16 32 L48 32 L47 38 L17 38 Z" fill="#C96F4A" />
         <path
           d="M49 28 Q60 28 58 38 Q56 45 46 43"
           fill="none"
-          stroke="#3E2F2A"
+          stroke="#231712"
           strokeWidth="3"
           strokeLinecap="round"
         />
@@ -1180,7 +1312,7 @@ export function CafetuliaLogo({ compact = false }: { compact?: boolean }): React
       <div>
         <span
           className={`font-serif font-bold tracking-tight text-[#3E2F2A] block leading-none ${
-            compact ? 'text-xl sm:text-2xl' : 'text-3xl sm:text-4xl'
+            compact ? 'text-lg sm:text-xl' : 'text-3xl sm:text-4xl'
           }`}
         >
           Cafetulia
