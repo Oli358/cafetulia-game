@@ -1,53 +1,31 @@
-# Cambios de la base v6
+# Base v7 para el encargo de menú, sonido y música
 
-Base preparada el **2026-10-25** para el encargo `docs/ARGON/09-pulido-ui-v6.md`.
-ZIP: `cafetulia-ui-v6.zip`.
+Fecha: **2026-10-25**.
+ZIP: `cafetulia-v7.zip`.
+Prompt: `docs/ARGON/10-menu-sonido-musica.md`.
 
-## Integración de la entrega v5 de Argon
+## Qué contiene esta base
 
-Archivos integrados desde `cafetulia (4).zip`:
+- La **v6 integrada y verificada**: cabecera en dos filas, menús exclusivos, final escenificado, placa `O & A`, cambio de comodín contextual, tablero con jerarquía, dock translúcido y drag opcional.
+- **48 tests** en verde, `typecheck`, `build`, `lint` y E2E completos.
+- Salvaguardas: Node 24.20.0, `pathToFileURL`, `DATABASE_URL`/`SQLITE_DB_PATH`, timeout de Vitest, Playwright local, `lib` DOM en e2e, `React.lazy` para el 3D y service worker solo en producción.
 
-- `apps/web/src/art/CharacterPortrait.tsx`
-- `apps/web/src/components/IllustratedBoard.tsx`
-- `apps/web/src/components/Modals.tsx`
-- `apps/web/src/components/PapercraftBoard.tsx`
-- `apps/web/src/components/Screens.tsx`
-- `apps/web/src/store/gameStore.ts`
-- `apps/web/src/utils/moveHelper.test.ts`
-- `apps/web/src/main.tsx`
-- `packages/ui/src/index.ts`
-- `e2e/tests/smoke.spec.ts`
+## Cambios de esta preparación
 
-Se conservaron las salvaguardas del proyecto: Node 24.20.0, `pathToFileURL`, `DATABASE_URL`/`SQLITE_DB_PATH`, timeout de Vitest, Playwright local, `lib` DOM en e2e, `React.lazy` para el 3D y service worker solo en producción.
+No se ha cambiado código de producción en esta sesión. Solo documentación y el encargo:
 
-## Correcciones aplicadas por nosotros
+- `docs/ARGON/10-menu-sonido-musica.md` — prompt v7.
+- `docs/ARGON/README.md` — enlace al prompt 10.
+- `docs/SESIONES.md` — Sesión 019.
+- `docs/DECISIONES.md` — D-075 a D-079 ya registradas en la sesión anterior.
+- `README.md` — estado y pendientes.
+- `CAMBIOS.md` — este archivo.
+- `docs/referencias/ui-v6-*.png` — capturas de la base.
 
-- `apps/web/src/components/Screens.tsx`: etiquetas de fin de partida corregidas (`player_empty_hand`, `bag_threshold_reached`, `last_player_standing`).
-- `apps/web/src/components/IllustratedBoard.tsx`: placa **O & A** (antes `O & C`).
-- `apps/web/src/components/PapercraftBoard.tsx`: placa **O & A** (antes `O & C`).
+## Qué debe hacer Argon
 
-## Documentación y evidencias nuevas
+Implementar el prompt 10 y devolver un ZIP con **todos** los archivos nuevos/modificados, sin `node_modules`, `dist`, `.git`, `test-results`, `playwright-report`, `.aistudio` ni ZIPs antiguos. Debe incluir su propio `CAMBIOS.md`.
 
-- `docs/SESIONES.md`: Sesión 016 con la integración, la auditoría y los bugs abiertos.
-- `docs/DECISIONES.md`: D-070 a D-074.
-- `docs/ARGON/09-pulido-ui-v6.md`: prompt completo del siguiente encargo.
-- `docs/ARGON/README.md`: enlace al prompt 09.
-- `README.md`: estado actualizado.
-- `docs/referencias/ui-v5-partida-1920.png`
-- `docs/referencias/ui-v5-partida-1280.png`
-- `docs/referencias/ui-v5-partida-movil.png`
-- `docs/referencias/ui-v5-menus.png`
-- `docs/referencias/ui-v5-final.png`
-- `CAMBIOS.md`: este archivo.
+## Referencias
 
-## Referencias de cartas
-
-Las fotos de referencia van solo en `references/cards/` dentro del ZIP, **fuera del build y del repositorio final**. No se deben copiar a `apps/web/public` ni usar como arte final.
-
-## Verificación
-
-- `npx pnpm typecheck` ✅
-- `npx pnpm test` ✅ (46 tests + simulación de 1000 partidas)
-- `npx pnpm build` ✅
-- `npx pnpm lint` ✅
-- `npx pnpm test:e2e` ✅
+Las fotos de cartas no son necesarias para este encargo y no se incluyen en el ZIP para mantenerlo ligero. No copies arte oficial.

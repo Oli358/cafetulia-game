@@ -5,6 +5,31 @@
 
 ---
 
+## Sesión 019 — 2026-10-25 — Preparación del encargo v7: menú, sonido y música
+
+**Objetivo:** cerrar el alcance del siguiente pase de Argon y preparar un ZIP limpio y un prompt corto para copiar y pegar, sin hacerle leer documentación larga.
+
+**Hecho:**
+- Alcance cerrado: portada/lobby como escena de café personalizada, SFX de UI por acción y música lo-fi con capas, variación y transiciones.
+- Se mantiene todo lo bueno de la v6 y no se tocan reglas, tablero, servidor ni arte oficial.
+- La v7 se prepara para que el usuario la pruebe directamente en iPhone/Android; el audio, las safe areas, el táctil y la PWA entran en el alcance.
+- Creado el prompt `docs/ARGON/10-menu-sonido-musica.md` y el ZIP `cafetulia-v7.zip`.
+- No se han integrado los ZIPs antiguos que venían en `public/assets/aistudio/`; el ZIP de entrega va limpio.
+
+**Decisiones:**
+- Se implementan D-075 (portada escena), D-076 (SFX de UI) y D-077 (música con variación). D-078 y D-079 se mantienen como salvaguardas.
+
+**Problemas:**
+- La prueba real en teléfono queda para cuando vuelva la v7.
+- El E2E no puede validar audio ni fluidez real; se añade checklist manual.
+
+**Siguiente:**
+1. Enviar `cafetulia-v7.zip` y el prompt 10 a Argon.
+2. Integrar la v7, ejecutar tests y preparar la prueba en móvil.
+3. Corregir lo que falle en el teléfono y desplegar en Render.
+
+---
+
 ## Sesión 018 — 2026-10-25 — Integración v6, verificación y auditoría de menú, sonido y música
 
 **Objetivo:** integrar la entrega v6 de Argon, comprobar que los P0/P1 del prompt 09 están realmente resueltos y detectar lo que falta para el siguiente pase centrado en menú, sonido y música.
