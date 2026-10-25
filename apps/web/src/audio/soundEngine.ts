@@ -13,6 +13,8 @@ export type SfxKind =
   | 'pureTableToast'
   | 'barPositive'
   | 'barNegative'
+  | 'coinClink'
+  | 'coinPenalty'
   | 'bell'
   | 'victoryFanfare';
 
@@ -156,6 +158,17 @@ class CafetuliaSoundEngine {
       }
       case 'barNegative': {
         this.tone(260, 195, 0.22, vol * 0.8, 'sawtooth', now);
+        break;
+      }
+      case 'coinClink': {
+        this.tone(1740, 2180, 0.08, vol * 0.65, 'triangle', now);
+        this.tone(2350, 2640, 0.09, vol * 0.5, 'sine', now + 0.055);
+        this.tone(1980, 2420, 0.07, vol * 0.4, 'triangle', now + 0.11);
+        break;
+      }
+      case 'coinPenalty': {
+        this.tone(980, 620, 0.11, vol * 0.6, 'triangle', now);
+        this.tone(740, 460, 0.14, vol * 0.55, 'sine', now + 0.07);
         break;
       }
       case 'bell': {

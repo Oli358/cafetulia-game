@@ -13,9 +13,11 @@ Fotos **reales** del tablero físico, aportadas por el usuario. No son imágenes
 - Estas fotos son referencia de **topología y estilo**; no se usarán como textura final del tablero.
 - Pendiente: confirmar el mapeo definitivo de cada una de las 24 mesas.
 
-## Capturas de la v1.0 local
+## Capturas de la v1.1 local
 
 - `ui-portada.png` — portada de Cafetulia.
-- `ui-partida.png` — partida 2.5D + 2D contra un bot, con mano pública, barra y registro.
+- `ui-partida.png` — partida rediseñada en escritorio: tablero ilustrado, barra central, monedas, cartas con nombre y sin scroll.
+- `ui-partida-movil.png` — partida en 390×844, sin scroll de página.
+- `ui-cafe-3d.png` — modal “Ver café” con el diorama 3D completo.
 
 Las capturas se generaron con Playwright el 2026-10-25.

@@ -10,15 +10,15 @@ Juego digital cozy, online y para **2–4 jugadores**, basado en **Café Interna
 
 ## Estado actual
 
-- **v1.0 implementada y verificada en local.**
+- **v1.1 — Rediseño de UI integrado y verificado en local.**
 - Monorepo con pnpm workspaces, TypeScript estricto, ESLint, Prettier, Vitest y Playwright.
-- Motor de reglas determinista en `packages/engine`: **42 tests en verde** (motor + servidor + helpers) y **1.000 partidas simuladas** con `fast-check`.
+- Motor de reglas determinista en `packages/engine`: **44 tests en verde** (motor + servidor + helpers) y **1.000 partidas simuladas** con `fast-check`.
 - `packages/content/board.json` validado: **24 mesas, 68 sillas, 28 compartidas y 20 plazas de barra**.
 - Servidor autoritativo con Colyseus: salas privadas de 6 caracteres, 2–4 jugadores, bots, reconexión de 15 s, temporizador, chat efímero, revancha y persistencia SQLite.
-- Cliente 2.5D papercraft + modo 2D: tablero de 13×13, 28 retratos, audio Web Audio, tutorial, reglamento, estadísticas locales, postal descargable y PWA.
-- Verificado en local: `typecheck`, `lint`, `build`, **42 tests**, E2E de Playwright, `/health` y creación de salas por API.
+- Cliente rediseñado: **pantalla única sin scroll**, tablero ilustrado de 13×13 con mesas, sillas y barra central, **24 personajes con nombre y frase**, cartas 2:3, fichas con retrato y bandera, **monedas 1/5/10** con vuelo al puntuar y al penalizar, modal **“Ver café”** 3D, cajón de registro/chat y PWA básica.
+- Verificado en local: `typecheck`, `lint`, `build`, **44 tests**, E2E de Playwright, `/health`, creación de salas y **sin scroll en 1280×800 y 390×844**.
 - **Requiere Node 22.5+** (usa `node:sqlite`). Recomendado Node 24 LTS. En este equipo está instalado Node 24.20.0.
-- Próximo paso: desplegar en Render, probar en iPhone/Android reales y pulir el diorama 3D.
+- Pendiente: desplegar en Render, probar en iPhone/Android reales, añadir service worker/offline y reducir el bundle (~830 KB).
 
 ## Comandos
 

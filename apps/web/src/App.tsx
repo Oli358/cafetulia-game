@@ -73,7 +73,9 @@ export function App(): React.ReactElement {
 
   return (
     <main
-      className={`min-h-screen transition-colors ${
+      className={`${
+        screen === 'playing' ? 'h-[100dvh] max-h-[100dvh] overflow-hidden' : 'min-h-screen'
+      } transition-colors ${
         nightMode
           ? 'bg-[#181C26] text-[#FFF9F0]'
           : highContrast

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   finalScores,
   getLegalMoves,
@@ -7,15 +7,22 @@ import {
   type Table,
   type Tile,
 } from '@cafetulia/engine';
-import { NATION_VISUALS, type NationKey } from '@cafetulia/ui';
+import { getCharacterProfile, NATION_VISUALS } from '@cafetulia/ui';
 import { soundEngine } from '../audio/soundEngine';
 import { CafetuliaLogo, CharacterPortrait, FlagBadge } from '../art/CharacterPortrait';
 import { useGameStore } from '../store/gameStore';
 import {
   evaluateDraftPlacements,
-  getNationName,
   inspectSeatsForSelectedTile,
 } from '../utils/moveHelper';
+import {
+  AnimatedScore,
+  CoinChip,
+  CoinTray,
+  FlyingCoinsLayer,
+  type CoinFlightEvent,
+} from './CoinTray';
+import { IllustratedBoard, type ChairToastInfo } from './IllustratedBoard';
 import { PapercraftBoard } from './PapercraftBoard';
 
 export function TitleScreen(): React.ReactElement {
@@ -34,9 +41,7 @@ export function TitleScreen(): React.ReactElement {
 
   return (
     <div className="min-h-screen flex flex-col justify-between p-4 sm:p-8 max-w-6xl mx-auto">
-      {/* Main Hero & Interactive Showcase */}
       <div className="my-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center py-4">
-        {/* Left column: Brand lockup + Cozy Cafe Vignette */}
         <div className="lg:col-span-7 space-y-6">
           <CafetuliaLogo />
 
@@ -45,24 +50,22 @@ export function TitleScreen(): React.ReactElement {
             sillas compartidas sin romper el equilibrio de parejas y evita que la barra se llene.
           </p>
 
-          {/* Character showcase vignette */}
           <div className="bg-[#FFF9F0] p-4 sm:p-5 rounded-[24px] border border-[#3E2F2A]/12 shadow-[0_8px_24px_rgba(62,47,42,0.08)] flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center -space-x-2">
               <CharacterPortrait nation="fr" gender="F" size={54} sipping />
               <CharacterPortrait nation="it" gender="M" size={54} />
-              <CharacterPortrait nation="es" gender="F" size={54} />
-              <CharacterPortrait nation="joker" gender="M" size={54} />
+              <CharacterPortrait nation="ch" gender="F" size={54} />
+              <CharacterPortrait nation="cu" gender="F" size={54} />
             </div>
             <div className="text-xs sm:text-sm text-[#6F5A4E]">
               <strong className="text-[#3E2F2A] block font-serif text-base">
                 Tablero oficial de 24 mesas y 68 sillas
               </strong>
-              <span>100 fichas · Manos públicas · Sin registro ni cuentas</span>
+              <span>24 personajes con carácter · Manos públicas · Sin registro</span>
             </div>
           </div>
         </div>
 
-        {/* Right column: Action Panel */}
         <div className="lg:col-span-5 bg-[#FFF9F0] p-6 sm:p-7 rounded-[24px] border border-[#3E2F2A]/15 shadow-[0_8px_24px_rgba(62,47,42,0.12)] space-y-5">
           <div>
             <label
@@ -122,7 +125,6 @@ export function TitleScreen(): React.ReactElement {
 
           <hr className="border-[#3E2F2A]/10" />
 
-          {/* Join by Room Code */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -169,7 +171,6 @@ export function TitleScreen(): React.ReactElement {
         </div>
       </div>
 
-      {/* Footer Clean Navigation & Control Hints */}
       <footer className="pt-4 border-t border-[#3E2F2A]/10 flex flex-wrap items-center justify-between gap-4 text-xs sm:text-sm text-[#6F5A4E]">
         <div className="flex flex-wrap items-center gap-4">
           <button
@@ -216,7 +217,7 @@ export function TitleScreen(): React.ReactElement {
           </button>
         </div>
         <div className="text-xs text-[#6F5A4E]">
-          Toca carta y silla · Vista 2.5D y 2D · Enter para partida rápida
+          Toca carta y silla · Sin scroll · Enter para partida rápida
         </div>
       </footer>
     </div>
@@ -291,7 +292,6 @@ export function LobbyScreen(): React.ReactElement {
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Players and Bots list */}
           <div className="space-y-3">
             <h2 className="font-serif font-bold text-lg">
               Tertulianos en la mesa ({activeSeatMembers.length}/{snapshot.config.maxPlayers})
@@ -335,7 +335,6 @@ export function LobbyScreen(): React.ReactElement {
               ))}
             </div>
 
-            {/* Host Bot Adder */}
             {isHost && activeSeatMembers.length < snapshot.config.maxPlayers && (
               <div className="pt-2 flex items-center gap-2">
                 <select
@@ -366,7 +365,6 @@ export function LobbyScreen(): React.ReactElement {
             )}
           </div>
 
-          {/* Room Configuration */}
           <div className="bg-[#F7EEDF] p-4 sm:p-5 rounded-2xl space-y-4">
             <h2 className="font-serif font-bold text-lg">Opciones de la partida</h2>
 
@@ -418,7 +416,6 @@ export function LobbyScreen(): React.ReactElement {
           </div>
         </div>
 
-        {/* Bottom Lobby CTAs */}
         <div className="pt-4 border-t border-[#3E2F2A]/10 flex flex-wrap items-center justify-between gap-3">
           {me && me.role === 'player' && (
             <button
@@ -459,14 +456,11 @@ export function PlayingScreen(): React.ReactElement {
   const draftPlacements = useGameStore((s) => s.draftPlacements);
   const preferredJokerNation = useGameStore((s) => s.preferredJokerNation);
   const focusedTableId = useGameStore((s) => s.focusedTableId);
-  const viewMode = useGameStore((s) => s.viewMode);
   const cameraAngleIndex = useGameStore((s) => s.cameraAngleIndex);
   const cameraZoom = useGameStore((s) => s.cameraZoom);
   const nightMode = useGameStore((s) => s.nightMode);
   const reducedMotion = useGameStore((s) => s.reducedMotion);
-  const contextualHints = useGameStore((s) => s.contextualHints);
   const errorBanner = useGameStore((s) => s.errorBanner);
-  const whyCannotBanner = useGameStore((s) => s.whyCannotBanner);
 
   const selectTile = useGameStore((s) => s.selectTile);
   const setPreferredJokerNation = useGameStore((s) => s.setPreferredJokerNation);
@@ -475,7 +469,6 @@ export function PlayingScreen(): React.ReactElement {
   const setPendingNegativeConfirm = useGameStore((s) => s.setPendingNegativeConfirm);
   const setWhyCannotBanner = useGameStore((s) => s.setWhyCannotBanner);
   const setFocusedTableId = useGameStore((s) => s.setFocusedTableId);
-  const setViewMode = useGameStore((s) => s.setViewMode);
   const cycleCameraAngle = useGameStore((s) => s.cycleCameraAngle);
   const resetCamera = useGameStore((s) => s.resetCamera);
   const setCameraZoom = useGameStore((s) => s.setCameraZoom);
@@ -484,12 +477,19 @@ export function PlayingScreen(): React.ReactElement {
   const sendChat = useGameStore((s) => s.sendChat);
   const leaveRoom = useGameStore((s) => s.leaveRoom);
 
+  const [cafeModalOpen, setCafeModalOpen] = useState(false);
+  const [rivalHandsOpen, setRivalHandsOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [sideTab, setSideTab] = useState<'log' | 'chat'>('log');
   const [chatInput, setChatInput] = useState('');
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
+  const [chairToast, setChairToast] = useState<ChairToastInfo | null>(null);
+  const [coinFlights, setCoinFlights] = useState<CoinFlightEvent[]>([]);
+  const lastLogLengthRef = useRef<number>(0);
 
   const gameState = snapshot?.gameState;
 
+  // Turn countdown timer
   useEffect(() => {
     const deadline = snapshot?.turnDeadlineMs ?? null;
     if (!deadline) {
@@ -504,6 +504,72 @@ export function PlayingScreen(): React.ReactElement {
     const timer = setInterval(updateClock, 500);
     return () => clearInterval(timer);
   }, [snapshot?.turnDeadlineMs]);
+
+  // Auto-dismiss chair toast after 3.5 seconds
+  useEffect(() => {
+    if (!chairToast) return;
+    const t = setTimeout(() => setChairToast(null), 3500);
+    return () => clearTimeout(t);
+  }, [chairToast]);
+
+  // Detect new scoring or bar penalty events in gameState.log and trigger flying coins + ceramic clink
+  useEffect(() => {
+    if (!gameState) return;
+    const currentLen = gameState.log.length;
+    if (lastLogLengthRef.current === 0) {
+      lastLogLengthRef.current = currentLen;
+      return;
+    }
+    if (currentLen <= lastLogLengthRef.current) {
+      lastLogLengthRef.current = currentLen;
+      return;
+    }
+
+    const newEvents = gameState.log.slice(lastLogLengthRef.current);
+    lastLogLengthRef.current = currentLen;
+
+    const flights: CoinFlightEvent[] = [];
+    for (let i = 0; i < newEvents.length; i++) {
+      const ev = newEvents[i];
+      if (!ev) continue;
+      if (ev.type === 'tile_seated' && ev.pointsEarned > 0) {
+        flights.push({
+          id: `flight-${Date.now()}-${i}`,
+          playerId: ev.playerId,
+          delta: ev.pointsEarned,
+          sourceSelector: `[data-seat-id="${ev.seatId}"]`,
+          targetSelector: `[data-player-tray="${ev.playerId}"]`,
+        });
+      } else if (ev.type === 'tile_bar' && ev.pointsDelta !== 0) {
+        if (ev.pointsDelta > 0) {
+          flights.push({
+            id: `flight-${Date.now()}-${i}`,
+            playerId: ev.playerId,
+            delta: ev.pointsDelta,
+            sourceSelector: '[data-testid="bar-center-button"]',
+            targetSelector: `[data-player-tray="${ev.playerId}"]`,
+          });
+        } else {
+          // Reverse trajectory: from player's coin tray to the central bar
+          flights.push({
+            id: `flight-${Date.now()}-${i}`,
+            playerId: ev.playerId,
+            delta: ev.pointsDelta,
+            sourceSelector: `[data-player-tray="${ev.playerId}"]`,
+            targetSelector: '[data-testid="bar-center-button"]',
+          });
+        }
+      }
+    }
+
+    if (flights.length > 0) {
+      const hasNegative = flights.some((f) => f.delta < 0);
+      soundEngine.playSfx(hasNegative ? 'coinPenalty' : 'coinClink');
+      setCoinFlights(flights);
+      const clearTimer = setTimeout(() => setCoinFlights([]), 900);
+      return () => clearTimeout(clearTimer);
+    }
+  }, [gameState, gameState?.log.length]);
 
   const activePlayerId = gameState?.turn ?? '';
   const isMyTurn = myRole === 'player' && activePlayerId === myPlayerId;
@@ -558,24 +624,43 @@ export function PlayingScreen(): React.ReactElement {
 
   const activePlayerObj = gameState.players.find((p) => p.id === activePlayerId);
 
+  const showAnchoredToast = (row: number, col: number, text: string) => {
+    setWhyCannotBanner(text);
+    setChairToast({
+      id: Date.now(),
+      row,
+      col,
+      text,
+    });
+  };
+
   const handleSeatClick = (seat: Seat) => {
     if (!isMyTurn) {
-      setWhyCannotBanner('Espera tu turno para colocar invitados en las mesas.');
+      showAnchoredToast(seat.row, seat.col, 'Espera tu turno para sentar invitados.');
       return;
     }
     if (!selectedTile) {
-      setWhyCannotBanner('Primero selecciona una carta de tu mano en la parte inferior.');
+      showAnchoredToast(
+        seat.row,
+        seat.col,
+        'Primero elige una carta de tu mano en la parte inferior.',
+      );
       return;
     }
     const inspect = seatInspections[seat.id];
     if (!inspect || inspect.status === 'illegal') {
-      setWhyCannotBanner(inspect?.whyCannotText ?? 'No puedes colocar esta ficha en esa silla.');
+      showAnchoredToast(
+        seat.row,
+        seat.col,
+        inspect?.whyCannotText ?? 'No puedes sentar a este invitado en esta silla.',
+      );
       return;
     }
     if (inspect.status === 'selected') {
       return;
     }
 
+    setChairToast(null);
     const chosenNation: Nation | undefined =
       selectedTile.nation === 'joker'
         ? (preferredJokerNation && inspect.validJokerNations.includes(preferredJokerNation)
@@ -597,35 +682,37 @@ export function PlayingScreen(): React.ReactElement {
 
   const handleBarClick = () => {
     if (!isMyTurn) {
-      setWhyCannotBanner('Solo puedes enviar invitados a la barra durante tu turno.');
+      showAnchoredToast(6, 6, 'Solo puedes servir en la barra durante tu turno.');
       return;
     }
     if (draftPlacements.length > 0) {
-      setWhyCannotBanner(
-        'No puedes combinar sillas de mesa y barra en el mismo turno. Limpia primero tu selección.',
+      showAnchoredToast(
+        6,
+        6,
+        'No puedes combinar sillas de mesa y barra. Pulsa Limpiar primero.',
       );
       return;
     }
     if (!selectedTile) {
-      setWhyCannotBanner('Selecciona primero una carta natural de tu mano para enviarla a la barra.');
+      showAnchoredToast(6, 6, 'Selecciona primero una carta natural de tu mano.');
       return;
     }
     if (selectedTile.nation === 'joker') {
-      setWhyCannotBanner('Los comodines nunca pueden enviarse a la barra.');
+      showAnchoredToast(6, 6, 'Los comodines nunca pueden enviarse a la barra.');
       return;
     }
 
+    setChairToast(null);
     const nextBarIdx = gameState.bar.findIndex((b) => b === null);
     const barPoints = nextBarIdx >= 0 ? (gameState.barValues[nextBarIdx] ?? -14) : -14;
     const barMove = { type: 'bar' as const, tileId: selectedTile.id };
+    const profile = getCharacterProfile(selectedTile.nation, selectedTile.gender);
 
     if (barPoints < 0) {
       setPendingNegativeConfirm({
         move: barMove,
         points: barPoints,
-        description: `Vas a colocar a tu invitado de ${getNationName(
-          selectedTile.nation,
-        )} en la plaza ${nextBarIdx + 1} de la barra.`,
+        description: `Vas a sentar a ${profile.name} (${profile.countryName}) en el posavasos ${nextBarIdx + 1} de la barra.`,
       });
       return;
     }
@@ -634,29 +721,36 @@ export function PlayingScreen(): React.ReactElement {
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-2 sm:p-4 max-w-[1440px] mx-auto gap-3">
-      {/* Top Discrete Header HUD */}
-      <header className="bg-[#FFF9F0] rounded-2xl border border-[#3E2F2A]/15 px-3.5 py-2.5 shadow-xs flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-3">
+    <div
+      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between px-2 py-1.5 sm:px-4 sm:py-2 max-w-[1440px] mx-auto select-none"
+      data-testid="playing-viewport"
+    >
+      {/* Flying Coins Animation Overlay */}
+      <FlyingCoinsLayer flights={coinFlights} reducedMotion={reducedMotion} />
+
+      {/* TOP COMPACT HEADER + SCOREBOARD BAR */}
+      <header className="shrink-0 bg-[#FFF9F0] rounded-2xl border border-[#3E2F2A]/15 px-2.5 py-1.5 shadow-xs flex flex-wrap items-center justify-between gap-1.5 z-30">
+        {/* Left: Brand, Room Code, Turn Pill, Timer */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
           <CafetuliaLogo compact />
-          <span className="text-xs font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-2.5 py-1 rounded-lg">
-            Sala {snapshot.code}
+          <span className="hidden sm:inline-block text-[11px] font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-2 py-0.5 rounded-lg">
+            #{snapshot.code}
           </span>
           <div
-            className={`px-3 py-1 rounded-xl text-xs font-bold ${
+            className={`px-2.5 py-1 rounded-xl text-[11px] sm:text-xs font-bold transition-all whitespace-nowrap ${
               isMyTurn
-                ? 'bg-[#C96F4A] text-[#FFF9F0]'
+                ? 'bg-[#C96F4A] text-[#FFF9F0] shadow-xs'
                 : 'bg-[#F7EEDF] text-[#3E2F2A] border border-[#3E2F2A]/15'
             }`}
             data-testid="turn-indicator"
           >
             {isMyTurn
-              ? `Tu turno (${activePlayerObj?.nickname ?? 'Jugador'})`
-              : `Turno de ${activePlayerObj?.nickname ?? 'Rival'}`}
+              ? `Tu turno`
+              : `Turno: ${activePlayerObj?.nickname ?? 'Rival'}`}
           </div>
           {remainingSeconds !== null && (
             <span
-              className={`text-xs font-mono font-bold tabular-nums px-2.5 py-1 rounded-lg ${
+              className={`text-[11px] font-mono font-bold tabular-nums px-2 py-0.5 rounded-lg ${
                 remainingSeconds <= 10
                   ? 'bg-[#FDECEB] text-[#A94438]'
                   : 'bg-[#F7EEDF] text-[#3E2F2A]'
@@ -667,362 +761,483 @@ export function PlayingScreen(): React.ReactElement {
           )}
         </div>
 
-        {/* Camera & Utility Controls */}
-        <div className="flex flex-wrap items-center gap-1.5 text-xs">
+        {/* Center: Compact Player Scoreboard with Coin Trays & Card Counts */}
+        <div
+          className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto max-w-full py-0.5"
+          data-testid="compact-scoreboard"
+        >
+          {gameState.players.map((p) => {
+            const pHandCount = (gameState.hands[p.id] ?? []).length;
+            const isTurn = gameState.turn === p.id;
+            return (
+              <div
+                key={p.id}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-xs transition-colors whitespace-nowrap ${
+                  isTurn
+                    ? 'bg-[#FEF6E0] border-[#C96F4A] font-bold'
+                    : 'bg-[#F7EEDF] border-[#3E2F2A]/12'
+                }`}
+              >
+                <span className="font-bold text-[#3E2F2A] truncate max-w-[72px] sm:max-w-[96px]">
+                  {p.nickname}
+                </span>
+                <CoinTray
+                  score={p.score}
+                  playerId={p.id}
+                  compact
+                  reducedMotion={reducedMotion}
+                />
+                <span
+                  className="text-[10px] font-mono font-semibold text-[#6F5A4E] bg-[#FFF9F0] px-1.5 py-0.2 rounded border border-[#3E2F2A]/15 tabular-nums"
+                  title={`${pHandCount} cartas en mano`}
+                >
+                  {pHandCount}c
+                </span>
+              </div>
+            );
+          })}
+
+          <span
+            className="hidden md:inline-block text-[11px] font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-2 py-1 rounded-xl tabular-nums"
+            title="Fichas restantes en la bolsa"
+          >
+            Bolsa: {gameState.bag.length}
+          </span>
+        </div>
+
+        {/* Right: Rival Hands Dropdown, "Ver café" 3D Modal, Log/Chat Drawer, Settings */}
+        <div className="flex items-center gap-1 text-xs relative">
+          {/* Rival Hands Dropdown Trigger */}
+          <div className="relative">
+            <button
+              type="button"
+              data-testid="rival-hands-btn"
+              onClick={() => setRivalHandsOpen((v) => !v)}
+              aria-expanded={rivalHandsOpen}
+              className="min-h-[36px] sm:min-h-[34px] px-2.5 py-1 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/15 font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer whitespace-nowrap"
+            >
+              Manos
+            </button>
+
+            {rivalHandsOpen && (
+              <div
+                data-testid="rival-hands-popover"
+                className="
+                  fixed sm:absolute right-2 sm:right-0 top-14 sm:top-full mt-1 z-50
+                  w-[min(92vw,340px)] bg-[#FFF9F0] text-[#3E2F2A] rounded-2xl p-3
+                  border-2 border-[#8B5E3C] shadow-[0_12px_32px_rgba(62,47,42,0.25)] space-y-2.5
+                "
+              >
+                <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-1.5">
+                  <span className="font-serif font-bold text-sm">
+                    Manos públicas en la mesa
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setRivalHandsOpen(false)}
+                    className="text-xs font-bold text-[#6F5A4E] hover:text-[#3E2F2A] px-1.5 cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                </div>
+                {gameState.players.map((p) => {
+                  const pHand = gameState.hands[p.id] ?? [];
+                  return (
+                    <div key={p.id} className="bg-[#F7EEDF] p-2 rounded-xl space-y-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold">
+                          {p.nickname} {p.id === myPlayerId ? '(Tú)' : ''}
+                        </span>
+                        <span className="font-mono text-[11px] text-[#6F5A4E]">
+                          {p.score} pts · {pHand.length} cartas
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {pHand.map((t) => {
+                          const prof = getCharacterProfile(t.nation, t.gender);
+                          return (
+                            <div
+                              key={t.id}
+                              className="inline-flex items-center gap-1 bg-[#FFF9F0] px-1.5 py-0.5 rounded-lg border border-[#3E2F2A]/15 text-[10px]"
+                            >
+                              <FlagBadge nation={t.nation} size={11} />
+                              <span className="font-bold">{prof.name}</span>
+                              <span className="text-[#6F5A4E]">{prof.genderSymbol}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* "Ver café" 3D Diorama Modal Button */}
           <button
             type="button"
-            onClick={() => setViewMode(viewMode === '3d' ? '2d' : '3d')}
-            className="px-2.5 py-1.5 rounded-lg bg-[#F7EEDF] font-semibold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+            data-testid="open-3d-cafe-btn"
+            onClick={() => setCafeModalOpen(true)}
+            className="min-h-[36px] sm:min-h-[34px] px-2.5 py-1 rounded-xl bg-[#3F5E4A] text-[#FFF9F0] font-bold hover:opacity-95 cursor-pointer whitespace-nowrap"
           >
-            {viewMode === '3d' ? 'Vista 2D' : 'Vista 2.5D'}
+            Ver café
           </button>
-          {viewMode === '3d' && (
-            <>
-              <button
-                type="button"
-                onClick={cycleCameraAngle}
-                className="px-2.5 py-1.5 rounded-lg bg-[#F7EEDF] font-semibold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
-              >
-                Girar 90°
-              </button>
-              <button
-                type="button"
-                onClick={() => setCameraZoom(cameraZoom + 0.15)}
-                aria-label="Acercar cámara"
-                className="px-2 py-1.5 rounded-lg bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
-              >
-                +
-              </button>
-              <button
-                type="button"
-                onClick={() => setCameraZoom(cameraZoom - 0.15)}
-                aria-label="Alejar cámara"
-                className="px-2 py-1.5 rounded-lg bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
-              >
-                −
-              </button>
-              <button
-                type="button"
-                onClick={resetCamera}
-                className="px-2.5 py-1.5 rounded-lg bg-[#F7EEDF] font-semibold text-[#6F5A4E] hover:text-[#3E2F2A] cursor-pointer"
-              >
-                Centrar
-              </button>
-            </>
-          )}
+
+          {/* Lateral Log & Chat Drawer Toggle */}
+          <button
+            type="button"
+            data-testid="open-drawer-btn"
+            onClick={() => setDrawerOpen((v) => !v)}
+            className="min-h-[36px] sm:min-h-[34px] px-2.5 py-1 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/15 font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer whitespace-nowrap"
+          >
+            Tertulia ({gameState.log.length})
+          </button>
+
           <button
             type="button"
             onClick={() => setActiveModal('rules')}
-            className="px-2.5 py-1.5 rounded-lg bg-[#F7EEDF] font-semibold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+            aria-label="Reglamento"
+            className="min-h-[36px] sm:min-h-[34px] px-2 py-1 rounded-xl bg-[#F7EEDF] font-semibold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer hidden sm:inline-block"
           >
             Reglas
           </button>
+
           <button
             type="button"
             onClick={() => setActiveModal('settings')}
-            className="px-2.5 py-1.5 rounded-lg bg-[#F7EEDF] font-semibold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+            aria-label="Ajustes"
+            className="min-h-[36px] sm:min-h-[34px] px-2.5 py-1 rounded-xl bg-[#F7EEDF] font-semibold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
           >
             Ajustes
           </button>
+
           <button
             type="button"
             onClick={leaveRoom}
-            className="px-2.5 py-1.5 rounded-lg text-[#A94438] font-semibold hover:bg-[#FDECEB] cursor-pointer"
+            aria-label="Salir de la partida"
+            className="min-h-[36px] sm:min-h-[34px] px-2 py-1 rounded-xl text-[#A94438] font-bold hover:bg-[#FDECEB] cursor-pointer"
           >
             Salir
           </button>
         </div>
       </header>
 
-      {/* Main Split Play Area */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1 items-start">
-        {/* Left / Center: Board + Contextual Assistance + Active Hand Dock */}
-        <div className="lg:col-span-8 xl:col-span-9 space-y-3">
-          {/* Contextual Preview / "¿Por qué no puedo?" / Error Banner */}
-          {(errorBanner || whyCannotBanner || contextualHints) && (
-            <div
-              className={`px-4 py-2.5 rounded-2xl border text-xs sm:text-sm flex flex-wrap items-center justify-between gap-2 ${
-                errorBanner || whyCannotBanner
-                  ? 'bg-[#FEF6E0] border-[#C9A227] text-[#3E2F2A]'
-                  : 'bg-[#FFF9F0] border-[#3E2F2A]/15 text-[#3E2F2A]'
-              }`}
-              data-testid="assistance-banner"
-            >
-              <div className="font-medium">
-                {errorBanner ? (
-                  <span className="text-[#A94438] font-bold">{errorBanner}</span>
-                ) : whyCannotBanner ? (
-                  <span>
-                    <strong className="text-[#C96F4A]">¿Por qué no puedo?:</strong>{' '}
-                    {whyCannotBanner}
-                  </span>
-                ) : draftPlacements.length > 0 ? (
-                  <span>
-                    <strong className="text-[#3F5E4A]">Vista previa:</strong>{' '}
-                    {draftEvaluation.summaryText}
-                  </span>
-                ) : selectedTile ? (
-                  <span>
-                    Carta seleccionada:{' '}
-                    <strong>
-                      {getNationName(selectedTile.nation)} (
-                      {selectedTile.gender === 'M' ? 'Hombre' : 'Mujer'})
-                    </strong>
-                    . Toca una silla iluminada en verde/dorado o una silla atenuada para saber por
-                    qué no admite a este invitado.
-                  </span>
-                ) : (
-                  <span>
-                    Toca una carta de tu mano abajo y luego una silla del tablero (o la barra).
-                  </span>
-                )}
-              </div>
-
-              {/* If selected tile is a Joker, allow choosing preferred represented nation */}
-              {selectedTile?.nation === 'joker' && (
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-[#6F5A4E]">Nación del comodín:</span>
-                  <select
-                    aria-label="Nacionalidad para el comodín"
-                    value={preferredJokerNation ?? ''}
-                    onChange={(e) =>
-                      setPreferredJokerNation(
-                        e.target.value ? (e.target.value as Nation) : undefined,
-                      )
-                    }
-                    className="h-8 px-2 rounded-lg bg-[#F7EEDF] border border-[#3E2F2A]/25 text-xs font-bold"
-                  >
-                    <option value="">Automática según silla</option>
-                    {Object.values(NATION_VISUALS).map((n) => (
-                      <option key={n.code} value={n.code}>
-                        {n.name} ({n.shortCode})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* 2.5D / 2D Interactive Board */}
-          <PapercraftBoard
-            gameState={gameState}
-            selectedTile={selectedTile}
-            draftPlacements={draftPlacements}
-            seatInspections={seatInspections}
-            focusedTableId={focusedTableId}
-            viewMode={viewMode}
-            cameraAngleIndex={cameraAngleIndex}
-            cameraZoom={cameraZoom}
-            nightMode={nightMode}
-            reducedMotion={reducedMotion}
-            onSeatClick={handleSeatClick}
-            onTableClick={handleTableClick}
-            onBarClick={handleBarClick}
-          />
-
-          {/* Player Hand & Turn Action Bar */}
+      {/* CENTER BOARD WORKSPACE (Takes remaining height, zero overflow) */}
+      <div className="flex-1 min-h-0 w-full flex items-center justify-center relative overflow-hidden">
+        {errorBanner && (
           <div
-            className="bg-[#FFF9F0] rounded-[20px] border border-[#3E2F2A]/15 p-2.5 sm:p-3 shadow-[0_8px_24px_rgba(62,47,42,0.08)]"
-            data-testid="player-hand-dock"
+            role="alert"
+            className="absolute top-2 left-1/2 -translate-x-1/2 z-40 px-4 py-1.5 rounded-xl bg-[#FDECEB] border border-[#A94438] text-xs font-bold text-[#A94438] shadow-md"
           >
-            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
-              <div className="flex items-center gap-2">
-                <h3 className="font-serif font-bold text-sm sm:text-base text-[#3E2F2A]">
-                  Tu mano pública ({myHand.length} cartas · máx.{' '}
-                  {gameState.handSize[myPlayerId ?? activePlayerId] ?? 5})
-                </h3>
-                <span className="text-xs text-[#6F5A4E] hidden sm:inline">
-                  · Todas las manos están boca arriba
-                </span>
-              </div>
-
-              {/* Action Controls for Draft & Joker Swaps */}
-              <div className="flex flex-wrap items-center gap-2">
-                {draftPlacements.length > 0 && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={clearDraft}
-                      className="px-3 py-1.5 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/20 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
-                    >
-                      Limpiar ({draftPlacements.length})
-                    </button>
-                    <button
-                      type="button"
-                      data-testid="confirm-move-btn"
-                      disabled={!draftEvaluation.isValidCompleteMove}
-                      onClick={() => {
-                        const first = draftPlacements[0];
-                        if (!first) return;
-                        const second = draftPlacements[1];
-                        void submitMove({
-                          type: 'seat',
-                          placements: second ? [first, second] : [first],
-                        });
-                      }}
-                      className="px-3.5 py-1.5 rounded-xl bg-[#3F5E4A] text-[#FFF9F0] text-xs font-bold shadow-xs hover:opacity-95 disabled:opacity-40 cursor-pointer"
-                    >
-                      Confirmar jugada (+{draftEvaluation.totalPoints} pts)
-                    </button>
-                  </>
-                )}
-
-                {availableSwapMoves.map((sw, idx) => (
-                  <button
-                    key={`${sw.seatId}-${idx}`}
-                    type="button"
-                    onClick={() => void submitMove(sw)}
-                    className="px-3 py-1.5 rounded-xl bg-[#C9A227] text-[#3E2F2A] text-xs font-bold hover:opacity-95 cursor-pointer"
-                  >
-                    Cambiar comodín en silla {sw.seatId}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Cards Grid (compact guest cards) */}
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-              {myHand.map((tile) => {
-                const isSelected = selectedTileId === tile.id;
-                const isInDraft = draftPlacements.some((d) => d.tileId === tile.id);
-                const meta =
-                  tile.nation === 'joker'
-                    ? null
-                    : NATION_VISUALS[tile.nation as NationKey];
-
-                return (
-                  <button
-                    key={tile.id}
-                    type="button"
-                    data-tile-id={tile.id}
-                    disabled={isInDraft}
-                    onClick={() => selectTile(isSelected ? null : tile.id)}
-                    aria-label={`Carta ${getNationName(tile.nation)} ${
-                      tile.gender === 'M' ? 'Hombre' : 'Mujer'
-                    }`}
-                    className={`group flex items-center gap-2 p-2 rounded-xl border-2 transition-all cursor-pointer select-none ${
-                      isInDraft
-                        ? 'opacity-40 bg-[#F7EEDF] border-[#3E2F2A]/20'
-                        : isSelected
-                          ? 'bg-[#FEF6E0] border-[#C96F4A] -translate-y-0.5 shadow-sm'
-                          : 'bg-[#F7EEDF] border-[#3E2F2A]/20 hover:border-[#3E2F2A]'
-                    }`}
-                  >
-                    <CharacterPortrait nation={tile.nation} gender={tile.gender} size={38} />
-                    <div className="text-left min-w-0 flex-1">
-                      <div className="flex items-center gap-1">
-                        <FlagBadge nation={tile.nation} size={13} />
-                        <span className="font-mono font-bold text-[10px] text-[#3E2F2A]">
-                          {tile.nation === 'joker' ? '★ COM' : meta?.shortCode}·
-                          {tile.gender === 'M' ? 'H' : 'M'}
-                        </span>
-                      </div>
-                      <span className="block font-serif font-bold text-xs text-[#3E2F2A] truncate mt-0.5">
-                        {getNationName(tile.nation)}
-                      </span>
-                      <span className="block text-[10px] text-[#6F5A4E] leading-none">
-                        {tile.gender === 'M' ? 'Caballero' : 'Dama'}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+            {errorBanner}
           </div>
+        )}
+
+        <IllustratedBoard
+          gameState={gameState}
+          selectedTile={selectedTile}
+          draftPlacements={draftPlacements}
+          seatInspections={seatInspections}
+          focusedTableId={focusedTableId}
+          nightMode={nightMode}
+          reducedMotion={reducedMotion}
+          chairToast={chairToast}
+          onDismissToast={() => setChairToast(null)}
+          onSeatClick={handleSeatClick}
+          onTableClick={handleTableClick}
+          onBarClick={handleBarClick}
+        />
+      </div>
+
+      {/* BOTTOM FIXED HAND DOCK (2:3 Fanned Character Cards + Confirm Action) */}
+      <section
+        aria-label="Tu mano de invitados"
+        data-testid="player-hand-dock"
+        className="shrink-0 bg-[#FFF9F0] rounded-2xl border border-[#3E2F2A]/15 px-2.5 py-1.5 sm:px-4 sm:py-2 shadow-[0_-4px_18px_rgba(62,47,42,0.08)] z-30 flex flex-col sm:flex-row items-center justify-between gap-2"
+      >
+        {/* Left / Top Mini Status & Joker Nation Selector */}
+        <div className="flex flex-wrap items-center justify-between w-full sm:w-auto gap-2">
+          <div className="text-xs">
+            <span className="font-serif font-bold text-[#3E2F2A] block leading-tight">
+              Tu mano ({myHand.length}/{gameState.handSize[myPlayerId ?? activePlayerId] ?? 5})
+            </span>
+            <span className="text-[11px] text-[#6F5A4E] hidden md:inline">
+              {draftPlacements.length > 0
+                ? draftEvaluation.summaryText
+                : selectedTile
+                  ? 'Elige una silla iluminada o sirve en la barra central'
+                  : 'Toca un personaje para iluminar sus sillas'}
+            </span>
+          </div>
+
+          {selectedTile?.nation === 'joker' && (
+            <label className="inline-flex items-center gap-1 text-[11px] font-bold text-[#6F5A4E]">
+              <span>País comodín:</span>
+              <select
+                aria-label="Nacionalidad para el comodín"
+                value={preferredJokerNation ?? ''}
+                onChange={(e) =>
+                  setPreferredJokerNation(
+                    e.target.value ? (e.target.value as Nation) : undefined,
+                  )
+                }
+                className="h-8 px-2 rounded-lg bg-[#F7EEDF] border border-[#3E2F2A]/25 text-xs font-bold text-[#3E2F2A]"
+              >
+                <option value="">Automático</option>
+                {Object.values(NATION_VISUALS).map((n) => (
+                  <option key={n.code} value={n.code}>
+                    {n.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
         </div>
 
-        {/* Right Sidebar: Scoreboard, Bag, Rivals' Public Hands, Log & Chat */}
-        <aside className="lg:col-span-4 xl:col-span-3 space-y-3">
-          {/* Scoreboard & Bag Counter */}
-          <div className="bg-[#FFF9F0] rounded-[24px] border border-[#3E2F2A]/15 p-4 shadow-xs space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="font-serif font-bold text-base">Marcador y manos</h3>
-              <span
-                className={`text-xs font-bold tabular-nums px-2.5 py-1 rounded-lg ${
-                  gameState.bag.length <= 6
-                    ? 'bg-[#FDECEB] text-[#A94438]'
-                    : 'bg-[#F7EEDF] text-[#6F5A4E]'
+        {/* Center: Fanned 2:3 Character Cards (5-col fit on mobile, fanned arc on desktop) */}
+        <div className="grid grid-cols-5 gap-1 w-full sm:w-auto sm:flex sm:items-end sm:justify-center sm:gap-2.5 py-0.5">
+          {myHand.map((tile, idx) => {
+            const isSelected = selectedTileId === tile.id;
+            const isInDraft = draftPlacements.some((d) => d.tileId === tile.id);
+            const profile = getCharacterProfile(tile.nation, tile.gender, tile.jokerNation);
+            const mid = (myHand.length - 1) / 2;
+            const fanAngle = reducedMotion ? 0 : (idx - mid) * 2.2;
+            const fanLift = reducedMotion ? 0 : Math.abs(idx - mid) * 1.5;
+
+            return (
+              <button
+                key={tile.id}
+                type="button"
+                data-tile-id={tile.id}
+                disabled={isInDraft}
+                onClick={() => selectTile(isSelected ? null : tile.id)}
+                aria-label={`Carta ${profile.name}, ${profile.countryName}, ${profile.genderLabel}`}
+                style={{
+                  transform: isSelected
+                    ? 'translateY(-6px) scale(1.04)'
+                    : `translateY(${fanLift}px) rotate(${fanAngle}deg)`,
+                }}
+                className={`group relative aspect-[2/3] w-full sm:w-auto sm:h-[124px] min-h-[92px] rounded-xl border-2 px-1 sm:px-1.5 py-1 flex flex-col items-center justify-between text-center transition-all cursor-pointer select-none shrink-0 ${
+                  isInDraft
+                    ? 'opacity-35 bg-[#F7EEDF] border-[#3E2F2A]/20'
+                    : isSelected
+                      ? 'bg-[#FEF6E0] border-[#C96F4A] shadow-[0_8px_18px_rgba(201,111,74,0.28)] z-20'
+                      : 'bg-[#FFF9F0] border-[#3E2F2A]/25 hover:border-[#3E2F2A] shadow-xs'
                 }`}
-                title="La partida termina si quedan 3 fichas en la bolsa tras robar"
               >
-                Bolsa: {gameState.bag.length} fichas
-              </span>
-            </div>
-
-            <div className="space-y-2.5">
-              {gameState.players.map((p) => {
-                const pHand = gameState.hands[p.id] ?? [];
-                const isTurn = gameState.turn === p.id;
-                return (
-                  <div
-                    key={p.id}
-                    className={`p-3 rounded-2xl border ${
-                      isTurn
-                        ? 'bg-[#FEF6E0] border-[#C96F4A]'
-                        : 'bg-[#F7EEDF] border-[#3E2F2A]/10'
+                {/* Card Header: Flag + Country Name + Gender Symbol */}
+                <div className="w-full flex items-center justify-between gap-0.5 text-[8px] sm:text-[10px] font-bold text-[#3E2F2A]">
+                  <span className="inline-flex items-center gap-0.5 truncate">
+                    <FlagBadge nation={tile.nation} size={10} />
+                    <span className="truncate">{profile.countryName}</span>
+                  </span>
+                  <span
+                    className={`shrink-0 font-extrabold ${
+                      tile.gender === 'F' ? 'text-[#C96F4A]' : 'text-[#2F4A6D]'
                     }`}
+                    title={profile.genderLabel}
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-sm text-[#3E2F2A]">
-                        {p.nickname} {p.id === myPlayerId ? '(Tú)' : ''}
-                      </span>
-                      <span className="font-serif font-bold text-lg text-[#3E2F2A] tabular-nums">
-                        {p.score} pts
-                      </span>
-                    </div>
-                    {/* Public rival hand mini-cards */}
-                    <div className="mt-2 flex flex-wrap items-center gap-1">
-                      {pHand.map((t) => (
-                        <span
-                          key={t.id}
-                          title={`${getNationName(t.nation)} (${
-                            t.gender === 'M' ? 'Hombre' : 'Mujer'
-                          })`}
-                          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#FFF9F0] border border-[#3E2F2A]/20 text-[10px] font-mono font-bold"
-                        >
-                          <FlagBadge nation={t.nation} size={12} />
-                          {t.nation === 'joker' ? '★' : t.nation.toUpperCase()}·
-                          {t.gender === 'M' ? 'H' : 'M'}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+                    {profile.genderSymbol}
+                  </span>
+                </div>
 
-          {/* Separate Log & Chat Tabs */}
-          <div className="bg-[#FFF9F0] rounded-[24px] border border-[#3E2F2A]/15 p-4 shadow-xs flex flex-col h-[340px]">
-            <div className="flex items-center gap-1 p-1 bg-[#F7EEDF] rounded-xl mb-3">
+                {/* Large Portrait */}
+                <div className="my-auto flex items-center justify-center">
+                  <CharacterPortrait
+                    nation={tile.nation}
+                    gender={tile.gender}
+                    size={38}
+                    sipping={isSelected}
+                  />
+                </div>
+
+                {/* Character Proper Name & Personality Quote */}
+                <div className="w-full">
+                  <span className="block font-serif font-bold text-[10px] sm:text-xs text-[#3E2F2A] leading-none truncate">
+                    {profile.name}
+                  </span>
+                  <span className="hidden sm:block text-[8px] text-[#6F5A4E] italic leading-tight line-clamp-2 mt-0.5">
+                    «{profile.quote}»
+                  </span>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Right: Confirm Move / Clear Draft / Joker Swap Actions */}
+        <div className="flex items-center justify-end gap-1.5 w-full sm:w-auto">
+          {draftPlacements.length > 0 && (
+            <>
               <button
                 type="button"
-                onClick={() => setSideTab('log')}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-bold cursor-pointer ${
-                  sideTab === 'log'
-                    ? 'bg-[#FFF9F0] text-[#3E2F2A] shadow-xs'
-                    : 'text-[#6F5A4E]'
-                }`}
+                onClick={clearDraft}
+                className="min-h-[44px] sm:min-h-[38px] px-3 py-1.5 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/20 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
               >
-                Registro ({gameState.log.length})
+                Limpiar
               </button>
               <button
                 type="button"
-                onClick={() => setSideTab('chat')}
-                className={`flex-1 py-1.5 rounded-lg text-xs font-bold cursor-pointer ${
-                  sideTab === 'chat'
-                    ? 'bg-[#FFF9F0] text-[#3E2F2A] shadow-xs'
-                    : 'text-[#6F5A4E]'
-                }`}
+                data-testid="confirm-move-btn"
+                disabled={!draftEvaluation.isValidCompleteMove}
+                onClick={() => {
+                  const first = draftPlacements[0];
+                  if (!first) return;
+                  const second = draftPlacements[1];
+                  void submitMove({
+                    type: 'seat',
+                    placements: second ? [first, second] : [first],
+                  });
+                }}
+                className="min-h-[44px] sm:min-h-[38px] px-4 py-1.5 rounded-xl bg-[#3F5E4A] text-[#FFF9F0] text-xs font-bold shadow-sm hover:opacity-95 disabled:opacity-40 cursor-pointer whitespace-nowrap"
               >
-                Chat ({snapshot.chat.length})
+                Confirmar (+{draftEvaluation.totalPoints})
+              </button>
+            </>
+          )}
+
+          {availableSwapMoves.map((sw, idx) => (
+            <button
+              key={`${sw.seatId}-${idx}`}
+              type="button"
+              onClick={() => void submitMove(sw)}
+              className="min-h-[44px] sm:min-h-[38px] px-3 py-1.5 rounded-xl bg-[#C9A227] text-[#3E2F2A] text-xs font-bold hover:opacity-95 cursor-pointer whitespace-nowrap"
+            >
+              Canjear comodín
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* ON-DEMAND "VER CAFÉ" 3D DIORAMA MODAL */}
+      {cafeModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#3E2F2A]/65 p-3 sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cafe-3d-modal-title"
+          data-testid="cafe-3d-modal"
+        >
+          <div className="w-full max-w-4xl bg-[#FFF9F0] text-[#3E2F2A] rounded-[24px] border-2 border-[#8B5E3C] p-4 sm:p-6 shadow-2xl space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#3E2F2A]/10 pb-2.5">
+              <div>
+                <h2 id="cafe-3d-modal-title" className="font-serif font-bold text-xl sm:text-2xl">
+                  Diorama 3D del Café
+                </h2>
+                <p className="text-xs text-[#6F5A4E]">
+                  Vista panorámica en papercraft de las 24 mesas, las fichas y el gato junto al tirador
+                </p>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs">
+                <button
+                  type="button"
+                  onClick={cycleCameraAngle}
+                  className="px-3 py-1.5 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+                >
+                  Girar 90°
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCameraZoom(cameraZoom + 0.15)}
+                  aria-label="Acercar cámara"
+                  className="px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+                >
+                  +
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCameraZoom(cameraZoom - 0.15)}
+                  aria-label="Alejar cámara"
+                  className="px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+                >
+                  −
+                </button>
+                <button
+                  type="button"
+                  onClick={resetCamera}
+                  className="px-3 py-1.5 rounded-xl bg-[#F7EEDF] font-semibold text-[#6F5A4E] hover:text-[#3E2F2A] cursor-pointer"
+                >
+                  Centrar
+                </button>
+                <button
+                  type="button"
+                  data-testid="close-3d-cafe-btn"
+                  onClick={() => setCafeModalOpen(false)}
+                  className="px-4 py-1.5 rounded-xl bg-[#C96F4A] text-[#FFF9F0] font-bold cursor-pointer"
+                >
+                  Volver al tablero
+                </button>
+              </div>
+            </div>
+
+            <PapercraftBoard
+              gameState={gameState}
+              selectedTile={selectedTile}
+              draftPlacements={draftPlacements}
+              seatInspections={seatInspections}
+              focusedTableId={focusedTableId}
+              viewMode="3d"
+              cameraAngleIndex={cameraAngleIndex}
+              cameraZoom={cameraZoom}
+              nightMode={nightMode}
+              reducedMotion={reducedMotion}
+              onSeatClick={handleSeatClick}
+              onTableClick={handleTableClick}
+              onBarClick={handleBarClick}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ON-DEMAND SLIDE-OVER LATERAL DRAWER FOR MOVE LOG & CHAT */}
+      {drawerOpen && (
+        <div
+          className="fixed inset-0 z-50 flex justify-end bg-[#3E2F2A]/40"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Registro de jugadas y chat"
+          data-testid="log-chat-drawer"
+        >
+          <div className="w-full max-w-sm h-full bg-[#FFF9F0] text-[#3E2F2A] p-4 shadow-2xl border-l-2 border-[#8B5E3C] flex flex-col justify-between">
+            <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-3">
+              <div className="flex items-center gap-1 bg-[#F7EEDF] p-1 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setSideTab('log')}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
+                    sideTab === 'log'
+                      ? 'bg-[#FFF9F0] text-[#3E2F2A] shadow-2xs'
+                      : 'text-[#6F5A4E]'
+                  }`}
+                >
+                  Registro ({gameState.log.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSideTab('chat')}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
+                    sideTab === 'chat'
+                      ? 'bg-[#FFF9F0] text-[#3E2F2A] shadow-2xs'
+                      : 'text-[#6F5A4E]'
+                  }`}
+                >
+                  Chat ({snapshot.chat.length})
+                </button>
+              </div>
+              <button
+                type="button"
+                data-testid="close-drawer-btn"
+                onClick={() => setDrawerOpen(false)}
+                className="px-3 py-1 rounded-xl bg-[#F7EEDF] text-xs font-bold text-[#3E2F2A] cursor-pointer"
+              >
+                Cerrar ✕
               </button>
             </div>
 
             {sideTab === 'log' ? (
               <div
-                className="flex-1 overflow-y-auto space-y-2 pr-1 text-xs"
+                className="flex-1 overflow-y-auto space-y-2 py-3 pr-1 text-xs"
                 data-testid="move-log-list"
               >
                 {gameState.log.length === 0 ? (
@@ -1038,16 +1253,22 @@ export function PlayingScreen(): React.ReactElement {
                       let desc = '';
                       let delta: number | null = null;
                       if (ev.type === 'tile_seated') {
+                        const prof = getCharacterProfile(
+                          ev.tile.nation,
+                          ev.tile.gender,
+                          ev.tile.jokerNation,
+                        );
                         pid = ev.playerId;
-                        desc = `sentó a ${getNationName(ev.tile.nation)} en ${ev.seatId}`;
+                        desc = `sentó a ${prof.name} (${prof.countryName})`;
                         delta = ev.pointsEarned;
                       } else if (ev.type === 'tile_bar') {
+                        const prof = getCharacterProfile(ev.tile.nation, ev.tile.gender);
                         pid = ev.playerId;
-                        desc = `envió a ${getNationName(ev.tile.nation)} a la barra (#${ev.barIndex + 1})`;
+                        desc = `sirvió a ${prof.name} en la barra (#${ev.barIndex + 1})`;
                         delta = ev.pointsDelta;
                       } else if (ev.type === 'joker_swapped') {
                         pid = ev.playerId;
-                        desc = `intercambió el comodín de ${ev.seatId}`;
+                        desc = `canjeó el comodín en mesa`;
                         delta = 0;
                       } else if (ev.type === 'turn_timeout_auto_move') {
                         pid = ev.playerId;
@@ -1065,7 +1286,7 @@ export function PlayingScreen(): React.ReactElement {
                       return (
                         <div
                           key={`${ev.type}-${i}`}
-                          className="p-2 rounded-xl bg-[#F7EEDF] text-[#3E2F2A] flex items-center justify-between gap-2"
+                          className="p-2.5 rounded-xl bg-[#F7EEDF] text-[#3E2F2A] flex items-center justify-between gap-2"
                         >
                           <div>
                             <span className="font-bold">{pl?.nickname ?? pid}:</span>{' '}
@@ -1086,7 +1307,7 @@ export function PlayingScreen(): React.ReactElement {
                 )}
               </div>
             ) : (
-              <div className="flex-1 flex flex-col min-h-0">
+              <div className="flex-1 flex flex-col min-h-0 py-3">
                 <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 text-xs mb-2">
                   {snapshot.chat.length === 0 ? (
                     <p className="text-[#6F5A4E] italic">
@@ -1104,7 +1325,6 @@ export function PlayingScreen(): React.ReactElement {
                   )}
                 </div>
 
-                {/* Quick Emote Bar */}
                 <div className="flex items-center justify-between gap-1 mb-2">
                   {['☕ ¡Salud!', '🥐 ¡Buena mesa!', '👏 ¡Bravo!', '🎩 ¡Qué elegancia!'].map(
                     (emote) => (
@@ -1112,7 +1332,7 @@ export function PlayingScreen(): React.ReactElement {
                         key={emote}
                         type="button"
                         onClick={() => void sendChat(emote, true)}
-                        className="px-2 py-1 rounded-lg bg-[#F7EEDF] hover:bg-[#EAD9C0] text-[11px] font-semibold cursor-pointer"
+                        className="px-2.5 py-1.5 rounded-lg bg-[#F7EEDF] hover:bg-[#EAD9C0] text-xs font-semibold cursor-pointer"
                       >
                         {emote.split(' ')[0]}
                       </button>
@@ -1135,11 +1355,11 @@ export function PlayingScreen(): React.ReactElement {
                     onChange={(e) => setChatInput(e.target.value)}
                     placeholder="Mensaje corto..."
                     maxLength={120}
-                    className="flex-1 h-9 px-2.5 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/20 text-xs"
+                    className="flex-1 h-10 px-3 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/20 text-xs"
                   />
                   <button
                     type="submit"
-                    className="px-3 h-9 rounded-xl bg-[#C96F4A] text-[#FFF9F0] text-xs font-bold cursor-pointer"
+                    className="px-3.5 h-10 rounded-xl bg-[#C96F4A] text-[#FFF9F0] text-xs font-bold cursor-pointer"
                   >
                     Enviar
                   </button>
@@ -1147,8 +1367,8 @@ export function PlayingScreen(): React.ReactElement {
               </div>
             )}
           </div>
-        </aside>
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1156,9 +1376,30 @@ export function PlayingScreen(): React.ReactElement {
 export function FinishedScreen(): React.ReactElement {
   const snapshot = useGameStore((s) => s.snapshot);
   const shareResult = useGameStore((s) => s.shareResult);
+  const reducedMotion = useGameStore((s) => s.reducedMotion);
   const voteRematch = useGameStore((s) => s.voteRematch);
   const leaveRoom = useGameStore((s) => s.leaveRoom);
   const [postcardUrl, setPostcardUrl] = useState<string | null>(null);
+  const [recountStep, setRecountStep] = useState<'table' | 'penalty' | 'final'>('table');
+
+  useEffect(() => {
+    if (reducedMotion) {
+      setRecountStep('final');
+      return;
+    }
+    const t1 = setTimeout(() => {
+      soundEngine.playSfx('coinPenalty');
+      setRecountStep('penalty');
+    }, 650);
+    const t2 = setTimeout(() => {
+      soundEngine.playSfx('coinClink');
+      setRecountStep('final');
+    }, 1350);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [reducedMotion]);
 
   if (!snapshot || !snapshot.gameState) return <div />;
 
@@ -1178,6 +1419,8 @@ export function FinishedScreen(): React.ReactElement {
       };
     })
     .sort((a, b) => b.finalScore - a.finalScore);
+
+  const isSharedVictory = summary.winners.length > 1;
 
   const reasonLabels: Record<string, string> = {
     last_seat_occupied: 'Se ha ocupado la última silla del café.',
@@ -1236,12 +1479,42 @@ export function FinishedScreen(): React.ReactElement {
   };
 
   return (
-    <div className="min-h-screen p-4 sm:p-8 max-w-3xl mx-auto flex flex-col justify-center">
-      <div className="bg-[#FFF9F0] rounded-[24px] border border-[#3E2F2A]/15 p-6 sm:p-8 shadow-[0_8px_24px_rgba(62,47,42,0.14)] space-y-6">
+    <div className="min-h-screen p-4 sm:p-8 max-w-3xl mx-auto flex flex-col justify-center relative overflow-hidden">
+      {/* Winner Coin Shower Animation */}
+      {!reducedMotion && recountStep === 'final' && (
+        <div
+          className="pointer-events-none fixed inset-0 z-10 overflow-hidden"
+          aria-hidden="true"
+          data-testid="winner-coin-shower"
+        >
+          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((idx) => (
+            <div
+              key={idx}
+              style={{
+                left: `${8 + idx * 7.8}%`,
+                top: '-32px',
+                animation: `fallCoin ${1.8 + (idx % 3) * 0.4}s ease-in ${(idx % 4) * 0.18}s forwards`,
+              }}
+              className="fixed"
+            >
+              <CoinChip denomination={idx % 3 === 0 ? 10 : idx % 2 === 0 ? 5 : 1} size={26} />
+            </div>
+          ))}
+          <style>{`
+            @keyframes fallCoin {
+              0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+              85% { opacity: 1; }
+              100% { transform: translateY(92vh) rotate(320deg); opacity: 0; }
+            }
+          `}</style>
+        </div>
+      )}
+
+      <div className="relative z-20 bg-[#FFF9F0] rounded-[24px] border border-[#3E2F2A]/15 p-6 sm:p-8 shadow-[0_8px_24px_rgba(62,47,42,0.14)] space-y-6">
         <div className="text-center space-y-1">
           <span className="text-xs font-bold text-[#C96F4A]">Recuento de cierre del café</span>
           <h1 className="font-serif font-bold text-3xl sm:text-4xl text-[#3E2F2A]">
-            {summary.winners.length > 1 ? '¡Victoria compartida!' : '¡Fin de la partida!'}
+            {isSharedVictory ? '¡Victoria compartida!' : '¡Fin de la partida!'}
           </h1>
           <p className="text-sm text-[#6F5A4E]">
             {reasonLabels[
@@ -1252,31 +1525,59 @@ export function FinishedScreen(): React.ReactElement {
           </p>
         </div>
 
-        {/* Final Standings Breakdown */}
+        {/* Final Standings Breakdown with Animated Recount & Coin Trays */}
         <div className="space-y-2.5">
-          {standings.map((st, idx) => (
-            <div
-              key={st.id}
-              className={`p-4 rounded-2xl border flex flex-wrap items-center justify-between gap-3 ${
-                st.isWinner
-                  ? 'bg-[#FEF6E0] border-[#C9A227] border-2'
-                  : 'bg-[#F7EEDF] border-[#3E2F2A]/10'
-              }`}
-            >
-              <div>
-                <span className="font-serif font-bold text-lg text-[#3E2F2A]">
-                  {idx + 1}. {st.nickname} {st.isWinner ? '🏆' : ''}
-                </span>
-                <span className="block text-xs text-[#6F5A4E] tabular-nums">
-                  Mesas y barra: {st.tablePoints} pts · En mano: {st.naturalLeft} naturales (-
-                  {st.naturalLeft * 5}) y {st.jokerLeft} comodines (-{st.jokerLeft * 10})
-                </span>
+          {standings.map((st, idx) => {
+            const shownScore =
+              recountStep === 'table' ? st.tablePoints : st.finalScore;
+
+            return (
+              <div
+                key={st.id}
+                className={`p-4 rounded-2xl border flex flex-wrap items-center justify-between gap-3 transition-all ${
+                  st.isWinner
+                    ? 'bg-[#FEF6E0] border-[#C9A227] border-2 shadow-sm'
+                    : 'bg-[#F7EEDF] border-[#3E2F2A]/10'
+                }`}
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-serif font-bold text-lg text-[#3E2F2A]">
+                      {idx + 1}. {st.nickname} {st.isWinner ? '🏆' : ''}
+                    </span>
+                    {st.isWinner && isSharedVictory && (
+                      <span className="text-xs font-bold text-[#3F5E4A]">
+                        · Victoria compartida
+                      </span>
+                    )}
+                  </div>
+                  <span className="block text-xs text-[#6F5A4E] tabular-nums">
+                    Mesas y barra: <strong>{st.tablePoints} pts</strong>
+                    {recountStep !== 'table' && (
+                      <>
+                        {' · '}Penalización de mano:{' '}
+                        <strong className="text-[#A94438]">
+                          -{Math.abs(st.penalty)} pts
+                        </strong>{' '}
+                        ({st.naturalLeft} naturales y {st.jokerLeft} comodines)
+                      </>
+                    )}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <CoinTray
+                    score={shownScore}
+                    playerId={st.id}
+                    reducedMotion={reducedMotion}
+                  />
+                  <div className="font-serif font-bold text-2xl text-[#3E2F2A] tabular-nums">
+                    <AnimatedScore value={shownScore} reducedMotion={reducedMotion} /> pts
+                  </div>
+                </div>
               </div>
-              <div className="font-serif font-bold text-2xl text-[#3E2F2A] tabular-nums">
-                {st.finalScore} pts
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {postcardUrl && (
@@ -1284,6 +1585,7 @@ export function FinishedScreen(): React.ReactElement {
             <img
               src={postcardUrl}
               alt="Postal de resultado de Cafetulia"
+              referrerPolicy="no-referrer"
               className="mx-auto rounded-xl border border-[#3E2F2A]/20 max-h-60"
             />
             <a

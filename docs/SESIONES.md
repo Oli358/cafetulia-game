@@ -5,6 +5,56 @@
 
 ---
 
+## Sesión 011 — 2026-10-25 — Rediseño de UI v3
+
+**Objetivo:** integrar la nueva versión de Argon con el rediseño visual: pantalla única, tablero ilustrado, cartas con personalidad y monedas animadas.
+
+**Hecho:**
+- Extraído y analizado `cafetulia (2).zip`.
+- Integrados los nuevos componentes:
+  - `IllustratedBoard.tsx`: tablero ilustrado con mesas, sillas, fichas, barra central y nombres.
+  - `CoinTray.tsx`: bandeja de monedas 1/5/10, contador animado y capa de monedas voladoras.
+  - `CHARACTER_ROSTER` en `packages/ui`: 24 personajes + 2 comodines con nombre, país, frase y pedido.
+- Nuevo layout de partida en `100dvh`, sin scroll de página, con:
+  - Header compacto con sala, turno, temporizador y marcador de monedas.
+  - Manos rivales en desplegable.
+  - “Ver café” como modal 3D.
+  - Registro y chat en cajón lateral.
+  - Mano fija abajo con cartas 2:3 en abanico.
+  - “¿Por qué no puedo?” como toast junto a la silla.
+- Conservadas nuestras correcciones de servidor/engine/Playwright/Node.
+- Corregidos:
+  - La bandeja mostraba una moneda de 1 con 0 puntos.
+  - La cámara del modal 3D recortaba la parte inferior del tablero.
+  - Las etiquetas de motivos de fin de partida.
+- Verificado:
+  - `npx pnpm typecheck` → OK.
+  - `npx pnpm test` → **44 tests en verde**.
+  - `npx pnpm build` → OK.
+  - `npx pnpm lint` → sin errores.
+  - `npx playwright test` → **1 E2E en verde**.
+  - **Sin scroll** en 1280×800 y 390×844.
+  - Capturas nuevas en `docs/referencias/ui-partida.png`, `ui-partida-movil.png` y `ui-cafe-3d.png`.
+
+**Decisiones:**
+- Rediseño de UI v1.1 integrado y verificado (D-062).
+- 24 personajes con nombre y frase + 2 comodines (D-063).
+- Monedas 1/5/10 con animación de ida y vuelta (D-064).
+
+**Problemas:**
+- El tablero ilustrado sigue siendo muy denso: 24 mesas + 68 sillas con banderas compiten entre sí. Habría que reducir el ruido visual de las sillas vacías.
+- El bundle principal pesa ~830 KB (Three.js incluido).
+- La PWA no tiene service worker/offline.
+- Falta probar en iPhone/Android reales y desplegar en Render.
+
+**Siguiente:**
+1. Desplegar en Render.
+2. Probar en móviles reales.
+3. Simplificar el tablero: sillas vacías con color/forma, no bandera; bandera solo en mesas y sillas compartidas.
+4. Añadir service worker y code-splitting.
+
+---
+
 ## Sesión 010 — 2026-10-25 — Integración de la v2 completa
 
 **Objetivo:** analizar `cafetulia (1).zip`, integrar la nueva versión y comprobar si realmente funciona.

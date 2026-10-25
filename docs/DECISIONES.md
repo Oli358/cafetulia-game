@@ -67,3 +67,6 @@ Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 | D-059 | 2026-10-25 | Node 22.5+ obligatorio; Node 24.20.0 LTS instalado | Cerrada | El servidor usa `node:sqlite`; Node 20 no lo soporta |
 | D-060 | 2026-10-25 | `npx pnpm dev` arranca el servidor full-stack | Cerrada | API + Vite en <http://localhost:3000>; Playwright usa el mismo comando |
 | D-061 | 2026-10-25 | Rejilla 2D con coordenadas 0–12 | Cerrada | Corrige el desplazamiento de filas/columnas del tablero |
+| D-062 | 2026-10-25 | Rediseño de UI v1.1 integrado | Cerrada | Pantalla única sin scroll, tablero ilustrado, cartas 2:3, modal 3D y cajón de registro/chat |
+| D-063 | 2026-10-25 | 24 personajes con nombre y frase + 2 comodines | Cerrada | `CHARACTER_ROSTER` en `packages/ui` |
+| D-064 | 2026-10-25 | Monedas 1/5/10 con animación de ida y vuelta | Cerrada | Al puntuar vuelan a la bandeja; al penalizar, a la barra |
