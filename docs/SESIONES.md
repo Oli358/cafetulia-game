@@ -12,6 +12,7 @@
 **Hecho:**
 - Creado `docs/ARGON/11-pulido-visual-animaciones.md` con el encargo completo.
 - Añadida una auditoría crítica de la v7: portada/lobby aún demasiado “dashboard”, botones e iconos genéricos, tipografía sin Fraunces/Nunito, falta de profundidad y de lenguaje de movimiento.
+- Añadida una sección específica de **fondos vivos y hover**: parallax suave, vapor, luz ambiental y micro-reacciones en menú/lobby/tablero, con límite de 60 fps y respeto a táctil/reduced motion.
 - El alcance queda cerrado a presentación y movimiento: sin tocar reglas, motor, servidor, `board.json`, cuentas, matchmaking ni modo asíncrono.
 - Se preservan las correcciones ganadas: mano centrada, cabecera, overlays, PWA, sala perdida, `O & A`, 49 tests y 2 E2E.
 - Preparado el ZIP `cafetulia-v8-visual.zip` con el prompt, el código base, capturas de referencia y las fotos de cartas en `references/cards/` (solo inspiración, fuera del build).

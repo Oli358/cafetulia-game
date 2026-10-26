@@ -118,6 +118,19 @@ La secuencia ya existe; llévala al nivel de una **postal de despedida**:
 - Stagger en ranking y listas; no animaciones eternas; 60 fps; transform/opacity preferentemente.
 - Todo debe funcionar con teclado y con `prefers-reduced-motion`.
 
+## Fondos vivos y hover
+
+Sí: quiero fondos animados y reactivos al puntero, pero **sutiles y de autor**, no una feria de partículas. La escena debe respirar y responder al jugador sin distraer del tablero.
+
+- **Portada**: escena en capas con parallax muy leve al mover el ratón (ventana, planta, gato, tocadiscos, mesa y avatar a distintas profundidades, 3–8 px). El vapor de la taza sube en bucle lento; el gato mueve la cola; el vinilo gira; la luz de la ventana cambia muy despacio.
+- **Hover de menú**: al pasar sobre **Jugar**, la taza se eleva un poco y sale una bocanada de vapor; al pasar sobre **Crear sala**, la servilleta/mantel se arruga y aparece un sello; al pasar sobre **Unirse**, la llave gira o se ilumina el ojo de la cerradura. Son micro-reacciones de 150–250 ms, no animaciones eternas.
+- **Lobby**: al pasar sobre una silla, el avatar se endereza o la silla se acerca; al pasar sobre la servilleta del código, se levanta una esquina; al pasar sobre “Listo” o “Empezar”, el sello/campana reaccionan.
+- **Tablero**: al pasar sobre una mesa, un foco cálido muy suave ilumina su bandera y sus sillas; al pasar sobre una silla legal, la ficha fantasma se asienta; al pasar sobre la barra, el siguiente posavasos respira. El fondo de madera puede tener un brillo de luz que sigue al puntero muy sutilmente, sin mover el tablero.
+- **Fondos**: textura de papel/madera con una capa de luz ambiental animada (gradiente muy lento, grano casi imperceptible, sombra de vapor). Nada de canvas pesado ni decenas de partículas; usa CSS, SVG y transform/opacity.
+- **Hover solo en escritorio**: en táctil no hay hover real; usa press/tap y animaciones ambientales. No escondas información solo en hover.
+- **Rendimiento**: 60 fps, sin layout shift, sin animar `width`/`height`/`top`/`left`; respeta `prefers-reduced-motion` y ofrece un modo sin parallax.
+- **No** pongas hover a todos los elementos a la vez. Elige 3–5 interacciones protagonistas por pantalla; el resto, estático y limpio.
+
 ## Móvil, rendimiento y accesibilidad
 
 - 390×844 y 1920×900/1280×800: sin scroll de página, sin solapes, texto legible y 44 px táctiles.
@@ -154,6 +167,7 @@ La secuencia ya existe; llévala al nivel de una **postal de despedida**:
 - La portada y el lobby se sienten como una escena de café de autor, no como un formulario con tarjetas.
 - El tablero tiene profundidad, jerarquía y materiales coherentes; las fichas se leen mejor que las mesas.
 - Los botones y transiciones tienen un lenguaje táctil común, no fades genéricos.
+- Hay un fondo vivo sutil y al menos 3 interacciones hover memorables en portada/lobby/tablero, sin ruido ni pérdida de 60 fps.
 - La mano sigue centrada y sin solapes en 1920, 1280 y 390.
 - Se mantienen los 49 tests, los 2 E2E y todas las salvaguardas.
 - No se han tocado reglas, tablero, servidor ni arte oficial.
