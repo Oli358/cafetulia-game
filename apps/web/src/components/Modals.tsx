@@ -196,7 +196,7 @@ export function AnchoredPopover({
               width: `${coords.width}px`,
               maxHeight: 'calc(100dvh - 16px)',
             }}
-            className="pointer-events-auto overflow-y-auto bg-[#FFF9F0] text-[#3E2F2A] rounded-2xl p-3 border-2 border-[#231712] ring-1 ring-inset ring-[#C9A227]/45 shadow-[0_12px_28px_rgba(35,23,18,0.28)] text-xs"
+            className="pointer-events-auto overflow-y-auto cafe-paper-sheet text-[#3E2F2A] rounded-2xl p-3 text-xs"
           >
             {children}
           </motion.div>
@@ -227,7 +227,7 @@ export function ActiveModalLayer(): React.ReactElement | null {
           initial={reducedMotion ? false : { opacity: 0, scale: 0.95, y: 8 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: reducedMotion ? 0 : 0.16 }}
-          className="w-full max-w-md rounded-[22px] bg-[#FFF9F0] text-[#3E2F2A] p-6 shadow-[0_12px_28px_rgba(35,23,18,0.3)] border-2 border-[#231712]"
+          className="w-full max-w-md rounded-[22px] cafe-paper-sheet text-[#3E2F2A] p-6"
         >
           <h3 id="neg-confirm-title" className="font-serif font-bold text-2xl text-[#A94438]">
             Confirmar jugada con puntos negativos
@@ -246,7 +246,7 @@ export function ActiveModalLayer(): React.ReactElement | null {
                 soundEngine.playSfx('uiCancel');
                 setPendingNegativeConfirm(null);
               }}
-              className="px-4 py-2.5 rounded-xl bg-[#F7EEDF] text-[#3E2F2A] font-semibold text-sm border border-[#231712]/25 hover:bg-[#EAD9C0] cursor-pointer"
+              className="px-4 py-2.5 rounded-xl cafe-btn-paper text-[#3E2F2A] font-semibold text-sm cursor-pointer"
             >
               Cancelar
             </button>
@@ -290,7 +290,7 @@ export function ActiveModalLayer(): React.ReactElement | null {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
             transition={{ duration: reducedMotion ? 0 : 0.18, ease: 'easeOut' }}
-            className="w-full max-w-2xl rounded-[24px] bg-[#FFF9F0] text-[#3E2F2A] p-5 sm:p-7 shadow-[0_14px_34px_rgba(35,23,18,0.3)] border-2 border-[#231712] ring-1 ring-inset ring-[#C9A227]/40 my-auto max-h-[90dvh] overflow-y-auto"
+            className="w-full max-w-2xl rounded-[24px] cafe-paper-sheet text-[#3E2F2A] p-5 sm:p-7 my-auto max-h-[90dvh] overflow-y-auto"
           >
             {activeModal === 'tutorial' && (
               <TutorialContent onClose={() => setActiveModal(null)} />
@@ -314,12 +314,12 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
 
   return (
     <div>
-      <div className="flex items-center justify-between gap-2 border-b border-[#3E2F2A]/10 pb-3">
+      <div className="flex items-center justify-between gap-2 cafe-double-rule pb-3">
         <div>
-          <span className="text-xs font-semibold text-[#C96F4A]">
-            Tutorial interactivo · Paso {step} de 3
+          <span className="text-[11px] font-extrabold uppercase tracking-[0.14em] text-[#C96F4A]">
+            Cuaderno de bienvenida · Paso {step} de 3
           </span>
-          <h2 className="font-serif font-bold text-2xl sm:text-3xl mt-0.5">
+          <h2 className="font-serif font-bold text-2xl sm:text-3xl mt-0.5 text-[#231712]">
             {step === 1 && '1. Abrir una mesa con una pareja'}
             {step === 2 && '2. Aprovechar una silla compartida'}
             {step === 3 && '3. Mandar un invitado a la barra'}
@@ -328,7 +328,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
         <button
           type="button"
           onClick={onClose}
-          className="px-3 py-1.5 rounded-xl bg-[#F7EEDF] text-xs font-semibold text-[#6F5A4E] hover:text-[#3E2F2A] border border-[#3E2F2A]/15 cursor-pointer"
+          className="px-3 py-1.5 rounded-xl cafe-btn-paper text-xs font-bold text-[#3E2F2A] cursor-pointer"
         >
           Cerrar
         </button>
@@ -336,14 +336,14 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
 
       <div className="mt-4 space-y-4">
         {step === 1 && (
-          <div className="bg-[#F7EEDF] p-4 rounded-2xl border border-[#3E2F2A]/10 space-y-3">
+          <div className="cafe-paper-subpanel p-4 rounded-2xl space-y-3">
             <p className="text-sm text-[#3E2F2A] leading-relaxed">
               En <strong>Cafetulia</strong> ningún invitado puede quedarse solo en una mesa vacía
               (salvo en la jugada inaugural de la partida). Para abrir una mesa nueva debes sentar{' '}
               <strong>un hombre y una mujer del país</strong> en el mismo turno.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4 py-2">
-              <div className="flex items-center gap-2 bg-[#FFF9F0] px-3 py-2 rounded-xl border border-[#3E2F2A]/15">
+              <div className="flex items-center gap-2 bg-[#FFF9F0] px-3 py-2 rounded-xl border border-[#231712]/20 shadow-2xs">
                 <CharacterPortrait nation="fr" gender="M" size={44} />
                 <div className="text-xs">
                   <div className="font-bold">Henri · Francia (HOMBRE)</div>
@@ -351,7 +351,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
                 </div>
               </div>
               <span className="font-serif font-bold text-xl text-[#C96F4A]">+</span>
-              <div className="flex items-center gap-2 bg-[#FFF9F0] px-3 py-2 rounded-xl border border-[#3E2F2A]/15">
+              <div className="flex items-center gap-2 bg-[#FFF9F0] px-3 py-2 rounded-xl border border-[#231712]/20 shadow-2xs">
                 <CharacterPortrait nation="fr" gender="F" size={44} />
                 <div className="text-xs">
                   <div className="font-bold">Colette · Francia (MUJER)</div>
@@ -365,7 +365,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
                 soundEngine.playSfx('tilePlace');
                 setStepDone(true);
               }}
-              className="w-full py-2.5 rounded-xl bg-[#C96F4A] text-[#FFF9F0] font-bold text-sm cursor-pointer"
+              className="w-full py-2.5 rounded-xl cafe-btn-primary font-bold text-sm cursor-pointer"
             >
               {stepDone
                 ? '✓ ¡Pareja sentada en Francia (+4 pts por misma nacionalidad)!'
@@ -375,7 +375,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
         )}
 
         {step === 2 && (
-          <div className="bg-[#F7EEDF] p-4 rounded-2xl border border-[#3E2F2A]/10 space-y-3">
+          <div className="cafe-paper-subpanel p-4 rounded-2xl space-y-3">
             <p className="text-sm text-[#3E2F2A] leading-relaxed">
               Hay <strong>28 sillas compartidas</strong> con cojín bicolor entre dos mesas vecinas.
               Al sentar allí un invitado válido, <strong>puntúas en las dos mesas a la vez</strong>,
@@ -394,7 +394,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
                 soundEngine.playSfx('pureTableToast');
                 setStepDone(true);
               }}
-              className="w-full py-2.5 rounded-xl bg-[#3F5E4A] text-[#FFF9F0] font-bold text-sm cursor-pointer"
+              className="w-full py-2.5 rounded-xl cafe-btn-sage font-bold text-sm cursor-pointer"
             >
               {stepDone
                 ? '✓ ¡Silla compartida usada (+3 en Francia y +2 en Inglaterra = +5 pts)!'
@@ -404,7 +404,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
         )}
 
         {step === 3 && (
-          <div className="bg-[#F7EEDF] p-4 rounded-2xl border border-[#3E2F2A]/10 space-y-3">
+          <div className="cafe-paper-subpanel p-4 rounded-2xl space-y-3">
             <p className="text-sm text-[#3E2F2A] leading-relaxed">
               Si no tienes jugada legal en las mesas (o prefieres reservar tus cartas), puedes
               enviar <strong>1 invitado natural a la barra</strong> (los comodines nunca van a la
@@ -417,7 +417,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
                 soundEngine.playSfx('barPositive');
                 setStepDone(true);
               }}
-              className="w-full py-2.5 rounded-xl bg-[#8B5E3C] text-[#FFF9F0] font-bold text-sm cursor-pointer"
+              className="w-full py-2.5 rounded-xl bg-[#8B5E3C] text-[#FFF9F0] border border-[#1E130E] shadow-[0_2px_0_#1E130E] font-bold text-sm cursor-pointer"
             >
               {stepDone
                 ? '✓ ¡Invitado colocado en el primer posavasos de la barra (+1 pt)!'
@@ -435,7 +435,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
             setStep((s) => (s > 1 ? ((s - 1) as 1 | 2 | 3) : s));
             setStepDone(false);
           }}
-          className="px-4 py-2 rounded-xl bg-[#F7EEDF] text-sm font-semibold disabled:opacity-40 cursor-pointer"
+          className="px-4 py-2 rounded-xl cafe-btn-paper text-sm font-semibold disabled:opacity-40 cursor-pointer"
         >
           Anterior
         </button>
@@ -446,7 +446,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
               setStep((s) => ((s + 1) as 1 | 2 | 3));
               setStepDone(false);
             }}
-            className="px-5 py-2.5 rounded-xl bg-[#C96F4A] text-[#FFF9F0] font-bold text-sm cursor-pointer"
+            className="px-5 py-2.5 rounded-xl cafe-btn-primary font-bold text-sm cursor-pointer"
           >
             Siguiente paso
           </button>
@@ -454,7 +454,7 @@ function TutorialContent({ onClose }: { onClose: () => void }): React.ReactEleme
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2.5 rounded-xl bg-[#3F5E4A] text-[#FFF9F0] font-bold text-sm cursor-pointer"
+            className="px-5 py-2.5 rounded-xl cafe-btn-sage font-bold text-sm cursor-pointer"
           >
             Terminar tutorial
           </button>
@@ -482,19 +482,26 @@ function RulesContent({ onClose }: { onClose: () => void }): React.ReactElement 
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-3">
-        <h2 className="font-serif font-bold text-2xl sm:text-3xl">Reglamento oficial de Cafetulia</h2>
+      <div className="flex items-center justify-between cafe-double-rule pb-3">
+        <div>
+          <span className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-[#C96F4A]">
+            Edición impresa · O &amp; A
+          </span>
+          <h2 className="font-serif font-bold text-2xl sm:text-3xl text-[#231712]">
+            Reglamento oficial de Cafetulia
+          </h2>
+        </div>
         <button
           type="button"
           onClick={onClose}
-          className="px-3.5 py-1.5 rounded-xl bg-[#C96F4A] text-[#FFF9F0] text-xs font-bold cursor-pointer"
+          className="px-3.5 py-1.5 rounded-xl cafe-btn-primary text-xs font-bold cursor-pointer"
         >
           Cerrar
         </button>
       </div>
 
       <div className="space-y-3 text-sm text-[#3E2F2A] leading-relaxed">
-        <section className="bg-[#F7EEDF] p-3.5 rounded-2xl">
+        <section className="cafe-paper-subpanel p-3.5 rounded-2xl">
           <h3 className="font-serif font-bold text-base">1. Componentes y manos públicas</h3>
           <p className="mt-1 text-xs sm:text-sm text-[#6F5A4E]">
             100 fichas en la bolsa: 96 invitados (4 hombres y 4 mujeres de cada uno de los 12
@@ -503,7 +510,7 @@ function RulesContent({ onClose }: { onClose: () => void }): React.ReactElement 
           </p>
         </section>
 
-        <section className="bg-[#F7EEDF] p-3.5 rounded-2xl">
+        <section className="cafe-paper-subpanel p-3.5 rounded-2xl">
           <h3 className="font-serif font-bold text-base">2. Los 12 países (orden horario)</h3>
           <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2">
             {nationsOrder.map((code, idx) => {
@@ -511,7 +518,7 @@ function RulesContent({ onClose }: { onClose: () => void }): React.ReactElement 
               return (
                 <div
                   key={code}
-                  className="flex items-center gap-2 bg-[#FFF9F0] px-2.5 py-1.5 rounded-xl border border-[#3E2F2A]/10 text-xs"
+                  className="flex items-center gap-2 bg-[#FFF9F0] px-2.5 py-1.5 rounded-xl border border-[#3E2F2A]/15 text-xs"
                 >
                   <FlagBadge nation={code} size={18} />
                   <span className="font-semibold">
@@ -523,7 +530,7 @@ function RulesContent({ onClose }: { onClose: () => void }): React.ReactElement 
           </div>
         </section>
 
-        <section className="bg-[#F7EEDF] p-3.5 rounded-2xl">
+        <section className="cafe-paper-subpanel p-3.5 rounded-2xl">
           <h3 className="font-serif font-bold text-base">3. Reglas para sentar invitados</h3>
           <ul className="mt-1 list-disc list-inside text-xs sm:text-sm text-[#6F5A4E] space-y-1">
             <li>
@@ -542,7 +549,7 @@ function RulesContent({ onClose }: { onClose: () => void }): React.ReactElement 
           </ul>
         </section>
 
-        <section className="bg-[#F7EEDF] p-3.5 rounded-2xl">
+        <section className="cafe-paper-subpanel p-3.5 rounded-2xl">
           <h3 className="font-serif font-bold text-base">
             4. Puntuación, monedas, cambiar comodín y barra
           </h3>
@@ -588,39 +595,39 @@ function StatsContent({ onClose }: { onClose: () => void }): React.ReactElement 
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-3">
-        <h2 className="font-serif font-bold text-2xl sm:text-3xl">
+      <div className="flex items-center justify-between cafe-double-rule pb-3">
+        <h2 className="font-serif font-bold text-2xl sm:text-3xl text-[#231712]">
           Estadísticas locales e historial
         </h2>
         <button
           type="button"
           onClick={onClose}
-          className="px-3.5 py-1.5 rounded-xl bg-[#C96F4A] text-[#FFF9F0] text-xs font-bold cursor-pointer"
+          className="px-3.5 py-1.5 rounded-xl cafe-btn-primary text-xs font-bold cursor-pointer"
         >
           Cerrar
         </button>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="bg-[#F7EEDF] p-3.5 rounded-2xl">
+        <div className="cafe-paper-subpanel p-3.5 rounded-2xl">
           <span className="text-xs text-[#6F5A4E]">Partidas jugadas</span>
           <div className="font-serif font-bold text-2xl tabular-nums mt-1">
             {localStats.gamesPlayed}
           </div>
         </div>
-        <div className="bg-[#F7EEDF] p-3.5 rounded-2xl">
+        <div className="cafe-paper-subpanel p-3.5 rounded-2xl">
           <span className="text-xs text-[#6F5A4E]">Victorias</span>
           <div className="font-serif font-bold text-2xl text-[#3F5E4A] tabular-nums mt-1">
             {localStats.wins}
           </div>
         </div>
-        <div className="bg-[#F7EEDF] p-3.5 rounded-2xl">
+        <div className="cafe-paper-subpanel p-3.5 rounded-2xl">
           <span className="text-xs text-[#6F5A4E]">Nación favorita</span>
           <div className="font-serif font-bold text-lg mt-1">
             {favNationEntry ? getNationName(favNationEntry[0]) : 'Aún sin datos'}
           </div>
         </div>
-        <div className="bg-[#F7EEDF] p-3.5 rounded-2xl">
+        <div className="cafe-paper-subpanel p-3.5 rounded-2xl">
           <span className="text-xs text-[#6F5A4E]">Tertuliano habitual</span>
           <div className="font-serif font-bold text-lg mt-1 truncate">
             {topRivalEntry ? topRivalEntry[0] : 'Aún sin datos'}
@@ -633,7 +640,7 @@ function StatsContent({ onClose }: { onClose: () => void }): React.ReactElement 
           Últimas 5 partidas registradas en el servidor
         </h3>
         {recentMatches.length === 0 ? (
-          <p className="text-sm text-[#6F5A4E] bg-[#F7EEDF] p-4 rounded-2xl">
+          <p className="text-sm text-[#6F5A4E] cafe-paper-subpanel p-4 rounded-2xl">
             Todavía no hay partidas finalizadas en este servidor.
           </p>
         ) : (
@@ -641,7 +648,7 @@ function StatsContent({ onClose }: { onClose: () => void }): React.ReactElement 
             {recentMatches.map((m) => (
               <div
                 key={m.id}
-                className="flex flex-wrap items-center justify-between gap-2 bg-[#F7EEDF] px-4 py-2.5 rounded-2xl text-xs"
+                className="flex flex-wrap items-center justify-between gap-2 cafe-paper-subpanel px-4 py-2.5 rounded-2xl text-xs"
               >
                 <div>
                   <span className="font-bold">Sala {m.roomCode}</span>
@@ -694,28 +701,40 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-3">
-        <h2 className="font-serif font-bold text-2xl sm:text-3xl">Ajustes y perfil</h2>
+      <div className="flex items-center justify-between cafe-double-rule pb-3">
+        <div>
+          <span className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-[#C96F4A]">
+            Mesa de control del café · O &amp; A
+          </span>
+          <h2 className="font-serif font-bold text-2xl sm:text-3xl text-[#231712]">
+            Ajustes y perfil
+          </h2>
+        </div>
         <button
           type="button"
           onClick={onClose}
-          className="px-3.5 py-1.5 rounded-xl bg-[#C96F4A] text-[#FFF9F0] text-xs font-bold cursor-pointer"
+          className="px-3.5 py-1.5 rounded-xl cafe-btn-primary text-xs font-bold cursor-pointer"
         >
           Guardar y cerrar
         </button>
       </div>
 
       {/* Profile & Avatar Dropdown (16 pre-made avatars, no photo upload) */}
-      <div className="bg-[#F7EEDF] p-3.5 rounded-2xl space-y-2.5 relative">
+      <div className="cafe-paper-subpanel p-3.5 rounded-2xl space-y-2.5 relative">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 className="font-serif font-bold text-base">Tu perfil y avatar</h3>
+          <div>
+            <h3 className="font-serif font-bold text-base text-[#231712]">
+              Tu tarjeta de tertuliano
+            </h3>
+            <p className="text-[11px] text-[#6F5A4E]">Apodo de mesa y emblema ilustrado</p>
+          </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
               data-testid="settings-avatar-dropdown-btn"
               aria-expanded={avatarOpen}
               onClick={() => setAvatarOpen((v) => !v)}
-              className="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl bg-[#FFF9F0] border border-[#3E2F2A]/25 text-xs font-bold cursor-pointer hover:bg-[#FEF6E0]"
+              className="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl cafe-btn-paper text-xs font-bold cursor-pointer"
             >
               <PlayerAvatar avatarId={avatarId} size={24} />
               <span>{currentAvatar?.label ?? 'Avatar'}</span>
@@ -736,13 +755,13 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
               onChange={(e) => setNickname(e.target.value)}
               maxLength={24}
               aria-label="Tu apodo"
-              className="px-2.5 py-1.5 rounded-xl bg-[#FFF9F0] border border-[#3E2F2A]/20 text-xs font-bold w-36"
+              className="px-2.5 py-1.5 rounded-xl bg-[#FFF9F0] border-[1.5px] border-[#231712]/35 text-xs font-bold w-36 shadow-inner"
             />
           </div>
         </div>
         {avatarOpen && (
           <div
-            className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 bg-[#FFF9F0] p-2.5 rounded-2xl border border-[#8B5E3C] shadow-md"
+            className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 bg-[#FFF9F0] p-2.5 rounded-2xl border-2 border-[#8B5E3C] shadow-md"
             role="radiogroup"
             aria-label="Seleccionar avatar prehecho"
           >
@@ -777,16 +796,16 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
         )}
       </div>
 
-      {/* Sound Controls ("Sonido del café") */}
+      {/* Sound Controls ("Sonido del café" — Tocadiscos y acústica de salón) */}
       <div
         data-testid="settings-sound-section"
-        className="bg-[#F7EEDF] p-3.5 rounded-2xl space-y-3 border border-[#231712]/12"
+        className="cafe-paper-subpanel p-3.5 rounded-2xl space-y-3"
       >
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <h3 className="font-serif font-bold text-base">Sonido del café</h3>
+            <h3 className="font-serif font-bold text-base text-[#231712]">Sonido del café</h3>
             <p className="text-[11px] text-[#6F5A4E]">
-              Música lo-fi de 24 compases, ambiente de salón y efectos táctiles
+              Tocadiscos lo-fi de 24 compases, murmullo de salón y efectos táctiles
             </p>
           </div>
           <div className="flex items-center gap-1.5">
@@ -799,7 +818,7 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
                 }
                 soundEngine.playSfx('uiPlay');
               }}
-              className="min-h-[36px] px-3 py-1.5 rounded-xl bg-[#FEF6E0] text-[#3E2F2A] border border-[#C9A227] text-xs font-bold hover:bg-[#F2C14E]/35 cursor-pointer"
+              className="min-h-[36px] px-3 py-1.5 rounded-xl bg-[#FEF6E0] text-[#231712] border-[1.5px] border-[#C9A227] shadow-[0_2px_0_#1E130E] text-xs font-bold hover:bg-[#F2C14E]/35 cursor-pointer"
             >
               Probar sonido
             </button>
@@ -815,10 +834,10 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
                   soundEngine.playSfx('uiToggle');
                 }
               }}
-              className={`min-h-[36px] px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer border ${
+              className={`min-h-[36px] px-3 py-1.5 rounded-xl text-xs font-bold cursor-pointer ${
                 vols.muted
-                  ? 'bg-[#A94438] text-[#FFF9F0] border-[#231712]'
-                  : 'bg-[#FFF9F0] text-[#3E2F2A] border-[#3E2F2A]/25 hover:bg-[#EAD9C0]'
+                  ? 'bg-[#A94438] text-[#FFF9F0] border-[1.5px] border-[#1E130E] shadow-[0_2px_0_#1E130E]'
+                  : 'cafe-btn-paper text-[#3E2F2A]'
               }`}
             >
               {vols.muted ? 'Silenciado (activar)' : 'Silenciar todo'}
@@ -828,7 +847,9 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
 
         {/* Music Mood Selector: Tertulia / Lluvia / Noche */}
         <div className="space-y-1">
-          <span className="text-xs font-bold text-[#6F5A4E] block">Ambiente musical</span>
+          <span className="text-xs font-bold text-[#6F5A4E] block">
+            Ambiente musical del tocadiscos
+          </span>
           <div
             className="grid grid-cols-3 gap-1.5"
             role="radiogroup"
@@ -851,8 +872,8 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
                   title={m.desc}
                   className={`min-h-[38px] px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-colors cursor-pointer ${
                     active
-                      ? 'bg-[#FEF6E0] border-[#C96F4A] text-[#231712] ring-1 ring-[#C96F4A]'
-                      : 'bg-[#FFF9F0] border-[#3E2F2A]/15 text-[#6F5A4E] hover:text-[#3E2F2A]'
+                      ? 'bg-[#FEF6E0] border-[#C96F4A] text-[#231712] ring-1 ring-[#C96F4A] shadow-[0_2px_0_#1E130E]'
+                      : 'bg-[#FFF9F0] border-[#3E2F2A]/20 text-[#6F5A4E] hover:text-[#3E2F2A]'
                   }`}
                 >
                   {m.label}
@@ -933,8 +954,10 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
       </div>
 
       {/* Visual & Accessibility toggles */}
-      <div className="bg-[#F7EEDF] p-3.5 rounded-2xl space-y-2.5 text-xs sm:text-sm">
-        <h3 className="font-serif font-bold text-base mb-1">Subtítulos, pantalla y accesibilidad</h3>
+      <div className="cafe-paper-subpanel p-3.5 rounded-2xl space-y-2.5 text-xs sm:text-sm">
+        <h3 className="font-serif font-bold text-base mb-1 text-[#231712]">
+          Subtítulos, lámparas y accesibilidad
+        </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pb-1">
           <label className="block text-xs font-bold text-[#6F5A4E]">
@@ -943,7 +966,7 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
               data-testid="settings-subtitle-mode-select"
               value={subtitleMode}
               onChange={(e) => setSubtitleMode(e.target.value as 'off' | 'key' | 'all')}
-              className="mt-1 w-full h-9 px-2.5 rounded-xl bg-[#FFF9F0] border border-[#3E2F2A]/20 text-xs font-bold text-[#3E2F2A]"
+              className="mt-1 w-full h-9 px-2.5 rounded-xl bg-[#FFF9F0] border-[1.5px] border-[#3E2F2A]/25 text-xs font-bold text-[#3E2F2A]"
             >
               <option value="off">Desactivados</option>
               <option value="key">Solo momentos clave</option>
@@ -957,7 +980,7 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
               data-testid="settings-subtitle-style-select"
               value={subtitleStyle}
               onChange={(e) => setSubtitleStyle(e.target.value as 'comic' | 'cafe' | 'arcade')}
-              className="mt-1 w-full h-9 px-2.5 rounded-xl bg-[#FFF9F0] border border-[#3E2F2A]/20 text-xs font-bold text-[#3E2F2A]"
+              className="mt-1 w-full h-9 px-2.5 rounded-xl bg-[#FFF9F0] border-[1.5px] border-[#3E2F2A]/25 text-xs font-bold text-[#3E2F2A]"
             >
               <option value="comic">Cómic (bocadillo de tinta)</option>
               <option value="cafe">Café (etiqueta de papel)</option>
@@ -1023,7 +1046,7 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
           type="button"
           data-testid="open-stats-from-settings"
           onClick={() => setActiveModal('stats')}
-          className="flex-1 py-2.5 px-3 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/15 text-xs font-bold hover:bg-[#EAD9C0] cursor-pointer"
+          className="flex-1 py-2.5 px-3 rounded-xl cafe-btn-paper text-xs font-bold cursor-pointer"
         >
           Estadísticas e historial
         </button>
@@ -1031,7 +1054,7 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
           type="button"
           data-testid="install-pwa-btn"
           onClick={() => void handleInstallPwa()}
-          className="flex-1 py-2.5 px-3 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/15 text-xs font-bold hover:bg-[#EAD9C0] cursor-pointer"
+          className="flex-1 py-2.5 px-3 rounded-xl cafe-btn-paper text-xs font-bold cursor-pointer"
         >
           Instalar en móvil (PWA)
         </button>
@@ -1043,17 +1066,17 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
 function IosPwaContent({ onClose }: { onClose: () => void }): React.ReactElement {
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-3">
+      <div className="flex items-center justify-between cafe-double-rule pb-3">
         <h2 className="font-serif font-bold text-2xl">Instalar Cafetulia en tu móvil</h2>
         <button
           type="button"
           onClick={onClose}
-          className="px-3.5 py-1.5 rounded-xl bg-[#C96F4A] text-[#FFF9F0] text-xs font-bold cursor-pointer"
+          className="px-3.5 py-1.5 rounded-xl cafe-btn-primary text-xs font-bold cursor-pointer"
         >
           Entendido
         </button>
       </div>
-      <div className="bg-[#F7EEDF] p-4 rounded-2xl space-y-2 text-sm text-[#3E2F2A]">
+      <div className="cafe-paper-subpanel p-4 rounded-2xl space-y-2 text-sm text-[#3E2F2A]">
         <p className="font-bold">En iPhone o iPad (Safari):</p>
         <ol className="list-decimal list-inside space-y-1 text-xs sm:text-sm text-[#6F5A4E]">
           <li>
@@ -1067,7 +1090,7 @@ function IosPwaContent({ onClose }: { onClose: () => void }): React.ReactElement
           </li>
         </ol>
       </div>
-      <div className="bg-[#F7EEDF] p-4 rounded-2xl space-y-2 text-sm text-[#3E2F2A]">
+      <div className="cafe-paper-subpanel p-4 rounded-2xl space-y-2 text-sm text-[#3E2F2A]">
         <p className="font-bold">En Android (Chrome):</p>
         <p className="text-xs sm:text-sm text-[#6F5A4E]">
           Abre el menú de tres puntos arriba a la derecha y pulsa{' '}

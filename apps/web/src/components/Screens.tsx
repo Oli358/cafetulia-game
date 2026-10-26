@@ -349,297 +349,365 @@ function SubtitlesDropdownPicker({ compact = false }: { compact?: boolean }): Re
 }
 
 /**
- * SVG Illustration of the Cafetulia corner scene:
- * Arched window with warm light, hanging plant, vinyl turntable, sleeping cat,
- * wooden café table, steaming porcelain cup, and O & A brass plaque.
+ * Panoramic Layered Café Stage SVG:
+ * Used both as the full-stage atmospheric backdrop and the interactive counter corner.
+ * Includes arched window with golden sunbeams, swaying hanging plant, spinning vinyl turntable,
+ * sleeping cat moving its tail, brass O & A plaque, espresso machine, and steaming cup.
  */
 function CafeCornerIllustration({
   reducedMotion,
+  parallax = { x: 0, y: 0 },
   compact = false,
 }: {
   reducedMotion: boolean;
+  parallax?: { x: number; y: number };
   compact?: boolean;
 }): React.ReactElement {
+  const bgTx = reducedMotion ? 0 : parallax.x * 2.5;
+  const bgTy = reducedMotion ? 0 : parallax.y * 1.8;
+  const midTx = reducedMotion ? 0 : parallax.x * 5;
+  const midTy = reducedMotion ? 0 : parallax.y * 3.5;
+  const fgTx = reducedMotion ? 0 : parallax.x * 7.5;
+  const fgTy = reducedMotion ? 0 : parallax.y * 4.5;
+
   return (
     <svg
-      viewBox="0 0 360 190"
+      viewBox="0 0 460 230"
+      preserveAspectRatio={compact ? 'xMidYMid meet' : 'xMidYMid slice'}
       aria-hidden="true"
       className={
         compact
-          ? 'w-28 sm:w-36 h-16 sm:h-20 shrink-0 rounded-xl border border-[#231712]/20 bg-[#F4E6D0]'
-          : 'w-full h-36 xl:h-44 rounded-2xl border border-[#231712]/20 bg-[#F4E6D0] shadow-inner'
+          ? 'w-full h-[104px] sm:h-[126px] rounded-2xl border-2 border-[#231712] bg-[#F2E3CA] shadow-[inset_0_2px_8px_rgba(35,23,18,0.12),0_3px_0_#231712] block'
+          : 'w-full h-[192px] xl:h-[220px] rounded-[20px] border-2 border-[#231712] bg-[#F2E3CA] shadow-[inset_0_2px_10px_rgba(35,23,18,0.14),0_4px_0_#231712] block'
       }
     >
       <defs>
-        <linearGradient id="cafeWallGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#F8EDD9" />
-          <stop offset="100%" stopColor="#E6D2B5" />
+        <linearGradient id="cafeWallGradV8" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#F9EFE0" />
+          <stop offset="68%" stopColor="#EAD6B8" />
+          <stop offset="100%" stopColor="#DEC39E" />
         </linearGradient>
-        <linearGradient id="windowSkyGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#FCE7B2" />
-          <stop offset="60%" stopColor="#F5C483" />
-          <stop offset="100%" stopColor="#D99B66" />
+        <linearGradient id="windowSkyGradV8" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#FFF2C2" />
+          <stop offset="55%" stopColor="#F5C47E" />
+          <stop offset="100%" stopColor="#D68C54" />
+        </linearGradient>
+        <linearGradient id="sunbeamGradV8" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#FFF7D6" stopOpacity="0.48" />
+          <stop offset="100%" stopColor="#FFF7D6" stopOpacity="0" />
         </linearGradient>
       </defs>
 
-      {/* Warm paper wall */}
-      <rect x="0" y="0" width="360" height="190" fill="url(#cafeWallGrad)" />
-
-      {/* Wainscoting / wood paneling */}
-      <rect x="0" y="132" width="360" height="58" fill="#6F4E37" opacity="0.22" />
-      <line x1="0" y1="132" x2="360" y2="132" stroke="#3E2F2A" strokeWidth="1.5" opacity="0.35" />
-
-      {/* Arched Café Window (Left-Center) */}
-      <g transform="translate(26, 16)">
-        <path
-          d="M0 105 L0 44 A48 44 0 0 1 96 44 L96 105 Z"
-          fill="url(#windowSkyGrad)"
-          stroke="#3E2F2A"
-          strokeWidth="3"
-        />
-        {/* Distant rooftops & sun */}
-        <circle cx="68" cy="36" r="11" fill="#FFF6D6" opacity="0.85" />
-        <path d="M4 103 L24 80 L44 103 Z" fill="#8C583A" opacity="0.35" />
-        <path d="M36 103 L64 74 L92 103 Z" fill="#5C3A28" opacity="0.35" />
-        {/* Window muntins */}
-        <line x1="48" y1="2" x2="48" y2="105" stroke="#3E2F2A" strokeWidth="2" />
-        <line x1="2" y1="56" x2="94" y2="56" stroke="#3E2F2A" strokeWidth="2" />
-
-        {/* Sleeping Cat on the windowsill */}
-        <g transform="translate(56, 86)">
-          {/* Cat body curled */}
-          <ellipse cx="16" cy="11" rx="14" ry="8" fill="#3E2F2A" />
-          {/* Cat head */}
-          <circle cx="7" cy="9" r="6" fill="#3E2F2A" />
-          {/* Ears */}
-          <polygon points="3,4 5,0 8,4" fill="#3E2F2A" />
-          <polygon points="8,4 11,0 13,4" fill="#3E2F2A" />
-          {/* Closed eye */}
-          <path d="M4 9 Q6 11 8 9" stroke="#F7EEDF" strokeWidth="1.2" fill="none" />
-          {/* Tail */}
-          <path
-            d="M28 13 Q35 15 32 20"
-            stroke="#3E2F2A"
-            strokeWidth="3"
-            strokeLinecap="round"
-            fill="none"
+      {/* LAYER 1: Wallpaper, Wainscoting & Framed Prints */}
+      <g transform={`translate(${bgTx}, ${bgTy})`}>
+        <rect x="-16" y="-16" width="492" height="262" fill="url(#cafeWallGradV8)" />
+        {/* Subtle vertical café wallpaper stripes */}
+        {[30, 80, 130, 180, 230, 280, 330, 380, 430].map((x) => (
+          <line
+            key={x}
+            x1={x}
+            y1="0"
+            x2={x}
+            y2="156"
+            stroke="#8B5E3C"
+            strokeWidth="1"
+            opacity="0.11"
           />
-          {/* Subtle Zzz */}
+        ))}
+        {/* Dark wood wainscoting paneling */}
+        <rect x="-16" y="154" width="492" height="86" fill="#6E472B" opacity="0.28" />
+        <line x1="-16" y1="154" x2="476" y2="154" stroke="#231712" strokeWidth="2.2" />
+      </g>
+
+      {/* LAYER 2: Arched Window, Sunbeams, Hanging Plant, Brass O & A Plaque, Turntable */}
+      <g transform={`translate(${midTx}, ${midTy})`}>
+        {/* Arched Café Window (Left) */}
+        <g transform="translate(22, 14)">
+          <path
+            d="M0 128 L0 54 A62 52 0 0 1 124 54 L124 128 Z"
+            fill="url(#windowSkyGradV8)"
+            stroke="#231712"
+            strokeWidth="3.4"
+          />
+          {/* Afternoon sun & European café rooftops */}
+          <circle cx="88" cy="40" r="14" fill="#FFFDF4" opacity="0.9" />
+          <path d="M4 126 L30 92 L58 126 Z" fill="#8C583A" opacity="0.42" />
+          <path d="M44 126 L80 84 L120 126 Z" fill="#5C3A28" opacity="0.45" />
+          {/* Window muntin bars */}
+          <line x1="62" y1="3" x2="62" y2="128" stroke="#231712" strokeWidth="2.6" />
+          <line x1="3" y1="68" x2="121" y2="68" stroke="#231712" strokeWidth="2.6" />
+
+          {/* Diagonal golden afternoon sunbeam across the café room */}
+          <polygon
+            points="16,42 122,68 230,175 74,175"
+            fill="url(#sunbeamGradV8)"
+          />
+
+          {/* Sleeping Cat on the windowsill with animated tail */}
+          <g transform="translate(68, 106)">
+            <ellipse cx="18" cy="12" rx="16" ry="8.5" fill="#2F211C" stroke="#231712" strokeWidth="1.5" />
+            <circle cx="7" cy="10" r="7" fill="#2F211C" stroke="#231712" strokeWidth="1.5" />
+            <polygon points="2,5 5,-1 9,5" fill="#2F211C" />
+            <polygon points="8,5 12,-1 14,5" fill="#2F211C" />
+            <path d="M4 10 Q6.5 12 9 10" stroke="#FFFDF8" strokeWidth="1.4" fill="none" />
+            <path
+              d="M31 14 Q41 16 37 23"
+              stroke="#2F211C"
+              strokeWidth="3.5"
+              strokeLinecap="round"
+              fill="none"
+              className={reducedMotion ? '' : 'animate-cafe-tail'}
+            />
+          </g>
+
+          {/* Wooden Windowsill */}
+          <rect
+            x="-6"
+            y="125"
+            width="136"
+            height="7"
+            rx="2.5"
+            fill="#6E472B"
+            stroke="#231712"
+            strokeWidth="2.2"
+          />
+        </g>
+
+        {/* Hanging Botanical Plant (Swaying gently) */}
+        <g
+          transform="translate(188, 0)"
+          className={reducedMotion ? '' : 'animate-cafe-plant'}
+        >
+          <line x1="22" y1="0" x2="22" y2="26" stroke="#231712" strokeWidth="2" />
+          <path
+            d="M10 26 L34 26 L30 43 L14 43 Z"
+            fill="#C86B46"
+            stroke="#231712"
+            strokeWidth="2"
+          />
+          <ellipse cx="7" cy="32" rx="9" ry="4.5" transform="rotate(-25 7 32)" fill="#3D5B47" stroke="#231712" strokeWidth="1.5" />
+          <ellipse cx="37" cy="32" rx="9" ry="4.5" transform="rotate(25 37 32)" fill="#3D5B47" stroke="#231712" strokeWidth="1.5" />
+          <ellipse cx="22" cy="23" rx="8" ry="4.5" fill="#4E735B" stroke="#231712" strokeWidth="1.5" />
+          <path
+            d="M16 43 Q9 56 14 70"
+            stroke="#3D5B47"
+            strokeWidth="2.2"
+            fill="none"
+            strokeLinecap="round"
+          />
+          <circle cx="11" cy="56" r="4" fill="#3D5B47" stroke="#231712" strokeWidth="1.2" />
+          <circle cx="14" cy="68" r="3.5" fill="#4E735B" stroke="#231712" strokeWidth="1.2" />
+        </g>
+
+        {/* Brass O & A Commemorative Plaque on the Café Wall */}
+        <g transform="translate(182, 86)">
+          <rect
+            x="2"
+            y="3"
+            width="70"
+            height="28"
+            rx="5"
+            fill="#231712"
+            opacity="0.3"
+          />
+          <rect
+            x="0"
+            y="0"
+            width="70"
+            height="28"
+            rx="5"
+            fill="#FEF6E0"
+            stroke="#231712"
+            strokeWidth="2.2"
+          />
+          <rect
+            x="3"
+            y="3"
+            width="64"
+            height="22"
+            rx="3"
+            fill="none"
+            stroke="#C8A12A"
+            strokeWidth="1.8"
+          />
+          <circle cx="7" cy="14" r="1.5" fill="#C8A12A" />
+          <circle cx="63" cy="14" r="1.5" fill="#C8A12A" />
           <text
-            x="14"
-            y="-1"
-            fill="#6F5A4E"
-            fontSize="8"
-            fontFamily="serif"
-            fontWeight="bold"
+            x="35"
+            y="18"
+            textAnchor="middle"
+            fill="#231712"
+            fontSize="11.5"
+            fontFamily="Fraunces, serif"
+            fontWeight="800"
           >
-            z
+            O &amp; A
           </text>
         </g>
 
-        {/* Windowsill */}
-        <rect
-          x="-5"
-          y="103"
-          width="106"
-          height="6"
-          rx="2"
-          fill="#6F4E37"
-          stroke="#231712"
-          strokeWidth="1.5"
-        />
-      </g>
-
-      {/* Hanging Botanical Plant (Top Center-Right) */}
-      <g transform="translate(152, 0)">
-        <line x1="18" y1="0" x2="18" y2="24" stroke="#3E2F2A" strokeWidth="1.5" />
-        <path
-          d="M8 24 L28 24 L25 38 L11 38 Z"
-          fill="#C96F4A"
-          stroke="#231712"
-          strokeWidth="1.5"
-        />
-        {/* Trailing leaves */}
-        <ellipse cx="6" cy="30" rx="7" ry="4" transform="rotate(-25 6 30)" fill="#3F5E4A" />
-        <ellipse cx="30" cy="30" rx="7" ry="4" transform="rotate(25 30 30)" fill="#3F5E4A" />
-        <ellipse cx="18" cy="22" rx="6" ry="4" fill="#4E735B" />
-        <path
-          d="M12 38 Q6 48 10 58"
-          stroke="#3F5E4A"
-          strokeWidth="2"
-          fill="none"
-          strokeLinecap="round"
-        />
-        <circle cx="9" cy="50" r="3.5" fill="#3F5E4A" />
-        <circle cx="11" cy="58" r="3" fill="#4E735B" />
-      </g>
-
-      {/* Brass O & A Plaque on the café wall */}
-      <g transform="translate(142, 74)">
-        <rect
-          x="0"
-          y="0"
-          width="54"
-          height="22"
-          rx="4"
-          fill="#FEF6E0"
-          stroke="#C9A227"
-          strokeWidth="2"
-        />
-        <text
-          x="27"
-          y="14"
-          textAnchor="middle"
-          fill="#3E2F2A"
-          fontSize="9.5"
-          fontFamily="serif"
-          fontWeight="bold"
-        >
-          O &amp; A
-        </text>
-      </g>
-
-      {/* Side Shelf with Spinning Vinyl Turntable (Right) */}
-      <g transform="translate(242, 62)">
-        {/* Shelf */}
-        <rect
-          x="-6"
-          y="46"
-          width="102"
-          height="6"
-          rx="2"
-          fill="#6F4E37"
-          stroke="#231712"
-          strokeWidth="1.5"
-        />
-        {/* Turntable Wooden Plinth */}
-        <rect
-          x="6"
-          y="30"
-          width="76"
-          height="16"
-          rx="3"
-          fill="#8C583A"
-          stroke="#231712"
-          strokeWidth="1.6"
-        />
-        {/* Vinyl Platter / Record */}
-        <g transform="translate(40, 26)">
-          <ellipse
-            cx="0"
-            cy="0"
-            rx="26"
-            ry="7"
-            fill="#231712"
-            stroke="#3E2F2A"
-            strokeWidth="1"
-          />
-          <ellipse cx="0" cy="0" rx="9" ry="2.6" fill="#C96F4A" />
-          <circle cx="0" cy="0" r="1.5" fill="#FFF9F0" />
-        </g>
-        {/* Tonearm */}
-        <line
-          x1="68"
-          y1="22"
-          x2="50"
-          y2="27"
-          stroke="#C9A227"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        {/* Floating musical notes */}
-        <text
-          x="16"
-          y="12"
-          fill="#C96F4A"
-          fontSize="12"
-          fontWeight="bold"
-          className={reducedMotion ? '' : 'animate-pulse'}
-        >
-          ♪
-        </text>
-        <text
-          x="58"
-          y="6"
-          fill="#3F5E4A"
-          fontSize="11"
-          fontWeight="bold"
-          className={reducedMotion ? '' : 'animate-pulse'}
-        >
-          ♫
-        </text>
-      </g>
-
-      {/* Foreground Café Table & Steaming Cup */}
-      <g transform="translate(0, 134)">
-        {/* Table top */}
-        <path
-          d="M16 18 L344 18 L356 56 L4 56 Z"
-          fill="#8C583A"
-          stroke="#231712"
-          strokeWidth="2"
-        />
-        {/* Table runner / menu mat */}
-        <path
-          d="M112 22 L248 22 L256 52 L104 52 Z"
-          fill="#FFF9F0"
-          stroke="#C9A227"
-          strokeWidth="1.5"
-        />
-
-        {/* Steaming Porcelain Cup */}
-        <g transform="translate(178, 4)">
-          {/* Steam wisps */}
-          <path
-            d="M-6 -4 Q-10 -14 -4 -22"
-            stroke="#FFF9F0"
+        {/* Wooden Shelf with Spinning Vinyl Turntable & Books (Right) */}
+        <g transform="translate(292, 58)">
+          {/* Books on left of shelf */}
+          <rect x="2" y="28" width="11" height="28" rx="1.5" fill="#3D5B47" stroke="#231712" strokeWidth="1.8" />
+          <rect x="13" y="24" width="12" height="32" rx="1.5" fill="#C86B46" stroke="#231712" strokeWidth="1.8" />
+          {/* Turntable Wooden Plinth */}
+          <rect
+            x="32"
+            y="38"
+            width="94"
+            height="18"
+            rx="3.5"
+            fill="#8C583A"
+            stroke="#231712"
             strokeWidth="2.2"
+          />
+          {/* Spinning Vinyl Record Platter */}
+          <g transform="translate(76, 33)">
+            <ellipse
+              cx="0"
+              cy="0"
+              rx="32"
+              ry="9"
+              fill="#231712"
+              stroke="#3E2F2A"
+              strokeWidth="1.5"
+            />
+            <ellipse cx="0" cy="0" rx="22" ry="6" fill="none" stroke="#FFFDF8" strokeWidth="0.7" opacity="0.35" />
+            <ellipse cx="0" cy="0" rx="11" ry="3.2" fill="#C86B46" />
+            <circle cx="0" cy="0" r="2" fill="#FFFDF8" />
+          </g>
+          {/* Brass Tonearm */}
+          <line
+            x1="112"
+            y1="27"
+            x2="88"
+            y2="34"
+            stroke="#C8A12A"
+            strokeWidth="2.5"
             strokeLinecap="round"
-            fill="none"
-            opacity="0.85"
           />
-          <path
-            d="M4 -2 Q8 -12 2 -20"
-            stroke="#FFF9F0"
-            strokeWidth="2"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.75"
-          />
-          {/* Saucer */}
-          <ellipse
-            cx="0"
-            cy="24"
-            rx="20"
-            ry="5.5"
-            fill="#FFF9F0"
+          {/* Shelf plank */}
+          <rect
+            x="-6"
+            y="56"
+            width="148"
+            height="7"
+            rx="2.5"
+            fill="#6E472B"
             stroke="#231712"
-            strokeWidth="1.6"
+            strokeWidth="2.2"
           />
-          {/* Cup body */}
+          {/* Hand-drawn SVG music notes */}
+          <g
+            transform="translate(52, 6)"
+            className={reducedMotion ? '' : 'animate-cafe-steam'}
+          >
+            <circle cx="4" cy="12" r="3" fill="#C86B46" />
+            <path d="M6.5 12 V2 L14 4 V7 L6.5 5" fill="#C86B46" stroke="#231712" strokeWidth="1.2" />
+          </g>
+          <g
+            transform="translate(96, 2)"
+            className={reducedMotion ? '' : 'animate-cafe-steam-delayed'}
+          >
+            <circle cx="4" cy="11" r="2.8" fill="#3D5B47" />
+            <line x1="6.5" y1="11" x2="6.5" y2="2" stroke="#3D5B47" strokeWidth="2" />
+          </g>
+        </g>
+      </g>
+
+      {/* LAYER 3: Foreground Café Counter, Linen Runner & Steaming Cup */}
+      <g transform={`translate(${fgTx}, ${fgTy})`}>
+        <g transform="translate(0, 162)">
+          {/* Polished wood bar counter top */}
           <path
-            d="M-13 8 L13 8 L10 22 C10 25 -10 25 -10 22 Z"
-            fill="#C96F4A"
+            d="M-12 16 L472 16 L484 68 L-24 68 Z"
+            fill="#7B5236"
             stroke="#231712"
-            strokeWidth="1.6"
-          />
-          {/* Cup rim coffee */}
-          <ellipse
-            cx="0"
-            cy="8"
-            rx="13"
-            ry="3.5"
-            fill="#3E2F2A"
-            stroke="#231712"
-            strokeWidth="1.4"
-          />
-          {/* Handle */}
-          <path
-            d="M12 11 C18 11 18 19 11 19"
-            stroke="#C96F4A"
             strokeWidth="2.6"
-            fill="none"
           />
+          <line x1="0" y1="21" x2="460" y2="21" stroke="#FFFDF8" strokeWidth="1.5" opacity="0.28" />
+
+          {/* Cream linen runner mat */}
+          <path
+            d="M124 20 L336 20 L348 64 L112 64 Z"
+            fill="#FFFDF8"
+            stroke="#231712"
+            strokeWidth="2"
+          />
+          <path
+            d="M130 24 L330 24 L340 60 L120 60 Z"
+            fill="none"
+            stroke="#C8A12A"
+            strokeWidth="1.4"
+            strokeDasharray="5 3"
+          />
+
+          {/* Croissant on small plate (Left of cup) */}
+          <g transform="translate(158, 38)">
+            <ellipse cx="0" cy="7" rx="18" ry="5.5" fill="#FFFDF8" stroke="#231712" strokeWidth="1.8" />
+            <path
+              d="M-11 5 Q-8 -4 0 -4 Q8 -4 11 5 Q6 8 3 3 Q0 1 -3 3 Q-6 8 -11 5 Z"
+              fill="#D69B43"
+              stroke="#231712"
+              strokeWidth="1.8"
+            />
+          </g>
+
+          {/* Steaming Porcelain Espresso Cup (Center-Right) */}
+          <g transform="translate(248, 8)">
+            <path
+              d="M-7 -4 Q-12 -16 -4 -26"
+              stroke="#FFFDF8"
+              strokeWidth="2.6"
+              strokeLinecap="round"
+              fill="none"
+              className={reducedMotion ? '' : 'animate-cafe-steam'}
+            />
+            <path
+              d="M5 -2 Q10 -14 3 -24"
+              stroke="#FFFDF8"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              fill="none"
+              className={reducedMotion ? '' : 'animate-cafe-steam-delayed'}
+            />
+            <ellipse
+              cx="0"
+              cy="30"
+              rx="25"
+              ry="7"
+              fill="#FFFDF8"
+              stroke="#231712"
+              strokeWidth="2"
+            />
+            <path
+              d="M-16 10 L16 10 L12 28 C12 32 -12 32 -12 28 Z"
+              fill="#C86B46"
+              stroke="#231712"
+              strokeWidth="2.2"
+            />
+            <ellipse
+              cx="0"
+              cy="10"
+              rx="16"
+              ry="4.2"
+              fill="#2F211C"
+              stroke="#231712"
+              strokeWidth="1.8"
+            />
+            <path
+              d="M15 13 C23 13 23 24 14 24"
+              stroke="#C86B46"
+              strokeWidth="3.2"
+              fill="none"
+            />
+            <path
+              d="M15 13 C23 13 23 24 14 24"
+              stroke="#231712"
+              strokeWidth="1.4"
+              fill="none"
+            />
+          </g>
         </g>
       </g>
     </svg>
@@ -661,6 +729,7 @@ export function TitleScreen(): React.ReactElement {
 
   const [joinCodeInput, setJoinCodeInput] = useState('');
   const [phraseIndex, setPhraseIndex] = useState(0);
+  const [parallax, setParallax] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -680,21 +749,222 @@ export function TitleScreen(): React.ReactElement {
       kind: 'icon' as const,
     };
 
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (reducedMotion) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return;
+    const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+    const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+    setParallax({ x: Math.max(-1, Math.min(1, nx)), y: Math.max(-1, Math.min(1, ny)) });
+  };
+
   return (
     <div
-      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between px-3 py-2 sm:px-6 sm:py-4 max-w-6xl mx-auto select-none"
+      onPointerMove={handlePointerMove}
+      onPointerLeave={() => setParallax({ x: 0, y: 0 })}
+      className="relative h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between select-none"
       data-testid="title-screen"
     >
-      {/* Top compact Café Header */}
-      <header className="shrink-0 flex flex-wrap items-center justify-between gap-2 pt-0.5">
-        <div className="flex items-center gap-2.5">
-          <CafetuliaLogo />
-          <span className="hidden md:inline-block text-xs text-[#6F5A4E] font-medium border-l border-[#3E2F2A]/20 pl-2.5">
-            Tertulia internacional de mesa y café · O &amp; A
+      {/* FULL-STAGE ARCHITECTURAL CAFÉ BACKDROP (Envelops the entire viewport on 1280/1920 & mobile) */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      >
+        <svg
+          viewBox="0 0 1600 900"
+          preserveAspectRatio="xMidYMid slice"
+          className="w-full h-full block"
+        >
+          <defs>
+            <linearGradient id="stageRoomWallGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#EFE0C6" />
+              <stop offset="62%" stopColor="#E4CEAC" />
+              <stop offset="100%" stopColor="#D3B48C" />
+            </linearGradient>
+            <radialGradient id="lampGlowGrad" cx="50%" cy="35%" r="55%">
+              <stop offset="0%" stopColor="#FFF6D1" stopOpacity="0.78" />
+              <stop offset="55%" stopColor="#F9DF9B" stopOpacity="0.25" />
+              <stop offset="100%" stopColor="#F9DF9B" stopOpacity="0" />
+            </radialGradient>
+            <linearGradient id="stageWindowSky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#FFF4C9" />
+              <stop offset="60%" stopColor="#F4C37E" />
+              <stop offset="100%" stopColor="#D88D56" />
+            </linearGradient>
+          </defs>
+
+          {/* Warm afternoon plaster wall */}
+          <rect x="0" y="0" width="1600" height="900" fill="url(#stageRoomWallGrad)" />
+
+          {/* Subtle vintage café wallpaper stripes */}
+          {[
+            80, 160, 240, 320, 400, 480, 560, 640, 720, 800, 880, 960, 1040, 1120, 1200, 1280,
+            1360, 1440, 1520,
+          ].map((x) => (
+            <line
+              key={x}
+              x1={x}
+              y1="0"
+              x2={x}
+              y2="620"
+              stroke="#7B5236"
+              strokeWidth="1.5"
+              opacity="0.09"
+            />
+          ))}
+
+          {/* Top wooden crown molding beam */}
+          <rect x="0" y="0" width="1600" height="22" fill="#5A3A26" />
+          <line x1="0" y1="22" x2="1600" y2="22" stroke="#231712" strokeWidth="3" />
+
+          {/* Left Panoramic Arched Café Window & Golden Afternoon Sunbeam */}
+          <g transform="translate(56, 88)" opacity="0.88">
+            <path
+              d="M0 440 L0 160 A165 145 0 0 1 330 160 L330 440 Z"
+              fill="url(#stageWindowSky)"
+              stroke="#231712"
+              strokeWidth="5"
+            />
+            <circle cx="235" cy="115" r="36" fill="#FFFDF6" opacity="0.85" />
+            <line x1="165" y1="15" x2="165" y2="440" stroke="#231712" strokeWidth="4" />
+            <line x1="0" y1="210" x2="330" y2="210" stroke="#231712" strokeWidth="4" />
+            <line x1="0" y1="330" x2="330" y2="330" stroke="#231712" strokeWidth="3.5" />
+            <rect
+              x="-14"
+              y="436"
+              width="358"
+              height="16"
+              rx="5"
+              fill="#6E472B"
+              stroke="#231712"
+              strokeWidth="3.5"
+            />
+            {/* Diagonal sunbeam across the room */}
+            <polygon
+              points="30,120 325,205 780,620 210,620"
+              fill="#FFF8DC"
+               opacity="0.22"
+            />
+          </g>
+
+          {/* Right Café Wall Wooden Shelves with Coffee Canisters, Carafe & Framed Prints */}
+          <g transform="translate(1190, 128)" opacity="0.88">
+            {/* Framed botanical & coffee press prints */}
+            <rect
+              x="20"
+              y="0"
+              width="110"
+              height="138"
+              rx="8"
+              fill="#FFFDF8"
+              stroke="#231712"
+              strokeWidth="3.5"
+            />
+            <rect
+              x="32"
+              y="12"
+              width="86"
+              height="114"
+              rx="4"
+              fill="#F3E5CE"
+              stroke="#C8A12A"
+              strokeWidth="2"
+            />
+            <circle cx="75" cy="68" r="24" fill="#C86B46" opacity="0.85" />
+            <path d="M62 82 Q75 50 88 82" stroke="#231712" strokeWidth="3" fill="none" />
+
+            <rect
+              x="156"
+              y="18"
+              width="124"
+              height="120"
+              rx="8"
+              fill="#FFFDF8"
+              stroke="#231712"
+              strokeWidth="3.5"
+            />
+            <rect
+              x="168"
+              y="30"
+              width="100"
+              height="96"
+              rx="4"
+              fill="#E9F0E8"
+              stroke="#3D5B47"
+              strokeWidth="2"
+            />
+            <ellipse cx="218" cy="78" rx="28" ry="15" fill="#3D5B47" opacity="0.75" />
+
+            {/* Lower wooden shelf with brass espresso tins */}
+            <rect x="40" y="218" width="42" height="54" rx="5" fill="#C86B46" stroke="#231712" strokeWidth="3" />
+            <rect x="92" y="206" width="46" height="66" rx="5" fill="#3D5B47" stroke="#231712" strokeWidth="3" />
+            <rect x="150" y="224" width="38" height="48" rx="5" fill="#C8A12A" stroke="#231712" strokeWidth="3" />
+            <rect
+              x="0"
+              y="272"
+              width="310"
+              height="14"
+              rx="4"
+              fill="#6E472B"
+              stroke="#231712"
+              strokeWidth="3.5"
+            />
+          </g>
+
+          {/* Three Hanging Warm Brass & Milk-Glass Café Pendant Lamps */}
+          {[310, 800, 1290].map((lx, idx) => (
+            <g key={lx} transform={`translate(${lx}, 0)`}>
+              <circle cx="0" cy="180" r={idx === 1 ? 260 : 210} fill="url(#lampGlowGrad)" />
+              <line x1="0" y1="22" x2="0" y2={idx === 1 ? 94 : 112} stroke="#231712" strokeWidth="3.5" />
+              <path
+                d={`M-38 ${idx === 1 ? 118 : 136} Q0 ${idx === 1 ? 82 : 100} 38 ${idx === 1 ? 118 : 136} Z`}
+                fill="#C8A12A"
+                stroke="#231712"
+                strokeWidth="3"
+              />
+              <ellipse
+                cx="0"
+                cy={idx === 1 ? 122 : 140}
+                rx="22"
+                ry="9"
+                fill="#FFFDF4"
+                stroke="#231712"
+                strokeWidth="2.5"
+              />
+            </g>
+          ))}
+
+          {/* Carved Wood Wainscoting & Continuous Café Bar Horizon Across Bottom */}
+          <rect x="0" y="610" width="1600" height="290" fill="#6E472B" />
+          <rect x="0" y="610" width="1600" height="18" fill="#8C583A" stroke="#231712" strokeWidth="3" />
+          <line x1="0" y1="615" x2="1600" y2="615" stroke="#C8A12A" strokeWidth="2" opacity="0.65" />
+          {[120, 340, 560, 780, 1000, 1220, 1440].map((px) => (
+            <rect
+              key={px}
+              x={px - 80}
+              y="646"
+              width="160"
+              height="210"
+              rx="8"
+              fill="#5A3A26"
+              stroke="#231712"
+              strokeWidth="2.5"
+              opacity="0.65"
+            />
+          ))}
+        </svg>
+      </div>
+
+      {/* Top Café Awning & Chalkboard Header */}
+      <header className="relative z-10 shrink-0 w-full max-w-6xl mx-auto px-3 pt-1.5 sm:px-6 sm:pt-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2.5 bg-[#FFFDF8]/92 px-3 py-1 rounded-2xl border-2 border-[#231712] shadow-[0_3px_0_#231712]">
+          <CafetuliaLogo compact />
+          <span className="hidden md:inline-block text-xs text-[#5A453B] font-semibold border-l-2 border-[#231712]/20 pl-2.5">
+            Salón de té y tertulia internacional · O &amp; A
           </span>
         </div>
 
-        {/* Discreet rotating chalkboard phrase */}
+        {/* Hanging Slate Chalkboard with Daily Phrase */}
         <button
           type="button"
           data-testid="title-daily-phrase"
@@ -703,74 +973,90 @@ export function TitleScreen(): React.ReactElement {
             setPhraseIndex((prev) => (prev + 1) % CAFE_DAILY_PHRASES.length);
           }}
           title="Cambiar nota de la pizarra del día"
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#231712] text-[#FEF6E0] border border-[#C9A227]/60 text-[11px] sm:text-xs font-serif italic shadow-2xs hover:bg-[#3E2F2A] transition-colors cursor-pointer"
+          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#261B16] text-[#FEF6E0] border-2 border-[#C8A12A] shadow-[0_3px_0_#140D0B] text-[11px] sm:text-xs font-serif italic hover:bg-[#34251F] active:translate-y-0.5 transition-all cursor-pointer"
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#C9A227] shrink-0" aria-hidden="true" />
+          <span className="w-2 h-2 rounded-full bg-[#C8A12A] shrink-0" aria-hidden="true" />
           <span>«{dailyPhrase}»</span>
         </button>
       </header>
 
-      {/* Main Café Scene + Menu Card Grid */}
-      <div className="my-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-2.5 sm:gap-4 items-stretch min-h-0">
-        {/* Left / Top Column: Living Café Scene + Seated Protagonist Avatar */}
+      {/* Main Stage Content: Integrated Counter Scene + Unfolded Printed Café Menu Sheet */}
+      <div className="relative z-10 my-auto w-full max-w-6xl mx-auto px-3 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-5 items-center min-h-0">
+        {/* Left / Top Column (lg:col-span-5): Living Café Corner + Protagonist Seated at the Bar */}
         <section
           data-testid="title-cafe-scene"
           aria-label="Escena del salón de Cafetulia"
-          className="lg:col-span-5 bg-[#FFF9F0] rounded-[22px] border-2 border-[#231712] ring-1 ring-inset ring-[#C9A227]/40 p-2.5 sm:p-4 shadow-[0_8px_24px_rgba(35,23,18,0.12)] flex flex-col justify-between gap-2"
+          className="lg:col-span-5 rounded-[22px] border-2 border-[#231712] bg-[#3A261D] text-[#FFFDF8] shadow-[0_8px_0_#1E130E,0_16px_28px_rgba(35,23,18,0.28)] p-2 sm:p-3.5 flex flex-col justify-between gap-2"
         >
-          {/* Responsive Café Corner SVG (compact on mobile portrait, full on lg+) */}
-          <div className="flex lg:flex-col items-center lg:items-stretch gap-2.5">
-            <div className="hidden lg:block w-full">
-              <CafeCornerIllustration reducedMotion={reducedMotion} compact={false} />
+          {/* Full Café Scene on both desktop and mobile (gives real scene weight on mobile) */}
+          <div className="w-full relative">
+            <div className="hidden sm:block">
+              <CafeCornerIllustration
+                reducedMotion={reducedMotion}
+                parallax={parallax}
+                compact={false}
+              />
             </div>
-            <div className="block lg:hidden shrink-0">
-              <CafeCornerIllustration reducedMotion={reducedMotion} compact />
+            <div className="block sm:hidden">
+              <CafeCornerIllustration
+                reducedMotion={reducedMotion}
+                parallax={parallax}
+                compact
+              />
             </div>
+            <span className="pointer-events-none absolute top-2 right-2 px-2 py-0.5 rounded-md bg-[#231712]/85 text-[#FEF6E0] border border-[#C8A12A] text-[9px] font-serif italic">
+              Rincón O &amp; A
+            </span>
+          </div>
 
-            {/* Seated Protagonist Avatar at the Counter + Time-of-day Greeting */}
-            <div className="flex-1 min-w-0 flex items-center gap-2.5 sm:gap-3 bg-[#F7EEDF] p-2 sm:p-3 rounded-2xl border border-[#231712]/15">
-              <button
-                type="button"
-                data-testid="title-hero-avatar"
-                onClick={() => {
-                  soundEngine.unlock();
-                  toggleOverlay('avatar');
-                }}
-                aria-label={`Cambiar avatar actual (${currentAvatar.label})`}
-                title="Pulsa para cambiar tu avatar"
-                className="relative group shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#FFF9F0] border-2 border-[#231712] shadow-[0_2px_0_#231712] flex items-center justify-center hover:scale-103 active:scale-97 transition-transform cursor-pointer focus:outline-2 focus:outline-[#C96F4A]"
-              >
-                <PlayerAvatar avatarId={avatarId} size={38} />
-                <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-md bg-[#C96F4A] text-[#FFF9F0] text-[9px] font-extrabold border border-[#231712] shadow-2xs">
-                  Editar
-                </span>
-              </button>
+          {/* Seated Protagonist Avatar at the Counter + Time-of-Day Greeting */}
+          <div className="bg-[#FFFDF8] text-[#231712] p-2 sm:p-2.5 rounded-2xl border-2 border-[#231712] shadow-[0_3px_0_#231712] flex items-center gap-2.5 sm:gap-3">
+            <button
+              type="button"
+              data-testid="title-hero-avatar"
+              onClick={() => {
+                soundEngine.unlock();
+                toggleOverlay('avatar');
+              }}
+              aria-label={`Cambiar avatar actual (${currentAvatar.label})`}
+              title="Pulsa para cambiar tu avatar"
+              className="relative group shrink-0 w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-[#FEF6E0] border-2 border-[#231712] shadow-[0_3px_0_#231712] flex items-center justify-center hover:-translate-y-0.5 active:translate-y-0.5 transition-transform cursor-pointer focus:outline-2 focus:outline-[#C86B46]"
+            >
+              <PlayerAvatar avatarId={avatarId} size={38} />
+              <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-md bg-[#C86B46] text-[#FFFDF8] text-[9px] font-extrabold border border-[#231712]">
+                Ficha
+              </span>
+            </button>
 
-              <div className="min-w-0 flex-1">
-                <span className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-[#C96F4A] block">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#C86B46]">
                   Tu sitio en la barra
                 </span>
-                <h1
-                  data-testid="title-greeting"
-                  className="font-serif font-bold text-sm sm:text-lg text-[#231712] leading-tight truncate"
-                >
-                  {greetingText}
-                </h1>
-                <p className="text-[11px] text-[#6F5A4E] truncate mt-0.5">
-                  Sienta parejas de 12 países sin llenar la barra central.
-                </p>
+                <span className="text-[10px] font-serif italic text-[#6C564A]">
+                  · Café servido
+                </span>
               </div>
+              <h1
+                data-testid="title-greeting"
+                className="font-serif font-bold text-sm sm:text-lg text-[#231712] leading-tight truncate"
+              >
+                {greetingText}
+              </h1>
+              <p className="text-[11px] text-[#6C564A] truncate">
+                Sienta parejas de 12 naciones sin desbordar la barra.
+              </p>
             </div>
           </div>
 
-          {/* Profile strip integrated at the counter base */}
-          <div className="space-y-1.5 pt-1 border-t border-[#3E2F2A]/10">
+          {/* Guest Registry Tag (Nickname + Avatar & Subtitles Pickers) */}
+          <div className="space-y-1.5 pt-1 border-t border-dashed border-[#FFFDF8]/20">
             <div className="flex items-center gap-2">
               <label
                 htmlFor="nickname-input"
-                className="text-[11px] font-bold text-[#6F5A4E] shrink-0"
+                className="text-[11px] font-extrabold uppercase tracking-wide text-[#F5E6CE] shrink-0"
               >
-                Apodo:
+                Reserva a nombre de:
               </label>
               <input
                 id="nickname-input"
@@ -779,98 +1065,122 @@ export function TitleScreen(): React.ReactElement {
                 onChange={(e) => setNickname(e.target.value)}
                 placeholder="Tu apodo en la mesa"
                 maxLength={24}
-                className="flex-1 min-h-[40px] sm:min-h-[44px] px-3 rounded-xl bg-[#F7EEDF] border border-[#231712]/30 text-xs sm:text-sm text-[#3E2F2A] font-bold focus:outline-2 focus:outline-[#C96F4A]"
+                className="flex-1 min-h-[36px] sm:min-h-[40px] px-2.5 rounded-xl bg-[#FFFDF8] border-2 border-[#231712] text-xs sm:text-sm text-[#231712] font-bold focus:outline-2 focus:outline-[#C86B46]"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <AvatarDropdownPicker />
-              <SubtitlesDropdownPicker />
+            <div className="grid grid-cols-2 gap-1.5">
+              <AvatarDropdownPicker compact />
+              <SubtitlesDropdownPicker compact />
             </div>
           </div>
         </section>
 
-        {/* Right / Bottom Column: Carta del Café Menu Card */}
+        {/* Right / Bottom Column (lg:col-span-7): Printed Café Menu Sheet ("Carta de la Casa") */}
         <section
           data-testid="title-menu-card"
           aria-label="Carta de menú del café"
-          className="lg:col-span-7 bg-[#FFF9F0] rounded-[22px] border-2 border-[#231712] ring-1 ring-inset ring-[#C9A227]/45 p-3 sm:p-5 shadow-[0_10px_26px_rgba(35,23,18,0.14)] flex flex-col justify-between gap-2.5"
+          className="lg:col-span-7 relative cafe-paper-sheet cafe-double-frame rounded-[22px] border-2 border-[#231712] p-2.5 sm:p-5 flex flex-col justify-between gap-1.5 sm:gap-3 lg:rotate-[0.35deg]"
         >
-          {/* Menu Card Header */}
-          <div className="flex items-center justify-between border-b border-[#3E2F2A]/15 pb-1.5">
+          {/* Decorative Brass Menu Clip at Top Center */}
+          <div
+            aria-hidden="true"
+            className="hidden sm:flex absolute -top-2.5 left-1/2 -translate-x-1/2 px-4 py-0.5 rounded-full bg-[#C8A12A] border-2 border-[#231712] shadow-[0_2px_0_#231712] items-center gap-1.5"
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-[#231712]" />
+            <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#231712]">
+              Menú de salón
+            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#231712]" />
+          </div>
+
+          {/* Editorial Double-Rule Menu Header */}
+          <div className="flex items-center justify-between cafe-double-rule pb-1.5">
             <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#C96F4A] block">
-                Carta de la casa · Servicio continuo
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#C86B46] block">
+                Carta de la casa · Imprenta O &amp; A
               </span>
-              <h2 className="font-serif font-bold text-base sm:text-xl text-[#231712] leading-tight">
-                Elige tu mesa para hoy
+              <h2 className="font-serif font-bold text-base sm:text-2xl text-[#231712] leading-tight">
+                Especialidades de mesa
               </h2>
             </div>
-            <span className="px-2.5 py-0.5 rounded-full bg-[#FEF6E0] border border-[#C9A227] text-[10px] font-bold text-[#3E2F2A]">
-              2–4 jugadores
+            <span className="px-2.5 py-0.5 rounded-md bg-[#FEF6E0] border-2 border-[#231712] shadow-[2px_2px_0_#231712] text-[10px] font-extrabold uppercase tracking-wider text-[#231712] -rotate-2">
+              2–4 comensales
             </span>
           </div>
 
           {errorBanner && (
             <div
               role="alert"
-              className="p-2 rounded-xl bg-[#FDECEB] border border-[#A94438]/40 text-xs font-semibold text-[#A94438]"
+              className="p-2 rounded-xl bg-[#FDECEB] border-2 border-[#A63F34] text-xs font-bold text-[#A63F34]"
             >
               {errorBanner}
             </div>
           )}
 
-          {/* Primary Menu Dishes: Jugar contra bot & Crear sala */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {/* Primary 1: Jugar contra bot (with warm steam/shimmer) */}
-            <button
-              type="button"
-              data-start="true"
-              data-testid="quick-start-btn"
-              disabled={isBusy}
-              onMouseEnter={() => soundEngine.playHover()}
-              onClick={() => {
-                soundEngine.unlock();
-                void quickStartWithBots(1, 'medium');
-              }}
-              className="group relative overflow-hidden w-full min-h-[54px] sm:min-h-[64px] px-3.5 py-2 rounded-2xl bg-[#C96F4A] text-[#FFF9F0] border-2 border-[#231712] shadow-[0_3px_0_#231712] hover:bg-[#B85F3B] active:translate-y-0.5 transition-all cursor-pointer disabled:opacity-50 text-left flex items-center gap-3 focus:outline-2 focus:outline-[#231712]"
-            >
+          {/* Featured Dish #1 (Protagonist CTA): Jugar contra bot */}
+          <button
+            type="button"
+            data-start="true"
+            data-testid="quick-start-btn"
+            disabled={isBusy}
+            onMouseEnter={() => soundEngine.playHover()}
+            onClick={() => {
+              soundEngine.unlock();
+              void quickStartWithBots(1, 'medium');
+            }}
+            className="group relative overflow-hidden w-full min-h-[50px] sm:min-h-[66px] px-3.5 py-1.5 sm:py-2 rounded-2xl cafe-btn-primary cursor-pointer disabled:opacity-50 text-left flex items-center justify-between gap-3 focus:outline-2 focus:outline-[#231712]"
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              {/* Hand-drawn steaming cup icon that lifts on hover */}
               <span
                 aria-hidden="true"
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#231712]/20 border border-[#FFF9F0]/30 flex items-center justify-center shrink-0"
+                className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-[#231712]/20 border border-[#FFFDF8]/40 flex items-center justify-center shrink-0 group-hover:-translate-y-0.5 group-hover:rotate-[-4deg] transition-transform"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <svg width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
                   <path
-                    d="M6 3C6 4.5 7.5 5 7.5 6.5M11 2.5C11 4 12.5 4.5 12.5 6"
-                    stroke="currentColor"
+                    d="M9 3.5 C8 5.5 10.5 6.5 9.5 8.5 M14.5 3 C13.5 5 16 6 15 8"
+                    stroke="#FFFDF8"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                   <path
-                    d="M4 9h12v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V9Z"
-                    stroke="currentColor"
+                    d="M5 10.5 H19 L17.5 19.5 C17 22 14.5 23 12 23 C9.5 23 7 22 6.5 19.5 Z"
+                    fill="#FFFDF8"
+                    stroke="#231712"
                     strokeWidth="2"
                     strokeLinejoin="round"
                   />
                   <path
-                    d="M16 10h2a2.5 2.5 0 0 1 0 5h-2"
-                    stroke="currentColor"
-                    strokeWidth="2"
+                    d="M19 12 H21.5 C23.2 12 24 13.2 24 14.8 C24 16.4 23.2 17.5 21.5 17.5 H18.2"
+                    stroke="#FFFDF8"
+                    strokeWidth="2.2"
                     strokeLinecap="round"
                   />
+                  <line x1="3.5" y1="24.5" x2="20.5" y2="24.5" stroke="#FFFDF8" strokeWidth="2.2" strokeLinecap="round" />
                 </svg>
               </span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-serif font-extrabold text-sm sm:text-base leading-tight">
+              <span className="min-w-0">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#FFFDF8]/90 block">
+                  Recomendación del maître · Partida inmediata
+                </span>
+                <span className="block font-serif font-extrabold text-sm sm:text-xl leading-tight">
                   Jugar contra bot
                 </span>
-                <span className="block text-[11px] text-[#FFF9F0]/90 truncate">
-                  Mesa rápida · Café recién servido
+                <span className="block text-[10px] sm:text-[11px] text-[#FFFDF8]/90 truncate">
+                  Mesa lista al instante con un autómata de la casa
                 </span>
               </span>
-            </button>
+            </div>
 
-            {/* Primary 2: Crear sala */}
+            <span className="hidden sm:inline-flex items-center px-2.5 py-1 rounded-lg bg-[#231712] text-[#FEF6E0] font-serif font-bold text-xs border border-[#C8A12A] shrink-0 group-hover:scale-105 transition-transform">
+              Servir →
+            </span>
+          </button>
+
+          {/* Secondary Dishes Row: Crear sala + Unirse con código */}
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-1.5 sm:gap-2 items-stretch">
+            {/* Dish #2: Crear sala */}
             <button
               type="button"
               data-testid="create-room-btn"
@@ -880,61 +1190,53 @@ export function TitleScreen(): React.ReactElement {
                 soundEngine.unlock();
                 void createRoom();
               }}
-              className="group w-full min-h-[54px] sm:min-h-[64px] px-3.5 py-2 rounded-2xl bg-[#F7EEDF] text-[#3E2F2A] border-2 border-[#231712]/40 shadow-[0_3px_0_rgba(35,23,18,0.2)] hover:bg-[#EAD9C0] active:translate-y-0.5 transition-all cursor-pointer disabled:opacity-50 text-left flex items-center gap-3 focus:outline-2 focus:outline-[#C96F4A]"
+              className="sm:col-span-5 group w-full min-h-[44px] sm:min-h-[56px] px-3 py-1.5 sm:py-2 rounded-2xl cafe-btn-paper cursor-pointer disabled:opacity-50 text-left flex items-center gap-2.5 focus:outline-2 focus:outline-[#C86B46]"
             >
               <span
                 aria-hidden="true"
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#FFF9F0] border border-[#231712]/25 flex items-center justify-center shrink-0 text-[#C96F4A]"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#FEF6E0] border-2 border-[#231712] flex items-center justify-center shrink-0 text-[#C86B46] group-hover:rotate-3 transition-transform"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <rect
-                    x="4"
-                    y="5"
-                    width="16"
-                    height="14"
-                    rx="3"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  />
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path
-                    d="M8 10h8M8 14h5"
-                    stroke="currentColor"
+                    d="M4 18 L9 6 L15 6 L20 18 Z"
+                    fill="#FFFDF8"
+                    stroke="#231712"
                     strokeWidth="2"
-                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
+                  <path d="M9 12 H15" stroke="#C86B46" strokeWidth="2.2" strokeLinecap="round" />
+                  <line x1="2" y1="19" x2="22" y2="19" stroke="#231712" strokeWidth="2" strokeLinecap="round" />
                 </svg>
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block font-serif font-extrabold text-sm sm:text-base leading-tight">
+                <span className="block font-serif font-bold text-xs sm:text-base text-[#231712] leading-tight">
                   Crear sala
                 </span>
-                <span className="block text-[11px] text-[#6F5A4E] truncate">
-                  Reserva mesa para amigos o bots
+                <span className="block text-[10px] sm:text-[11px] text-[#6C564A] truncate">
+                  Reserva mesa privada
                 </span>
               </span>
             </button>
-          </div>
 
-          {/* Integrated Join Room Ticket Form */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              soundEngine.unlock();
-              void joinRoom(joinCodeInput, false);
-            }}
-            className="bg-[#F7EEDF] p-2 sm:p-2.5 rounded-2xl border border-[#231712]/20 flex flex-wrap sm:flex-nowrap items-center gap-2"
-          >
-            <div className="flex items-center gap-2 flex-1 min-w-[150px]">
+            {/* Dish #3: Unirse con código (Perforated Paper Ticket) */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                soundEngine.unlock();
+                void joinRoom(joinCodeInput, false);
+              }}
+              className="sm:col-span-7 cafe-paper-subpanel px-2.5 py-1 rounded-2xl border-2 border-[#231712] flex items-center gap-2"
+            >
               <span
                 aria-hidden="true"
-                className="w-8 h-8 rounded-xl bg-[#FFF9F0] border border-[#231712]/20 flex items-center justify-center text-[#3F5E4A] shrink-0"
+                className="w-8 h-8 rounded-xl bg-[#FFFDF8] border-2 border-[#231712] flex items-center justify-center text-[#3D5B47] shrink-0"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle cx="8" cy="12" r="4" stroke="currentColor" strokeWidth="2" />
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <circle cx="7.5" cy="12" r="4" stroke="currentColor" strokeWidth="2.2" />
                   <path
-                    d="M12 12h9m-3 0v3m-3-3v2"
+                    d="M11.5 12 H21 M18 12 V15.5 M15 12 V14.5"
                     stroke="currentColor"
-                    strokeWidth="2"
+                    strokeWidth="2.2"
                     strokeLinecap="round"
                   />
                 </svg>
@@ -945,51 +1247,50 @@ export function TitleScreen(): React.ReactElement {
                 aria-label="Código de sala"
                 value={joinCodeInput}
                 onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
-                placeholder="CÓDIGO DE SALA"
+                placeholder="CÓDIGO"
                 maxLength={8}
-                className="w-full min-h-[44px] px-3 rounded-xl bg-[#FFF9F0] border border-[#231712]/30 text-xs sm:text-sm text-[#3E2F2A] font-mono font-bold uppercase tracking-wider focus:outline-2 focus:outline-[#C96F4A]"
+                className="min-w-0 flex-1 min-h-[38px] sm:min-h-[42px] px-2.5 rounded-xl bg-[#FFFDF8] border-2 border-[#231712]/35 text-xs sm:text-sm text-[#231712] font-mono font-extrabold uppercase tracking-wider focus:outline-2 focus:outline-[#C86B46]"
               />
-            </div>
-            <button
-              type="submit"
-              data-testid="join-room-btn"
-              disabled={isBusy}
-              onMouseEnter={() => soundEngine.playHover()}
-              className="px-4 min-h-[44px] rounded-xl bg-[#3F5E4A] text-[#FFF9F0] font-bold text-xs sm:text-sm border border-[#231712] shadow-[0_2px_0_#231712] hover:opacity-95 active:translate-y-0.5 transition-all cursor-pointer disabled:opacity-50 inline-flex items-center gap-1.5 shrink-0"
-            >
-              <span>Unirse</span>
-              <span className="text-[10px] opacity-80 hidden sm:inline">· Con código</span>
-            </button>
-          </form>
+              <button
+                type="submit"
+                data-testid="join-room-btn"
+                disabled={isBusy}
+                onMouseEnter={() => soundEngine.playHover()}
+                className="px-3.5 min-h-[44px] rounded-xl cafe-btn-sage font-bold text-xs sm:text-sm cursor-pointer disabled:opacity-50 inline-flex items-center gap-1 shrink-0"
+              >
+                <span>Unirse</span>
+              </button>
+            </form>
+          </div>
 
-          {/* Secondary Menu Actions: Tutorial, Reglas, Ajustes (with SVG icons & microcopy) */}
-          <div className="grid grid-cols-3 gap-2 pt-1 border-t border-[#3E2F2A]/10">
+          {/* Menu Footer Strip: Tutorial, Reglas, Ajustes with custom ink-line SVGs */}
+          <div className="grid grid-cols-3 gap-2 pt-1.5 border-t-2 border-dashed border-[#231712]/20">
             <button
               type="button"
               data-testid="title-tutorial-btn"
               onMouseEnter={() => soundEngine.playHover()}
               onClick={() => setActiveModal('tutorial')}
-              className="min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 hover:bg-[#EAD9C0] active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-2 text-left"
+              className="min-h-[44px] px-2.5 py-1 rounded-xl cafe-btn-paper cursor-pointer flex items-center gap-2 text-left"
             >
               <svg
-                width="16"
-                height="16"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 aria-hidden="true"
-                className="text-[#C96F4A] shrink-0"
+                className="text-[#C86B46] shrink-0"
               >
                 <path
-                  d="M4 6h16M4 12h16M4 18h10"
+                  d="M3 5.5 C3 4.5 4 4 5.5 4 H11 V19 H5.5 C4 19 3 19.5 3 20.5 Z M21 5.5 C21 4.5 20 4 18.5 4 H13 V19 H18.5 C20 19 21 19.5 21 20.5 Z"
                   stroke="currentColor"
                   strokeWidth="2"
-                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 />
               </svg>
               <span className="min-w-0">
-                <span className="block text-xs font-bold text-[#3E2F2A] truncate">Tutorial</span>
-                <span className="hidden sm:block text-[10px] text-[#6F5A4E] truncate">
-                  3 pasos rápidos
+                <span className="block text-xs font-extrabold text-[#231712] truncate">Tutorial</span>
+                <span className="hidden sm:block text-[10px] text-[#6C564A] truncate">
+                  3 pasos en mesa
                 </span>
               </span>
             </button>
@@ -999,28 +1300,23 @@ export function TitleScreen(): React.ReactElement {
               data-testid="title-rules-btn"
               onMouseEnter={() => soundEngine.playHover()}
               onClick={() => setActiveModal('rules')}
-              className="min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 hover:bg-[#EAD9C0] active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-2 text-left"
+              className="min-h-[44px] px-2.5 py-1 rounded-xl cafe-btn-paper cursor-pointer flex items-center gap-2 text-left"
             >
               <svg
-                width="16"
-                height="16"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 aria-hidden="true"
-                className="text-[#3F5E4A] shrink-0"
+                className="text-[#3D5B47] shrink-0"
               >
-                <path
-                  d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinejoin="round"
-                />
-                <path d="M9 8h6M9 12h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                <rect x="5" y="3.5" width="14" height="17" rx="2.5" stroke="currentColor" strokeWidth="2" />
+                <path d="M8.5 8 H15.5 M8.5 12 H15.5 M8.5 16 H12.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
               <span className="min-w-0">
-                <span className="block text-xs font-bold text-[#3E2F2A] truncate">Reglas</span>
-                <span className="hidden sm:block text-[10px] text-[#6F5A4E] truncate">
-                  Manual del café
+                <span className="block text-xs font-extrabold text-[#231712] truncate">Reglas</span>
+                <span className="hidden sm:block text-[10px] text-[#6C564A] truncate">
+                  Manual ilustrado
                 </span>
               </span>
             </button>
@@ -1030,27 +1326,23 @@ export function TitleScreen(): React.ReactElement {
               data-testid="title-settings-btn"
               onMouseEnter={() => soundEngine.playHover()}
               onClick={() => setActiveModal('settings')}
-              className="min-h-[44px] px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 hover:bg-[#EAD9C0] active:translate-y-0.5 transition-all cursor-pointer flex items-center gap-2 text-left"
+              className="min-h-[44px] px-2.5 py-1 rounded-xl cafe-btn-paper cursor-pointer flex items-center gap-2 text-left"
             >
               <svg
-                width="16"
-                height="16"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 aria-hidden="true"
-                className="text-[#6F5A4E] shrink-0"
+                className="text-[#7B5236] shrink-0"
               >
-                <circle cx="12" cy="12" r="3.5" stroke="currentColor" strokeWidth="2" />
-                <path
-                  d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
+                <circle cx="12" cy="12" r="7.5" stroke="currentColor" strokeWidth="2" />
+                <circle cx="12" cy="12" r="2" fill="currentColor" />
+                <path d="M12 12 L15.5 8.5 M7 16 H17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
               </svg>
               <span className="min-w-0">
-                <span className="block text-xs font-bold text-[#3E2F2A] truncate">Ajustes</span>
-                <span className="hidden sm:block text-[10px] text-[#6F5A4E] truncate">
+                <span className="block text-xs font-extrabold text-[#231712] truncate">Ajustes</span>
+                <span className="hidden sm:block text-[10px] text-[#6C564A] truncate">
                   Sonido y vista
                 </span>
               </span>
@@ -1059,9 +1351,9 @@ export function TitleScreen(): React.ReactElement {
         </section>
       </div>
 
-      {/* Minimal footer */}
-      <footer className="shrink-0 text-center text-[11px] text-[#6F5A4E] pb-0.5">
-        2–4 jugadores · Manos públicas · Pulsa Enter para empezar
+      {/* Minimal café print footer */}
+      <footer className="relative z-10 shrink-0 text-center text-[11px] font-semibold text-[#FEF6E0] drop-shadow-[0_1px_1px_rgba(35,23,18,0.85)] pb-1">
+        100 fichas de cartón · Manos a la vista · Pulsa Enter para servir mesa rápida
       </footer>
     </div>
   );
@@ -1134,22 +1426,27 @@ export function LobbyScreen(): React.ReactElement {
 
   return (
     <div
-      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden p-2 sm:p-5 max-w-5xl mx-auto flex flex-col justify-center select-none"
+      className="relative h-[100dvh] max-h-[100dvh] w-full overflow-hidden p-2 sm:p-5 max-w-6xl mx-auto flex flex-col justify-center select-none"
       data-testid="lobby-screen"
     >
-      <div className="bg-[#FFF9F0] rounded-[24px] border-2 border-[#231712] ring-1 ring-inset ring-[#C9A227]/45 p-3 sm:p-5 shadow-[0_12px_30px_rgba(35,23,18,0.16)] flex flex-col justify-between max-h-[96dvh] overflow-hidden gap-2.5">
-        {/* Top Lobby Bar: Napkin Room Code Card + Quick Actions */}
-        <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 border-b border-[#3E2F2A]/10 pb-2">
-          {/* Paper Napkin / Coaster Room Code Card */}
+      <div className="cafe-paper-sheet cafe-double-frame rounded-[24px] border-2 border-[#231712] p-3 sm:p-5 flex flex-col justify-between max-h-[96dvh] overflow-hidden gap-2.5">
+        {/* Top Lobby Bar: Paper Napkin Room Code Card + Quick Actions */}
+        <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 cafe-double-rule pb-2">
+          {/* Paper Napkin / Coaster Room Code Card with folded corner */}
           <div
             data-testid="lobby-napkin-code"
-            className="flex items-center gap-2.5 bg-[#FEF6E0] px-3 py-1.5 rounded-2xl border-2 border-dashed border-[#C9A227] shadow-2xs"
+            className="group relative flex items-center gap-3 bg-[#FEF6E0] px-3.5 py-1.5 rounded-2xl border-2 border-[#231712] shadow-[3px_3px_0_#231712] -rotate-1 hover:rotate-0 transition-transform"
           >
-            <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#6F5A4E] block">
-                Servilleta de mesa
+            {/* Napkin inner stitch border */}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-1 rounded-xl border border-dashed border-[#C8A12A]"
+            />
+            <div className="relative z-10">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#7B5236] block">
+                Servilleta de reserva
               </span>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5">
                 <h1 className="font-mono font-extrabold text-xl sm:text-2xl text-[#231712] tracking-wider leading-none">
                   #{snapshot.code}
                 </h1>
@@ -1157,28 +1454,26 @@ export function LobbyScreen(): React.ReactElement {
                   type="button"
                   data-testid="lobby-copy-code-btn"
                   onClick={() => void copyInvite()}
-                  className={`min-h-[36px] px-2.5 py-1 rounded-xl text-xs font-bold border transition-all cursor-pointer inline-flex items-center gap-1 ${
+                  className={`min-h-[36px] px-3 py-1 rounded-xl text-xs font-extrabold border-2 cursor-pointer inline-flex items-center gap-1.5 ${
                     copied
-                      ? 'bg-[#3F5E4A] text-[#FFF9F0] border-[#231712]'
-                      : 'bg-[#FFF9F0] text-[#3E2F2A] border-[#231712]/25 hover:bg-[#EAD9C0]'
+                      ? 'bg-[#3D5B47] text-[#FFFDF8] border-[#231712] shadow-[0_2px_0_#231712]'
+                      : 'bg-[#FFFDF8] text-[#231712] border-[#231712] shadow-[0_2px_0_#231712] hover:bg-[#EAD8BE]'
                   }`}
                 >
-                  {copied && (
-                    <svg
-                      width="12"
-                      height="12"
-                      viewBox="0 0 12 12"
-                      fill="none"
-                      aria-hidden="true"
-                      className="shrink-0"
-                    >
+                  {copied ? (
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                       <path
                         d="M2.2 6.2L4.8 8.8L9.8 3.2"
                         stroke="currentColor"
-                        strokeWidth="2"
+                        strokeWidth="2.2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       />
+                    </svg>
+                  ) : (
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <rect x="5" y="5" width="9" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.8" />
+                      <path d="M3 11V3h8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                     </svg>
                   )}
                   <span>{copied ? 'Sello copiado' : 'Copiar invitación'}</span>
@@ -1192,14 +1487,14 @@ export function LobbyScreen(): React.ReactElement {
             <button
               type="button"
               onClick={() => setActiveModal('settings')}
-              className="min-h-[38px] px-3 py-1.5 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+              className="min-h-[38px] px-3 py-1.5 rounded-xl cafe-btn-paper text-xs font-bold cursor-pointer"
             >
               Ajustes
             </button>
             <button
               type="button"
               onClick={leaveRoom}
-              className="min-h-[38px] px-3 py-1.5 rounded-xl text-xs font-bold text-[#A94438] hover:bg-[#FDECEB] cursor-pointer"
+              className="min-h-[38px] px-3 py-1.5 rounded-xl border-2 border-[#A63F34]/40 bg-[#FDECEB] text-xs font-extrabold text-[#A63F34] hover:bg-[#F9D7D5] cursor-pointer"
             >
               Salir
             </button>
@@ -1209,31 +1504,31 @@ export function LobbyScreen(): React.ReactElement {
         {errorBanner && (
           <div
             role="alert"
-            className="shrink-0 p-2 rounded-xl bg-[#FDECEB] border border-[#A94438]/30 text-xs font-semibold text-[#A94438]"
+            className="shrink-0 p-2 rounded-xl bg-[#FDECEB] border-2 border-[#A63F34] text-xs font-bold text-[#A63F34]"
           >
             {errorBanner}
           </div>
         )}
 
-        {/* Center 2-column grid: Prepared 4-Chair Table Scene + Tactile Room Controls */}
-        <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-3 overflow-y-auto pr-0.5 items-center">
-          {/* Left 7 cols: Prepared Café Table with 4 Chairs */}
+        {/* Center 2-column grid: Visual Prepared 4-Chair Café Table + Tactile Room Controls */}
+        <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-3 overflow-y-auto pr-0.5 items-stretch">
+          {/* Left 7 cols: Visual Round Café Table with 4 Physical Chairs Around the Tablecloth */}
           <div
             data-testid="lobby-table-scene"
-            className="lg:col-span-7 bg-[#F7EEDF] p-3 sm:p-4 rounded-2xl border border-[#231712]/15 flex flex-col justify-between gap-2.5"
+            className="lg:col-span-7 cafe-paper-subpanel p-3 sm:p-4 rounded-2xl border-2 border-[#231712]/25 flex flex-col justify-between gap-2.5 relative overflow-hidden"
           >
-            <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2 relative z-10">
               <div>
-                <h2 className="font-serif font-bold text-sm sm:text-base text-[#231712]">
-                  Mesa reservada ({activeSeatMembers.length}/{snapshot.config.maxPlayers} sillas)
+                <h2 className="font-serif font-bold text-sm sm:text-lg text-[#231712]">
+                  Mesa preparada ({activeSeatMembers.length}/{snapshot.config.maxPlayers} comensales)
                 </h2>
-                <p className="text-[11px] text-[#6F5A4E]">
-                  Cada comensal toma asiento alrededor del mantel antes de servir.
+                <p className="text-[11px] text-[#6C564A]">
+                  Toma asiento alrededor del mantel bordado antes de tocar la campana.
                 </p>
               </div>
 
               {isHost && activeSeatMembers.length < snapshot.config.maxPlayers && (
-                <div className="flex items-center gap-1 bg-[#FFF9F0] p-1 rounded-xl border border-[#231712]/20">
+                <div className="flex items-center gap-1 bg-[#FFFDF8] p-1 rounded-xl border-2 border-[#231712] shadow-[0_2px_0_#231712]">
                   {(['basic', 'medium', 'hard'] as const).map((diff) => {
                     const label =
                       diff === 'basic' ? 'Básico' : diff === 'medium' ? 'Medio' : 'Difícil';
@@ -1246,10 +1541,10 @@ export function LobbyScreen(): React.ReactElement {
                           soundEngine.playSfx('uiToggle');
                           setBotDiff(diff);
                         }}
-                        className={`px-2 py-1 rounded-lg text-[11px] font-bold cursor-pointer ${
+                        className={`px-2 py-1 rounded-lg text-[11px] font-extrabold cursor-pointer ${
                           active
-                            ? 'bg-[#231712] text-[#FFF9F0]'
-                            : 'text-[#6F5A4E] hover:text-[#231712]'
+                            ? 'bg-[#231712] text-[#FFFDF8]'
+                            : 'text-[#6C564A] hover:text-[#231712]'
                         }`}
                       >
                         {label}
@@ -1260,7 +1555,7 @@ export function LobbyScreen(): React.ReactElement {
                     type="button"
                     data-testid="add-bot-btn"
                     onClick={() => void addBot(botDiff)}
-                    className="ml-1 px-2.5 py-1 min-h-[32px] rounded-lg bg-[#3F5E4A] text-[#FFF9F0] text-xs font-bold border border-[#231712] hover:opacity-95 cursor-pointer"
+                    className="ml-1 px-2.5 py-1 min-h-[32px] rounded-lg cafe-btn-sage text-xs font-extrabold cursor-pointer"
                   >
                     + Bot
                   </button>
@@ -1268,11 +1563,98 @@ export function LobbyScreen(): React.ReactElement {
               )}
             </div>
 
-            {/* 4 Chairs Arranged Around the Central Café Table Emblem */}
-            <div className="relative grid grid-cols-2 gap-2.5 sm:gap-3 pt-1">
+            {/* VISUAL CAFÉ TABLE STAGE: 3-column grid [Left Chairs | Unobstructed Central Round Table | Right Chairs] */}
+            <div className="relative py-2 my-auto grid grid-cols-1 sm:grid-cols-12 gap-2.5 sm:gap-3 items-center">
+              {/* Central Illustrated Round Café Table with Embroidered Linen Tablecloth (Unobstructed in center col) */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none hidden sm:flex sm:col-span-4 sm:col-start-5 sm:row-start-1 sm:row-span-2 flex-col items-center justify-center py-1"
+              >
+                <div className="relative w-38 h-38 xl:w-44 xl:h-44 rounded-full bg-[#7B5236] border-[3px] border-[#231712] shadow-[0_10px_22px_rgba(35,23,18,0.28),0_4px_0_#231712] flex items-center justify-center">
+                  {/* Four wooden chair-connector arms extending toward the 4 seats */}
+                  <span className="absolute -left-3 top-6 w-4 h-3 rounded-l-full bg-[#5A3A26] border-2 border-[#231712]" />
+                  <span className="absolute -right-3 top-6 w-4 h-3 rounded-r-full bg-[#5A3A26] border-2 border-[#231712]" />
+                  <span className="absolute -left-3 bottom-6 w-4 h-3 rounded-l-full bg-[#5A3A26] border-2 border-[#231712]" />
+                  <span className="absolute -right-3 bottom-6 w-4 h-3 rounded-r-full bg-[#5A3A26] border-2 border-[#231712]" />
+
+                  {/* Cream embroidered linen tablecloth */}
+                  <div className="w-[84%] h-[84%] rounded-full bg-[#FFFDF8] border-2 border-[#231712] flex flex-col items-center justify-center relative shadow-inner">
+                    <span className="absolute inset-1.5 rounded-full border border-dashed border-[#C86B46]/65" />
+                    {/* Centerpiece Porcelain Service & 4 Cups Oriented Toward the 4 Chairs */}
+                    <svg width="110" height="110" viewBox="0 0 100 100" fill="none" className="w-[82%] h-[82%]">
+                      <circle cx="50" cy="50" r="36" fill="#FEF6E0" stroke="#C8A12A" strokeWidth="1.8" />
+                      {/* 4 place-setting cups & saucers oriented toward the 4 chairs */}
+                      {[
+                        { cx: 24, cy: 26, occupied: Boolean(chairSlots[0]?.member) },
+                        { cx: 76, cy: 26, occupied: Boolean(chairSlots[1]?.member) },
+                        { cx: 24, cy: 74, occupied: Boolean(chairSlots[2]?.member) },
+                        { cx: 76, cy: 74, occupied: Boolean(chairSlots[3]?.member) },
+                      ].map((cup, cIdx) => (
+                        <g key={cIdx} transform={`translate(${cup.cx}, ${cup.cy})`}>
+                          <circle
+                            cx="0"
+                            cy="0"
+                            r="9"
+                            fill="#FFFDF8"
+                            stroke="#231712"
+                            strokeWidth="1.8"
+                          />
+                          <circle
+                            cx="0"
+                            cy="0"
+                            r="5.5"
+                            fill={cup.occupied ? '#3A241B' : '#EAD9C0'}
+                            stroke="#231712"
+                            strokeWidth="1.4"
+                          />
+                        </g>
+                      ))}
+                      {/* Small plate with croissant at top & bottom */}
+                      <ellipse cx="50" cy="20" rx="8" ry="4.5" fill="#D69B43" stroke="#231712" strokeWidth="1.4" />
+                      <ellipse cx="50" cy="80" rx="8" ry="4.5" fill="#D69B43" stroke="#231712" strokeWidth="1.4" />
+                      {/* Center brass O & A emblem */}
+                      <rect
+                        x="30"
+                        y="40"
+                        width="40"
+                        height="20"
+                        rx="5"
+                        fill="#231712"
+                        stroke="#C8A12A"
+                        strokeWidth="1.8"
+                      />
+                      <text
+                        x="50"
+                        y="53"
+                        textAnchor="middle"
+                        fill="#FEF6E0"
+                        fontSize="10.5"
+                        fontFamily="Fraunces, serif"
+                        fontWeight="800"
+                      >
+                        O &amp; A
+                      </text>
+                    </svg>
+                  </div>
+                </div>
+                <span className="mt-1.5 px-2.5 py-0.5 rounded-full bg-[#FEF6E0] border border-[#231712]/40 text-[10px] font-serif italic text-[#5A453B]">
+                  Mesa de tertulia · {activeSeatMembers.length}/{snapshot.config.maxPlayers}
+                </span>
+              </div>
+
+              {/* 4 Physical Café Chairs Positioned Left (0, 2) and Right (1, 3) of the Round Table */}
               {chairSlots.map(({ idx, member, isLocked }) => {
                 const isMe = member?.id === myPlayerId;
                 const isBot = member?.role === 'bot';
+                const gridPosClass =
+                  idx === 0
+                    ? 'sm:col-span-4 sm:col-start-1 sm:row-start-1'
+                    : idx === 1
+                      ? 'sm:col-span-4 sm:col-start-9 sm:row-start-1'
+                      : idx === 2
+                        ? 'sm:col-span-4 sm:col-start-1 sm:row-start-2'
+                        : 'sm:col-span-4 sm:col-start-9 sm:row-start-2';
+
                 return (
                   <motion.div
                     key={member ? member.id : `empty-seat-${idx}`}
@@ -1280,38 +1662,48 @@ export function LobbyScreen(): React.ReactElement {
                     initial={
                       reducedMotion || !member
                         ? false
-                        : { scale: 0.92, opacity: 0, y: isBot ? -8 : 6 }
+                        : { scale: 0.9, opacity: 0, y: isBot ? -10 : 8 }
                     }
                     animate={{ scale: 1, opacity: 1, y: 0 }}
-                    transition={{ duration: reducedMotion ? 0 : 0.22 }}
-                    className={`relative min-h-[68px] sm:min-h-[78px] p-2.5 rounded-2xl border-2 flex items-center justify-between gap-2 transition-all ${
+                    transition={{ duration: reducedMotion ? 0 : 0.24 }}
+                    className={`${gridPosClass} relative min-h-[72px] sm:min-h-[88px] pt-3 px-2.5 pb-2 rounded-2xl border-2 flex items-center justify-between gap-2 transition-all ${
                       member
                         ? isMe
-                          ? 'bg-[#FFF9F0] border-[#C96F4A] shadow-2xs'
-                          : 'bg-[#FFF9F0] border-[#231712]/25'
+                          ? 'bg-[#FFFDF8] border-[#C86B46] shadow-[0_4px_0_#231712]'
+                          : 'bg-[#FFFDF8] border-[#231712] shadow-[0_3px_0_#231712]'
                         : isLocked
-                          ? 'bg-[#EAD9C0]/45 border-dashed border-[#3E2F2A]/15 opacity-55'
-                          : 'bg-[#FFF9F0]/60 border-dashed border-[#3E2F2A]/30'
+                          ? 'bg-[#EAD9C0]/45 border-dashed border-[#231712]/20 opacity-55'
+                          : 'bg-[#F7EEDF]/92 border-2 border-[#7B5236] shadow-[0_3px_0_#5A3A26]'
                     }`}
                   >
+                    {/* Curved Wooden Chair Backrest Bar at the top of every seat */}
+                    <span
+                      aria-hidden="true"
+                      className={`pointer-events-none absolute -top-2 left-4 right-4 h-3 rounded-t-full border-2 border-[#231712] ${
+                        member ? 'bg-[#7B5236]' : isLocked ? 'bg-[#9E8C7A]' : 'bg-[#8C583A]'
+                      }`}
+                    />
+
                     {member ? (
                       <>
                         <div className="flex items-center gap-2 min-w-0">
                           <div className="relative shrink-0">
-                            <PlayerAvatar avatarId={member.avatarId} size={34} />
-                            <span className="absolute -top-1 -left-1 w-4 h-4 rounded-full bg-[#231712] text-[#FFF9F0] text-[9px] font-mono font-bold flex items-center justify-center">
+                            <div className="p-0.5 rounded-xl bg-[#FEF6E0] border-2 border-[#231712]">
+                              <PlayerAvatar avatarId={member.avatarId} size={34} />
+                            </div>
+                            <span className="absolute -top-1.5 -left-1.5 w-4.5 h-4.5 rounded-full bg-[#231712] text-[#FFFDF8] text-[9px] font-mono font-extrabold flex items-center justify-center">
                               {idx + 1}
                             </span>
                           </div>
                           <div className="min-w-0">
-                            <span className="font-bold text-xs sm:text-sm text-[#231712] block truncate">
+                            <span className="font-serif font-bold text-xs sm:text-sm text-[#231712] block truncate">
                               {member.nickname}
                               {member.id === snapshot.hostId ? ' · Anfitrión' : ''}
                               {isMe ? ' (Tú)' : ''}
                             </span>
-                            <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                            <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                               {isBot ? (
-                                <span className="px-1.5 py-0.2 rounded bg-[#FEF6E0] border border-[#C9A227] text-[10px] font-bold text-[#3E2F2A]">
+                                <span className="px-1.5 py-0.2 rounded-md bg-[#FEF6E0] border border-[#231712] text-[10px] font-extrabold text-[#231712]">
                                   Autómata{' '}
                                   {member.botDifficulty === 'hard'
                                     ? 'Difícil'
@@ -1322,7 +1714,7 @@ export function LobbyScreen(): React.ReactElement {
                               ) : member.ready ? (
                                 <span
                                   data-testid={isMe ? 'lobby-ready-stamp' : undefined}
-                                  className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded bg-[#E6F4EA] border border-[#3F5E4A] text-[10px] font-extrabold text-[#3F5E4A] uppercase tracking-wider"
+                                  className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md bg-[#E6F4EA] border-2 border-[#3D5B47] text-[10px] font-extrabold text-[#3D5B47] uppercase tracking-wider -rotate-1 shadow-[1px_1px_0_#231712]"
                                 >
                                   <svg
                                     width="10"
@@ -1335,15 +1727,17 @@ export function LobbyScreen(): React.ReactElement {
                                     <path
                                       d="M2.2 6.2L4.8 8.8L9.8 3.2"
                                       stroke="currentColor"
-                                      strokeWidth="2"
+                                      strokeWidth="2.2"
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
                                     />
                                   </svg>
-                                  <span>Listo en mesa</span>
+                                  <span>Listo</span>
                                 </span>
                               ) : (
-                                <span className="text-[11px] text-[#6F5A4E]">Mirando la carta…</span>
+                                <span className="text-[10px] font-semibold text-[#6C564A]">
+                                  Mirando la carta…
+                                </span>
                               )}
                             </div>
                           </div>
@@ -1353,18 +1747,26 @@ export function LobbyScreen(): React.ReactElement {
                           <button
                             type="button"
                             onClick={() => void removeBot(member.id)}
-                            className="px-2 py-1 rounded-lg bg-[#FDECEB] text-[11px] font-bold text-[#A94438] hover:underline cursor-pointer shrink-0"
+                            className="px-2 py-1 rounded-lg bg-[#FDECEB] border border-[#A63F34]/40 text-[10px] font-extrabold text-[#A63F34] hover:bg-[#F9D7D5] cursor-pointer shrink-0"
                           >
-                            Quitar
+                            Retirar
                           </button>
                         )}
                       </>
                     ) : (
-                      <div className="flex items-center gap-2 text-xs text-[#6F5A4E]">
-                        <span className="w-7 h-7 rounded-full border border-dashed border-[#6F5A4E]/50 flex items-center justify-center font-mono text-[11px] font-bold">
+                      /* Empty Wooden Chair with Upholstered Cushion & Table Place Setting */
+                      <div className="flex items-center gap-2 text-xs text-[#5A453B] w-full">
+                        <span className="w-8 h-8 rounded-xl bg-[#FFFDF8] border-2 border-dashed border-[#7B5236] flex items-center justify-center font-mono text-xs font-extrabold text-[#7B5236] shrink-0">
                           {idx + 1}
                         </span>
-                        <span>{isLocked ? 'Silla retirada' : 'Silla libre · Esperando'}</span>
+                        <div className="min-w-0">
+                          <span className="font-serif font-bold text-xs text-[#231712] block">
+                            {isLocked ? 'Silla retirada' : 'Silla libre'}
+                          </span>
+                          <span className="text-[10px] text-[#6C564A] block truncate">
+                            {isLocked ? 'Sin cubierto' : 'Esperando comensal…'}
+                          </span>
+                        </div>
                       </div>
                     )}
                   </motion.div>
@@ -1373,24 +1775,24 @@ export function LobbyScreen(): React.ReactElement {
             </div>
           </div>
 
-          {/* Right 5 cols: Tactile Segmented Controls for Players & Turn Clock */}
-          <div className="lg:col-span-5 bg-[#F7EEDF] p-3 sm:p-4 rounded-2xl border border-[#231712]/15 space-y-3 self-stretch flex flex-col justify-between">
+          {/* Right 5 cols: Tactile Café Tokens for Players & Turn Clock */}
+          <div className="lg:col-span-5 cafe-paper-subpanel p-3 sm:p-4 rounded-2xl border-2 border-[#231712]/25 space-y-3 self-stretch flex flex-col justify-between">
             <div className="space-y-3">
-              <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#C96F4A] block">
-                  Servicio de mesa
+              <div className="cafe-double-rule pb-1.5">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#C86B46] block">
+                  Comanda del anfitrión
                 </span>
-                <h2 className="font-serif font-bold text-base text-[#231712]">
-                  Opciones de la tertulia
+                <h2 className="font-serif font-bold text-base sm:text-lg text-[#231712]">
+                  Ajustes de la mesa
                 </h2>
               </div>
 
-              {/* Tactile Max Players Control */}
-              <div className="space-y-1" data-testid="lobby-maxplayers-control">
-                <span className="block text-xs font-bold text-[#3E2F2A]">
-                  Sillas en la mesa
+              {/* Tactile Max Players Tokens */}
+              <div className="space-y-1.5" data-testid="lobby-maxplayers-control">
+                <span className="block text-xs font-extrabold text-[#231712]">
+                  Cubiertos en la mesa
                 </span>
-                <div className="grid grid-cols-3 gap-1.5">
+                <div className="grid grid-cols-3 gap-2">
                   {([2, 3, 4] as const).map((count) => {
                     const active = snapshot.config.maxPlayers === count;
                     return (
@@ -1403,10 +1805,10 @@ export function LobbyScreen(): React.ReactElement {
                           soundEngine.playSfx('uiToggle');
                           void updateRoomConfig({ maxPlayers: count });
                         }}
-                        className={`min-h-[40px] px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer disabled:opacity-60 ${
+                        className={`min-h-[42px] px-2.5 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer disabled:opacity-60 ${
                           active
-                            ? 'bg-[#231712] text-[#FFF9F0] border-[#231712] shadow-2xs'
-                            : 'bg-[#FFF9F0] text-[#3E2F2A] border-[#231712]/20 hover:bg-[#EAD9C0]'
+                            ? 'cafe-btn-primary'
+                            : 'cafe-btn-paper'
                         }`}
                       >
                         {count} sillas
@@ -1416,10 +1818,10 @@ export function LobbyScreen(): React.ReactElement {
                 </div>
               </div>
 
-              {/* Tactile Turn Clock Control */}
-              <div className="space-y-1" data-testid="lobby-timer-control">
-                <span className="block text-xs font-bold text-[#3E2F2A]">
-                  Reloj por turno
+              {/* Tactile Turn Clock Tokens */}
+              <div className="space-y-1.5" data-testid="lobby-timer-control">
+                <span className="block text-xs font-extrabold text-[#231712]">
+                  Reloj de cortesía por turno
                 </span>
                 <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-3 gap-1.5">
                   {[
@@ -1443,10 +1845,10 @@ export function LobbyScreen(): React.ReactElement {
                             timerSeconds: opt.val > 0 ? opt.val : 60,
                           });
                         }}
-                        className={`min-h-[38px] px-2 py-1 rounded-xl border text-xs font-bold transition-all cursor-pointer disabled:opacity-60 ${
+                        className={`min-h-[38px] px-2 py-1 rounded-xl text-xs font-extrabold transition-all cursor-pointer disabled:opacity-60 ${
                           active
-                            ? 'bg-[#C96F4A] text-[#FFF9F0] border-[#231712] shadow-2xs'
-                            : 'bg-[#FFF9F0] text-[#3E2F2A] border-[#231712]/20 hover:bg-[#EAD9C0]'
+                            ? 'cafe-btn-primary'
+                            : 'cafe-btn-paper'
                         }`}
                       >
                         {opt.label}
@@ -1457,24 +1859,24 @@ export function LobbyScreen(): React.ReactElement {
               </div>
             </div>
 
-            <div className="pt-2 border-t border-[#3E2F2A]/10 text-[11px] text-[#6F5A4E] flex items-center justify-between">
-              <span>Bolsa: 100 fichas · 24 mesas</span>
-              <span className="font-serif font-bold text-[#3E2F2A]">O &amp; A</span>
+            <div className="pt-2 border-t-2 border-dashed border-[#231712]/15 text-[11px] font-semibold text-[#5A453B] flex items-center justify-between">
+              <span>Bolsa de terciopelo: 100 fichas</span>
+              <span className="font-serif font-bold text-[#231712] bg-[#FEF6E0] px-2 py-0.5 rounded border border-[#C8A12A]">
+                O &amp; A
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Bottom Action Bar: Ready Stamp + Café Service Bell Start */}
-        <div className="shrink-0 pt-2 border-t border-[#3E2F2A]/10 flex items-center justify-between gap-2">
+        {/* Bottom Action Bar: Ready Ink Stamp + Café Service Bell Start */}
+        <div className="shrink-0 pt-2 border-t-2 border-[#231712]/15 flex items-center justify-between gap-2">
           {me && me.role === 'player' && (
             <button
               type="button"
               data-testid="lobby-ready-btn"
               onClick={() => void toggleReady(!me.ready)}
-              className={`px-4 min-h-[44px] rounded-xl font-bold text-xs sm:text-sm cursor-pointer transition-all inline-flex items-center gap-2 ${
-                me.ready
-                  ? 'bg-[#3F5E4A] text-[#FFF9F0] border-2 border-[#231712] shadow-[0_2px_0_#231712]'
-                  : 'bg-[#F7EEDF] text-[#3E2F2A] border-2 border-[#231712]/30 hover:bg-[#EAD9C0]'
+              className={`px-4 min-h-[44px] rounded-xl font-extrabold text-xs sm:text-sm cursor-pointer transition-all inline-flex items-center gap-2 ${
+                me.ready ? 'cafe-btn-sage' : 'cafe-btn-paper'
               }`}
             >
               {me.ready && (
@@ -1489,13 +1891,13 @@ export function LobbyScreen(): React.ReactElement {
                   <path
                     d="M2.2 6.2L4.8 8.8L9.8 3.2"
                     stroke="currentColor"
-                    strokeWidth="2"
+                    strokeWidth="2.2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 </svg>
               )}
-              <span>{me.ready ? 'Sello: Listo' : 'Marcar como listo'}</span>
+              <span>{me.ready ? 'Sello: Listo en mesa' : 'Sellar: Estoy listo'}</span>
             </button>
           )}
 
@@ -1505,18 +1907,18 @@ export function LobbyScreen(): React.ReactElement {
               data-testid="start-game-btn"
               disabled={activeSeatMembers.length < 2}
               onClick={() => void startGame()}
-              className="px-5 min-h-[44px] rounded-xl bg-[#C96F4A] text-[#FFF9F0] font-bold text-xs sm:text-sm border-2 border-[#231712] shadow-[0_3px_0_#231712] hover:bg-[#B85F3B] active:translate-y-0.5 disabled:opacity-45 cursor-pointer ml-auto inline-flex items-center gap-2"
+              className="px-5 min-h-[44px] rounded-xl cafe-btn-primary font-extrabold text-xs sm:text-sm disabled:opacity-45 cursor-pointer ml-auto inline-flex items-center gap-2"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path
                   d="M12 4v2m-7 11h14a7 7 0 0 0-14 0Zm-2 3h18"
                   stroke="currentColor"
-                  strokeWidth="2"
+                  strokeWidth="2.2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
               </svg>
-              <span>Empezar partida ({activeSeatMembers.length})</span>
+              <span>Tocar timbre y empezar ({activeSeatMembers.length})</span>
             </button>
           )}
         </div>
@@ -2090,7 +2492,7 @@ export function PlayingScreen(): React.ReactElement {
         >
           {/* Left: Brand, Room Code, Turn Pill, Timer */}
           <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 shrink">
-            <CafetuliaLogo compact />
+            <CafetuliaLogo compact hideTextOnMobile />
             <span className="hidden md:inline-block text-[11px] font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-2 py-0.5 rounded-lg border border-[#231712]/10 shrink-0">
               #{snapshot.code}
             </span>
@@ -2631,23 +3033,28 @@ export function PlayingScreen(): React.ReactElement {
         />
       </div>
 
-      {/* BOTTOM TRANSLUCENT HAND DOCK (P1.2 — bg-[#FFF9F0]/45 backdrop-blur-lg + 100% opaque square tiles) */}
+      {/* BOTTOM TRANSLUCENT HAND DOCK (P1.2 — bg-[#FFF9F0]/45 backdrop-blur-lg + centered 3-col grid + cardboard tiles with subtle fan) */}
       <section
         aria-label="Tu mano de invitados"
         data-testid="player-hand-dock"
-        className="shrink-0 bg-[#FFF9F0]/45 backdrop-blur-lg rounded-2xl border-2 border-[#231712]/25 px-2 py-1 sm:px-3.5 sm:py-1.5 shadow-[0_-4px_18px_rgba(35,23,18,0.1)] z-30 flex flex-col sm:grid sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center justify-between sm:justify-normal gap-1.5"
+        className="shrink-0 bg-[#FFF9F0]/55 backdrop-blur-lg rounded-2xl border-2 border-[#231712]/35 px-2 py-1 sm:px-3.5 sm:py-1.5 shadow-[0_-6px_20px_rgba(35,23,18,0.14)] z-30 flex flex-col sm:grid sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center justify-between sm:justify-normal gap-1.5"
       >
-        {/* Left / Top: Compact Selection Detail Panel or Opaque Contrast Pill */}
-        <div className="flex flex-wrap items-center justify-between w-full sm:w-full sm:min-w-0 sm:max-w-[295px] gap-1.5 sm:justify-self-start">
+        {/* Left / Top: Printed Café Tasting Note / Luggage Tag for Selected Guest */}
+        <div className="flex flex-wrap items-center justify-between w-full sm:w-full sm:min-w-0 sm:max-w-[305px] gap-1.5 sm:justify-self-start">
           {selectedTile && selectedProfile ? (
             <div
               data-testid="selected-tile-detail"
-              className="flex items-center gap-2 bg-[#FFF9F0] px-2.5 py-1 rounded-xl border-2 border-[#C96F4A] shadow-2xs w-full"
+              className="relative flex items-center gap-2 bg-[#FFF9F0] pl-5 pr-2.5 py-1 rounded-xl border-2 border-[#C96F4A] shadow-[0_3px_0_#1E130E] w-full"
             >
+              {/* Brass luggage-tag eyelet */}
+              <span
+                aria-hidden="true"
+                className="absolute left-1.5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#3E2F2A] border-[1.5px] border-[#C9A227]"
+              />
               <FlagBadge nation={selectedTile.nation} size={20} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-serif font-bold text-xs sm:text-sm text-[#3E2F2A] truncate">
+                  <span className="font-serif font-bold text-xs sm:text-sm text-[#231712] truncate">
                     {selectedProfile.name}
                   </span>
                   <span className="text-[10px] font-bold text-[#6F5A4E] truncate">
@@ -2655,10 +3062,10 @@ export function PlayingScreen(): React.ReactElement {
                   </span>
                   <span
                     data-testid="selected-gender-badge"
-                    className={`ml-auto px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase ${
+                    className={`ml-auto px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase border ${
                       selectedTile.gender === 'F'
-                        ? 'bg-[#FDECEB] text-[#9E2A2B]'
-                        : 'bg-[#E6EEF8] text-[#1E4E8C]'
+                        ? 'bg-[#FDECEB] text-[#9E2A2B] border-[#9E2A2B]/30'
+                        : 'bg-[#E6EEF8] text-[#1E4E8C] border-[#1E4E8C]/30'
                     }`}
                   >
                     {selectedProfile.genderBadge}
@@ -2670,8 +3077,8 @@ export function PlayingScreen(): React.ReactElement {
               </div>
             </div>
           ) : (
-            <div className="text-xs min-w-0 bg-[#FFF9F0]/90 px-2.5 py-1 rounded-xl border border-[#231712]/15 shadow-2xs w-full sm:w-auto">
-              <span className="font-serif font-bold text-[#3E2F2A] block leading-tight">
+            <div className="text-xs min-w-0 bg-[#FFF9F0]/92 px-2.5 py-1 rounded-xl border border-[#231712]/20 shadow-[0_2px_0_rgba(35,23,18,0.12)] w-full sm:w-auto">
+              <span className="font-serif font-bold text-[#231712] block leading-tight">
                 Tu mano ({myHand.length}/{gameState.handSize[myPlayerId ?? activePlayerId] ?? 5})
               </span>
               <span className="text-[10px] sm:text-[11px] text-[#6F5A4E] truncate block max-w-[245px]">
@@ -2683,7 +3090,7 @@ export function PlayingScreen(): React.ReactElement {
           )}
 
           {selectedTile?.nation === 'joker' && (
-            <label className="inline-flex items-center gap-1 text-[11px] font-bold text-[#3E2F2A] bg-[#FFF9F0]/90 px-2 py-0.5 rounded-lg border border-[#231712]/15">
+            <label className="inline-flex items-center gap-1 text-[11px] font-bold text-[#3E2F2A] bg-[#FFF9F0]/95 px-2 py-0.5 rounded-lg border border-[#231712]/25">
               <span>País:</span>
               <select
                 aria-label="Nacionalidad para el comodín"
@@ -2706,12 +3113,12 @@ export function PlayingScreen(): React.ReactElement {
           )}
         </div>
 
-        {/* Center: 5 Opaque Square Rounded Tiles (Flag Background + Caricature, ZERO visible text) */}
+        {/* Center: 5 Opaque Square Rounded Cardboard Tiles (Flag Background + Caricature, ZERO visible text) */}
         <div
           className="grid grid-cols-5 gap-1.5 w-full max-w-[356px] sm:max-w-none sm:w-auto sm:flex sm:items-center sm:justify-center sm:justify-self-center sm:gap-2.5 py-0.5"
           data-testid="hand-tiles-row"
         >
-          {myHand.map((tile) => {
+          {myHand.map((tile, idx) => {
             const isSelected = selectedTileId === tile.id;
             const isInDraft = draftPlacements.some((d) => d.tileId === tile.id);
             const profile = getCharacterProfile(
@@ -2721,6 +3128,9 @@ export function PlayingScreen(): React.ReactElement {
               tile.id,
             );
             const genderWord = tile.gender === 'F' ? 'Mujer' : 'Hombre';
+            const mid = (myHand.length - 1) / 2;
+            const fanDeg = !reducedMotion && !isSelected ? (idx - mid) * 1.4 : 0;
+            const fanLift = !reducedMotion && !isSelected ? Math.abs(idx - mid) * 1.2 : 0;
 
             return (
               <button
@@ -2737,14 +3147,19 @@ export function PlayingScreen(): React.ReactElement {
                 aria-label={`${profile.name}, ${profile.countryName}, ${genderWord}`}
                 title={`${profile.name} · ${profile.countryName} (${genderWord})`}
                 style={{
-                  transform: isSelected && !reducedMotion ? 'translateY(-5px) scale(1.06)' : undefined,
+                  transform:
+                    isSelected && !reducedMotion
+                      ? 'translateY(-7px) scale(1.07)'
+                      : !reducedMotion
+                        ? `translateY(${fanLift.toFixed(1)}px) rotate(${fanDeg.toFixed(1)}deg)`
+                        : undefined,
                 }}
                 className={`group relative aspect-square w-full sm:w-[72px] sm:h-[72px] rounded-[14px] p-0.5 flex items-center justify-center transition-all duration-150 cursor-pointer select-none shrink-0 ${
                   isInDraft
                     ? 'opacity-35 bg-[#FFF9F0] ring-1 ring-[#3E2F2A]/20'
                     : isSelected
-                      ? 'bg-[#FFF9F0] ring-3 ring-[#C96F4A] shadow-[0_8px_18px_rgba(201,111,74,0.38)] z-20'
-                      : 'bg-[#FFF9F0] hover:scale-103 shadow-[0_3px_8px_rgba(35,23,18,0.18)]'
+                      ? 'bg-[#FFF9F0] cafe-cardboard-tile-selected ring-2 ring-[#C96F4A] z-20'
+                      : 'bg-[#FFF9F0] cafe-cardboard-tile hover:-translate-y-1 hover:scale-103'
                 }`}
               >
                 <CharacterPortrait
@@ -2769,7 +3184,7 @@ export function PlayingScreen(): React.ReactElement {
                   soundEngine.playSfx('uiCancel');
                   clearDraft();
                 }}
-                className="min-h-[38px] px-3 py-1 rounded-xl bg-[#FFF9F0] border border-[#231712]/30 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+                className="min-h-[38px] px-3 py-1 rounded-xl cafe-btn-paper text-xs font-bold text-[#3E2F2A] cursor-pointer"
               >
                 Limpiar
               </button>
@@ -2787,7 +3202,7 @@ export function PlayingScreen(): React.ReactElement {
                     placements: second ? [first, second] : [first],
                   });
                 }}
-                className="min-h-[38px] px-4 py-1 rounded-xl bg-[#3F5E4A] text-[#FFF9F0] text-xs font-bold border border-[#231712] shadow-[0_2px_0_#231712] hover:opacity-95 disabled:opacity-40 cursor-pointer whitespace-nowrap"
+                className="min-h-[38px] px-4 py-1 rounded-xl cafe-btn-sage text-xs font-bold disabled:opacity-40 cursor-pointer whitespace-nowrap"
               >
                 Confirmar (+{draftEvaluation.totalPoints})
               </button>
@@ -2803,7 +3218,7 @@ export function PlayingScreen(): React.ReactElement {
               aria-controls="joker-swap-popover"
               title={JOKER_SWAP_EXPLANATION}
               onClick={() => toggleOverlay('joker_swap')}
-              className="min-h-[36px] px-2.5 py-1 rounded-xl bg-[#FEF6E0] text-[#3E2F2A] border border-[#C9A227] text-[11px] font-bold hover:bg-[#F2C14E]/35 cursor-pointer whitespace-nowrap inline-flex items-center gap-1"
+              className="min-h-[36px] px-2.5 py-1 rounded-xl bg-[#FEF6E0] text-[#3E2F2A] border border-[#C9A227] shadow-[0_2px_0_#1E130E] text-[11px] font-bold hover:bg-[#F2C14E]/35 cursor-pointer whitespace-nowrap inline-flex items-center gap-1"
             >
               <span>
                 {detailedSwapOptions[0]?.profile
@@ -2845,9 +3260,9 @@ export function PlayingScreen(): React.ReactElement {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
               transition={{ duration: reducedMotion ? 0 : 0.18 }}
-              className="w-full max-w-4xl bg-[#FFF9F0] text-[#3E2F2A] rounded-[24px] border-2 border-[#231712] p-4 sm:p-6 shadow-2xl space-y-3"
+              className="w-full max-w-4xl cafe-paper-sheet text-[#3E2F2A] rounded-[24px] p-4 sm:p-6 space-y-3"
             >
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#3E2F2A]/10 pb-2.5">
+              <div className="flex flex-wrap items-center justify-between gap-2 cafe-double-rule pb-2.5">
                 <div>
                   <h2 id="cafe-3d-modal-title" className="font-serif font-bold text-xl sm:text-2xl">
                     Café Vivo en 3D
@@ -2936,7 +3351,7 @@ export function PlayingScreen(): React.ReactElement {
                     type="button"
                     data-testid="close-3d-cafe-btn"
                     onClick={() => setActiveOverlay(null)}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#C96F4A] text-[#FFF9F0] font-bold cursor-pointer"
+                    className="px-3.5 py-1.5 rounded-xl cafe-btn-primary font-bold cursor-pointer"
                   >
                     Volver al tablero
                   </button>
@@ -2975,7 +3390,7 @@ export function PlayingScreen(): React.ReactElement {
         )}
       </AnimatePresence>
 
-      {/* ON-DEMAND SLIDE-OVER LATERAL DRAWER FOR MOVE LOG & CHAT */}
+      {/* ON-DEMAND SLIDE-OVER LATERAL DRAWER FOR MOVE LOG & CHAT (Waiter's Notepad / Cuaderno de Tertulia) */}
       <AnimatePresence>
         {drawerOpen && (
           <motion.div
@@ -2983,7 +3398,7 @@ export function PlayingScreen(): React.ReactElement {
             animate={{ opacity: 1 }}
             exit={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
             transition={{ duration: reducedMotion ? 0 : 0.16 }}
-            className="fixed inset-0 z-50 flex justify-end bg-[#231712]/40"
+            className="fixed inset-0 z-50 flex justify-end bg-[#231712]/45"
             role="dialog"
             aria-modal="true"
             aria-label="Registro de jugadas y chat"
@@ -2997,49 +3412,56 @@ export function PlayingScreen(): React.ReactElement {
               animate={{ x: 0, opacity: 1 }}
               exit={reducedMotion ? { opacity: 0 } : { x: 80, opacity: 0 }}
               transition={{ duration: reducedMotion ? 0 : 0.18, ease: 'easeOut' }}
-              className="w-full max-w-sm h-full bg-[#FFF9F0] text-[#3E2F2A] p-4 shadow-2xl border-l-2 border-[#231712] flex flex-col justify-between"
+              className="w-full max-w-sm h-full cafe-paper-sheet text-[#3E2F2A] p-4 border-l-3 border-[#1E130E] flex flex-col justify-between"
             >
-              <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-3">
-                <div className="flex items-center gap-1 bg-[#F7EEDF] p-1 rounded-xl">
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-[#C96F4A]">
+                    Cuaderno de camarero · O &amp; A
+                  </span>
+                </div>
+                <div className="flex items-center justify-between cafe-double-rule pb-3">
+                  <div className="flex items-center gap-1 bg-[#F7EEDF] p-1 rounded-xl border border-[#231712]/15">
+                    <button
+                      type="button"
+                      onClick={() => setSideTab('log')}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
+                        sideTab === 'log'
+                          ? 'bg-[#FFF9F0] text-[#231712] shadow-2xs border border-[#231712]/15'
+                          : 'text-[#6F5A4E]'
+                      }`}
+                    >
+                      Registro ({gameState.log.length})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSideTab('chat')}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
+                        sideTab === 'chat'
+                          ? 'bg-[#FFF9F0] text-[#231712] shadow-2xs border border-[#231712]/15'
+                          : 'text-[#6F5A4E]'
+                      }`}
+                    >
+                      Chat ({snapshot.chat.length})
+                    </button>
+                  </div>
                   <button
                     type="button"
-                    onClick={() => setSideTab('log')}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
-                      sideTab === 'log'
-                        ? 'bg-[#FFF9F0] text-[#3E2F2A] shadow-2xs'
-                        : 'text-[#6F5A4E]'
-                    }`}
+                    data-testid="close-drawer-btn"
+                    onClick={() => setActiveOverlay(null)}
+                    className="px-3 py-1 rounded-xl cafe-btn-paper text-xs font-bold text-[#3E2F2A] cursor-pointer inline-flex items-center gap-1.5"
                   >
-                    Registro ({gameState.log.length})
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSideTab('chat')}
-                    className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
-                      sideTab === 'chat'
-                        ? 'bg-[#FFF9F0] text-[#3E2F2A] shadow-2xs'
-                        : 'text-[#6F5A4E]'
-                    }`}
-                  >
-                    Chat ({snapshot.chat.length})
+                    <span>Cerrar</span>
+                    <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+                      <path
+                        d="M1.5 1.5l7 7M8.5 1.5l-7 7"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                      />
+                    </svg>
                   </button>
                 </div>
-                <button
-                  type="button"
-                  data-testid="close-drawer-btn"
-                  onClick={() => setActiveOverlay(null)}
-                  className="px-3 py-1 rounded-xl bg-[#F7EEDF] text-xs font-bold text-[#3E2F2A] cursor-pointer inline-flex items-center gap-1.5"
-                >
-                  <span>Cerrar</span>
-                  <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
-                    <path
-                      d="M1.5 1.5l7 7M8.5 1.5l-7 7"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </button>
               </div>
 
               {sideTab === 'log' ? (
@@ -3100,7 +3522,7 @@ export function PlayingScreen(): React.ReactElement {
                         return (
                           <div
                             key={`${ev.type}-${i}`}
-                            className="p-2.5 rounded-xl bg-[#F7EEDF] text-[#3E2F2A] flex items-center justify-between gap-2"
+                            className="p-2.5 rounded-xl cafe-paper-subpanel text-[#3E2F2A] flex items-center justify-between gap-2"
                           >
                             <div className="flex items-center gap-1.5 min-w-0">
                               <PlayerAvatar avatarId={plAvatar} size={18} />
@@ -3111,7 +3533,7 @@ export function PlayingScreen(): React.ReactElement {
                             </div>
                             {delta !== null && (
                               <span
-                                className={`font-mono font-bold tabular-nums shrink-0 ${
+                                className={`font-serif font-bold tabular-nums shrink-0 ${
                                   delta >= 0 ? 'text-[#3F5E4A]' : 'text-[#A94438]'
                                 }`}
                               >
@@ -3137,7 +3559,7 @@ export function PlayingScreen(): React.ReactElement {
                         return (
                           <div
                             key={msg.id}
-                            className="p-2 rounded-xl bg-[#F7EEDF] flex items-center gap-2"
+                            className="p-2 rounded-xl cafe-paper-subpanel flex items-center gap-2"
                           >
                             <PlayerAvatar avatarId={msgAvatar} size={20} />
                             <div>
@@ -3159,7 +3581,7 @@ export function PlayingScreen(): React.ReactElement {
                           key={emote}
                           type="button"
                           onClick={() => void sendChat(emote, true)}
-                          className="px-2.5 py-1.5 rounded-lg bg-[#F7EEDF] hover:bg-[#EAD9C0] text-xs font-semibold cursor-pointer"
+                          className="px-2.5 py-1.5 rounded-lg cafe-btn-paper text-xs font-semibold cursor-pointer"
                         >
                           {emote.split(' ')[0]}
                         </button>
@@ -3182,11 +3604,11 @@ export function PlayingScreen(): React.ReactElement {
                       onChange={(e) => setChatInput(e.target.value)}
                       placeholder="Mensaje corto..."
                       maxLength={120}
-                      className="flex-1 h-10 px-3 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/20 text-xs"
+                      className="flex-1 h-10 px-3 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/25 text-xs"
                     />
                     <button
                       type="submit"
-                      className="px-3.5 h-10 rounded-xl bg-[#C96F4A] text-[#FFF9F0] text-xs font-bold cursor-pointer"
+                      className="px-3.5 h-10 rounded-xl cafe-btn-primary text-xs font-bold cursor-pointer"
                     >
                       Enviar
                     </button>
@@ -3201,9 +3623,9 @@ export function PlayingScreen(): React.ReactElement {
   );
 }
 
-const PAPER_CONFETTI_PIECES = Array.from({ length: 24 }, (_, idx) => ({
+const PAPER_CONFETTI_PIECES = Array.from({ length: 36 }, (_, idx) => ({
   id: idx,
-  leftPct: 4 + ((idx * 37) % 92),
+  leftPct: 3 + ((idx * 29) % 94),
   color:
     idx % 5 === 0
       ? '#C9A227'
@@ -3214,13 +3636,13 @@ const PAPER_CONFETTI_PIECES = Array.from({ length: 24 }, (_, idx) => ({
           : idx % 5 === 3
             ? '#3F5E4A'
             : '#C96F4A',
-  delay: (idx % 6) * 0.14,
-  duration: 2.1 + (idx % 4) * 0.35,
-  rotate: (idx % 2 === 0 ? 1 : -1) * (180 + idx * 15),
+  delay: (idx % 7) * 0.12,
+  duration: 2.0 + (idx % 4) * 0.35,
+  rotate: (idx % 2 === 0 ? 1 : -1) * (180 + idx * 14),
 }));
 
 /**
- * P0.3 — Full-Screen Staged Closing Celebration & Credits Screen (FinishedScreen)
+ * P0.3 — Full-Screen Staged Closing Celebration & Farewell Café Postcard (FinishedScreen)
  */
 export function FinishedScreen(): React.ReactElement {
   const snapshot = useGameStore((s) => s.snapshot);
@@ -3342,9 +3764,31 @@ export function FinishedScreen(): React.ReactElement {
   return (
     <div
       data-testid="finished-screen"
-      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden p-2 sm:p-5 max-w-4xl mx-auto flex flex-col justify-center relative select-none"
+      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden p-2 sm:p-5 flex flex-col items-center justify-center relative select-none bg-[#E6D3B8]"
     >
-      {/* 3. Joyful Paper Confetti Shower (2–3 s, café/crema/rojo/azul) */}
+      {/* Warm Evening Café Window Backdrop */}
+      <svg
+        viewBox="0 0 1440 900"
+        preserveAspectRatio="xMidYMid slice"
+        className="pointer-events-none absolute inset-0 w-full h-full"
+        aria-hidden="true"
+      >
+        <defs>
+          <radialGradient id="closing-glow" cx="50%" cy="35%" r="65%">
+            <stop offset="0%" stopColor="#FFF7E4" stopOpacity="0.88" />
+            <stop offset="55%" stopColor="#EAD9C0" stopOpacity="0.65" />
+            <stop offset="100%" stopColor="#5C3A21" stopOpacity="0.35" />
+          </radialGradient>
+        </defs>
+        <rect x="0" y="0" width="1440" height="900" fill="url(#closing-glow)" />
+        {/* Wood wainscot & brass lamps */}
+        <rect x="0" y="650" width="1440" height="250" fill="#5C3A21" opacity="0.85" />
+        <line x1="0" y1="650" x2="1440" y2="650" stroke="#C9A227" strokeWidth="4" />
+        <circle cx="240" cy="180" r="85" fill="#FFF6DE" opacity="0.45" />
+        <circle cx="1200" cy="180" r="85" fill="#FFF6DE" opacity="0.45" />
+      </svg>
+
+      {/* 3. Joyful 36-Piece Paper Confetti Shower (2–3 s, café/crema/rojo/azul) */}
       {!reducedMotion && (
         <div
           className="pointer-events-none fixed inset-0 z-10 overflow-hidden"
@@ -3371,23 +3815,29 @@ export function FinishedScreen(): React.ReactElement {
         </div>
       )}
 
-      {/* Main Full-Screen Closing Card */}
-      <div className="relative z-20 bg-[#FFF9F0] rounded-[24px] border-2 border-[#231712] ring-2 ring-inset ring-[#C9A227]/45 p-3.5 sm:p-6 shadow-[0_14px_38px_rgba(35,23,18,0.22)] max-h-[96dvh] flex flex-col justify-between overflow-hidden gap-2.5 sm:gap-3.5">
+      {/* Main Farewell Café Postcard Sheet */}
+      <div className="relative z-20 w-full max-w-4xl cafe-paper-sheet rounded-[24px] p-3.5 sm:p-6 max-h-[96dvh] flex flex-col justify-between overflow-hidden gap-2.5 sm:gap-3.5">
+        {/* Decorative Washi Tape & Postmark Stamp */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 w-28 h-4 rotate-[-1deg] bg-[#EAD9C0]/90 border border-[#8B5E3C]/35 rounded-xs shadow-2xs"
+        />
+
         {/* Top Row: 1. Large Stamp «¡FINAL!» + Terminal Reason + Skip Button */}
-        <div className="shrink-0 flex items-center justify-between gap-2 border-b border-[#3E2F2A]/10 pb-2">
+        <div className="shrink-0 flex items-center justify-between gap-2 cafe-double-rule pb-2.5">
           <div className="flex items-center gap-2.5 min-w-0">
             <motion.span
               data-testid="final-stamp-heading"
               initial={reducedMotion ? false : { scale: 1.35, rotate: -6, opacity: 0 }}
               animate={{ scale: 1, rotate: -2, opacity: 1 }}
               transition={{ duration: reducedMotion ? 0 : 0.28, ease: 'easeOut' }}
-              className="inline-block px-3 py-1 rounded-xl bg-[#C96F4A] text-[#FFF9F0] border-2 border-[#231712] shadow-[3px_3px_0_#231712] font-serif font-extrabold text-lg sm:text-2xl tracking-wider uppercase shrink-0"
+              className="inline-block px-3 py-1 rounded-xl bg-[#C96F4A] text-[#FFF9F0] border-2 border-[#1E130E] shadow-[3px_3px_0_#1E130E] font-serif font-extrabold text-lg sm:text-2xl tracking-wider uppercase shrink-0"
             >
               ¡FINAL!
             </motion.span>
             <div className="min-w-0">
-              <span className="text-[11px] font-bold text-[#C96F4A] block uppercase tracking-wide">
-                ¡Cierre del café! · Sala #{snapshot.code}
+              <span className="text-[11px] font-extrabold text-[#C96F4A] block uppercase tracking-[0.14em]">
+                Postal de despedida · Sala #{snapshot.code}
               </span>
               <p className="text-xs text-[#6F5A4E] truncate">
                 {reasonLabels[
@@ -3407,7 +3857,7 @@ export function FinishedScreen(): React.ReactElement {
                 setSequenceSkipped(true);
                 setRecountStep('final');
               }}
-              className="px-3 py-1 rounded-xl bg-[#F7EEDF] border border-[#231712]/25 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer shrink-0"
+              className="px-3 py-1 rounded-xl cafe-btn-paper text-xs font-bold text-[#3E2F2A] cursor-pointer shrink-0"
             >
               Saltar
             </button>
@@ -3421,10 +3871,10 @@ export function FinishedScreen(): React.ReactElement {
             initial={reducedMotion ? false : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: reducedMotion ? 0 : 0.24 }}
-            className="shrink-0 bg-[#FEF6E0] rounded-2xl border-2 border-[#C9A227] p-3 sm:p-4 shadow-xs flex flex-wrap items-center justify-between gap-3"
+            className="shrink-0 bg-[#FEF6E0] rounded-2xl border-2 border-[#C9A227] shadow-[0_3px_0_#1E130E] p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3"
           >
             <div className="flex items-center gap-3 min-w-0">
-              <div className="p-1 rounded-2xl bg-[#FFF9F0] border-2 border-[#231712] shadow-xs shrink-0">
+              <div className="p-1 rounded-2xl bg-[#FFF9F0] border-2 border-[#1E130E] shadow-[0_2px_0_#1E130E] shrink-0">
                 <PlayerAvatar avatarId={topWinner.avatarId} size={48} />
               </div>
               <div className="min-w-0">
@@ -3477,18 +3927,18 @@ export function FinishedScreen(): React.ReactElement {
                 }}
                 className={`p-2.5 sm:p-3 rounded-2xl border flex flex-wrap items-center justify-between gap-2 transition-all ${
                   st.isWinner
-                    ? 'bg-[#FEF6E0]/90 border-[#C9A227] border-2'
-                    : 'bg-[#F7EEDF] border-[#231712]/15'
+                    ? 'bg-[#FEF6E0]/95 border-[#C9A227] border-2 shadow-[0_2px_0_#1E130E]'
+                    : 'cafe-paper-subpanel'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="w-6 h-6 rounded-full bg-[#231712] text-[#FFF9F0] font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                  <span className="w-6 h-6 rounded-full bg-[#231712] text-[#FFF9F0] font-serif font-bold text-xs flex items-center justify-center shrink-0">
                     {idx + 1}
                   </span>
                   <PlayerAvatar avatarId={st.avatarId} size={30} />
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="font-serif font-bold text-sm sm:text-base text-[#3E2F2A] truncate">
+                      <span className="font-serif font-bold text-sm sm:text-base text-[#231712] truncate">
                         {st.nickname}
                       </span>
                       {st.isBot && (
@@ -3541,7 +3991,7 @@ export function FinishedScreen(): React.ReactElement {
           })}
 
           {postcardUrl && (
-            <div className="bg-[#F7EEDF] p-2.5 rounded-2xl text-center space-y-1.5 border border-[#231712]/15">
+            <div className="cafe-paper-subpanel p-2.5 rounded-2xl text-center space-y-1.5">
               <img
                 src={postcardUrl}
                 alt="Postal de resultado de Cafetulia"
@@ -3551,7 +4001,7 @@ export function FinishedScreen(): React.ReactElement {
               <a
                 href={postcardUrl}
                 download={`cafetulia-${snapshot.code}.png`}
-                className="inline-block px-3.5 py-1 rounded-xl bg-[#3F5E4A] text-[#FFF9F0] text-xs font-bold"
+                className="inline-block px-3.5 py-1 rounded-xl cafe-btn-sage text-xs font-bold"
               >
                 Descargar postal PNG
               </a>
@@ -3562,10 +4012,10 @@ export function FinishedScreen(): React.ReactElement {
         {/* 5. Warm Credits & Dedication Block (O & A) */}
         <div
           data-testid="final-credits-block"
-          className="shrink-0 bg-[#F7EEDF] px-3 py-2 rounded-2xl border border-[#231712]/15 flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#6F5A4E]"
+          className="shrink-0 cafe-paper-subpanel px-3 py-2 rounded-2xl flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#6F5A4E]"
         >
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-serif font-bold text-[#3E2F2A]">
+            <span className="font-serif font-bold text-[#231712]">
               Cafetulia — una tertulia de café
             </span>
             <span>· Arte original</span>
@@ -3573,7 +4023,7 @@ export function FinishedScreen(): React.ReactElement {
           </div>
           <span
             data-testid="final-credits-oa"
-            className="font-serif font-bold text-[#3E2F2A] bg-[#FEF6E0] px-2 py-0.5 rounded-lg border border-[#C9A227]"
+            className="font-serif font-bold text-[#231712] bg-[#FEF6E0] px-2.5 py-0.5 rounded-lg border border-[#C9A227] shadow-[0_1px_0_#1E130E]"
             title="Dedicatoria del café"
           >
             Dedicatoria: O &amp; A
@@ -3581,12 +4031,12 @@ export function FinishedScreen(): React.ReactElement {
         </div>
 
         {/* 6. Clear Footer Actions */}
-        <div className="shrink-0 pt-1.5 border-t border-[#3E2F2A]/10 flex flex-wrap items-center justify-between gap-2">
+        <div className="shrink-0 pt-2 border-t border-[#3E2F2A]/15 flex flex-wrap items-center justify-between gap-2">
           <button
             type="button"
             data-testid="generate-postcard-btn"
             onClick={generatePostcard}
-            className="px-3.5 py-2 rounded-xl bg-[#F7EEDF] border border-[#231712]/25 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+            className="px-3.5 py-2 rounded-xl cafe-btn-paper text-xs font-bold text-[#3E2F2A] cursor-pointer"
           >
             Generar postal
           </button>
@@ -3596,7 +4046,7 @@ export function FinishedScreen(): React.ReactElement {
               type="button"
               data-testid="back-to-title-btn"
               onClick={leaveRoom}
-              className="px-3.5 py-2 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 text-xs font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+              className="px-3.5 py-2 rounded-xl cafe-btn-paper text-xs font-bold text-[#3E2F2A] cursor-pointer"
             >
               Volver a la portada
             </button>
@@ -3605,9 +4055,9 @@ export function FinishedScreen(): React.ReactElement {
               data-start="true"
               data-testid="rematch-btn"
               onClick={() => void voteRematch(true)}
-              className="px-4 py-2 rounded-xl bg-[#C96F4A] text-[#FFF9F0] border border-[#231712] shadow-[0_2px_0_#231712] text-xs font-bold hover:opacity-95 cursor-pointer"
+              className="px-4 py-2 rounded-xl cafe-btn-primary text-xs font-bold cursor-pointer"
             >
-              Votar revancha ({rematchVotesCount}/{ Math.max(1, humanPlayers.length) })
+              Votar revancha ({rematchVotesCount}/{Math.max(1, humanPlayers.length)})
             </button>
           </div>
         </div>

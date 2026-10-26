@@ -54,15 +54,15 @@ type TestStoreShape = {
   setState: (patch: Record<string, unknown>) => void;
 };
 
-test.describe('Cafetulia E2E v6 & v7 (Escena de café en portada/lobby, Sonido del café, Header estable con 9999 pts, menús exclusivos, Cambiar comodín, FinishedScreen y O & A)', () => {
-  test('Cumple P0 y P1 de v6 y v7 sin scroll en 1920x900, 1280x800 y 390x844 y genera capturas ui-v7-*.png', async ({
+test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de café en portada/lobby, mano centrada, Sonido del café, Header estable, menús exclusivos y O & A)', () => {
+  test('Cumple dirección visual v8 sin scroll en 1920x900, 1280x800 y 390x844 y genera las 7 capturas ui-v8-*.png', async ({
     page,
   }) => {
-    // 1. Verificar Portada v7 (escena de café, avatar protagonista, saludo, frase del día y carta de menú) sin scroll en 390x844, 1280x800 y 1920x900
+    // 1. Verificar Portada v8 (escena de café completa, avatar protagonista, saludo, pizarra del día y carta de menú) sin scroll en 390x844, 1280x800 y 1920x900
     for (const vp of [
-      { width: 390, height: 844, shot: 'ui-v7-portada-movil.png' },
-      { width: 1280, height: 800, shot: 'ui-v7-portada-1280.png' },
-      { width: 1920, height: 900, shot: 'ui-v7-portada-1920.png' },
+      { width: 390, height: 844, shot: 'ui-v8-portada-movil.png' },
+      { width: 1280, height: 800, shot: 'ui-v8-portada-1280.png' },
+      { width: 1920, height: 900, shot: 'ui-v8-portada-1920.png' },
     ]) {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       if (page.url() === 'about:blank') {
@@ -119,7 +119,7 @@ test.describe('Cafetulia E2E v6 & v7 (Escena de café en portada/lobby, Sonido d
     await page.getByTestId('avatar-option-gato').click();
     await expect(page.getByTestId('avatar-dropdown-popover')).toBeHidden();
 
-    // 2b. Verificar modal de Ajustes «Sonido del café» (sliders, probar sonido, silenciar todo, atmósfera musical) y captura ui-v7-ajustes-sonido.png
+    // 2b. Verificar modal de Ajustes «Sonido del café» (sliders, probar sonido, silenciar todo, atmósfera musical)
     await page.getByTestId('title-settings-btn').click();
     await expect(page.getByTestId('settings-sound-section')).toBeVisible();
     await expect(page.getByTestId('test-sound-btn')).toBeVisible();
@@ -130,8 +130,6 @@ test.describe('Cafetulia E2E v6 & v7 (Escena de café en portada/lobby, Sonido d
     await page.getByTestId('settings-mood-lluvia').click();
     await page.getByTestId('settings-mood-tertulia').click();
     await page.getByTestId('test-sound-btn').click();
-
-    await page.screenshot({ path: path.join(REF_DIR, 'ui-v7-ajustes-sonido.png') });
 
     // Comprobar que el modal de Ajustes tampoco genera scroll de página en 390x844
     await page.setViewportSize({ width: 390, height: 844 });
@@ -180,8 +178,8 @@ test.describe('Cafetulia E2E v6 & v7 (Escena de café en portada/lobby, Sonido d
       expect(lobbyScroll.scrollHeight).toBeLessThanOrEqual(lobbyScroll.innerHeight + 1);
     }
 
-    // Captura ui-v7-lobby.png en 1280x800 con mesa de 4 sillas, bot sentado y sello de listo
-    await page.screenshot({ path: path.join(REF_DIR, 'ui-v7-lobby.png') });
+    // Captura ui-v8-lobby.png en 1280x800 con mesa de 4 sillas, bot sentado y sello de listo
+    await page.screenshot({ path: path.join(REF_DIR, 'ui-v8-lobby.png') });
 
     // Empezar partida
     await page.getByTestId('start-game-btn').click();
@@ -195,7 +193,7 @@ test.describe('Cafetulia E2E v6 & v7 (Escena de café en portada/lobby, Sonido d
     const bodyTextPlay = await page.evaluate(() => document.body.innerText);
     expect(bodyTextPlay).not.toMatch(/O\s*&\s*C|OxC/i);
 
-    // 5. Verificar fichas cuadradas en la mano (sin texto visible, con aria-label Mujer/Hombre)
+    // 5. Verificar fichas cuadradas en la mano (sin texto visible, con aria-label Mujer/Hombre) y mano centrada
     const handTiles = page.getByTestId('hand-square-tile');
     expect(await handTiles.count()).toBe(5);
     for (let i = 0; i < 5; i++) {
@@ -208,10 +206,30 @@ test.describe('Cafetulia E2E v6 & v7 (Escena de café en portada/lobby, Sonido d
     await handTiles.first().click();
     await expect(page.getByTestId('selected-tile-detail')).toBeVisible();
 
-    // Captura 1: ui-v6-desktop.png (partida en 1280x800 con jerarquía clara y dock translúcido)
-    await page.screenshot({ path: path.join(REF_DIR, 'ui-v6-desktop.png') });
+    // Verificar mano centrada en 1280x800 y 1920x900
+    for (const w of [1280, 1920]) {
+      await page.setViewportSize({ width: w, height: w === 1920 ? 900 : 800 });
+      const centerCheck = await page.evaluate(() => {
+        const dock = document.querySelector('[data-testid="player-hand-dock"]');
+        const row = document.querySelector('[data-testid="hand-tiles-row"]');
+        const dBox = dock?.getBoundingClientRect();
+        const rBox = row?.getBoundingClientRect();
+        const dockCenter = dBox ? dBox.left + dBox.width / 2 : 0;
+        const handCenter = rBox ? rBox.left + rBox.width / 2 : 0;
+        return { diff: Math.abs(handCenter - dockCenter) };
+      });
+      expect(centerCheck.diff).toBeLessThanOrEqual(32);
+    }
 
-    // 6. Verificar Partida en 390x844 y 1920x900 sin scroll ni solape entre tablero y dock
+    // Captura ui-v8-partida-1920.png (partida en 1920x900 con tablero con bisel, mano centrada y etiqueta de cata)
+    await page.setViewportSize({ width: 1920, height: 900 });
+    const widePlayCheck = await page.evaluate(
+      () => document.documentElement.scrollHeight <= window.innerHeight + 1,
+    );
+    expect(widePlayCheck).toBe(true);
+    await page.screenshot({ path: path.join(REF_DIR, 'ui-v8-partida-1920.png') });
+
+    // 6. Verificar Partida en 390x844 sin scroll ni solape entre tablero y dock y captura ui-v8-partida-movil.png
     await page.setViewportSize({ width: 390, height: 844 });
     const mobilePlayCheck = await page.evaluate(() => {
       const board = document.querySelector('[data-testid="papercraft-board"]');
@@ -228,14 +246,7 @@ test.describe('Cafetulia E2E v6 & v7 (Escena de café en portada/lobby, Sonido d
     expect(mobilePlayCheck.overlaps).toBe(false);
     expect(mobilePlayCheck.dockClass).toContain('backdrop-blur-lg');
 
-    // Captura 2: ui-v6-mobile.png (partida en 390x844)
-    await page.screenshot({ path: path.join(REF_DIR, 'ui-v6-mobile.png') });
-
-    await page.setViewportSize({ width: 1920, height: 900 });
-    const widePlayCheck = await page.evaluate(
-      () => document.documentElement.scrollHeight <= window.innerHeight + 1,
-    );
-    expect(widePlayCheck).toBe(true);
+    await page.screenshot({ path: path.join(REF_DIR, 'ui-v8-partida-movil.png') });
 
     // 7. P0.1 & P0.2: Header estable con puntuaciones altas (1234, 987, 9999) + exclusión mutua y popovers dentro del viewport
     await page.setViewportSize({ width: 1280, height: 800 });
@@ -307,9 +318,6 @@ test.describe('Cafetulia E2E v6 & v7 (Escena de café en portada/lobby, Sonido d
     expect(legendBox!.x + legendBox!.width).toBeLessThanOrEqual(1280);
     expect(legendBox!.y + legendBox!.height).toBeLessThanOrEqual(800);
 
-    // Captura 4: ui-v6-menus.png (solo un menú abierto y dentro del viewport)
-    await page.screenshot({ path: path.join(REF_DIR, 'ui-v6-menus.png') });
-
     // Al pulsar Manos, '?' se cierra automáticamente y Manos queda dentro del viewport
     await page.getByTestId('rival-hands-btn').click();
     await expect(page.getByTestId('board-legend-popover')).toBeHidden();
@@ -321,9 +329,6 @@ test.describe('Cafetulia E2E v6 & v7 (Escena de café en portada/lobby, Sonido d
     expect(handsBox!.y).toBeGreaterThanOrEqual(0);
     expect(handsBox!.x + handsBox!.width).toBeLessThanOrEqual(1280);
     expect(handsBox!.y + handsBox!.height).toBeLessThanOrEqual(800);
-
-    // Captura 3: ui-v6-high-scores.png (1234 y 987 pts con Manos abierto sin salirse de pantalla)
-    await page.screenshot({ path: path.join(REF_DIR, 'ui-v6-high-scores.png') });
 
     // Probar también con 9999 puntos
     await page.evaluate(() => {
@@ -350,10 +355,8 @@ test.describe('Cafetulia E2E v6 & v7 (Escena de café en portada/lobby, Sonido d
     await expect(page.getByTestId('rival-hands-popover')).toBeHidden();
 
     // 8. P0.5: Verificar "Cambiar comodín" explicado y con confirmación
-    // Cuando no hay comodín sentado, el botón no aparece
     await expect(page.getByTestId('joker-swap-btn')).toHaveCount(0);
 
-    // Simular estado legal con un comodín sentado en una mesa acompañada y la ficha natural correspondiente en mano
     await page.evaluate(() => {
       const store = (window as unknown as { __CAFETULIA_STORE__: TestStoreShape }).__CAFETULIA_STORE__;
       const snap = store.getState().snapshot;
@@ -419,12 +422,10 @@ test.describe('Cafetulia E2E v6 & v7 (Escena de café en portada/lobby, Sonido d
       'Entregas una ficha natural que podría ocupar esa silla y recuperas el comodín. No puntúas y no robas. Úsalo solo si te conviene.',
     );
 
-    // Captura 5: ui-v6-joker-swap.png (estado con cambio de comodín y su explicación visible)
-    await page.screenshot({ path: path.join(REF_DIR, 'ui-v6-joker-swap.png') });
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('joker-swap-popover')).toBeHidden();
 
-    // 9. P0.3: Pantalla final escenificada a pantalla completa (phase === 'finished')
+    // 9. P0.3: Pantalla final escenificada a pantalla completa (phase === 'finished') y captura ui-v8-final.png
     await page.evaluate(() => {
       const store = (window as unknown as { __CAFETULIA_STORE__: TestStoreShape }).__CAFETULIA_STORE__;
       const snap = store.getState().snapshot;
@@ -465,14 +466,13 @@ test.describe('Cafetulia E2E v6 & v7 (Escena de café en portada/lobby, Sonido d
     await expect(page.getByTestId('generate-postcard-btn')).toBeVisible();
     await expect(page.getByTestId('back-to-title-btn')).toBeVisible();
 
-    // Si aparece el botón Saltar durante el recuento, pulsarlo lleva directo al estado final
     const skipBtn = page.getByTestId('skip-final-sequence-btn');
     if (await skipBtn.isVisible()) {
       await skipBtn.click();
     }
 
-    // Captura 6: ui-v6-finished.png (pantalla final escenificada con ganador, ranking, confeti y O & A)
-    await page.screenshot({ path: path.join(REF_DIR, 'ui-v6-finished.png') });
+    // Captura ui-v8-final.png (postal de despedida escenificada con ganador, ranking, confeti y O & A)
+    await page.screenshot({ path: path.join(REF_DIR, 'ui-v8-final.png') });
 
     // Verificar ausencia de scroll en FinishedScreen en 1920x900, 1280x800 y 390x844
     for (const vp of [

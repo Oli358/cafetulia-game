@@ -1,5 +1,5 @@
 /* global self, caches, fetch, URL */
-const CACHE_NAME = 'cafetulia-shell-v4';
+const CACHE_NAME = 'cafetulia-shell-v5';
 const SHELL_ASSETS = [
   '/',
   '/index.html',

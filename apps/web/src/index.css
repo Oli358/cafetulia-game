@@ -1,1 +1,293 @@
+@import "@fontsource/fraunces/latin-600.css";
+@import "@fontsource/fraunces/latin-600-italic.css";
+@import "@fontsource/fraunces/latin-700.css";
+@import "@fontsource/fraunces/latin-800.css";
+@import "@fontsource/nunito-sans/latin-400.css";
+@import "@fontsource/nunito-sans/latin-600.css";
+@import "@fontsource/nunito-sans/latin-700.css";
+@import "@fontsource/nunito-sans/latin-800.css";
 @import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-cream: #F6EFE4;
+    --bg-card: #FFFDF8;
+    --bg-paper: #EFE3CE;
+    --bg-paper-warm: #F4E8D4;
+    --ink-main: #2F211C;
+    --ink-strong: #231712;
+    --ink-muted: #6C564A;
+    --wood-warm: #7B5236;
+    --wood-deep: #5A3A26;
+    --terracotta: #C86B46;
+    --caramel: #D69B43;
+    --sage: #3D5B47;
+    --gold: #C8A12A;
+    --danger: #A63F34;
+    --font-serif: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    --font-sans: "Nunito Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-cream);
+    color: var(--ink-main);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-serif {
+    font-family: var(--font-serif);
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  .font-sans {
+    font-family: var(--font-sans);
+  }
+}
+
+/* Tactile Cotton Paper & Printmaking Surfaces (ARTE_BIBLE.md) */
+.cafe-paper-sheet {
+  background-color: #FFFDF8;
+  background-image:
+    radial-gradient(rgba(123, 82, 54, 0.045) 1px, transparent 0),
+    radial-gradient(rgba(200, 161, 42, 0.035) 1px, #FFFDF8 0);
+  background-size: 18px 18px;
+  background-position: 0 0, 9px 9px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 0 0 1px rgba(200, 161, 42, 0.28),
+    0 4px 0 #231712,
+    0 12px 26px rgba(35, 23, 18, 0.16);
+}
+
+.cafe-paper-subpanel {
+  background-color: #F5EBDD;
+  background-image: linear-gradient(180deg, rgba(255, 253, 248, 0.55) 0%, rgba(239, 227, 206, 0.35) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    0 2px 0 rgba(35, 23, 18, 0.18);
+}
+
+/* Double-line editorial rule (filete de imprenta) */
+.cafe-double-rule {
+  border-bottom: 3px double rgba(47, 33, 28, 0.24);
+}
+
+.cafe-double-frame {
+  box-shadow:
+    inset 0 0 0 3px #FFFDF8,
+    inset 0 0 0 4.5px rgba(200, 161, 42, 0.55),
+    0 4px 0 #231712,
+    0 14px 30px rgba(35, 23, 18, 0.18);
+}
+
+/* Die-cut cardboard tile thickness & contact shadow */
+.cafe-cardboard-tile {
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1.5px 0 rgba(35, 23, 18, 0.22),
+    0 3px 0 #231712,
+    0 6px 12px rgba(35, 23, 18, 0.22);
+}
+
+.cafe-cardboard-tile-selected {
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+    0 0 0 2.5px #C86B46,
+    0 5px 0 #231712,
+    0 12px 22px rgba(200, 107, 70, 0.36);
+}
+
+/* Tactile Pressable Paper Buttons */
+.cafe-btn-primary {
+  background: linear-gradient(180deg, #D1744E 0%, #BE5F3A 100%);
+  color: #FFFDF8;
+  border: 2px solid #231712;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 253, 248, 0.38),
+    0 3.5px 0 #231712,
+    0 7px 14px rgba(35, 23, 18, 0.2);
+  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms cubic-bezier(0.22, 1, 0.36, 1), filter 150ms ease;
+}
+
+.cafe-btn-primary:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+  filter: brightness(1.03);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 253, 248, 0.45),
+    0 5px 0 #231712,
+    0 10px 18px rgba(35, 23, 18, 0.24);
+}
+
+.cafe-btn-primary:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 253, 248, 0.25),
+    0 1.5px 0 #231712,
+    0 3px 6px rgba(35, 23, 18, 0.18);
+}
+
+.cafe-btn-paper {
+  background: linear-gradient(180deg, #FFFDF8 0%, #F3E6D3 100%);
+  color: #2F211C;
+  border: 2px solid #231712;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.9),
+    0 3px 0 #231712,
+    0 5px 10px rgba(35, 23, 18, 0.12);
+  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms cubic-bezier(0.22, 1, 0.36, 1), background-color 150ms ease;
+}
+
+.cafe-btn-paper:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+  background: linear-gradient(180deg, #FFFDF8 0%, #EAD8BE 100%);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
+    0 4.5px 0 #231712,
+    0 8px 14px rgba(35, 23, 18, 0.16);
+}
+
+.cafe-btn-paper:active:not(:disabled) {
+  transform: translateY(1.5px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 1px 0 #231712;
+}
+
+.cafe-btn-sage {
+  background: linear-gradient(180deg, #466852 0%, #35513E 100%);
+  color: #FFFDF8;
+  border: 2px solid #231712;
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 253, 248, 0.3),
+    0 3px 0 #231712,
+    0 5px 10px rgba(35, 23, 18, 0.16);
+  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cafe-btn-sage:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+  box-shadow:
+    inset 0 1.5px 0 rgba(255, 253, 248, 0.4),
+    0 4.5px 0 #231712,
+    0 8px 14px rgba(35, 23, 18, 0.22);
+}
+
+.cafe-btn-sage:active:not(:disabled) {
+  transform: translateY(1.5px);
+  box-shadow: 0 1px 0 #231712;
+}
+
+/* Keyframes for subtle living café ambience */
+@keyframes cafe-steam-rise {
+  0% {
+    transform: translateY(0) translateX(0) scaleX(0.95);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(-5px) translateX(1.5px) scaleX(1.06);
+    opacity: 0.82;
+  }
+  100% {
+    transform: translateY(-11px) translateX(-1px) scaleX(0.92);
+    opacity: 0.1;
+  }
+}
+
+@keyframes cafe-plant-sway {
+  0%,
+  100% {
+    transform: rotate(-1.6deg);
+  }
+  50% {
+    transform: rotate(1.6deg);
+  }
+}
+
+@keyframes cafe-cat-tail {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(7deg);
+  }
+}
+
+@keyframes cafe-vinyl-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-cafe-steam {
+  animation: cafe-steam-rise 3.2s ease-in-out infinite;
+}
+
+.animate-cafe-steam-delayed {
+  animation: cafe-steam-rise 3.2s ease-in-out 1.4s infinite;
+}
+
+.animate-cafe-plant {
+  transform-origin: top center;
+  animation: cafe-plant-sway 5.5s ease-in-out infinite;
+}
+
+.animate-cafe-tail {
+  transform-origin: 28px 13px;
+  animation: cafe-cat-tail 4.2s ease-in-out infinite;
+}
+
+.animate-cafe-vinyl {
+  transform-origin: center;
+  animation: cafe-vinyl-spin 9s linear infinite;
+}
+
+/* Reduced motion & accessibility */
+.reduced-motion *,
+.reduced-motion *::before,
+.reduced-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+.high-contrast {
+  --bg-cream: #FFFDF9;
+  --ink-main: #140D0B;
+  --ink-muted: #2B1F1B;
+  filter: contrast(1.12);
+}
+
+.large-text {
+  font-size: 109%;
+}
+
+.night-lamps {
+  --bg-cream: #1F1815;
+  --bg-card: #2B221E;
+  --bg-paper: #342823;
+  --ink-main: #FDF5E6;
+  --ink-muted: #D8C4B6;
+}

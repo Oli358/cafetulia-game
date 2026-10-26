@@ -5,6 +5,74 @@
 
 ---
 
+## Sesión 026 — 2026-10-26 — Integración v8, revisión visual y montaje local
+
+**Objetivo:** integrar la entrega visual v8, comprobar que no rompe nada y dejarla disponible en local/PWA para probarla en el teléfono.
+
+**Hecho:**
+- Extraído e integrado `cafetulia (2).zip` (la v8 visual): `apps/web/src`, `apps/web/package.json`, `apps/web/src/index.css`, `src/index.css`, `e2e/tests/smoke.spec.ts` y docs.
+- Añadidas las dependencias autoalojadas `@fontsource/fraunces` y `@fontsource/nunito-sans` al `package.json` raíz; `pnpm install` correcto.
+- **No** se copiaron `.aistudio/`, `metadata.json`, `bun.lock` ni `public/assets/aistudio/cafetulia-v8-visual_*.zip`.
+- Verificado:
+  - `typecheck` ✅
+  - **49 tests** ✅
+  - `build` ✅ (fuentes woff/woff2 locales, sin CDN)
+  - `lint` ✅
+  - E2E: **2 tests** ✅ en 1920×900, 1280×800 y 390×844.
+- Revisión visual:
+  - La portada ya es una escena de salón completa: ventanal, lámparas, estanterías, rincón de barra con parallax, gato, planta, tocadiscos y carta impresa. Se nota el salto de calidad.
+  - El lobby ya tiene mesa redonda central, cuatro sillas, tazas, servilleta de código y sellos; mucho más “mesa preparada”.
+  - El tablero tiene marco de madera, fichas 3/4 y mazo centrado en abanico; el dock no pisa el tablero.
+  - La pantalla final es una postal nocturna con confeti, ranking y créditos.
+  - Pendiente menor: a 1280 algunos nombres de jugadores del lobby se truncan demasiado (“Cafetero · An…”, “Baris…”); se puede ajustar en un pase pequeño.
+- Montaje:
+  - Servidor de producción local en `127.0.0.1:3000`.
+  - Túnel HTTPS activo para PWA: `https://tech-stays-correctly-rpg.trycloudflare.com`.
+  - Iconos, manifest y service worker funcionando.
+
+**Decisiones:**
+- La v8 visual queda integrada; no se añaden funcionalidades nuevas en este pase.
+- Antes de tocar más diseño, probar en el teléfono real y decidir si el siguiente paso es pulir nombres/legibilidad o cerrar la v1.0.
+
+**Problemas:**
+- Los nombres largos del lobby se recortan en 1280.
+- El tablero sigue siendo denso en móvil; hay que valorar si necesita más zoom o simplificación.
+- El túnel HTTPS es temporal y depende del PC.
+
+**Siguiente:**
+1. Probar la v8 en el teléfono con la URL HTTPS.
+2. Anotar legibilidad, audio, tacto y rendimiento.
+3. Corregir nombres/legibilidad si molesta y preparar Render.
+
+---
+
+## Sesión 025 — 2026-10-26 — Implementación y verificación de Cafetulia v8 (Dirección visual y animaciones)
+
+**Objetivo:** ejecutar el encargo `docs/ARGON/11-pulido-visual-animaciones.md` para transformar Cafetulia en un juego de café de autor (papel de algodón, tinta, madera, cerámica, imprenta y luz de tarde) sin tocar motor, reglas ni servidor.
+
+**Hecho:**
+- **Tipografía autoalojada (`@fontsource/fraunces` y `@fontsource/nunito-sans`)**: configuradas en `apps/web/src/index.css` y `src/index.css` con grano de papel de algodón, filetes dobles de imprenta (`.cafe-double-rule`, `.cafe-double-frame`), fichas con canto de cartón 3D (`.cafe-cardboard-tile`) y botones táctiles con sombra de contacto.
+- **Portada envolvente (`TitleScreen`)**: añadido fondo arquitectónico SVG a pantalla completa (ventanal francés con haz de sol, tres lámparas colgantes de latón, estanterías con botes de café y zócalo de madera), barra de café integrada (`title-cafe-scene`) con parallax suave y animaciones vivas (vapor, planta, cola del gato, vinilo) y `Carta de la Casa` (`title-menu-card`) con iconos SVG de línea de tinta hechos a medida.
+- **Lobby como mesa redonda preparada (`LobbyScreen`)**: dispuesta la escena en 3 columnas (`[Sillas 1 y 3 | Mesa redonda central con mantel bordado, 4 tazas, cruasanes y placa O & A | Sillas 2 y 4]`) para que la mesa redonda se vea completa y sin solapes; servilleta de reserva con pespunte y sello de copiado.
+- **Tablero, retratos 3/4, mazo centrado y modales (`IllustratedBoard.tsx`, `CharacterPortrait.tsx`, `Modals.tsx`, `Screens.tsx`)**:
+  - Marco de madera con bisel y foco cálido que sigue al puntero en el tablero.
+  - Retratos 3/4 enriquecidos con sombreado suave, cuellos/solapas por nación y bisel de cartulina.
+  - Mano centrada respecto al dock completo con ligero abanico y etiqueta de cata con ojal de latón; en móvil (`390×844`) el logo de partida compacta el texto para que `Tu turno` se lea entero.
+  - Ajustes como `Mesa de control del café · O & A`, Tutorial como `Cuaderno de bienvenida`, Reglas como `Edición impresa · O & A`, registro como `Cuaderno de camarero · O & A` y pantalla final como `Postal de despedida` con confeti de papel.
+- **Limpieza y capturas**: eliminada la carpeta temporal `references/` y generadas las 7 capturas `docs/referencias/ui-v8-*.png`.
+- **Verificación completa en verde**: `pnpm typecheck`, `pnpm test` (49/49), `pnpm build`, `pnpm lint` y `pnpm test:e2e` (2/2).
+
+**Decisiones:**
+- En el lobby, la mesa redonda ocupa su propia columna central entre los dos pares de sillas para no quedar tapada por las tarjetas de asiento (D-087).
+
+**Problemas:**
+- Ninguno. Todos los chequeos y capturas en verde.
+
+**Siguiente:**
+1. Probar en teléfono real (iOS/Android) y desplegar en Render.
+
+---
+
 ## Sesión 024 — 2026-10-26 — Preparación del encargo visual v8
 
 **Objetivo:** preparar el último encargo fuerte de Argon antes de que termine la suscripción, priorizando dirección visual y animaciones sobre nuevas mecánicas.

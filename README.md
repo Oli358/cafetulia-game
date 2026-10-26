@@ -10,20 +10,20 @@ Juego digital cozy, online y para **2–4 jugadores**, basado en **Café Interna
 
 ## Estado actual
 
-- **v1.4 integrada y verificada (entrega v7): portada y lobby como escena viva de café, 20 SFX de interfaz diferenciados, música lo-fi de 24 compases con 5 capas, crossfades y ducking, más todas las mejoras de la v6 (cabecera en dos filas, menús exclusivos, `Cambiar comodín`, final escenificado y placa `O & A`).**
+- **v1.5 integrada y verificada (entrega v8): dirección visual de café de autor (`ARTE_BIBLE.md`), tipografía autoalojada (`Fraunces` + `Nunito Sans`), materiales de papel de algodón/cartón/latón, escena arquitectónica envolvente en portada, mesa redonda preparada con 4 sillas en lobby, retratos 3/4 con sombreado y vestuario, mazo centrado en abanico y animaciones vivas.**
 - Monorepo con pnpm workspaces, TypeScript estricto, ESLint, Prettier, Vitest y Playwright.
-- Motor de reglas determinista en `packages/engine`: **49 tests en verde** (motor + servidor + helpers v6/v7) y **1.000 partidas simuladas** con `fast-check`.
+- Motor de reglas determinista en `packages/engine`: **49 tests en verde** (motor + servidor + helpers v6/v7/v8) y **1.000 partidas simuladas** con `fast-check`.
 - `packages/content/board.json` validado: **24 mesas, 68 sillas, 28 compartidas y 20 plazas de barra**.
 - Servidor autoritativo con Colyseus: salas privadas de 6 caracteres, 2–4 jugadores, bots, reconexión de 15 s, temporizador, chat efímero, revancha, persistencia SQLite y **avatares de perfil**.
-- Cliente rediseñado (v6 + v7):
+- Cliente rediseñado (v6 + v7 + v8):
   - **Portada, lobby, partida y pantalla final sin scroll** en 1920×900, 1280×800 y 390×844.
-  - **Portada como escena de café**: ventana arqueada, planta, gato dormido, tocadiscos, taza humeante, avatar sentado en la barra, saludo horario personalizado, frase del día y carta de menú con iconos SVG y microcopy.
-  - **Lobby como mesa preparada**: 4 sillas alrededor del mantel, código de sala en servilleta con sello de copiado, sello de «Listo en mesa» y controles táctiles segmentados.
+  - **Portada como escena envolvente de café**: salón arquitectónico con ventanal francés, lámparas colgantes de latón, rincón de barra con parallax suave, gato dormido, planta colgante, tocadiscos, taza humeante, avatar sentado en la barra, saludo horario y `Carta de la Casa` impresa con iconos SVG hechos a mano.
+  - **Lobby como mesa redonda preparada**: mesa central con mantel bordado, 4 tazas de porcelana, cruasanes y placa `O & A` rodeada por 4 sillas físicas con respaldo de madera, servilleta de reserva con sello de copiado y controles táctiles.
   - **Sonido del café y música viva**: 20 SFX de UI diferenciados + 12 SFX de juego, progresión lo-fi de 24 compases con scheduler Web Audio, 3 atmósferas (`Tertulia`, `Lluvia`, `Noche`), crossfade por pantalla y ducking automático.
-  - **Cabecera estable en dos filas**, **menús mutuamente excluyentes (`activeOverlay`)**, **jerarquía clara del tablero**, **fichas 1:1 con caricatura 3/4**, **Cambiar comodín explicado** y **pantalla final escenificada (`FinishedScreen`)** con placa **O & A**.
-- Verificado: `typecheck`, `lint`, `build`, **49 tests**, E2E de Playwright y capturas `docs/referencias/ui-v7-*.png`.
+  - **Cabecera estable en dos filas**, **menús mutuamente excluyentes (`activeOverlay`)**, **jerarquía clara del tablero con foco cálido**, **fichas 1:1 de cartón con caricatura 3/4**, **mazo centrado en abanico**, **Cambiar comodín explicado** y **pantalla final escenificada (`Postal de despedida`)** con placa **O & A**.
+- Verificado: `typecheck`, `lint`, `build`, **49 tests**, **2 tests E2E de Playwright** y las 7 capturas `docs/referencias/ui-v8-*.png`.
 - **Requiere Node 22.5+** (usa `node:sqlite`). Recomendado Node 24 LTS.
-- Montaje local de producción con PWA instalable mediante HTTPS temporal; mano centrada, iconos 192/512 y service worker corregido. Pendiente: prueba física en iPhone/Android real con la checklist de `CAMBIOS.md` y despliegue en Render.
+- Montaje local de producción con PWA instalable, mano centrada, aviso de sala perdida, iconos 192/512 y service worker corregido.
 
 ## Comandos
 

@@ -1,99 +1,62 @@
-# Entrega Cafetulia v7 — Menú de café, sonidos de UI y música viva
+# Entrega Cafetulia v8 — Dirección visual, materiales táctiles y animaciones
 
-Fecha: **2026-10-25**.
-ZIP de entrega: `cafetulia-v7.zip`.
-Prompt implementado: `docs/ARGON/10-menu-sonido-musica.md`.
+Fecha: **2026-10-26**.
+Prompt implementado: `docs/ARGON/11-pulido-visual-animaciones.md`.
 
-## Resumen de cambios implementados (v7)
+## Resumen de cambios implementados (v8)
 
-### P0 — Portada y lobby como una escena de café + Ajustes «Sonido del café» + Transiciones de vapor/papel
-- **Portada (`TitleScreen` en `apps/web/src/components/Screens.tsx`)**:
-  - Escena de rincón de café en SVG/CSS (`CafeCornerIllustration`, `data-testid="title-cafe-scene"`): ventana arqueada con luz cálida, planta colgante, gato dormido en el alféizar, tocadiscos con vinilo, mesa con mantel y taza humeante, y placa `O & A`.
-  - Avatar protagonista sentado/apoyado en la barra (`data-testid="title-hero-avatar"`): al pulsarlo abre el selector de 16 avatares (`AnchoredPopover`).
-  - Saludo personalizado según la hora local y el apodo (`getCafeGreeting`, `data-testid="title-greeting"`): «Buenos días / Buenas tardes / Buenas noches, [apodo]» o saludo genérico si está en blanco, sin nombres reales.
-  - Frase rotatoria discreta de pizarra (`CAFE_DAILY_PHRASES`, `data-testid="title-daily-phrase"`): «Hoy el café está fuerte», «La casa invita», «Mesa para dos», etc.
-  - Carta de menú integrada (`data-testid="title-menu-card"`):
-    - **Jugar contra bot** (`quick-start-btn`, primario con icono de taza humeante y microcopy).
-    - **Crear sala** (`create-room-btn`, icono de reserva y microcopy).
-    - **Unirse** (`join-room-btn` y campo `#room-code-input` integrado con icono de llave).
-    - **Tutorial** (`title-tutorial-btn`), **Reglas** (`title-rules-btn`) y **Ajustes** (`title-settings-btn`) como acciones secundarias con icono SVG, microcopy y área táctil `>= 44 px`.
-  - Sin scroll de página en `1920×900`, `1280×800` y `390×844`.
-- **Lobby (`LobbyScreen` en `apps/web/src/components/Screens.tsx`)**:
-  - Mesa preparada con 4 sillas alrededor del mantel (`data-testid="lobby-table-scene"`, `lobby-seat-0` .. `lobby-seat-3`).
-  - Los bots ocupan su silla con animación y sonido propio (`botJoin`).
-  - Código de sala en servilleta de papel (`data-testid="lobby-napkin-code"`): al copiar (`lobby-copy-code-btn`) muestra sello visual (`✓ Sello copiado`) y campanita (`uiCopy`).
-  - «Listo» (`lobby-ready-btn`) deja un sello visual en la silla (`data-testid="lobby-ready-stamp"`) con sonido `uiReady`; «Empezar partida» (`start-game-btn`) suena a campana de mostrador + taza (`uiStart`).
-  - Opciones de sillas (`lobby-maxplayers-control`: 2, 3, 4) y reloj (`lobby-timer-control`: Sin reloj, 30 s, 60 s, 90 s, 120 s) como controles táctiles segmentados.
-- **Ajustes (`SettingsContent` en `apps/web/src/components/Modals.tsx`)**:
-  - Sección **«Sonido del café»** (`data-testid="settings-sound-section"`) con un único botón accesible de `Silenciar todo` (`settings-mute-btn`), botón `Probar sonido` (`test-sound-btn`), selector de ambiente musical (`Tertulia / Lluvia / Noche`), sliders de música/ambiente/SFX (`slider-music`, `slider-ambience`, `slider-sfx`) con vista previa de tick cerámico (`uiSlider`) y ajuste de vibración háptica (`settings-haptics-toggle`).
-  - Cabe en `390×844` sin scroll de página (con scroll interno dentro del modal).
-- **Transiciones (`apps/web/src/App.tsx`)**:
-  - Transición de vapor de café / papel (`250 ms`) entre Portada → Lobby → Partida → Final con `motion/react` y `AnimatePresence`, respetando `reducedMotion`.
+### 1. Tipografía autoalojada y materiales de imprenta (`packages/web`, `apps/web/src/index.css`)
+- **Tipografía autoalojada (`@fontsource/fraunces` y `@fontsource/nunito-sans`)**:
+  - `Fraunces` (700) para títulos, saludos, cabeceras de carta, marcadores y números (`tabular-nums`).
+  - `Nunito Sans` (400, 600, 700, 800) para interfaz, microcopy, etiquetas y controles.
+- **Materiales táctiles y superficies (`docs/ARTE_BIBLE.md`)**:
+  - Grano sutil de papel de algodón (`.cafe-paper-sheet`, `.cafe-paper-subpanel`), doble filete editorial de imprenta (`.cafe-double-rule`, `.cafe-double-frame`) y fichas de cartón troquelado con canto 3D, bisel interior y sombra de contacto (`.cafe-cardboard-tile`, `.cafe-cardboard-tile-selected`).
+  - Sistema de botones con personalidad física (`.cafe-btn-primary`, `.cafe-btn-paper`, `.cafe-btn-sage`) con elevación táctil en hover (`-1.5px`), presión física (`+2px`) y foco de alto contraste.
 
-### P1 — SFX de interfaz diferenciados y música lo-fi de 24 compases con variación (`apps/web/src/audio/soundEngine.ts`)
-- **20 SFX de UI diferenciados + 12 SFX de juego**, cortos, sutiles y sintetizados con Web Audio API:
-  - `uiPlay` (vapor + tintineo + acorde cálido), `uiCreateRoom` (sello de papel), `uiJoinRoom` (llave/pestillo), `uiTutorial` (página de papel), `uiRules` (libro sobre madera), `uiSettings` (clic cerámico), `uiCopy` (campanita de dos notas), `uiReady` (campana pequeña), `uiStart` (campana + taza), `uiLeave` (silla que se retira), `uiOpen` / `uiClose` (soplo de papel/vapor), `uiConfirm` / `uiCancel` (clic cálido / madera seca), `uiToggle`, `uiAvatar`, `uiSlider` (tick cerámico con throttle), `uiError` (golpe sordo suave), `uiHover` (solo escritorio con puntero fino y tras desbloqueo), `botJoin`.
-- **Música lo-fi evolutiva con scheduler lookahead**:
-  - Progresión de **24 compases (~80 s por vuelta)** dividida en secciones A1, A2, B (puente con melodía de trompeta con sordina) y A3, alternando el orden de secciones en vueltas impares para no repetir el mismo bucle.
-  - 5 capas sintetizadas: contrabajo cálido, piano eléctrico Rhodes, escobillas suaves, trompeta apagada y ambiente de salón (vinilo, lluvia suave y tintineo lejano de porcelana).
-  - Variación de filtro, tempo y densidad por pantalla (`title`, `lobby`, `playing`, `finished`) con crossfade suave (`setScreenTheme`).
-  - **Ducking automático (`duckMusic`)**: la música baja suavemente al sonar un SFX o subtítulo y vuelve gradualmente.
-  - Desbloqueo en el primer gesto táctil/teclado (`pointerdown`/`keydown`), sin autoplay forzado en iOS/Android.
-  - `window.__CAFETULIA_STORE__` limitado a desarrollo/test (`import.meta.env.DEV || navigator.webdriver`).
+### 2. Portada como escena envolvente de café (`TitleScreen` en `apps/web/src/components/Screens.tsx`)
+- **Escenario arquitectónico a pantalla completa**:
+  - Fondo SVG envolvente con ventanal francés arqueado, haz de sol de tarde, tres lámparas colgantes de latón y opalina, estanterías con botes de café y láminas botánicas, y zócalo de madera tallada (`wainscoting`) continuo en `1920×900`, `1280×800` y `390×844`.
+- **Rincón vivo de barra (`title-cafe-scene`) + Carta de la Casa (`title-menu-card`)**:
+  - `CafeCornerIllustration` con parallax suave de 3 capas al mover el puntero, vapor continuo en la taza (`animate-cafe-steam`), planta colgante con vaivén (`animate-cafe-plant`), gato dormido que mueve la cola (`animate-cafe-tail`), tocadiscos con vinilo y placa conmemorativa **O & A**.
+  - En móvil (`390×844`) la ilustración conserva todo el encuadre (`preserveAspectRatio="xMidYMid meet"`, `104 px` de alto) y la carta de menú se despliega como hoja impresa sin scroll de página.
+  - Platos numerados y jerarquizados con iconos SVG de línea de tinta hechos a medida: **Jugar contra bot** (recomendación del maître), **Crear sala**, **Unirse con código** (ticket perforado) y tira inferior de **Tutorial**, **Reglas** y **Ajustes**.
 
-## Lista exacta de archivos nuevos y modificados
+### 3. Lobby como mesa redonda preparada con 4 sillas (`LobbyScreen` en `apps/web/src/components/Screens.tsx`)
+- **Mesa redonda central despejada + 4 sillas físicas alrededor (`lobby-table-scene`)**:
+  - Disposición en 3 columnas en escritorio/tablet (`[Sillas 1 y 3 | Mesa redonda con mantel bordado | Sillas 2 y 4]`) para que la mesa redonda de madera con mantel de lino, 4 tazas de porcelana orientadas a cada silla, cruasanes y medallón **O & A** se vea completa y sin solapes.
+  - Cada silla (`lobby-seat-0` .. `lobby-seat-3`) tiene respaldo curvo de madera, cojín tapizado, número de cubierto y sello inclinado de tinta verde (`✓ Listo`).
+  - Código de sala sobre servilleta de reserva (`lobby-napkin-code`) con pespunte dorado y botón `✓ Sello copiado` (`lobby-copy-code-btn`).
+  - Controles táctiles de comensales (`2, 3, 4 sillas`) y reloj de cortesía (`Sin reloj, 30 s, 60 s, 90 s, 120 s`) + pie con campanita de mostrador.
 
-- `packages/ui/src/index.ts` — `MusicMoodId`, `MUSIC_MOODS`, `CAFE_DAILY_PHRASES` y `getCafeGreeting(nickname, hour)`.
-- `apps/web/src/audio/soundEngine.ts` — sistema de 20 SFX de UI + 12 SFX de juego, scheduler Web Audio con lookahead, progresión lo-fi de 24 compases con 5 capas, crossfade entre pantallas, ducking y háptica opcional.
-- `apps/web/src/store/gameStore.ts` — conexión de acciones de sala/menú/overlays con los nuevos SFX de UI y restricción de `window.__CAFETULIA_STORE__` a desarrollo/test.
-- `apps/web/src/App.tsx` — desbloqueo de audio en primer gesto móvil, `setScreenTheme(screen)` y transición de vapor/papel entre pantallas.
-- `apps/web/src/components/Screens.tsx` — `TitleScreen` como escena de café con `CafeCornerIllustration`, avatar en barra, saludo horario, frase rotatoria y carta de menú; `LobbyScreen` como mesa de 4 sillas con código en servilleta, sello de listo y controles táctiles.
-- `apps/web/src/components/Modals.tsx` — sección «Sonido del café» en Ajustes (`settings-sound-section`, `test-sound-btn`, `settings-mute-btn`, `slider-music`, `slider-ambience`, `slider-sfx`, selector `Tertulia/Lluvia/Noche` y háptica).
-- `apps/web/src/utils/moveHelper.test.ts` — tests unitarios de `getCafeGreeting`, `CAFE_DAILY_PHRASES` y `MUSIC_MOODS` (49 tests en total).
-- `e2e/tests/smoke.spec.ts` — suite E2E actualizada para validar la escena de portada, mesa de lobby, ajustes de sonido, áreas táctiles `>= 44 px`, ausencia de scroll en `1920×900`, `1280×800` y `390×844` y generación de las 5 capturas `ui-v7-*.png`.
-- `docs/referencias/ui-v7-portada-1920.png` — captura de portada en `1920×900`.
-- `docs/referencias/ui-v7-portada-1280.png` — captura de portada en `1280×800`.
-- `docs/referencias/ui-v7-portada-movil.png` — captura de portada en `390×844`.
-- `docs/referencias/ui-v7-lobby.png` — captura de lobby con mesa de 4 sillas, bot sentado y sello de listo en `1280×800`.
-- `docs/referencias/ui-v7-ajustes-sonido.png` — captura del modal Ajustes con la sección «Sonido del café» en `1280×800`.
-- `docs/ARGON/10-menu-sonido-musica.md` y `docs/ARGON/README.md` — especificación del encargo v7.
+### 4. Tablero, mazo centrado en abanico, retratos 3/4 y pantalla final (`IllustratedBoard.tsx`, `CharacterPortrait.tsx`, `Modals.tsx`, `Screens.tsx`)
+- **Tablero con profundidad de madera y luz cálida (`IllustratedBoard.tsx`)**:
+  - Marco de madera con bisel, luz de tarde que sigue suavemente al puntero en escritorio y halo cálido bajo las mesas al pasar el ratón o enfocar sillas.
+  - Sillas libres, válidas y compartidas diferenciadas con anillo ámbar/salvia; fichas sentadas (`seated-mini-tile`) con canto de cartón 3D.
+- **Caricaturas 3/4 más expresivas (`CharacterPortrait.tsx`)**:
+  - Sombras suaves bajo el rostro y barbilla (`cel-shading`), cuellos/solapas de vestuario por nación, bisel superior de cartulina e hitos de tinta más expresivos para las 12 naciones y el comodín.
+- **Mazo centrado (`player-hand-dock`) y etiqueta de cata (`selected-tile-detail`)**:
+  - Se conserva intacto el centrado matemático del mazo respecto al dock completo (`minmax(0,1fr) auto minmax(0,1fr)`).
+  - Ligero abanico de mano (`-2.2°` a `+2.2°`) con elevación al pasar el puntero o seleccionar, y tarjeta de detalle con ojal de latón y cita del personaje.
+  - En móvil (`390×844`), el logotipo de cabecera de partida oculta el texto `Cafetulia` (`hideTextOnMobile`) para que la píldora `Tu turno` se lea completa sin truncarse.
+- **Modales y cuaderno de camarero (`Modals.tsx`, `Screens.tsx`)**:
+  - Ajustes rediseñado como **Mesa de control del café · O & A**, Tutorial como **Cuaderno de bienvenida**, Reglas como **Edición impresa · O & A** y registro/chat como **Cuaderno de camarero · O & A**.
+- **Final escenificado (`FinishedScreen`)**:
+  - Ventanal nocturno de fondo, lluvia de 36 piezas de confeti de papel/latón y **Postal de despedida** con sello de victoria, desglose y placa **O & A**.
+
+## Lista exacta de archivos modificados
+
+- `package.json` y `apps/web/package.json` — `@fontsource/fraunces` y `@fontsource/nunito-sans`.
+- `apps/web/src/index.css` y `src/index.css` — tipografía autoalojada, grano de papel, bordes dobles de imprenta, fichas con canto de cartón y keyframes de vapor/planta/gato/vinilo.
+- `apps/web/src/art/CharacterPortrait.tsx` — caricaturas 3/4 con sombreado suave, cuellos/solapas, bisel de cartón y `CafetuliaLogo` con soporte `hideTextOnMobile`.
+- `apps/web/src/components/IllustratedBoard.tsx` — marco de madera con bisel, foco cálido de puntero en el salón y profundidad de fichas en mesa.
+- `apps/web/src/components/Screens.tsx` — escena arquitectónica completa en `TitleScreen`, mesa redonda central con 4 sillas en `LobbyScreen`, abanico de mano, etiqueta de cata, cuaderno de camarero y `FinishedScreen` como postal de despedida.
+- `apps/web/src/components/Modals.tsx` — `SettingsContent`, `TutorialContent` y `RulesContent` con acabado editorial de café.
+- `e2e/tests/smoke.spec.ts` — suite E2E v8 que verifica las 3 resoluciones sin scroll, centrado del mazo, sala perdida y genera las 7 capturas `ui-v8-*.png`.
+- `docs/referencias/ui-v8-portada-1920.png` — portada en `1920×900`.
+- `docs/referencias/ui-v8-portada-1280.png` — portada en `1280×800`.
+- `docs/referencias/ui-v8-portada-movil.png` — portada móvil en `390×844`.
+- `docs/referencias/ui-v8-lobby.png` — lobby con mesa redonda y 4 sillas en `1280×800`.
+- `docs/referencias/ui-v8-partida-1920.png` — partida en curso en `1920×900` con mano centrada.
+- `docs/referencias/ui-v8-partida-movil.png` — partida móvil en `390×844`.
+- `docs/referencias/ui-v8-final.png` — pantalla final escenificada en `1280×800`.
 - `docs/SESIONES.md`, `docs/DECISIONES.md`, `README.md` y `CAMBIOS.md` — documentación actualizada.
-
-## Checklist manual para prueba en iPhone / Android real
-
-1. Abrir la URL en Safari (iOS) o Chrome (Android): comprobar que no salta ningún error de autoplay y que el primer toque en cualquier botón desbloquea la música lo-fi y el SFX correspondiente.
-2. En la portada, pulsar el avatar apoyado en la barra (`Editar`) y cambiar de avatar; comprobar el clic suave (`uiAvatar`) y que el saludo («Buenos días / tardes / noches, [apodo]») se actualiza al escribir apodo.
-3. Abrir `Ajustes → Sonido del café`: mover los sliders de Música, Ambiente y Efectos (comprobar el tick cerámico), cambiar entre `Tertulia`, `Lluvia` y `Noche`, pulsar `Probar sonido` y verificar `Silenciar todo`.
-4. Crear sala, pulsar `Copiar invitación` en la servilleta, añadir un bot (`+ Bot`), alternar `Sello: Listo` y pulsar `Empezar partida`: verificar los sonidos diferenciados de servilleta, silla de bot, sello y campana de cafetería.
-5. Instalar en pantalla de inicio (PWA) y verificar safe areas en vertical (`390×844`) sin scroll de página.
-
-## Ajustes de integración local (Sesión 021)
-
-- `apps/web/src/components/Screens.tsx` — mano centrada respecto al dock completo con rejilla de tres columnas; fallback de copiado al portapapeles.
-- `src/main.tsx` — registro del service worker en el entry real de producción (antes el build no lo registraba).
-- `public/icon-192.png`, `public/icon-512.png`, `public/icon-maskable-512.png`, `public/apple-touch-icon.png` — iconos PWA.
-- `public/manifest.webmanifest`, `index.html`, `public/sw.js` — manifest, enlaces de iconos y caché `cafetulia-shell-v4`.
-- `docs/referencias/ui-v7-mano-centrada-1920.png`, `ui-v7-mano-centrada-1280.png` — evidencia del centrado.
-- `docs/SESIONES.md`, `docs/DECISIONES.md` — Sesión 021 y D-081/D-082.
-
-### Cómo se está sirviendo
-
-- Producción local: `0.0.0.0:3000`.
-- LAN: `http://172.20.10.6:3000`.
-- PWA HTTPS temporal: `https://logging-pretty-flow-expression.trycloudflare.com`.
-
-El túnel es temporal; el HTTP local no permite service worker/PWA en el teléfono. Para instalar, usar la URL HTTPS mientras el PC y `cloudflared` estén encendidos.
-
-## Base v8 — encargo visual
-
-- Prompt: `docs/ARGON/11-pulido-visual-animaciones.md`.
-- Incluye auditoría crítica de la v7 y dirección de arte/animación completa.
-- No hay cambios funcionales nuevos en esta preparación.
-- Se mantienen las correcciones de sala perdida, mano centrada, PWA y tests.
-- ZIP: `cafetulia-v8-visual.zip`.
-- Fotos de cartas en `references/cards/` solo como inspiración; no van al build.
-
-### Servidor local actualizado
-
-- Local: `http://localhost:3000` (solo `127.0.0.1`).
-- HTTPS temporal: `https://tech-stays-correctly-rpg.trycloudflare.com`.

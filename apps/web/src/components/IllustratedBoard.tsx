@@ -47,6 +47,8 @@ export function IllustratedBoard({
   onBarClick,
 }: IllustratedBoardProps): React.ReactElement {
   const [hoveredSeatId, setHoveredSeatId] = useState<string | null>(null);
+  const [hoveredTableId, setHoveredTableId] = useState<string | null>(null);
+  const [pointerPct, setPointerPct] = useState<{ x: number; y: number }>({ x: 50, y: 36 });
   const [celebratingTables, setCelebratingTables] = useState<Record<string, boolean>>({});
   const [boardZoomed, setBoardZoomed] = useState(false);
   const [panOffset, setPanOffset] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -135,14 +137,22 @@ export function IllustratedBoard({
       className="relative w-full h-full min-h-0 flex items-center justify-center p-0 sm:p-0.5 select-none"
       data-testid="papercraft-board"
     >
-      {/* Strictly 1:1 Square Illustrated Board Container */}
+      {/* Strictly 1:1 Square Illustrated Board Container with Wood Frame Bevel */}
       <div
         role="region"
         aria-label="Tablero ilustrado de Cafetulia con 24 mesas, 68 sillas y barra central"
-        className={`relative aspect-square w-[min(96vw,calc(100dvh-218px))] h-[min(96vw,calc(100dvh-218px))] sm:w-[min(93vw,calc(100dvh-204px))] sm:h-[min(93vw,calc(100dvh-204px))] rounded-[20px] sm:rounded-[26px] border-2 shadow-[0_8px_24px_rgba(35,23,18,0.18)] overflow-hidden shrink-0 transition-colors ${
+        onPointerMove={(e) => {
+          if (reducedMotion) return;
+          const rect = e.currentTarget.getBoundingClientRect();
+          if (rect.width <= 0 || rect.height <= 0) return;
+          const x = Math.round(((e.clientX - rect.left) / rect.width) * 100);
+          const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
+          setPointerPct({ x: Math.max(10, Math.min(90, x)), y: Math.max(10, Math.min(90, y)) });
+        }}
+        className={`relative aspect-square w-[min(96vw,calc(100dvh-218px))] h-[min(96vw,calc(100dvh-218px))] sm:w-[min(93vw,calc(100dvh-204px))] sm:h-[min(93vw,calc(100dvh-204px))] rounded-[20px] sm:rounded-[26px] border-3 overflow-hidden shrink-0 transition-colors ${
           nightMode
-            ? 'bg-[#282D3A] border-[#C9A227]/55 text-[#FFF9F0]'
-            : 'bg-[#EFE3CE] border-[#231712] text-[#3E2F2A]'
+            ? 'bg-[#282D3A] border-[#C9A227]/65 text-[#FFF9F0] shadow-[0_6px_0_#141720,0_16px_32px_rgba(0,0,0,0.45)]'
+            : 'bg-[#EFE3CE] border-[#231712] text-[#3E2F2A] shadow-[0_5px_0_#1E130E,0_14px_28px_rgba(35,23,18,0.22),inset_0_2px_0_rgba(255,253,248,0.85)]'
         }`}
       >
         {/* Mobile Zoom / Pan Quick Toggle (Top-Right Corner of Board) */}
@@ -207,7 +217,7 @@ export function IllustratedBoard({
           }}
           className="relative w-full h-full transition-transform duration-200 origin-center"
         >
-          {/* Quiet, Low-Noise SVG Floor + Subtle Table-to-Chair Connection Lines */}
+          {/* Quiet, Low-Noise SVG Floor + Warm Afternoon Spotlight + Subtle Table-to-Chair Connection Lines */}
           <svg
             viewBox="0 0 1300 1300"
             className="absolute inset-0 w-full h-full pointer-events-none"
@@ -227,35 +237,73 @@ export function IllustratedBoard({
                   opacity="0.5"
                 />
               </pattern>
-              <radialGradient id="floor-vignette" cx="50%" cy="50%" r="58%">
-                <stop offset="0%" stopColor="#FFF9F0" stopOpacity={nightMode ? '0.02' : '0.32'} />
-                <stop offset="100%" stopColor="#3E2F2A" stopOpacity={nightMode ? '0.28' : '0.08'} />
+              <radialGradient
+                id="floor-vignette"
+                cx={`${pointerPct.x}%`}
+                cy={`${pointerPct.y}%`}
+                r="62%"
+              >
+                <stop offset="0%" stopColor="#FFFDF8" stopOpacity={nightMode ? '0.06' : '0.44'} />
+                <stop offset="55%" stopColor="#FFF9F0" stopOpacity={nightMode ? '0.02' : '0.18'} />
+                <stop offset="100%" stopColor="#3E2F2A" stopOpacity={nightMode ? '0.32' : '0.12'} />
               </radialGradient>
             </defs>
 
             <rect x="0" y="0" width="1300" height="1300" fill="url(#parquet-pattern)" />
             <rect x="0" y="0" width="1300" height="1300" fill="url(#floor-vignette)" />
 
+            {/* Double-ink & brass perimeter inlay */}
             <rect
-              x="14"
-              y="14"
-              width="1272"
-              height="1272"
+              x="12"
+              y="12"
+              width="1276"
+              height="1276"
               rx="32"
               fill="none"
-              stroke="#C9A227"
-              strokeWidth="2"
-              strokeDasharray="10 8"
-              opacity="0.35"
+              stroke="#8B5E3C"
+              strokeWidth="3"
+              opacity="0.32"
             />
+            <rect
+              x="20"
+              y="20"
+              width="1260"
+              height="1260"
+              rx="28"
+              fill="none"
+              stroke="#C9A227"
+              strokeWidth="1.8"
+              strokeDasharray="10 8"
+              opacity="0.45"
+            />
+
+            {/* Soft spotlight halo under hovered or focused table */}
+            {gameState.tables.map((table) => {
+              const isHighlighted =
+                focusedTableId === table.id || hoveredTableId === table.id;
+              if (!isHighlighted) return null;
+              const tx = (table.col + 0.5) * 100;
+              const ty = (table.row + 0.5) * 100;
+              return (
+                <circle
+                  key={`halo-${table.id}`}
+                  cx={tx}
+                  cy={ty}
+                  r="105"
+                  fill="#FFF8E8"
+                  opacity={nightMode ? '0.12' : '0.45'}
+                />
+              );
+            })}
 
             {/* Subtle connection spokes from each table to its 4 chairs */}
             {gameState.tables.map((table) => {
               const tx = (table.col + 0.5) * 100;
               const ty = (table.row + 0.5) * 100;
               const meta = NATION_VISUALS[table.nation as NationKey] ?? NATION_VISUALS.fr;
-              const isTableFocused = focusedTableId === table.id;
-              const isDimmed = Boolean(focusedTableId && !isTableFocused);
+              const isTableFocused =
+                focusedTableId === table.id || hoveredTableId === table.id;
+              const isDimmed = Boolean(focusedTableId && focusedTableId !== table.id);
               return table.seatIds.map((sid) => {
                 const seat = gameState.seats.find((s) => s.id === sid);
                 if (!seat) return null;
@@ -278,7 +326,7 @@ export function IllustratedBoard({
                           ? '0.72'
                           : nightMode
                             ? '0.26'
-                            : '0.18'
+                            : '0.2'
                     }
                   />
                 );
@@ -303,7 +351,7 @@ export function IllustratedBoard({
               e.preventDefault();
               onBarClick();
             }}
-            className={`absolute z-10 rounded-[16px] sm:rounded-[20px] border-2 p-1 sm:p-1.5 flex flex-col justify-between shadow-[0_4px_14px_rgba(35,23,18,0.24)] transition-opacity duration-200 ${
+            className={`absolute z-10 rounded-[16px] sm:rounded-[20px] border-2 p-1 sm:p-1.5 flex flex-col justify-between shadow-[0_4px_0_#1E130E,0_10px_20px_rgba(35,23,18,0.28)] transition-opacity duration-200 ${
               focusedTableId ? 'opacity-25' : 'opacity-100'
             } ${
               nightMode
@@ -421,7 +469,7 @@ export function IllustratedBoard({
             </div>
           </div>
 
-          {/* 24 ILLUSTRATED ROUND TABLES (Hierarchy #1: Cream tablecloth + discreet 14px centered flag badge) */}
+          {/* 24 ILLUSTRATED ROUND TABLES (Hierarchy #1: Cream tablecloth + wood bevel + discreet 14px centered flag badge) */}
           {gameState.tables.map((table) => {
             const meta = NATION_VISUALS[table.nation as NationKey] ?? NATION_VISUALS.fr;
             const occCount = table.seatIds.filter((sid) => {
@@ -438,6 +486,8 @@ export function IllustratedBoard({
                 type="button"
                 data-table-id={table.id}
                 onClick={() => onTableClick(table)}
+                onMouseEnter={() => setHoveredTableId(table.id)}
+                onMouseLeave={() => setHoveredTableId((prev) => (prev === table.id ? null : prev))}
                 aria-label={`Mesa de ${meta.name}, ${occCount} de 4 sillas ocupadas`}
                 title={`Mesa de ${meta.name} (${occCount}/4 ocupadas) · Toca para enfocar`}
                 style={{
@@ -451,7 +501,7 @@ export function IllustratedBoard({
                       ? '#C9A227'
                       : meta.primaryColor,
                 }}
-                className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#FFF9F0] border-[3px] shadow-[0_5px_12px_rgba(35,23,18,0.26)] flex flex-col items-center justify-center cursor-pointer transition-all duration-200 z-20 after:content-[''] after:absolute after:-inset-1.5 ${
+                className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#FFF9F0] border-[3px] shadow-[0_3px_0_#1E130E,0_7px_14px_rgba(35,23,18,0.26)] flex flex-col items-center justify-center cursor-pointer transition-all duration-200 z-20 after:content-[''] after:absolute after:-inset-1.5 ${
                   isFocused
                     ? 'ring-4 ring-[#C96F4A]/80 scale-115 z-35'
                     : isDimmedByFocus
@@ -613,9 +663,9 @@ export function IllustratedBoard({
                 )}
 
                 {occupant ? (
-                  /* SEATED GUEST: Prominent Square Tile with Flag Background + Caricature Face (ZERO text labels!) */
+                  /* SEATED GUEST: Prominent Square Cardboard Tile with Flag Background + Caricature Face (ZERO text labels!) */
                   <div
-                    className="w-full h-full flex items-center justify-center rounded-[8px] bg-[#FFF9F0] p-[1px] border border-[#231712] overflow-hidden"
+                    className="w-full h-full flex items-center justify-center rounded-[8px] bg-[#FFF9F0] p-[1px] border border-[#1E130E] shadow-[0_2px_0_#1E130E] overflow-hidden"
                     data-testid="seated-mini-tile"
                   >
                     <CharacterPortrait
