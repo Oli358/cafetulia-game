@@ -10,6 +10,28 @@ import type {
 import { soundEngine } from '../audio/soundEngine';
 import { recordFinishedGameLocally, type LocalPlayerStats, loadLocalStats } from '../utils/moveHelper';
 
+let moveRequestInFlight = false;
+
+function roomLostPatch(message: string) {
+  return {
+    screen: 'title' as const,
+    roomCode: null,
+    myPlayerId: null,
+    myRole: 'player' as const,
+    snapshot: null,
+    shareResult: null,
+    selectedTileId: null,
+    draftPlacements: [],
+    focusedTableId: null,
+    errorBanner: message,
+    whyCannotBanner: null,
+    pendingNegativeConfirm: null,
+    activeOverlay: null,
+    activeModal: null,
+    isBusy: false,
+  };
+}
+
 export type RoomMemberInfo = {
   id: string;
   nickname: string;
@@ -622,66 +644,104 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   },
 
   submitMove: async (move) => {
-    const { roomCode, myPlayerId } = get();
-    if (!roomCode || !myPlayerId) return false;
-    const res = await fetch(`/rooms/${roomCode}/moves`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId: myPlayerId, move }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      set({
-        errorBanner: data.error?.message ?? 'Jugada inválida.',
+    if (moveRequestInFlight) return false;
+    moveRequestInFlight = true;
+    try {
+      const { roomCode, myPlayerId } = get();
+      if (!roomCode || !myPlayerId) return false;
+      const res = await fetch(`/rooms/${roomCode}/moves`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: myPlayerId, move }),
       });
-      return false;
-    }
+      const data = (await res.json().catch(() => ({}))) as {
+        snapshot?: RoomSnapshot;
+        error?: string | { code?: string; message?: string };
+        message?: string;
+      };
 
-    const snap = data.snapshot as RoomSnapshot;
-    const recentEvents = snap.gameState?.log.slice(-4) ?? [];
-    const hasPure = recentEvents.some(
-      (ev) => ev.type === 'tile_seated' && ev.pureTablesCompleted > 0,
-    );
-    const barEv = recentEvents.find(
-      (ev): ev is Extract<typeof ev, { type: 'tile_bar' }> => ev.type === 'tile_bar',
-    );
-    if (hasPure) {
-      soundEngine.playSfx('pureTableToast');
-    } else if (barEv && barEv.pointsDelta < 0) {
-      soundEngine.playSfx('barNegative');
-    } else if (barEv) {
-      soundEngine.playSfx('barPositive');
-    } else {
-      soundEngine.playSfx('tilePlace');
-    }
+      if (!res.ok) {
+        soundEngine.playSfx('uiError');
+        if (res.status === 404 || data.error === 'ROOM_NOT_FOUND') {
+          set(
+            roomLostPatch(
+              'La sala ya no existe. Puede que el servidor se haya reiniciado; vuelve a crear una sala.',
+            ),
+          );
+          return false;
+        }
+        const message =
+          typeof data.error === 'string'
+            ? (data.message ?? data.error)
+            : (data.error?.message ?? data.message ?? 'Jugada inválida.');
+        // A rejection may mean the board/turn changed while the move was in flight.
+        // Clear the stale draft and refresh the authoritative snapshot so the player
+        // can immediately try again instead of being stuck on an old selection.
+        set({
+          errorBanner: message,
+          selectedTileId: null,
+          draftPlacements: [],
+          preferredJokerNation: undefined,
+          whyCannotBanner: null,
+        });
+        void get().pollRoom();
+        return false;
+      }
 
-    let nextLocalStats = get().localStats;
-    if (snap.phase === 'finished' && snap.gameState) {
-      soundEngine.playSfx('victoryFanfare');
-      void get().pollRoom();
-      const winners =
-        get().shareResult?.winners ??
-        snap.gameState.players
-          .slice()
-          .sort((a, b) => b.score - a.score)
-          .slice(0, 1)
-          .map((p) => p.id);
-      nextLocalStats = recordFinishedGameLocally(snap.gameState, myPlayerId, winners);
-    }
+      if (!data.snapshot) {
+        set({ errorBanner: 'El servidor no devolvió el estado de la partida.' });
+        return false;
+      }
 
-    set({
-      snapshot: snap,
-      screen: snap.phase,
-      selectedTileId: null,
-      draftPlacements: [],
-      preferredJokerNation: undefined,
-      pendingNegativeConfirm: null,
-      errorBanner: null,
-      whyCannotBanner: null,
-      localStats: nextLocalStats,
-      activeOverlay: snap.phase === 'finished' || move.type === 'swap' ? null : get().activeOverlay,
-    });
-    return true;
+      const snap = data.snapshot;
+      const recentEvents = snap.gameState?.log.slice(-4) ?? [];
+      const hasPure = recentEvents.some(
+        (ev) => ev.type === 'tile_seated' && ev.pureTablesCompleted > 0,
+      );
+      const barEv = recentEvents.find(
+        (ev): ev is Extract<typeof ev, { type: 'tile_bar' }> => ev.type === 'tile_bar',
+      );
+      if (hasPure) {
+        soundEngine.playSfx('pureTableToast');
+      } else if (barEv && barEv.pointsDelta < 0) {
+        soundEngine.playSfx('barNegative');
+      } else if (barEv) {
+        soundEngine.playSfx('barPositive');
+      } else {
+        soundEngine.playSfx('tilePlace');
+      }
+
+      let nextLocalStats = get().localStats;
+      if (snap.phase === 'finished' && snap.gameState) {
+        soundEngine.playSfx('victoryFanfare');
+        void get().pollRoom();
+        const winners =
+          get().shareResult?.winners ??
+          snap.gameState.players
+            .slice()
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 1)
+            .map((p) => p.id);
+        nextLocalStats = recordFinishedGameLocally(snap.gameState, myPlayerId, winners);
+      }
+
+      set({
+        snapshot: snap,
+        screen: snap.phase,
+        selectedTileId: null,
+        draftPlacements: [],
+        preferredJokerNation: undefined,
+        pendingNegativeConfirm: null,
+        errorBanner: null,
+        whyCannotBanner: null,
+        localStats: nextLocalStats,
+        activeOverlay:
+          snap.phase === 'finished' || move.type === 'swap' ? null : get().activeOverlay,
+      });
+      return true;
+    } finally {
+      moveRequestInFlight = false;
+    }
   },
 
   sendChat: async (text, isEmote = false) => {
@@ -724,17 +784,45 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
     if (!roomCode || screen === 'title') return;
     try {
       const res = await fetch(`/rooms/${roomCode}`);
-      if (!res.ok) return;
-      const data = await res.json();
-      if (data.snapshot) {
-        const nextPhase = data.snapshot.phase as 'lobby' | 'playing' | 'finished';
-        set((s) => ({
+      const data = (await res.json().catch(() => ({}))) as {
+        snapshot?: RoomSnapshot;
+        shareResult?: ShareResultPayload | null;
+        error?: string;
+        message?: string;
+      };
+      if (res.status === 404 || data.error === 'ROOM_NOT_FOUND') {
+        set(
+          roomLostPatch(
+            'La sala ya no existe. Puede que el servidor se haya reiniciado; vuelve a crear una sala.',
+          ),
+        );
+        return;
+      }
+      if (!res.ok || !data.snapshot) return;
+
+      const nextPhase = data.snapshot.phase;
+      set((s) => {
+        const prevGame = s.snapshot?.gameState;
+        const nextGame = data.snapshot?.gameState;
+        const turnChanged =
+          prevGame && nextGame
+            ? prevGame.turn !== nextGame.turn || prevGame.turnNumber !== nextGame.turnNumber
+            : false;
+        return {
           snapshot: data.snapshot,
-          shareResult: data.shareResult ?? null,
+          shareResult: (data.shareResult as typeof s.shareResult) ?? null,
           screen: nextPhase,
           activeOverlay: nextPhase !== s.screen ? null : s.activeOverlay,
-        }));
-      }
+          ...(turnChanged
+            ? {
+                selectedTileId: null,
+                draftPlacements: [],
+                preferredJokerNation: undefined,
+                whyCannotBanner: null,
+              }
+            : {}),
+        };
+      });
     } catch {
       // ignore transient network errors during poll
     }

@@ -5,6 +5,42 @@
 
 ---
 
+## Sesión 023 — 2026-10-26 — Diagnóstico de “Jugada inválida” con movimientos válidos
+
+**Objetivo:** localizar el fallo que dejaba a un jugador sin poder colocar cartas aunque fuera su turno y las jugadas parecieran válidas.
+
+**Diagnóstico:**
+- El mensaje genérico **“Jugada inválida.”** solo aparece cuando la respuesta del servidor no trae un `message` de regla. Las reglas sí devuelven mensajes concretos (“No es tu turno”, “La silla ya está ocupada”, etc.).
+- El caso que encaja es un **404 `ROOM_NOT_FOUND`**: la sala había desaparecido del servidor (reinicio de AI Studio/local, recarga del proceso o pérdida de la sala). El cliente seguía mostrando el tablero antiguo y cada intento recibía un 404 que se mostraba como “Jugada inválida.”.
+- `pollRoom` ignoraba silenciosamente los 404, así que la UI se quedaba congelada en una partida que ya no existía.
+- También había dos riesgos menores: se podía enviar dos veces la misma jugada (doble clic) y un borrador viejo podía sobrevivir a un cambio de turno/rechazo.
+
+**Hecho:**
+- `submitMove` y `pollRoom` detectan `404`/`ROOM_NOT_FOUND` y vuelven a la portada con el aviso:
+  “La sala ya no existe. Puede que el servidor se haya reiniciado; vuelve a crear una sala.”
+- Los errores usan ahora `data.message` o `data.error.message`; ya no se muestra “Jugada inválida.” si el servidor explica el motivo.
+- Al rechazar una jugada se limpian selección/borrador y se refresca la sala.
+- Al cambiar de turno se limpian selección/borrador para no reutilizar un estado viejo.
+- Añadido bloqueo de una sola petición de jugada en vuelo para evitar dobles envíos.
+- Añadido E2E: simula un 404 al enviar una jugada y comprueba que aparece el aviso y se vuelve a la portada.
+
+**Verificación:**
+- `typecheck` ✅
+- **49 tests** ✅
+- `build` ✅
+- `lint` ✅
+- E2E: **2 tests** ✅ (suite completa + sala desaparecida).
+
+**Problemas:**
+- Las salas viven en memoria; si el servidor se reinicia, la partida no se puede recuperar. Ahora al menos se avisa y no se queda bloqueada.
+- Si vuelve a pasar, el mensaje ya dirá si es sala perdida, turno, silla ocupada u otra regla.
+
+**Siguiente:**
+1. Repetir la partida con dos jugadores y confirmar que no vuelve a quedarse bloqueada.
+2. Si aparece otro rechazo, anotar el mensaje exacto y la acción.
+
+---
+
 ## Sesión 022 — 2026-10-25 — Cierre del puerto LAN y túnel HTTPS activo
 
 **Objetivo:** dejar de exponer el puerto local en la Wi-Fi y mantener la web accesible por HTTPS para la prueba en teléfono.

@@ -47,6 +47,9 @@ type TestStoreShape = {
   getState: () => {
     myPlayerId: string | null;
     snapshot: TestSnapshot | null;
+    screen: string;
+    errorBanner: string | null;
+    submitMove: (move: unknown) => Promise<boolean>;
   };
   setState: (patch: Record<string, unknown>) => void;
 };
@@ -483,5 +486,36 @@ test.describe('Cafetulia E2E v6 & v7 (Escena de café en portada/lobby, Sonido d
       );
       expect(finScroll).toBe(true);
     }
+  });
+
+  test('avisa y vuelve a la portada si la sala desaparece durante la partida', async ({ page }) => {
+    await page.goto('/');
+    await page.getByTestId('quick-start-btn').click();
+    await expect(page.getByTestId('papercraft-board')).toBeVisible();
+
+    await page.route('**/rooms/*/moves', async (route) => {
+      if (route.request().method() !== 'POST') {
+        await route.continue();
+        return;
+      }
+      await route.fulfill({
+        status: 404,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'ROOM_NOT_FOUND', message: 'Sala no encontrada.' }),
+      });
+    });
+
+    const result = await page.evaluate(async () => {
+      const store = (window as unknown as { __CAFETULIA_STORE__: TestStoreShape }).__CAFETULIA_STORE__;
+      const ok = await store.getState().submitMove({ type: 'bar', tileId: 'tile-inexistente' });
+      const state = store.getState();
+      return { ok, screen: state.screen, errorBanner: state.errorBanner };
+    });
+
+    expect(result.ok).toBe(false);
+    expect(result.screen).toBe('title');
+    expect(result.errorBanner).toContain('La sala ya no existe');
+    await expect(page.getByTestId('title-screen')).toBeVisible();
+    await expect(page.getByText(/La sala ya no existe/)).toBeVisible();
   });
 });
