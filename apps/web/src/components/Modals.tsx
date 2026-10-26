@@ -671,6 +671,8 @@ function StatsContent({ onClose }: { onClose: () => void }): React.ReactElement 
 function SettingsContent({ onClose }: { onClose: () => void }): React.ReactElement {
   const [vols, setVols] = useState(soundEngine.getVolumes());
   const [avatarOpen, setAvatarOpen] = useState(false);
+  const screen = useGameStore((s) => s.screen);
+  const inMatch = screen === 'playing' || screen === 'finished';
   const avatarId = useGameStore((s) => s.avatarId);
   const setAvatarId = useGameStore((s) => s.setAvatarId);
   const nickname = useGameStore((s) => s.nickname);
@@ -733,8 +735,9 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
               type="button"
               data-testid="settings-avatar-dropdown-btn"
               aria-expanded={avatarOpen}
+              disabled={inMatch}
               onClick={() => setAvatarOpen((v) => !v)}
-              className="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl cafe-btn-paper text-xs font-bold cursor-pointer"
+              className="inline-flex items-center gap-2 px-2.5 py-1 rounded-xl cafe-btn-paper text-xs font-bold cursor-pointer disabled:opacity-55 disabled:cursor-not-allowed"
             >
               <PlayerAvatar avatarId={avatarId} size={24} />
               <span>{currentAvatar?.label ?? 'Avatar'}</span>
@@ -754,14 +757,20 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
               maxLength={24}
+              disabled={inMatch}
               aria-label="Tu apodo"
-              className="px-2.5 py-1.5 rounded-xl bg-[#FFF9F0] border-[1.5px] border-[#231712]/35 text-xs font-bold w-36 shadow-inner"
+              className="px-2.5 py-1.5 rounded-xl bg-[#FFF9F0] border-[1.5px] border-[#231712]/35 text-xs font-bold w-36 shadow-inner disabled:opacity-55 disabled:cursor-not-allowed"
             />
           </div>
         </div>
-        {avatarOpen && (
+        {inMatch && (
+          <p className="text-[11px] font-bold text-[#A63F34] bg-[#FDECEB] border border-[#A63F34]/30 rounded-xl px-2.5 py-1.5">
+            Tu apodo y tu emblema quedan bloqueados durante la partida.
+          </p>
+        )}
+        {avatarOpen && !inMatch && (
           <div
-            className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 bg-[#FFF9F0] p-2.5 rounded-2xl border-2 border-[#8B5E3C] shadow-md"
+            className="flex gap-1.5 overflow-x-auto pb-1.5 snap-x snap-mandatory bg-[#FFF9F0] p-2.5 rounded-2xl border-2 border-[#8B5E3C] shadow-md"
             role="radiogroup"
             aria-label="Seleccionar avatar prehecho"
           >
@@ -779,14 +788,14 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
                     setAvatarOpen(false);
                   }}
                   title={av.label}
-                  className={`flex flex-col items-center justify-center p-1 rounded-xl border transition-transform cursor-pointer ${
+                  className={`snap-start shrink-0 w-[64px] flex flex-col items-center justify-center p-1 rounded-xl border transition-transform cursor-pointer ${
                     active
                       ? 'bg-[#FEF6E0] border-[#C96F4A] ring-2 ring-[#C96F4A] scale-105'
                       : 'bg-[#F7EEDF]/60 border-[#3E2F2A]/10 hover:bg-[#F7EEDF]'
                   }`}
                 >
-                  <PlayerAvatar avatarId={av.id} size={26} />
-                  <span className="text-[9px] font-semibold truncate w-full text-center mt-0.5">
+                  <PlayerAvatar avatarId={av.id} size={30} />
+                  <span className="text-[9px] font-semibold leading-tight w-full text-center mt-0.5">
                     {av.label}
                   </span>
                 </button>
@@ -938,7 +947,7 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
         </label>
 
         <label className="flex items-center justify-between py-0.5 text-xs font-semibold cursor-pointer">
-          <span>Vibración háptica suave en móvil (confirmar / aviso)</span>
+          <span>Vibración háptica en Android (confirmar / aviso)</span>
           <input
             type="checkbox"
             data-testid="settings-haptics-toggle"
@@ -951,6 +960,9 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
             className="w-4 h-4 accent-[#C96F4A]"
           />
         </label>
+        <p className="text-[10px] leading-snug text-[#6F5A4E]">
+          iOS no permite vibración web. En iPhone el aviso de turno usa sonido y el marco cálido de la pantalla.
+        </p>
       </div>
 
       {/* Visual & Accessibility toggles */}

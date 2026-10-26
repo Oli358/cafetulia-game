@@ -5,6 +5,36 @@
 
 ---
 
+## Sesión 027 — 2026-10-26 — Ajustes de móvil, turno y perfil (v9)
+
+**Objetivo:** corregir los problemas detectados en la prueba real de iPhone/PWA de la v8 y preparar el encargo v9.
+
+**Hecho:**
+- Movido el control de zoom fuera del cuadrado del tablero, para que no tape la última silla de España.
+- Mano convertida a fila flexible centrada: 3, 4 o 5 fichas quedan centradas.
+- `Bolsa: N` separada del scroll de jugadores en móvil.
+- Selector de avatar convertido en carrusel horizontal; apodo/avatar bloqueados durante partida y final.
+- Añadido marco cálido pulsante y campana al empezar el turno propio, con alternativa para iOS sin vibración.
+- Añadido `viewport-fit=cover`, `theme-color` crema, safe bottom y ocultado el footer móvil prescindible.
+- Añadidos ajustes de feedback de colocación y documentación del límite de vibración de iOS.
+- Verificado `typecheck`, `build`, `lint` y E2E (2 tests) con el servidor de producción.
+- Nuevo prompt `docs/ARGON/12-ajustes-movil-turno.md` y ZIP `cafetulia-v9-ajustes.zip`.
+- Captura de referencia en `docs/referencias/ui-v9-movil-fixes.png`.
+
+**Decisiones:**
+- La vibración en iPhone no se puede implementar por limitación de iOS; el aviso alternativo es sonido + marco visual.
+- El zoom móvil vive fuera del tablero.
+
+**Problemas:**
+- La validación de la banda de estado de iOS requiere el dispositivo real; se ha aplicado `theme-color`/viewport-fit como mejor esfuerzo.
+
+**Siguiente:**
+1. Enviar ZIP + prompt 12 a Argon.
+2. Integrar v9 y probar en iPhone.
+3. Render y keep-alive.
+
+---
+
 ## Sesión 026 — 2026-10-26 — Integración v8, revisión visual y montaje local
 
 **Objetivo:** integrar la entrega visual v8, comprobar que no rompe nada y dejarla disponible en local/PWA para probarla en el teléfono.

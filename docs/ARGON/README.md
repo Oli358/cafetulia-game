@@ -18,6 +18,7 @@ Esta carpeta contiene el contexto y los prompts para que **Gemini 4 Argon** impl
    - [`09-pulido-ui-v6.md`](09-pulido-ui-v6.md) — pulido de UI, cabecera, menús, final, cartas y movimiento
    - [`10-menu-sonido-musica.md`](10-menu-sonido-musica.md) — portada/lobby de café, SFX de UI y música con variación
    - [`11-pulido-visual-animaciones.md`](11-pulido-visual-animaciones.md) — dirección visual, materiales y sistema de animación
+   - [`12-ajustes-movil-turno.md`](12-ajustes-movil-turno.md) — zoom, mano, marcador, avatar, turno y safe areas de iPhone
 4. Al terminar cada fase, Argon debe:
    - Ejecutar `pnpm typecheck`, `pnpm test` y `pnpm build`.
    - Actualizar `docs/SESIONES.md` con la sesión.

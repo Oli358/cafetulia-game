@@ -143,7 +143,7 @@ function AvatarDropdownPicker({ compact = false }: { compact?: boolean }): React
               </svg>
             </button>
           </div>
-          <div className="grid grid-cols-4 gap-1.5 max-h-[52dvh] overflow-y-auto">
+          <div className="flex gap-2 overflow-x-auto pb-1.5 snap-x snap-mandatory">
             {PRESET_AVATARS.map((av) => {
               const active = avatarId === av.id;
               return (
@@ -159,20 +159,23 @@ function AvatarDropdownPicker({ compact = false }: { compact?: boolean }): React
                     btnRef.current?.focus();
                   }}
                   title={av.label}
-                  className={`flex flex-col items-center justify-center p-1.5 rounded-xl border transition-transform cursor-pointer ${
+                  className={`snap-start shrink-0 w-[78px] min-h-[92px] flex flex-col items-center justify-center p-1.5 rounded-xl border transition-transform cursor-pointer ${
                     active
                       ? 'bg-[#FEF6E0] border-[#C96F4A] ring-2 ring-[#C96F4A] scale-103'
                       : 'bg-[#F7EEDF]/75 border-[#3E2F2A]/10 hover:bg-[#F7EEDF]'
                   }`}
                 >
-                  <PlayerAvatar avatarId={av.id} size={28} />
-                  <span className="text-[9px] font-bold truncate w-full text-center mt-1">
+                  <PlayerAvatar avatarId={av.id} size={40} />
+                  <span className="text-[9px] font-bold leading-tight w-full text-center mt-1">
                     {av.label}
                   </span>
                 </button>
               );
             })}
           </div>
+          <p className="text-[10px] font-semibold text-[#6F5A4E]">
+            Desliza para elegir · tu emblema se ve en la mesa
+          </p>
         </div>
       </AnchoredPopover>
     </div>
@@ -1352,7 +1355,7 @@ export function TitleScreen(): React.ReactElement {
       </div>
 
       {/* Minimal café print footer */}
-      <footer className="relative z-10 shrink-0 text-center text-[11px] font-semibold text-[#FEF6E0] drop-shadow-[0_1px_1px_rgba(35,23,18,0.85)] pb-1">
+      <footer className="relative z-10 shrink-0 text-center text-[11px] font-semibold text-[#FEF6E0] drop-shadow-[0_1px_1px_rgba(35,23,18,0.85)] pb-1 hidden sm:block">
         100 fichas de cartón · Manos a la vista · Pulsa Enter para servir mesa rápida
       </footer>
     </div>
@@ -1426,7 +1429,7 @@ export function LobbyScreen(): React.ReactElement {
 
   return (
     <div
-      className="relative h-[100dvh] max-h-[100dvh] w-full overflow-hidden p-2 sm:p-5 max-w-6xl mx-auto flex flex-col justify-center select-none"
+      className="relative h-[100dvh] max-h-[100dvh] w-full overflow-hidden p-2 sm:p-5 max-w-6xl mx-auto flex flex-col justify-center select-none safe-bottom"
       data-testid="lobby-screen"
     >
       <div className="cafe-paper-sheet cafe-double-frame rounded-[24px] border-2 border-[#231712] p-3 sm:p-5 flex flex-col justify-between max-h-[96dvh] overflow-hidden gap-2.5">
@@ -2208,6 +2211,25 @@ export function PlayingScreen(): React.ReactElement {
 
   const activePlayerId = gameState?.turn ?? '';
   const isMyTurn = myRole === 'player' && activePlayerId === myPlayerId;
+  const turnSignalRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!isMyTurn) {
+      turnSignalRef.current = activePlayerId || null;
+      return;
+    }
+    if (turnSignalRef.current === activePlayerId) return;
+    turnSignalRef.current = activePlayerId;
+    soundEngine.playSfx('bell');
+    if (soundEngine.getVolumes().haptics && typeof navigator.vibrate === 'function') {
+      try {
+        navigator.vibrate([30, 35, 30]);
+      } catch {
+        // iOS Safari does not implement the Vibration API.
+      }
+    }
+  }, [isMyTurn, activePlayerId]);
+
   const activeHand = useMemo(
     () => (gameState ? (gameState.hands[activePlayerId] ?? []) : []),
     [gameState, activePlayerId],
@@ -2413,9 +2435,16 @@ export function PlayingScreen(): React.ReactElement {
 
   return (
     <div
-      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between px-1.5 py-1 sm:px-4 sm:py-1.5 gap-0.5 sm:gap-1 max-w-[1440px] mx-auto select-none"
+      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between px-1.5 py-1 sm:px-4 sm:py-1.5 gap-0.5 sm:gap-1 max-w-[1440px] mx-auto select-none safe-bottom"
       data-testid="playing-viewport"
     >
+      {isMyTurn && (
+        <div
+          data-testid="my-turn-glow"
+          aria-hidden="true"
+          className="cafe-turn-glow pointer-events-none fixed inset-0 z-20"
+        />
+      )}
       {/* 3D Coin Flip Animation Overlay */}
       <FlyingCoinsLayer flights={coinFlights} reducedMotion={reducedMotion} />
 
@@ -2625,10 +2654,10 @@ export function PlayingScreen(): React.ReactElement {
 
         {/* ROW 2: Full-Width Compact Scoreboard with Summary CoinTrays & Bag Counter */}
         <div
-          className="flex items-center justify-between gap-1 sm:gap-1.5 overflow-x-auto max-w-full pt-0.5 border-t border-[#3E2F2A]/10"
+          className="flex flex-col gap-0.5 max-w-full pt-0.5 border-t border-[#3E2F2A]/10"
           data-testid="compact-scoreboard"
         >
-          <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
+          <div className="flex items-center gap-1 sm:gap-1.5 min-w-0 overflow-x-auto">
             {gameState.players.map((p) => {
               const pHandCount = (gameState.hands[p.id] ?? []).length;
               const isTurn = gameState.turn === p.id;
@@ -2663,15 +2692,24 @@ export function PlayingScreen(): React.ReactElement {
                 </div>
               );
             })}
+            <span
+              data-testid="bag-counter-pill"
+              className="hidden sm:inline-block text-[11px] font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-2 py-0.5 rounded-xl border border-[#231712]/12 tabular-nums whitespace-nowrap shrink-0"
+              title="Fichas restantes en la bolsa"
+            >
+              Bolsa: {gameState.bag.length}
+            </span>
           </div>
 
-          <span
-            data-testid="bag-counter-pill"
-            className="text-[10px] sm:text-[11px] font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-1.5 sm:px-2 py-0.5 rounded-xl border border-[#231712]/12 tabular-nums whitespace-nowrap shrink-0"
-            title="Fichas restantes en la bolsa"
-          >
-            Bolsa: {gameState.bag.length}
-          </span>
+          <div className="sm:hidden flex justify-end pr-0.5">
+            <span
+              data-testid="bag-counter-pill-mobile"
+              className="text-[10px] font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-1.5 py-0.5 rounded-lg border border-[#231712]/12 tabular-nums whitespace-nowrap"
+              title="Fichas restantes en la bolsa"
+            >
+              Bolsa: {gameState.bag.length}
+            </span>
+          </div>
         </div>
       </header>
 
@@ -3115,7 +3153,7 @@ export function PlayingScreen(): React.ReactElement {
 
         {/* Center: 5 Opaque Square Rounded Cardboard Tiles (Flag Background + Caricature, ZERO visible text) */}
         <div
-          className="grid grid-cols-5 gap-1.5 w-full max-w-[356px] sm:max-w-none sm:w-auto sm:flex sm:items-center sm:justify-center sm:justify-self-center sm:gap-2.5 py-0.5"
+          className="flex items-center justify-center gap-1.5 w-full max-w-[356px] sm:max-w-none sm:w-auto sm:justify-self-center sm:gap-2.5 py-0.5"
           data-testid="hand-tiles-row"
         >
           {myHand.map((tile, idx) => {
@@ -3154,7 +3192,7 @@ export function PlayingScreen(): React.ReactElement {
                         ? `translateY(${fanLift.toFixed(1)}px) rotate(${fanDeg.toFixed(1)}deg)`
                         : undefined,
                 }}
-                className={`group relative aspect-square w-full sm:w-[72px] sm:h-[72px] rounded-[14px] p-0.5 flex items-center justify-center transition-all duration-150 cursor-pointer select-none shrink-0 ${
+                className={`group relative w-[64px] h-[64px] sm:w-[72px] sm:h-[72px] rounded-[14px] p-0.5 flex items-center justify-center transition-all duration-150 cursor-pointer select-none shrink-0 ${
                   isInDraft
                     ? 'opacity-35 bg-[#FFF9F0] ring-1 ring-[#3E2F2A]/20'
                     : isSelected
@@ -3166,7 +3204,7 @@ export function PlayingScreen(): React.ReactElement {
                   nation={tile.nation}
                   gender={tile.gender}
                   tileId={tile.id}
-                  size={66}
+                  size={62}
                   sipping={isSelected}
                 />
               </button>
@@ -3764,7 +3802,7 @@ export function FinishedScreen(): React.ReactElement {
   return (
     <div
       data-testid="finished-screen"
-      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden p-2 sm:p-5 flex flex-col items-center justify-center relative select-none bg-[#E6D3B8]"
+      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden p-2 sm:p-5 flex flex-col items-center justify-center relative select-none bg-[#E6D3B8] safe-bottom"
     >
       {/* Warm Evening Café Window Backdrop */}
       <svg
