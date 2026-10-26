@@ -5,6 +5,32 @@
 
 ---
 
+## Sesión 024 — 2026-10-26 — Preparación del encargo visual v8
+
+**Objetivo:** preparar el último encargo fuerte de Argon antes de que termine la suscripción, priorizando dirección visual y animaciones sobre nuevas mecánicas.
+
+**Hecho:**
+- Creado `docs/ARGON/11-pulido-visual-animaciones.md` con el encargo completo.
+- Añadida una auditoría crítica de la v7: portada/lobby aún demasiado “dashboard”, botones e iconos genéricos, tipografía sin Fraunces/Nunito, falta de profundidad y de lenguaje de movimiento.
+- El alcance queda cerrado a presentación y movimiento: sin tocar reglas, motor, servidor, `board.json`, cuentas, matchmaking ni modo asíncrono.
+- Se preservan las correcciones ganadas: mano centrada, cabecera, overlays, PWA, sala perdida, `O & A`, 49 tests y 2 E2E.
+- Preparado el ZIP `cafetulia-v8-visual.zip` con el prompt, el código base, capturas de referencia y las fotos de cartas en `references/cards/` (solo inspiración, fuera del build).
+
+**Decisiones:**
+- La v8 será un pase visual/animación, no una entrega de funcionalidades (D-085).
+- La referencia de materiales y paleta es `docs/ARTE_BIBLE.md`; la tipografía objetivo es Fraunces + Nunito Sans autoalojadas (D-086).
+
+**Problemas:**
+- El tiempo de Argon es limitado; si hay que recortar, primero portada, lobby, tablero y movimiento; después ajustes y arte fino.
+- La prueba final seguirá siendo en móvil real.
+
+**Siguiente:**
+1. Enviar ZIP + prompt 11 a Argon.
+2. Integrar, verificar tests y comparar capturas.
+3. Probar en teléfono y desplegar.
+
+---
+
 ## Sesión 023 — 2026-10-26 — Diagnóstico de “Jugada inválida” con movimientos válidos
 
 **Objetivo:** localizar el fallo que dejaba a un jugador sin poder colocar cartas aunque fuera su turno y las jugadas parecieran válidas.

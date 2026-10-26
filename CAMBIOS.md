@@ -83,3 +83,17 @@ Prompt implementado: `docs/ARGON/10-menu-sonido-musica.md`.
 - PWA HTTPS temporal: `https://logging-pretty-flow-expression.trycloudflare.com`.
 
 El túnel es temporal; el HTTP local no permite service worker/PWA en el teléfono. Para instalar, usar la URL HTTPS mientras el PC y `cloudflared` estén encendidos.
+
+## Base v8 — encargo visual
+
+- Prompt: `docs/ARGON/11-pulido-visual-animaciones.md`.
+- Incluye auditoría crítica de la v7 y dirección de arte/animación completa.
+- No hay cambios funcionales nuevos en esta preparación.
+- Se mantienen las correcciones de sala perdida, mano centrada, PWA y tests.
+- ZIP: `cafetulia-v8-visual.zip`.
+- Fotos de cartas en `references/cards/` solo como inspiración; no van al build.
+
+### Servidor local actualizado
+
+- Local: `http://localhost:3000` (solo `127.0.0.1`).
+- HTTPS temporal: `https://tech-stays-correctly-rpg.trycloudflare.com`.
