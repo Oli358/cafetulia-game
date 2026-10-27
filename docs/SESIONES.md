@@ -5,7 +5,7 @@
 
 ---
 
-## Sesión 027 — 2026-10-26 — Ajustes de móvil, turno y perfil (v9)
+## Sesión 028 - 2026-10-27 - Encargo visual v10\n\n**Objetivo:** preparar una pasada visual de Argon sobre la base v9, con prioridades claras y sin tocar reglas.\n\n**Hecho:**\n- Nuevo prompt `docs/ARGON/13-pulido-visual-v10.md`.\n- Diagnóstico visual: tablero pequeño en escritorio, HUD ruidoso, fichas poco táctiles, lobby/postal mejorables y arte de avatares a unificar.\n- Nuevo ZIP `cafetulia-v10-visual.zip` con la base v9 y el encargo v10.\n- Sin cambios de código en esta sesión.\n\n**Siguiente:** enviar el ZIP y el prompt a Argon; al volver, integrar y probar en iPhone.\n\n---\n\n## Sesión 027 - 2026-10-26 - Ajustes de móvil, turno y perfil (v9)
 
 **Objetivo:** corregir los problemas detectados en la prueba real de iPhone/PWA de la v8 y preparar el encargo v9.
 
