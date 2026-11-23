@@ -312,10 +312,10 @@
 @keyframes cafe-head-sway {
   0%,
   100% {
-    transform: rotate(-1deg) translateY(0);
+    transform: translateY(0);
   }
   50% {
-    transform: rotate(1.2deg) translateY(-2px);
+    transform: translateY(-1px);
   }
 }
 
@@ -443,7 +443,7 @@
 .cafe-head-gaze {
   transform-box: fill-box;
   transform-origin: 50% 90%;
-  transform: translate(-3px, 1px) rotate(-1.4deg);
+  transform: translateX(-2px);
   transition: transform 300ms ease-out;
 }
 

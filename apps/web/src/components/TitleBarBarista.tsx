@@ -213,8 +213,8 @@ export function TitleBarBarista({
           <path d="M128 127 Q150 138 174 125" fill="none" stroke={variant.skinShade} strokeWidth="1.6" opacity="0.28" />
           <path d="M112 86 Q116 106 128 119" fill="none" stroke="#F1C79C" strokeWidth="2.4" opacity="0.45" />
 
-          <path d="M115 70 Q128 64 141 68" fill="none" stroke={variant.hair} strokeWidth="4.2" strokeLinecap="round" />
-          <path d="M160 64 Q173 57 185 66" fill="none" stroke={variant.hair} strokeWidth="4.2" strokeLinecap="round" />
+          <path d="M115 69 Q128 64 141 68" fill="none" stroke={variant.hair} strokeWidth="4.2" strokeLinecap="round" />
+          <path d="M159 68 Q172 63 185 68" fill="none" stroke={variant.hair} strokeWidth="4.2" strokeLinecap="round" />
           <ellipse cx="130" cy="81" rx="6.5" ry="5" fill="#F4E4CC" stroke={variant.skinShade} strokeWidth="1" />
           <ellipse cx="170" cy="81" rx="6.5" ry="5" fill="#F4E4CC" stroke={variant.skinShade} strokeWidth="1" />
           <ellipse cx="135" cy="83" rx="3.2" ry="3.8" fill="#201916" />
@@ -274,9 +274,8 @@ export function TitleBarBarista({
 function ForwardHair({ variant }: { variant: BaristaVariant }): React.ReactElement {
   return (
     <g fill={variant.hair} stroke="#0B1D17" strokeWidth="3">
-      {/* Corte corto: nuca y laterales rebajados, volumen arriba */}
+      {/* Corte corto: nuca y laterales rebajados */}
       <path d="M101 80 C100 50 116 31 150 31 C184 31 200 50 199 80 C192 64 180 56 166 53 C152 50 138 54 126 62 C116 69 106 76 101 80 Z" />
-      <path d="M104 56 C116 44 130 39 145 42 C159 45 171 53 184 48 C190 46 194 42 197 38 C198 48 193 59 185 66 C174 74 161 74 149 69 C137 63 126 67 116 73 C109 77 105 71 104 66 C103 62 103 58 104 56 Z" fill={variant.hairLight} strokeWidth="2.4" opacity="0.9" />
       <path d="M101 80 Q97 86 101 92 Q105 86 106 78 Z" strokeWidth="2.2" />
       <path d="M199 80 Q203 86 199 92 Q195 86 194 78 Z" strokeWidth="2.2" />
       <path d="M106 83 Q110 87 111 92" fill="none" stroke={variant.hairLight} strokeWidth="1.4" opacity="0.5" />
@@ -290,13 +289,14 @@ function ForwardHair({ variant }: { variant: BaristaVariant }): React.ReactEleme
 function ForwardFringe({ variant }: { variant: BaristaVariant }): React.ReactElement {
   return (
     <g>
+      {/* Flequillo barrido hacia delante, con raya lateral y mechones */}
       <path
-        d="M105 61 C111 44 127 35 144 39 C157 42 167 50 180 48 C187 47 192 42 195 37 C197 48 192 60 184 68 C173 77 159 77 147 71 C136 66 126 68 116 74 C109 79 105 72 104 66 Z"
+        d="M105 61 C111 44 127 35 144 39 C157 42 167 50 180 48 C187 47 192 43 195 40 C196 50 191 60 184 68 C173 77 159 77 147 71 C136 66 126 68 116 74 C109 79 105 72 104 66 Z"
         fill={variant.hair}
         stroke="#0B1D17"
         strokeWidth="2.8"
       />
-      <path d="M112 55 C124 65 140 70 155 64 C167 59 178 51 188 42" fill="none" stroke={variant.hairLight} strokeWidth="1.8" opacity="0.5" />
+      <path d="M111 55 C124 65 140 70 155 64 C167 59 178 51 188 42" fill="none" stroke={variant.hairLight} strokeWidth="1.8" opacity="0.5" />
       <path d="M126 45 Q135 58 130 71" fill="none" stroke={variant.hairLight} strokeWidth="1.7" strokeLinecap="round" opacity="0.45" />
       <path d="M169 35 Q176 49 168 64" fill="none" stroke={variant.hairLight} strokeWidth="1.6" strokeLinecap="round" opacity="0.4" />
       <path d="M184 34 Q190 42 188 52" fill="none" stroke={variant.hairLight} strokeWidth="1.4" strokeLinecap="round" opacity="0.4" />

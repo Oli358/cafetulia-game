@@ -418,15 +418,15 @@ export function TitleBarScene({
       </div>
 
       {/* Dos gatos de la casa: siamés en la estantería y oscuro en la barra */}
-      <div className="pointer-events-none absolute bottom-[54.3%] right-[6.5%] z-[3] h-2 w-20 border-y border-[#0B1D17] bg-[#8B5E3C] shadow-[0_2px_0_#0B1D17] sm:right-[17.5%] sm:w-28" />
-      <div className="pointer-events-none absolute bottom-[55.2%] right-[8%] z-[3] h-2.5 w-14 rounded-[50%] bg-[#7A3F32]/80 sm:right-[19%] sm:w-20" />
+      <div className="pointer-events-none absolute bottom-[59.3%] right-[6.5%] z-[3] h-2 w-20 border-y border-[#0B1D17] bg-[#8B5E3C] shadow-[0_2px_0_#0B1D17] sm:right-[17.5%] sm:w-28" />
+      <div className="pointer-events-none absolute bottom-[60.2%] right-[8%] z-[3] h-2.5 w-14 rounded-[50%] bg-[#7A3F32]/80 sm:right-[19%] sm:w-20" />
       <button
         type="button"
         data-testid="title-cat-siames"
         onClick={() => petCat('Miau. El siamés de la casa te mira con ojos azules.')}
         aria-label="Acariciar al gato siamés"
         title="Acariciar al siamés"
-        className="absolute bottom-[55%] right-[8%] z-[4] w-[72px] cursor-pointer text-left transition-transform hover:-translate-y-0.5 focus:outline-2 focus:outline-offset-4 focus:outline-[#F0D278] sm:right-[19%] sm:w-28"
+        className="absolute bottom-[60%] right-[8%] z-[4] w-[72px] cursor-pointer text-left transition-transform hover:-translate-y-0.5 focus:outline-2 focus:outline-offset-4 focus:outline-[#F0D278] sm:right-[19%] sm:w-28"
       >
         <SiameseCat reducedMotion={reducedMotion} />
       </button>
