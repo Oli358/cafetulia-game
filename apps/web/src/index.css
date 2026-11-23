@@ -424,41 +424,6 @@
   animation: cafe-glint 4.8s ease-in-out infinite;
 }
 
-@keyframes cafe-raster-breathe {
-  0%,
-  100% {
-    transform: translateY(0) scale(1);
-  }
-  50% {
-    transform: translateY(-3px) scale(1.004);
-  }
-}
-
-.cafe-raster-breathe {
-  transform-origin: 50% 100%;
-  animation: cafe-raster-breathe 4.6s ease-in-out infinite;
-}
-
-@keyframes cafe-cat-breathe {
-  0%,
-  100% {
-    transform: translateY(0) rotate(-0.4deg);
-  }
-  50% {
-    transform: translateY(-2px) rotate(0.4deg);
-  }
-}
-
-.cafe-cat-breathe,
-.cafe-cat-breathe-delayed {
-  transform-origin: 50% 100%;
-  animation: cafe-cat-breathe 5.2s ease-in-out infinite;
-}
-
-.cafe-cat-breathe-delayed {
-  animation-delay: 0.9s;
-}
-
 @keyframes cafe-bubble {
   0% {
     opacity: 0;
@@ -490,10 +455,7 @@
   .cafe-shake,
   .cafe-pour,
   .cafe-blink,
-  .cafe-glint,
-  .cafe-raster-breathe,
-  .cafe-cat-breathe,
-  .cafe-cat-breathe-delayed {
+  .cafe-glint {
     animation: none;
   }
 

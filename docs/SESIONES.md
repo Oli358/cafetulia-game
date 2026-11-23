@@ -5,26 +5,6 @@
 
 ---
 
-## Sesión 035 - 2026-11-23 - Portada raster con los recursos definitivos
-
-**Objetivo:** dejar la portada con el mismo acabado de la referencia, usando los recursos que preparó el usuario.
-
-**Hecho:**
-- Recortado el fondo limpio de la cafetería desde `Café acogedor con cuatro baristas-3.png` (sin personajes).
-- Recortados los cuatro baristas con transparencia y sus acciones de la misma hoja.
-- Extraídos y limpiados los dos gatos (siamés y atigrado).
-- Sustituida la escena SVG por fondo raster + sprites; la pizarra, la barra, las plantas y la cafetera ya son las de la referencia.
-- La carta, el nombre, el avatar y los gatos siguen siendo HTML interactivo.
-- Añadida animación suave de respiración a los baristas y a los gatos.
-- Fondo convertido a JPEG para aligerar la carga.
-
-**Verificación:**
-- typecheck, lint, build y 3 E2E en verde.
-
-**Siguiente:** si el resultado convence, aplicar el mismo pipeline raster al lobby y al final.
-
----
-
 ## Sesión 034 - 2026-11-23 - Baristas según los bocetos y pizarra de la casa
 
 **Objetivo:** dejar de corregir el pelo a ciegas y seguir las hojas de referencia del usuario.
