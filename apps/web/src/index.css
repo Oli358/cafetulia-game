@@ -292,6 +292,29 @@
   --ink-muted: #D8C4B6;
 }
 
+/* Barista secando una copa en la portada. */
+@keyframes cafe-wipe {
+  0%,
+  100% {
+    transform: rotate(-1.5deg);
+  }
+  50% {
+    transform: rotate(4.5deg);
+  }
+}
+
+.cafe-wipe {
+  transform-box: fill-box;
+  transform-origin: 76% 48%;
+  animation: cafe-wipe 3.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cafe-wipe {
+    animation: none;
+  }
+}
+
 /* Turn-to-play cue: a warm frame around the whole table. */
 .cafe-turn-glow {
   border: 3px solid rgba(200, 107, 70, 0.72);

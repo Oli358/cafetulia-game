@@ -54,15 +54,15 @@ type TestStoreShape = {
   setState: (patch: Record<string, unknown>) => void;
 };
 
-test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de café en portada/lobby, mano centrada, Sonido del café, Header estable, menús exclusivos y O & A)', () => {
-  test('Cumple dirección visual v8 sin scroll en 1920x900, 1280x800 y 390x844 y genera las 7 capturas ui-v8-*.png', async ({
+test.describe('Cafetulia E2E v10 (barra de café, carta en primer plano, lobbies, mano centrada, sonido, menús exclusivos y O & A)', () => {
+  test('Cumple dirección visual v10 sin scroll en 1920x900, 1280x800 y 390x844 y genera las capturas ui-v10-*.png', async ({
     page,
   }) => {
-    // 1. Verificar Portada v8 (escena de café completa, avatar protagonista, saludo, pizarra del día y carta de menú) sin scroll en 390x844, 1280x800 y 1920x900
+    // 1. Verificar la portada v10: barra de café, barista, saludo, pizarra y carta física.
     for (const vp of [
-      { width: 390, height: 844, shot: 'ui-v8-portada-movil.png' },
-      { width: 1280, height: 800, shot: 'ui-v8-portada-1280.png' },
-      { width: 1920, height: 900, shot: 'ui-v8-portada-1920.png' },
+      { width: 390, height: 844, shot: 'ui-v10-portada-movil.png', menuShot: 'ui-v10-carta-movil.png' },
+      { width: 1280, height: 800, shot: 'ui-v10-portada-1280.png', menuShot: 'ui-v10-carta-1280.png' },
+      { width: 1920, height: 900, shot: 'ui-v10-portada-1920.png', menuShot: 'ui-v10-carta-1920.png' },
     ]) {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       if (page.url() === 'about:blank') {
@@ -81,7 +81,13 @@ test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de caf�
       }));
       expect(scrollCheck.scrollHeight).toBeLessThanOrEqual(scrollCheck.innerHeight + 1);
 
-      // Verificar áreas táctiles >= 44px en botones de menú principales y secundarios
+      await page.screenshot({ path: path.join(REF_DIR, vp.shot) });
+
+      // La carta se abre en primer plano y contiene la creación de sala, el nombre y las utilidades.
+      await page.getByTestId('title-menu-card').click();
+      await expect(page.getByTestId('title-menu-overlay')).toBeVisible();
+      await expect(page.getByTestId('title-menu-heading')).toBeVisible();
+
       for (const tid of [
         'title-hero-avatar',
         'quick-start-btn',
@@ -96,15 +102,26 @@ test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de caf�
         expect(box!.height).toBeGreaterThanOrEqual(42);
       }
 
-      await page.screenshot({ path: path.join(REF_DIR, vp.shot) });
+      const menuScroll = await page.evaluate(() => ({
+        scrollHeight: document.documentElement.scrollHeight,
+        innerHeight: window.innerHeight,
+      }));
+      expect(menuScroll.scrollHeight).toBeLessThanOrEqual(menuScroll.innerHeight + 1);
+      await page.screenshot({ path: path.join(REF_DIR, vp.menuShot) });
+      await page.keyboard.press('Escape');
+      await expect(page.getByTestId('title-menu-overlay')).toBeHidden();
     }
 
-    // 2. Verificar que pulsar el avatar protagonista abre el selector de avatar, y exclusión mutua con Subtítulos
+    // 2. El avatar del barista abre la carta; dentro se cambia el avatar y se comprueba la exclusión mutua con Subtítulos.
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.getByTestId('title-hero-avatar').click();
+    await expect(page.getByTestId('title-menu-overlay')).toBeVisible();
+    await page.getByTestId('avatar-dropdown-btn').click();
     await expect(page.getByTestId('avatar-dropdown-popover')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('avatar-dropdown-popover')).toBeHidden();
 
-    // Al abrir Subtítulos directamente, Avatar se cierra automáticamente
+    // Subtítulos se abre sin dejar el selector de avatar abierto.
     await page.getByTestId('subtitles-dropdown-btn').click();
     await expect(page.getByTestId('subtitles-dropdown-popover')).toBeVisible();
     await expect(page.getByTestId('avatar-dropdown-popover')).toBeHidden();
@@ -490,6 +507,7 @@ test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de caf�
 
   test('avisa y vuelve a la portada si la sala desaparece durante la partida', async ({ page }) => {
     await page.goto('/');
+    await page.getByTestId('title-menu-card').click();
     await page.getByTestId('quick-start-btn').click();
     await expect(page.getByTestId('papercraft-board')).toBeVisible();
 

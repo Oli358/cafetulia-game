@@ -5,6 +5,27 @@
 
 ---
 
+## Sesión 031 - 2026-11-23 - Rediseño de la portada: la barra
+
+**Objetivo:** sustituir el menú de tarjetas por una portada de barra de café, más física y menos generada por IA.
+
+**Hecho:**
+- Nueva escena `TitleBarScene`: barra de madera, espejo, estanterías, lámparas, ventana y barista secando una copa.
+- El avatar elegido aparece como pin del delantal; el saludo y el nombre están en una placa de la barra.
+- La carta física “Menú” abre un panel en primer plano con nombre, avatar, subtítulos, mesa rápida, crear sala, entrar con código, tutorial, reglas y ajustes.
+- El panel respeta Escape, foco inicial, backdrop y reducción de movimiento.
+- El error de sala perdida se muestra también en la portada cerrada.
+- Añadido `docs/DISENO_INTERFAZ.md` como contrato visual y `vite.config` ignora `.opencode` para evitar bloqueos del watcher.
+- Actualizados E2E y capturas `ui-v10-*`.
+
+**Verificación:**
+- `typecheck`, `lint`, `build`, 49 tests y 2 E2E en verde.
+- Scanner `avoid-ai-design` sobre la nueva escena: sin hallazgos.
+
+**Siguiente:** aplicar el contrato de interfaz al lobby y revisar el contraste del panel de carta en iPhone.
+
+---
+
 ## Sesión 030 - 2026-11-23 - Skills de diseño del proyecto
 
 **Objetivo:** incorporar ayuda de diseño para renovar el menú principal sin depender de Argon.

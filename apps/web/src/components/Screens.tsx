@@ -37,6 +37,7 @@ import {
   type CoinFlightEvent,
 } from './CoinTray';
 import { IllustratedBoard, type ChairToastInfo } from './IllustratedBoard';
+import { TitleBarScene } from './TitleBarScene';
 import { AnchoredPopover } from './Modals';
 
 const LazyPapercraftBoard = React.lazy(() => import('./PapercraftBoard'));
@@ -351,372 +352,6 @@ function SubtitlesDropdownPicker({ compact = false }: { compact?: boolean }): Re
   );
 }
 
-/**
- * Panoramic Layered Café Stage SVG:
- * Used both as the full-stage atmospheric backdrop and the interactive counter corner.
- * Includes arched window with golden sunbeams, swaying hanging plant, spinning vinyl turntable,
- * sleeping cat moving its tail, brass O & A plaque, espresso machine, and steaming cup.
- */
-function CafeCornerIllustration({
-  reducedMotion,
-  parallax = { x: 0, y: 0 },
-  compact = false,
-}: {
-  reducedMotion: boolean;
-  parallax?: { x: number; y: number };
-  compact?: boolean;
-}): React.ReactElement {
-  const bgTx = reducedMotion ? 0 : parallax.x * 2.5;
-  const bgTy = reducedMotion ? 0 : parallax.y * 1.8;
-  const midTx = reducedMotion ? 0 : parallax.x * 5;
-  const midTy = reducedMotion ? 0 : parallax.y * 3.5;
-  const fgTx = reducedMotion ? 0 : parallax.x * 7.5;
-  const fgTy = reducedMotion ? 0 : parallax.y * 4.5;
-
-  return (
-    <svg
-      viewBox="0 0 460 230"
-      preserveAspectRatio={compact ? 'xMidYMid meet' : 'xMidYMid slice'}
-      aria-hidden="true"
-      className={
-        compact
-          ? 'w-full h-[104px] sm:h-[126px] rounded-2xl border-2 border-[#231712] bg-[#F2E3CA] shadow-[inset_0_2px_8px_rgba(35,23,18,0.12),0_3px_0_#231712] block'
-          : 'w-full h-[192px] xl:h-[220px] rounded-[20px] border-2 border-[#231712] bg-[#F2E3CA] shadow-[inset_0_2px_10px_rgba(35,23,18,0.14),0_4px_0_#231712] block'
-      }
-    >
-      <defs>
-        <linearGradient id="cafeWallGradV8" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#F9EFE0" />
-          <stop offset="68%" stopColor="#EAD6B8" />
-          <stop offset="100%" stopColor="#DEC39E" />
-        </linearGradient>
-        <linearGradient id="windowSkyGradV8" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#FFF2C2" />
-          <stop offset="55%" stopColor="#F5C47E" />
-          <stop offset="100%" stopColor="#D68C54" />
-        </linearGradient>
-        <linearGradient id="sunbeamGradV8" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#FFF7D6" stopOpacity="0.48" />
-          <stop offset="100%" stopColor="#FFF7D6" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-
-      {/* LAYER 1: Wallpaper, Wainscoting & Framed Prints */}
-      <g transform={`translate(${bgTx}, ${bgTy})`}>
-        <rect x="-16" y="-16" width="492" height="262" fill="url(#cafeWallGradV8)" />
-        {/* Subtle vertical café wallpaper stripes */}
-        {[30, 80, 130, 180, 230, 280, 330, 380, 430].map((x) => (
-          <line
-            key={x}
-            x1={x}
-            y1="0"
-            x2={x}
-            y2="156"
-            stroke="#8B5E3C"
-            strokeWidth="1"
-            opacity="0.11"
-          />
-        ))}
-        {/* Dark wood wainscoting paneling */}
-        <rect x="-16" y="154" width="492" height="86" fill="#6E472B" opacity="0.28" />
-        <line x1="-16" y1="154" x2="476" y2="154" stroke="#231712" strokeWidth="2.2" />
-      </g>
-
-      {/* LAYER 2: Arched Window, Sunbeams, Hanging Plant, Brass O & A Plaque, Turntable */}
-      <g transform={`translate(${midTx}, ${midTy})`}>
-        {/* Arched Café Window (Left) */}
-        <g transform="translate(22, 14)">
-          <path
-            d="M0 128 L0 54 A62 52 0 0 1 124 54 L124 128 Z"
-            fill="url(#windowSkyGradV8)"
-            stroke="#231712"
-            strokeWidth="3.4"
-          />
-          {/* Afternoon sun & European café rooftops */}
-          <circle cx="88" cy="40" r="14" fill="#FFFDF4" opacity="0.9" />
-          <path d="M4 126 L30 92 L58 126 Z" fill="#8C583A" opacity="0.42" />
-          <path d="M44 126 L80 84 L120 126 Z" fill="#5C3A28" opacity="0.45" />
-          {/* Window muntin bars */}
-          <line x1="62" y1="3" x2="62" y2="128" stroke="#231712" strokeWidth="2.6" />
-          <line x1="3" y1="68" x2="121" y2="68" stroke="#231712" strokeWidth="2.6" />
-
-          {/* Diagonal golden afternoon sunbeam across the café room */}
-          <polygon
-            points="16,42 122,68 230,175 74,175"
-            fill="url(#sunbeamGradV8)"
-          />
-
-          {/* Sleeping Cat on the windowsill with animated tail */}
-          <g transform="translate(68, 106)">
-            <ellipse cx="18" cy="12" rx="16" ry="8.5" fill="#2F211C" stroke="#231712" strokeWidth="1.5" />
-            <circle cx="7" cy="10" r="7" fill="#2F211C" stroke="#231712" strokeWidth="1.5" />
-            <polygon points="2,5 5,-1 9,5" fill="#2F211C" />
-            <polygon points="8,5 12,-1 14,5" fill="#2F211C" />
-            <path d="M4 10 Q6.5 12 9 10" stroke="#FFFDF8" strokeWidth="1.4" fill="none" />
-            <path
-              d="M31 14 Q41 16 37 23"
-              stroke="#2F211C"
-              strokeWidth="3.5"
-              strokeLinecap="round"
-              fill="none"
-              className={reducedMotion ? '' : 'animate-cafe-tail'}
-            />
-          </g>
-
-          {/* Wooden Windowsill */}
-          <rect
-            x="-6"
-            y="125"
-            width="136"
-            height="7"
-            rx="2.5"
-            fill="#6E472B"
-            stroke="#231712"
-            strokeWidth="2.2"
-          />
-        </g>
-
-        {/* Hanging Botanical Plant (Swaying gently) */}
-        <g
-          transform="translate(188, 0)"
-          className={reducedMotion ? '' : 'animate-cafe-plant'}
-        >
-          <line x1="22" y1="0" x2="22" y2="26" stroke="#231712" strokeWidth="2" />
-          <path
-            d="M10 26 L34 26 L30 43 L14 43 Z"
-            fill="#C86B46"
-            stroke="#231712"
-            strokeWidth="2"
-          />
-          <ellipse cx="7" cy="32" rx="9" ry="4.5" transform="rotate(-25 7 32)" fill="#3D5B47" stroke="#231712" strokeWidth="1.5" />
-          <ellipse cx="37" cy="32" rx="9" ry="4.5" transform="rotate(25 37 32)" fill="#3D5B47" stroke="#231712" strokeWidth="1.5" />
-          <ellipse cx="22" cy="23" rx="8" ry="4.5" fill="#4E735B" stroke="#231712" strokeWidth="1.5" />
-          <path
-            d="M16 43 Q9 56 14 70"
-            stroke="#3D5B47"
-            strokeWidth="2.2"
-            fill="none"
-            strokeLinecap="round"
-          />
-          <circle cx="11" cy="56" r="4" fill="#3D5B47" stroke="#231712" strokeWidth="1.2" />
-          <circle cx="14" cy="68" r="3.5" fill="#4E735B" stroke="#231712" strokeWidth="1.2" />
-        </g>
-
-        {/* Brass O & A Commemorative Plaque on the Café Wall */}
-        <g transform="translate(182, 86)">
-          <rect
-            x="2"
-            y="3"
-            width="70"
-            height="28"
-            rx="5"
-            fill="#231712"
-            opacity="0.3"
-          />
-          <rect
-            x="0"
-            y="0"
-            width="70"
-            height="28"
-            rx="5"
-            fill="#FEF6E0"
-            stroke="#231712"
-            strokeWidth="2.2"
-          />
-          <rect
-            x="3"
-            y="3"
-            width="64"
-            height="22"
-            rx="3"
-            fill="none"
-            stroke="#C8A12A"
-            strokeWidth="1.8"
-          />
-          <circle cx="7" cy="14" r="1.5" fill="#C8A12A" />
-          <circle cx="63" cy="14" r="1.5" fill="#C8A12A" />
-          <text
-            x="35"
-            y="18"
-            textAnchor="middle"
-            fill="#231712"
-            fontSize="11.5"
-            fontFamily="Fraunces, serif"
-            fontWeight="800"
-          >
-            O &amp; A
-          </text>
-        </g>
-
-        {/* Wooden Shelf with Spinning Vinyl Turntable & Books (Right) */}
-        <g transform="translate(292, 58)">
-          {/* Books on left of shelf */}
-          <rect x="2" y="28" width="11" height="28" rx="1.5" fill="#3D5B47" stroke="#231712" strokeWidth="1.8" />
-          <rect x="13" y="24" width="12" height="32" rx="1.5" fill="#C86B46" stroke="#231712" strokeWidth="1.8" />
-          {/* Turntable Wooden Plinth */}
-          <rect
-            x="32"
-            y="38"
-            width="94"
-            height="18"
-            rx="3.5"
-            fill="#8C583A"
-            stroke="#231712"
-            strokeWidth="2.2"
-          />
-          {/* Spinning Vinyl Record Platter */}
-          <g transform="translate(76, 33)">
-            <ellipse
-              cx="0"
-              cy="0"
-              rx="32"
-              ry="9"
-              fill="#231712"
-              stroke="#3E2F2A"
-              strokeWidth="1.5"
-            />
-            <ellipse cx="0" cy="0" rx="22" ry="6" fill="none" stroke="#FFFDF8" strokeWidth="0.7" opacity="0.35" />
-            <ellipse cx="0" cy="0" rx="11" ry="3.2" fill="#C86B46" />
-            <circle cx="0" cy="0" r="2" fill="#FFFDF8" />
-          </g>
-          {/* Brass Tonearm */}
-          <line
-            x1="112"
-            y1="27"
-            x2="88"
-            y2="34"
-            stroke="#C8A12A"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-          {/* Shelf plank */}
-          <rect
-            x="-6"
-            y="56"
-            width="148"
-            height="7"
-            rx="2.5"
-            fill="#6E472B"
-            stroke="#231712"
-            strokeWidth="2.2"
-          />
-          {/* Hand-drawn SVG music notes */}
-          <g
-            transform="translate(52, 6)"
-            className={reducedMotion ? '' : 'animate-cafe-steam'}
-          >
-            <circle cx="4" cy="12" r="3" fill="#C86B46" />
-            <path d="M6.5 12 V2 L14 4 V7 L6.5 5" fill="#C86B46" stroke="#231712" strokeWidth="1.2" />
-          </g>
-          <g
-            transform="translate(96, 2)"
-            className={reducedMotion ? '' : 'animate-cafe-steam-delayed'}
-          >
-            <circle cx="4" cy="11" r="2.8" fill="#3D5B47" />
-            <line x1="6.5" y1="11" x2="6.5" y2="2" stroke="#3D5B47" strokeWidth="2" />
-          </g>
-        </g>
-      </g>
-
-      {/* LAYER 3: Foreground Café Counter, Linen Runner & Steaming Cup */}
-      <g transform={`translate(${fgTx}, ${fgTy})`}>
-        <g transform="translate(0, 162)">
-          {/* Polished wood bar counter top */}
-          <path
-            d="M-12 16 L472 16 L484 68 L-24 68 Z"
-            fill="#7B5236"
-            stroke="#231712"
-            strokeWidth="2.6"
-          />
-          <line x1="0" y1="21" x2="460" y2="21" stroke="#FFFDF8" strokeWidth="1.5" opacity="0.28" />
-
-          {/* Cream linen runner mat */}
-          <path
-            d="M124 20 L336 20 L348 64 L112 64 Z"
-            fill="#FFFDF8"
-            stroke="#231712"
-            strokeWidth="2"
-          />
-          <path
-            d="M130 24 L330 24 L340 60 L120 60 Z"
-            fill="none"
-            stroke="#C8A12A"
-            strokeWidth="1.4"
-            strokeDasharray="5 3"
-          />
-
-          {/* Croissant on small plate (Left of cup) */}
-          <g transform="translate(158, 38)">
-            <ellipse cx="0" cy="7" rx="18" ry="5.5" fill="#FFFDF8" stroke="#231712" strokeWidth="1.8" />
-            <path
-              d="M-11 5 Q-8 -4 0 -4 Q8 -4 11 5 Q6 8 3 3 Q0 1 -3 3 Q-6 8 -11 5 Z"
-              fill="#D69B43"
-              stroke="#231712"
-              strokeWidth="1.8"
-            />
-          </g>
-
-          {/* Steaming Porcelain Espresso Cup (Center-Right) */}
-          <g transform="translate(248, 8)">
-            <path
-              d="M-7 -4 Q-12 -16 -4 -26"
-              stroke="#FFFDF8"
-              strokeWidth="2.6"
-              strokeLinecap="round"
-              fill="none"
-              className={reducedMotion ? '' : 'animate-cafe-steam'}
-            />
-            <path
-              d="M5 -2 Q10 -14 3 -24"
-              stroke="#FFFDF8"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              fill="none"
-              className={reducedMotion ? '' : 'animate-cafe-steam-delayed'}
-            />
-            <ellipse
-              cx="0"
-              cy="30"
-              rx="25"
-              ry="7"
-              fill="#FFFDF8"
-              stroke="#231712"
-              strokeWidth="2"
-            />
-            <path
-              d="M-16 10 L16 10 L12 28 C12 32 -12 32 -12 28 Z"
-              fill="#C86B46"
-              stroke="#231712"
-              strokeWidth="2.2"
-            />
-            <ellipse
-              cx="0"
-              cy="10"
-              rx="16"
-              ry="4.2"
-              fill="#2F211C"
-              stroke="#231712"
-              strokeWidth="1.8"
-            />
-            <path
-              d="M15 13 C23 13 23 24 14 24"
-              stroke="#C86B46"
-              strokeWidth="3.2"
-              fill="none"
-            />
-            <path
-              d="M15 13 C23 13 23 24 14 24"
-              stroke="#231712"
-              strokeWidth="1.4"
-              fill="none"
-            />
-          </g>
-        </g>
-      </g>
-    </svg>
-  );
-}
-
 export function TitleScreen(): React.ReactElement {
   const nickname = useGameStore((s) => s.nickname);
   const setNickname = useGameStore((s) => s.setNickname);
@@ -725,14 +360,16 @@ export function TitleScreen(): React.ReactElement {
   const joinRoom = useGameStore((s) => s.joinRoom);
   const quickStartWithBots = useGameStore((s) => s.quickStartWithBots);
   const setActiveModal = useGameStore((s) => s.setActiveModal);
-  const toggleOverlay = useGameStore((s) => s.toggleOverlay);
+  const activeModal = useGameStore((s) => s.activeModal);
+  const activeOverlay = useGameStore((s) => s.activeOverlay);
   const errorBanner = useGameStore((s) => s.errorBanner);
   const isBusy = useGameStore((s) => s.isBusy);
   const reducedMotion = useGameStore((s) => s.reducedMotion);
 
   const [joinCodeInput, setJoinCodeInput] = useState('');
   const [phraseIndex, setPhraseIndex] = useState(0);
-  const [parallax, setParallax] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuCloseRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -742,232 +379,78 @@ export function TitleScreen(): React.ReactElement {
     return () => window.clearInterval(timer);
   }, [reducedMotion]);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const focusTimer = window.setTimeout(() => menuCloseRef.current?.focus(), 40);
+    return () => window.clearTimeout(focusTimer);
+  }, [menuOpen]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (activeModal || activeOverlay) return;
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
+        setMenuOpen(false);
+        return;
+      }
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      const tag = (event.target as HTMLElement | null)?.tagName;
+      if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'A') {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+    };
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, [activeModal, activeOverlay, menuOpen]);
+
   const greetingText = useMemo(() => getCafeGreeting(nickname), [nickname]);
   const dailyPhrase = CAFE_DAILY_PHRASES[phraseIndex] ?? CAFE_DAILY_PHRASES[0];
-  const currentAvatar =
-    PRESET_AVATARS.find((a) => a.id === avatarId) ?? {
-      id: 'espresso',
-      label: 'Taza Espresso',
-      bg: '#C96F4A',
-      kind: 'icon' as const,
-    };
 
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (reducedMotion) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    if (rect.width <= 0 || rect.height <= 0) return;
-    const nx = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
-    const ny = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-    setParallax({ x: Math.max(-1, Math.min(1, nx)), y: Math.max(-1, Math.min(1, ny)) });
+  const openMenu = () => {
+    soundEngine.unlock();
+    soundEngine.playSfx('uiToggle');
+    setMenuOpen(true);
+  };
+
+  const closeMenu = () => {
+    soundEngine.playSfx('uiToggle');
+    setMenuOpen(false);
+  };
+
+  const openAvatarPicker = () => {
+    openMenu();
   };
 
   return (
     <div
-      onPointerMove={handlePointerMove}
-      onPointerLeave={() => setParallax({ x: 0, y: 0 })}
-      className="relative h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between select-none"
+      className="relative h-[100dvh] max-h-[100dvh] w-full overflow-hidden select-none"
       data-testid="title-screen"
     >
-      {/* FULL-STAGE ARCHITECTURAL CAFÉ BACKDROP (Envelops the entire viewport on 1280/1920 & mobile) */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      <TitleBarScene
+        avatarId={avatarId}
+        nickname={nickname}
+        greeting={greetingText}
+        reducedMotion={reducedMotion}
+        menuOpen={menuOpen}
+        onOpenMenu={openMenu}
+        onAvatarClick={openAvatarPicker}
+      />
+
+      <header
+        className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 px-3 sm:px-6"
+        style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top))' }}
       >
-        <svg
-          viewBox="0 0 1600 900"
-          preserveAspectRatio="xMidYMid slice"
-          className="w-full h-full block"
-        >
-          <defs>
-            <linearGradient id="stageRoomWallGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#EFE0C6" />
-              <stop offset="62%" stopColor="#E4CEAC" />
-              <stop offset="100%" stopColor="#D3B48C" />
-            </linearGradient>
-            <radialGradient id="lampGlowGrad" cx="50%" cy="35%" r="55%">
-              <stop offset="0%" stopColor="#FFF6D1" stopOpacity="0.78" />
-              <stop offset="55%" stopColor="#F9DF9B" stopOpacity="0.25" />
-              <stop offset="100%" stopColor="#F9DF9B" stopOpacity="0" />
-            </radialGradient>
-            <linearGradient id="stageWindowSky" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#FFF4C9" />
-              <stop offset="60%" stopColor="#F4C37E" />
-              <stop offset="100%" stopColor="#D88D56" />
-            </linearGradient>
-          </defs>
-
-          {/* Warm afternoon plaster wall */}
-          <rect x="0" y="0" width="1600" height="900" fill="url(#stageRoomWallGrad)" />
-
-          {/* Subtle vintage café wallpaper stripes */}
-          {[
-            80, 160, 240, 320, 400, 480, 560, 640, 720, 800, 880, 960, 1040, 1120, 1200, 1280,
-            1360, 1440, 1520,
-          ].map((x) => (
-            <line
-              key={x}
-              x1={x}
-              y1="0"
-              x2={x}
-              y2="620"
-              stroke="#7B5236"
-              strokeWidth="1.5"
-              opacity="0.09"
-            />
-          ))}
-
-          {/* Top wooden crown molding beam */}
-          <rect x="0" y="0" width="1600" height="22" fill="#5A3A26" />
-          <line x1="0" y1="22" x2="1600" y2="22" stroke="#231712" strokeWidth="3" />
-
-          {/* Left Panoramic Arched Café Window & Golden Afternoon Sunbeam */}
-          <g transform="translate(56, 88)" opacity="0.88">
-            <path
-              d="M0 440 L0 160 A165 145 0 0 1 330 160 L330 440 Z"
-              fill="url(#stageWindowSky)"
-              stroke="#231712"
-              strokeWidth="5"
-            />
-            <circle cx="235" cy="115" r="36" fill="#FFFDF6" opacity="0.85" />
-            <line x1="165" y1="15" x2="165" y2="440" stroke="#231712" strokeWidth="4" />
-            <line x1="0" y1="210" x2="330" y2="210" stroke="#231712" strokeWidth="4" />
-            <line x1="0" y1="330" x2="330" y2="330" stroke="#231712" strokeWidth="3.5" />
-            <rect
-              x="-14"
-              y="436"
-              width="358"
-              height="16"
-              rx="5"
-              fill="#6E472B"
-              stroke="#231712"
-              strokeWidth="3.5"
-            />
-            {/* Diagonal sunbeam across the room */}
-            <polygon
-              points="30,120 325,205 780,620 210,620"
-              fill="#FFF8DC"
-               opacity="0.22"
-            />
-          </g>
-
-          {/* Right Café Wall Wooden Shelves with Coffee Canisters, Carafe & Framed Prints */}
-          <g transform="translate(1190, 128)" opacity="0.88">
-            {/* Framed botanical & coffee press prints */}
-            <rect
-              x="20"
-              y="0"
-              width="110"
-              height="138"
-              rx="8"
-              fill="#FFFDF8"
-              stroke="#231712"
-              strokeWidth="3.5"
-            />
-            <rect
-              x="32"
-              y="12"
-              width="86"
-              height="114"
-              rx="4"
-              fill="#F3E5CE"
-              stroke="#C8A12A"
-              strokeWidth="2"
-            />
-            <circle cx="75" cy="68" r="24" fill="#C86B46" opacity="0.85" />
-            <path d="M62 82 Q75 50 88 82" stroke="#231712" strokeWidth="3" fill="none" />
-
-            <rect
-              x="156"
-              y="18"
-              width="124"
-              height="120"
-              rx="8"
-              fill="#FFFDF8"
-              stroke="#231712"
-              strokeWidth="3.5"
-            />
-            <rect
-              x="168"
-              y="30"
-              width="100"
-              height="96"
-              rx="4"
-              fill="#E9F0E8"
-              stroke="#3D5B47"
-              strokeWidth="2"
-            />
-            <ellipse cx="218" cy="78" rx="28" ry="15" fill="#3D5B47" opacity="0.75" />
-
-            {/* Lower wooden shelf with brass espresso tins */}
-            <rect x="40" y="218" width="42" height="54" rx="5" fill="#C86B46" stroke="#231712" strokeWidth="3" />
-            <rect x="92" y="206" width="46" height="66" rx="5" fill="#3D5B47" stroke="#231712" strokeWidth="3" />
-            <rect x="150" y="224" width="38" height="48" rx="5" fill="#C8A12A" stroke="#231712" strokeWidth="3" />
-            <rect
-              x="0"
-              y="272"
-              width="310"
-              height="14"
-              rx="4"
-              fill="#6E472B"
-              stroke="#231712"
-              strokeWidth="3.5"
-            />
-          </g>
-
-          {/* Three Hanging Warm Brass & Milk-Glass Café Pendant Lamps */}
-          {[310, 800, 1290].map((lx, idx) => (
-            <g key={lx} transform={`translate(${lx}, 0)`}>
-              <circle cx="0" cy="180" r={idx === 1 ? 260 : 210} fill="url(#lampGlowGrad)" />
-              <line x1="0" y1="22" x2="0" y2={idx === 1 ? 94 : 112} stroke="#231712" strokeWidth="3.5" />
-              <path
-                d={`M-38 ${idx === 1 ? 118 : 136} Q0 ${idx === 1 ? 82 : 100} 38 ${idx === 1 ? 118 : 136} Z`}
-                fill="#C8A12A"
-                stroke="#231712"
-                strokeWidth="3"
-              />
-              <ellipse
-                cx="0"
-                cy={idx === 1 ? 122 : 140}
-                rx="22"
-                ry="9"
-                fill="#FFFDF4"
-                stroke="#231712"
-                strokeWidth="2.5"
-              />
-            </g>
-          ))}
-
-          {/* Carved Wood Wainscoting & Continuous Café Bar Horizon Across Bottom */}
-          <rect x="0" y="610" width="1600" height="290" fill="#6E472B" />
-          <rect x="0" y="610" width="1600" height="18" fill="#8C583A" stroke="#231712" strokeWidth="3" />
-          <line x1="0" y1="615" x2="1600" y2="615" stroke="#C8A12A" strokeWidth="2" opacity="0.65" />
-          {[120, 340, 560, 780, 1000, 1220, 1440].map((px) => (
-            <rect
-              key={px}
-              x={px - 80}
-              y="646"
-              width="160"
-              height="210"
-              rx="8"
-              fill="#5A3A26"
-              stroke="#231712"
-              strokeWidth="2.5"
-              opacity="0.65"
-            />
-          ))}
-        </svg>
-      </div>
-
-      {/* Top Café Awning & Chalkboard Header */}
-      <header className="relative z-10 shrink-0 w-full max-w-6xl mx-auto px-3 pt-1.5 sm:px-6 sm:pt-3 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2.5 bg-[#FFFDF8]/92 px-3 py-1 rounded-2xl border-2 border-[#231712] shadow-[0_3px_0_#231712]">
+        <div className="pointer-events-auto inline-flex items-center border-2 border-[#0B1D17] bg-[#F1E3CC] px-2.5 py-1.5 shadow-[3px_3px_0_#0B1D17]">
           <CafetuliaLogo compact />
-          <span className="hidden md:inline-block text-xs text-[#5A453B] font-semibold border-l-2 border-[#231712]/20 pl-2.5">
-            Salón de té y tertulia internacional · O &amp; A
+          <span className="ml-2 hidden border-l border-[#0B1D17]/25 pl-2 text-[11px] font-semibold text-[#315A48] md:inline">
+            Café de tertulia
           </span>
         </div>
 
-        {/* Hanging Slate Chalkboard with Daily Phrase */}
         <button
           type="button"
           data-testid="title-daily-phrase"
@@ -975,389 +458,240 @@ export function TitleScreen(): React.ReactElement {
             soundEngine.playSfx('uiToggle');
             setPhraseIndex((prev) => (prev + 1) % CAFE_DAILY_PHRASES.length);
           }}
-          title="Cambiar nota de la pizarra del día"
-          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#261B16] text-[#FEF6E0] border-2 border-[#C8A12A] shadow-[0_3px_0_#140D0B] text-[11px] sm:text-xs font-serif italic hover:bg-[#34251F] active:translate-y-0.5 transition-all cursor-pointer"
+          title="Cambiar la nota de la pizarra"
+          className="pointer-events-auto max-w-[55vw] border-y border-[#C8A12A]/55 bg-[#07110D]/45 px-2.5 py-1.5 text-left text-[#F1E3CC] backdrop-blur-xs transition-colors hover:bg-[#07110D]/65 focus:outline-2 focus:outline-offset-2 focus:outline-[#F0D278] sm:max-w-sm sm:px-3 sm:py-2"
         >
-          <span className="w-2 h-2 rounded-full bg-[#C8A12A] shrink-0" aria-hidden="true" />
-          <span>«{dailyPhrase}»</span>
+          <span className="block font-serif text-[11px] italic leading-snug sm:text-sm">
+            «{dailyPhrase}»
+          </span>
+          <span className="mt-0.5 block text-[8px] font-bold text-[#C8A12A]/90 sm:text-[9px]">
+            La pizarra de hoy
+          </span>
         </button>
       </header>
 
-      {/* Main Stage Content: Integrated Counter Scene + Unfolded Printed Café Menu Sheet */}
-      <div className="relative z-10 my-auto w-full max-w-6xl mx-auto px-3 sm:px-6 grid grid-cols-1 lg:grid-cols-12 gap-2 sm:gap-5 items-center min-h-0">
-        {/* Left / Top Column (lg:col-span-5): Living Café Corner + Protagonist Seated at the Bar */}
-        <section
-          data-testid="title-cafe-scene"
-          aria-label="Escena del salón de Cafetulia"
-          className="lg:col-span-5 rounded-[22px] border-2 border-[#231712] bg-[#3A261D] text-[#FFFDF8] shadow-[0_8px_0_#1E130E,0_16px_28px_rgba(35,23,18,0.28)] p-2 sm:p-3.5 flex flex-col justify-between gap-2"
+      {errorBanner && !menuOpen && (
+        <div
+          role="alert"
+          data-testid="title-error-banner"
+          className="pointer-events-none absolute left-1/2 top-[4.75rem] z-30 w-[min(92vw,34rem)] -translate-x-1/2 border border-[#A63F34] bg-[#FDECEB] px-3 py-2 text-center text-xs font-bold text-[#A63F34] shadow-[3px_3px_0_#0B1D17] sm:top-24"
         >
-          {/* Full Café Scene on both desktop and mobile (gives real scene weight on mobile) */}
-          <div className="w-full relative">
-            <div className="hidden sm:block">
-              <CafeCornerIllustration
-                reducedMotion={reducedMotion}
-                parallax={parallax}
-                compact={false}
-              />
-            </div>
-            <div className="block sm:hidden">
-              <CafeCornerIllustration
-                reducedMotion={reducedMotion}
-                parallax={parallax}
-                compact
-              />
-            </div>
-            <span className="pointer-events-none absolute top-2 right-2 px-2 py-0.5 rounded-md bg-[#231712]/85 text-[#FEF6E0] border border-[#C8A12A] text-[9px] font-serif italic">
-              Rincón O &amp; A
-            </span>
-          </div>
+          {errorBanner}
+        </div>
+      )}
 
-          {/* Seated Protagonist Avatar at the Counter + Time-of-Day Greeting */}
-          <div className="bg-[#FFFDF8] text-[#231712] p-2 sm:p-2.5 rounded-2xl border-2 border-[#231712] shadow-[0_3px_0_#231712] flex items-center gap-2.5 sm:gap-3">
-            <button
-              type="button"
-              data-testid="title-hero-avatar"
-              onClick={() => {
-                soundEngine.unlock();
-                toggleOverlay('avatar');
-              }}
-              aria-label={`Cambiar avatar actual (${currentAvatar.label})`}
-              title="Pulsa para cambiar tu avatar"
-              className="relative group shrink-0 w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-[#FEF6E0] border-2 border-[#231712] shadow-[0_3px_0_#231712] flex items-center justify-center hover:-translate-y-0.5 active:translate-y-0.5 transition-transform cursor-pointer focus:outline-2 focus:outline-[#C86B46]"
-            >
-              <PlayerAvatar avatarId={avatarId} size={38} />
-              <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-md bg-[#C86B46] text-[#FFFDF8] text-[9px] font-extrabold border border-[#231712]">
-                Ficha
-              </span>
-            </button>
-
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#C86B46]">
-                  Tu sitio en la barra
-                </span>
-                <span className="text-[10px] font-serif italic text-[#6C564A]">
-                  · Café servido
-                </span>
-              </div>
-              <h1
-                data-testid="title-greeting"
-                className="font-serif font-bold text-sm sm:text-lg text-[#231712] leading-tight truncate"
-              >
-                {greetingText}
-              </h1>
-              <p className="text-[11px] text-[#6C564A] truncate">
-                Sienta parejas de 12 naciones sin desbordar la barra.
-              </p>
-            </div>
-          </div>
-
-          {/* Guest Registry Tag (Nickname + Avatar & Subtitles Pickers) */}
-          <div className="space-y-1.5 pt-1 border-t border-dashed border-[#FFFDF8]/20">
-            <div className="flex items-center gap-2">
-              <label
-                htmlFor="nickname-input"
-                className="text-[11px] font-extrabold uppercase tracking-wide text-[#F5E6CE] shrink-0"
-              >
-                Reserva a nombre de:
-              </label>
-              <input
-                id="nickname-input"
-                type="text"
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-                placeholder="Tu apodo en la mesa"
-                maxLength={24}
-                className="flex-1 min-h-[36px] sm:min-h-[40px] px-2.5 rounded-xl bg-[#FFFDF8] border-2 border-[#231712] text-xs sm:text-sm text-[#231712] font-bold focus:outline-2 focus:outline-[#C86B46]"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-1.5">
-              <AvatarDropdownPicker compact />
-              <SubtitlesDropdownPicker compact />
-            </div>
-          </div>
-        </section>
-
-        {/* Right / Bottom Column (lg:col-span-7): Printed Café Menu Sheet ("Carta de la Casa") */}
-        <section
-          data-testid="title-menu-card"
-          aria-label="Carta de menú del café"
-          className="lg:col-span-7 relative cafe-paper-sheet cafe-double-frame rounded-[22px] border-2 border-[#231712] p-2.5 sm:p-5 flex flex-col justify-between gap-1.5 sm:gap-3 lg:rotate-[0.35deg]"
-        >
-          {/* Decorative Brass Menu Clip at Top Center */}
-          <div
-            aria-hidden="true"
-            className="hidden sm:flex absolute -top-2.5 left-1/2 -translate-x-1/2 px-4 py-0.5 rounded-full bg-[#C8A12A] border-2 border-[#231712] shadow-[0_2px_0_#231712] items-center gap-1.5"
-          >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#231712]" />
-            <span className="text-[9px] font-extrabold uppercase tracking-widest text-[#231712]">
-              Menú de salón
-            </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#231712]" />
-          </div>
-
-          {/* Editorial Double-Rule Menu Header */}
-          <div className="flex items-center justify-between cafe-double-rule pb-1.5">
-            <div>
-              <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#C86B46] block">
-                Carta de la casa · Imprenta O &amp; A
-              </span>
-              <h2 className="font-serif font-bold text-base sm:text-2xl text-[#231712] leading-tight">
-                Especialidades de mesa
-              </h2>
-            </div>
-            <span className="px-2.5 py-0.5 rounded-md bg-[#FEF6E0] border-2 border-[#231712] shadow-[2px_2px_0_#231712] text-[10px] font-extrabold uppercase tracking-wider text-[#231712] -rotate-2">
-              2–4 comensales
-            </span>
-          </div>
-
-          {errorBanner && (
-            <div
-              role="alert"
-              className="p-2 rounded-xl bg-[#FDECEB] border-2 border-[#A63F34] text-xs font-bold text-[#A63F34]"
-            >
-              {errorBanner}
-            </div>
-          )}
-
-          {/* Featured Dish #1 (Protagonist CTA): Jugar contra bot */}
-          <button
-            type="button"
-            data-start="true"
-            data-testid="quick-start-btn"
-            disabled={isBusy}
-            onMouseEnter={() => soundEngine.playHover()}
-            onClick={() => {
-              soundEngine.unlock();
-              void quickStartWithBots(1, 'medium');
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            key="title-menu"
+            data-testid="title-menu-overlay"
+            initial={reducedMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: reducedMotion ? 0 : 0.18 }}
+            className="absolute inset-0 z-40 flex items-center justify-center bg-[#07110D]/70 p-2 backdrop-blur-sm sm:p-5"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget) closeMenu();
             }}
-            className="group relative overflow-hidden w-full min-h-[50px] sm:min-h-[66px] px-3.5 py-1.5 sm:py-2 rounded-2xl cafe-btn-primary cursor-pointer disabled:opacity-50 text-left flex items-center justify-between gap-3 focus:outline-2 focus:outline-[#231712]"
           >
-            <div className="flex items-center gap-3 min-w-0">
-              {/* Hand-drawn steaming cup icon that lifts on hover */}
-              <span
-                aria-hidden="true"
-                className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-[#231712]/20 border border-[#FFFDF8]/40 flex items-center justify-center shrink-0 group-hover:-translate-y-0.5 group-hover:rotate-[-4deg] transition-transform"
-              >
-                <svg width="24" height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-                  <path
-                    d="M9 3.5 C8 5.5 10.5 6.5 9.5 8.5 M14.5 3 C13.5 5 16 6 15 8"
-                    stroke="#FFFDF8"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                  <path
-                    d="M5 10.5 H19 L17.5 19.5 C17 22 14.5 23 12 23 C9.5 23 7 22 6.5 19.5 Z"
-                    fill="#FFFDF8"
-                    stroke="#231712"
-                    strokeWidth="2"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M19 12 H21.5 C23.2 12 24 13.2 24 14.8 C24 16.4 23.2 17.5 21.5 17.5 H18.2"
-                    stroke="#FFFDF8"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                  />
-                  <line x1="3.5" y1="24.5" x2="20.5" y2="24.5" stroke="#FFFDF8" strokeWidth="2.2" strokeLinecap="round" />
-                </svg>
-              </span>
-              <span className="min-w-0">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#FFFDF8]/90 block">
-                  Recomendación del maître · Partida inmediata
-                </span>
-                <span className="block font-serif font-extrabold text-sm sm:text-xl leading-tight">
-                  Jugar contra bot
-                </span>
-                <span className="block text-[10px] sm:text-[11px] text-[#FFFDF8]/90 truncate">
-                  Mesa lista al instante con un autómata de la casa
-                </span>
-              </span>
-            </div>
-
-            <span className="hidden sm:inline-flex items-center px-2.5 py-1 rounded-lg bg-[#231712] text-[#FEF6E0] font-serif font-bold text-xs border border-[#C8A12A] shrink-0 group-hover:scale-105 transition-transform">
-              Servir →
-            </span>
-          </button>
-
-          {/* Secondary Dishes Row: Crear sala + Unirse con código */}
-          <div className="grid grid-cols-1 sm:grid-cols-12 gap-1.5 sm:gap-2 items-stretch">
-            {/* Dish #2: Crear sala */}
-            <button
-              type="button"
-              data-testid="create-room-btn"
-              disabled={isBusy}
-              onMouseEnter={() => soundEngine.playHover()}
-              onClick={() => {
-                soundEngine.unlock();
-                void createRoom();
-              }}
-              className="sm:col-span-5 group w-full min-h-[44px] sm:min-h-[56px] px-3 py-1.5 sm:py-2 rounded-2xl cafe-btn-paper cursor-pointer disabled:opacity-50 text-left flex items-center gap-2.5 focus:outline-2 focus:outline-[#C86B46]"
+            <motion.section
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="title-menu-heading"
+              initial={reducedMotion ? false : { y: 24, opacity: 0, rotate: -0.4 }}
+              animate={{ y: 0, opacity: 1, rotate: 0 }}
+              exit={reducedMotion ? { opacity: 0 } : { y: 16, opacity: 0, rotate: 0.3 }}
+              transition={{ duration: reducedMotion ? 0 : 0.22, ease: [0.22, 1, 0.36, 1] }}
+              className="relative max-h-[calc(100dvh-1rem)] w-full max-w-4xl overflow-y-auto border-2 border-[#0B1D17] bg-[#F1E3CC] text-[#1E3027] shadow-[8px_10px_0_#0B1D17,0_28px_60px_rgba(0,0,0,0.42)]"
             >
-              <span
-                aria-hidden="true"
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#FEF6E0] border-2 border-[#231712] flex items-center justify-center shrink-0 text-[#C86B46] group-hover:rotate-3 transition-transform"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path
-                    d="M4 18 L9 6 L15 6 L20 18 Z"
-                    fill="#FFFDF8"
-                    stroke="#231712"
-                    strokeWidth="2"
-                    strokeLinejoin="round"
+              <div className="flex items-start justify-between gap-3 border-b border-[#0B1D17]/25 px-3 py-2.5 sm:px-6 sm:py-4">
+                <div className="min-w-0">
+                  <p className="font-serif text-[11px] font-semibold italic text-[#315A48] sm:text-xs">
+                    Cafetulia
+                  </p>
+                  <h2
+                    id="title-menu-heading"
+                    data-testid="title-menu-heading"
+                    className="font-serif text-2xl font-bold leading-none text-[#1E3027] sm:text-3xl"
+                  >
+                    La carta
+                  </h2>
+                </div>
+                <button
+                  ref={menuCloseRef}
+                  type="button"
+                  data-testid="title-menu-close"
+                  onClick={closeMenu}
+                  className="min-h-[44px] shrink-0 border border-[#0B1D17]/35 px-2.5 py-1 text-[11px] font-bold text-[#315A48] transition-colors hover:bg-[#E4D2B6] focus:outline-2 focus:outline-[#315A48]"
+                >
+                  Volver a la barra
+                </button>
+              </div>
+
+              {errorBanner && (
+                <div
+                  role="alert"
+                  className="mx-3 mt-2 border border-[#A63F34] bg-[#FDECEB] px-3 py-2 text-xs font-bold text-[#A63F34] sm:mx-6"
+                >
+                  {errorBanner}
+                </div>
+              )}
+
+              <div className="grid lg:grid-cols-[0.78fr_1.22fr]">
+                <section className="border-b border-[#0B1D17]/25 px-3 py-3 sm:px-6 sm:py-4 lg:border-b-0 lg:border-r">
+                  <h3 className="font-serif text-lg font-bold">Tu mesa</h3>
+                  <p className="mt-0.5 text-[11px] leading-snug text-[#5A453B]">
+                    Estás en la barra como {nickname || 'invitado'}.
+                  </p>
+
+                  <label
+                    htmlFor="nickname-input"
+                    className="mt-3 block text-[11px] font-bold text-[#315A48]"
+                  >
+                    Nombre en la barra
+                  </label>
+                  <input
+                    id="nickname-input"
+                    type="text"
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    placeholder="Tu apodo en la mesa"
+                    maxLength={24}
+                    className="mt-1 min-h-[38px] w-full border-2 border-[#0B1D17]/45 bg-[#FFF9F0] px-2.5 text-sm font-bold text-[#1E3027] focus:border-[#315A48] focus:outline-2 focus:outline-[#315A48]"
                   />
-                  <path d="M9 12 H15" stroke="#C86B46" strokeWidth="2.2" strokeLinecap="round" />
-                  <line x1="2" y1="19" x2="22" y2="19" stroke="#231712" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-serif font-bold text-xs sm:text-base text-[#231712] leading-tight">
-                  Crear sala
-                </span>
-                <span className="block text-[10px] sm:text-[11px] text-[#6C564A] truncate">
-                  Reserva mesa privada
-                </span>
-              </span>
-            </button>
 
-            {/* Dish #3: Unirse con código (Perforated Paper Ticket) */}
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                soundEngine.unlock();
-                void joinRoom(joinCodeInput, false);
-              }}
-              className="sm:col-span-7 cafe-paper-subpanel px-2.5 py-1 rounded-2xl border-2 border-[#231712] flex items-center gap-2"
-            >
-              <span
-                aria-hidden="true"
-                className="w-8 h-8 rounded-xl bg-[#FFFDF8] border-2 border-[#231712] flex items-center justify-center text-[#3D5B47] shrink-0"
-              >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <circle cx="7.5" cy="12" r="4" stroke="currentColor" strokeWidth="2.2" />
-                  <path
-                    d="M11.5 12 H21 M18 12 V15.5 M15 12 V14.5"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </span>
-              <input
-                id="room-code-input"
-                type="text"
-                aria-label="Código de sala"
-                value={joinCodeInput}
-                onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
-                placeholder="CÓDIGO"
-                maxLength={8}
-                className="min-w-0 flex-1 min-h-[38px] sm:min-h-[42px] px-2.5 rounded-xl bg-[#FFFDF8] border-2 border-[#231712]/35 text-xs sm:text-sm text-[#231712] font-mono font-extrabold uppercase tracking-wider focus:outline-2 focus:outline-[#C86B46]"
-              />
-              <button
-                type="submit"
-                data-testid="join-room-btn"
-                disabled={isBusy}
-                onMouseEnter={() => soundEngine.playHover()}
-                className="px-3.5 min-h-[44px] rounded-xl cafe-btn-sage font-bold text-xs sm:text-sm cursor-pointer disabled:opacity-50 inline-flex items-center gap-1 shrink-0"
-              >
-                <span>Unirse</span>
-              </button>
-            </form>
-          </div>
+                  <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
+                    <AvatarDropdownPicker compact />
+                    <SubtitlesDropdownPicker compact />
+                  </div>
 
-          {/* Menu Footer Strip: Tutorial, Reglas, Ajustes with custom ink-line SVGs */}
-          <div className="grid grid-cols-3 gap-2 pt-1.5 border-t-2 border-dashed border-[#231712]/20">
-            <button
-              type="button"
-              data-testid="title-tutorial-btn"
-              onMouseEnter={() => soundEngine.playHover()}
-              onClick={() => setActiveModal('tutorial')}
-              className="min-h-[44px] px-2.5 py-1 rounded-xl cafe-btn-paper cursor-pointer flex items-center gap-2 text-left"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-                className="text-[#C86B46] shrink-0"
-              >
-                <path
-                  d="M3 5.5 C3 4.5 4 4 5.5 4 H11 V19 H5.5 C4 19 3 19.5 3 20.5 Z M21 5.5 C21 4.5 20 4 18.5 4 H13 V19 H18.5 C20 19 21 19.5 21 20.5 Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="min-w-0">
-                <span className="block text-xs font-extrabold text-[#231712] truncate">Tutorial</span>
-                <span className="hidden sm:block text-[10px] text-[#6C564A] truncate">
-                  3 pasos en mesa
-                </span>
-              </span>
-            </button>
+                  <p className="mt-3 border-t border-dashed border-[#0B1D17]/25 pt-2 text-[10px] leading-snug text-[#5A453B]">
+                    Tu avatar aparece detrás de la barra. Los ajustes de sonido y vista están al pie.
+                  </p>
+                </section>
 
-            <button
-              type="button"
-              data-testid="title-rules-btn"
-              onMouseEnter={() => soundEngine.playHover()}
-              onClick={() => setActiveModal('rules')}
-              className="min-h-[44px] px-2.5 py-1 rounded-xl cafe-btn-paper cursor-pointer flex items-center gap-2 text-left"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-                className="text-[#3D5B47] shrink-0"
-              >
-                <rect x="5" y="3.5" width="14" height="17" rx="2.5" stroke="currentColor" strokeWidth="2" />
-                <path d="M8.5 8 H15.5 M8.5 12 H15.5 M8.5 16 H12.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-              <span className="min-w-0">
-                <span className="block text-xs font-extrabold text-[#231712] truncate">Reglas</span>
-                <span className="hidden sm:block text-[10px] text-[#6C564A] truncate">
-                  Manual ilustrado
-                </span>
-              </span>
-            </button>
+                <section className="px-3 py-3 sm:px-6 sm:py-4">
+                  <h3 className="font-serif text-lg font-bold">Elige una mesa</h3>
 
-            <button
-              type="button"
-              data-testid="title-settings-btn"
-              onMouseEnter={() => soundEngine.playHover()}
-              onClick={() => setActiveModal('settings')}
-              className="min-h-[44px] px-2.5 py-1 rounded-xl cafe-btn-paper cursor-pointer flex items-center gap-2 text-left"
-            >
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                aria-hidden="true"
-                className="text-[#7B5236] shrink-0"
-              >
-                <circle cx="12" cy="12" r="7.5" stroke="currentColor" strokeWidth="2" />
-                <circle cx="12" cy="12" r="2" fill="currentColor" />
-                <path d="M12 12 L15.5 8.5 M7 16 H17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-              <span className="min-w-0">
-                <span className="block text-xs font-extrabold text-[#231712] truncate">Ajustes</span>
-                <span className="hidden sm:block text-[10px] text-[#6C564A] truncate">
-                  Sonido y vista
-                </span>
-              </span>
-            </button>
-          </div>
-        </section>
-      </div>
+                  <div className="mt-1 divide-y divide-[#0B1D17]/20 border-y border-[#0B1D17]/20">
+                    <div className="flex flex-col gap-2 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                      <div className="min-w-0">
+                        <p className="font-serif text-base font-bold leading-tight">Mesa rápida</p>
+                        <p className="text-[11px] leading-snug text-[#5A453B]">
+                          Una partida contra la casa, sin esperas.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        data-start="true"
+                        data-testid="quick-start-btn"
+                        disabled={isBusy}
+                        onMouseEnter={() => soundEngine.playHover()}
+                        onClick={() => {
+                          soundEngine.unlock();
+                          void quickStartWithBots(1, 'medium');
+                        }}
+                        className="min-h-[44px] shrink-0 border-2 border-[#0B1D17] bg-[#315A48] px-4 text-xs font-bold text-[#F1E3CC] shadow-[3px_3px_0_#0B1D17] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-50 focus:outline-2 focus:outline-offset-2 focus:outline-[#315A48]"
+                      >
+                        Empezar
+                      </button>
+                    </div>
 
-      {/* Minimal café print footer */}
-      <footer className="relative z-10 shrink-0 text-center text-[11px] font-semibold text-[#FEF6E0] drop-shadow-[0_1px_1px_rgba(35,23,18,0.85)] pb-1 hidden sm:block">
-        100 fichas de cartón · Manos a la vista · Pulsa Enter para servir mesa rápida
-      </footer>
+                    <div className="flex flex-col gap-2 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                      <div className="min-w-0">
+                        <p className="font-serif text-base font-bold leading-tight">Abrir una mesa</p>
+                        <p className="text-[11px] leading-snug text-[#5A453B]">
+                          Invita a quien quieras con un código.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        data-testid="create-room-btn"
+                        disabled={isBusy}
+                        onMouseEnter={() => soundEngine.playHover()}
+                        onClick={() => {
+                          soundEngine.unlock();
+                          void createRoom();
+                        }}
+                        className="min-h-[44px] shrink-0 border-2 border-[#0B1D17]/45 bg-transparent px-4 text-xs font-bold text-[#315A48] transition-colors hover:bg-[#E4D2B6] disabled:cursor-not-allowed disabled:opacity-50 focus:outline-2 focus:outline-[#315A48]"
+                      >
+                        Crear sala
+                      </button>
+                    </div>
+
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        soundEngine.unlock();
+                        void joinRoom(joinCodeInput, false);
+                      }}
+                      className="flex flex-col gap-2 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+                    >
+                      <div className="min-w-0">
+                        <p className="font-serif text-base font-bold leading-tight">Entrar con código</p>
+                        <p className="text-[11px] leading-snug text-[#5A453B]">
+                          ¿Ya tienes una reserva? Escribe el código.
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-stretch gap-1.5">
+                        <input
+                          id="room-code-input"
+                          type="text"
+                          aria-label="Código de sala"
+                          value={joinCodeInput}
+                          onChange={(e) => setJoinCodeInput(e.target.value.toUpperCase())}
+                          placeholder="Código"
+                          maxLength={8}
+                          className="min-h-[40px] w-24 border-2 border-[#0B1D17]/45 bg-[#FFF9F0] px-2 text-xs font-mono font-extrabold uppercase tracking-wider text-[#1E3027] focus:border-[#315A48] focus:outline-2 focus:outline-[#315A48]"
+                        />
+                        <button
+                          type="submit"
+                          data-testid="join-room-btn"
+                          disabled={isBusy}
+                          onMouseEnter={() => soundEngine.playHover()}
+                          className="min-h-[44px] border-2 border-[#0B1D17]/45 bg-transparent px-3 text-xs font-bold text-[#315A48] transition-colors hover:bg-[#E4D2B6] disabled:cursor-not-allowed disabled:opacity-50 focus:outline-2 focus:outline-[#315A48]"
+                        >
+                          Entrar
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-bold text-[#315A48]">
+                    <button
+                      type="button"
+                      data-testid="title-tutorial-btn"
+                      onMouseEnter={() => soundEngine.playHover()}
+                      onClick={() => setActiveModal('tutorial')}
+                      className="min-h-[44px] underline decoration-[#C8A12A]/60 underline-offset-4 hover:text-[#1E3027] focus:outline-2 focus:outline-[#315A48]"
+                    >
+                      Tutorial
+                    </button>
+                    <button
+                      type="button"
+                      data-testid="title-rules-btn"
+                      onMouseEnter={() => soundEngine.playHover()}
+                      onClick={() => setActiveModal('rules')}
+                      className="min-h-[44px] underline decoration-[#C8A12A]/60 underline-offset-4 hover:text-[#1E3027] focus:outline-2 focus:outline-[#315A48]"
+                    >
+                      Reglas
+                    </button>
+                    <button
+                      type="button"
+                      data-testid="title-settings-btn"
+                      onMouseEnter={() => soundEngine.playHover()}
+                      onClick={() => setActiveModal('settings')}
+                      className="min-h-[44px] underline decoration-[#C8A12A]/60 underline-offset-4 hover:text-[#1E3027] focus:outline-2 focus:outline-[#315A48]"
+                    >
+                      Ajustes
+                    </button>
+                  </div>
+                </section>
+              </div>
+            </motion.section>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
