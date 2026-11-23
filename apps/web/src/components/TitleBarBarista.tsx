@@ -224,16 +224,18 @@ export function TitleBarBarista({
           <path d="M124 78 Q130 74 136 78" fill="none" stroke={variant.skinShade} strokeWidth="1.5" strokeLinecap="round" />
           <path d="M164 78 Q170 74 176 78" fill="none" stroke={variant.skinShade} strokeWidth="1.5" strokeLinecap="round" />
 
-          <g className={reducedMotion ? '' : 'cafe-blink'} transform="translate(0 -2.4)">
-            <path d="M123 81 Q130 76 137 81 Q130 85 123 81 Z" fill={variant.skin} />
-            <path d="M163 81 Q170 76 177 81 Q170 85 163 81 Z" fill={variant.skin} />
+          <g className={reducedMotion ? '' : 'cafe-blink'}>
+            <ellipse cx="130" cy="81" rx="8" ry="6" fill={variant.skin} />
+            <ellipse cx="170" cy="81" rx="8" ry="6" fill={variant.skin} />
+            <path d="M122 80 Q130 84 138 80" fill="none" stroke={variant.hair} strokeWidth="2.2" strokeLinecap="round" />
+            <path d="M162 80 Q170 84 178 80" fill="none" stroke={variant.hair} strokeWidth="2.2" strokeLinecap="round" />
           </g>
 
           {variant.glasses && (
             <g fill="none" stroke="#2A211D" strokeWidth="2">
-              <rect x="120" y="74" width="22" height="15" rx="6" />
-              <rect x="158" y="74" width="22" height="15" rx="6" />
-              <path d="M142 80 H158" />
+              <rect x="120" y="76" width="22" height="15" rx="6" />
+              <rect x="158" y="76" width="22" height="15" rx="6" />
+              <path d="M142 82 H158" />
             </g>
           )}
 
