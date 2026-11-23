@@ -5,6 +5,24 @@
 
 ---
 
+## Sesión 033 - 2026-11-23 - Baristas rotativos, gatos y carta que crece
+
+**Objetivo:** pulir la portada con variación real de personajes, los dos gatos de la casa y una apertura de menú más viva.
+
+**Hecho:**
+- Roster de cuatro baristas con piel, pelo, ropa y accesorios distintos; cada recarga elige uno nuevo y evita repetir el anterior.
+- Acciones distintas: secar una copa, agitar un cóctel y servir café con la cafetera.
+- Rasgos propios corregidos: nariz más normal, lunar pequeño junto a la nariz y flequillo moderno hacia delante.
+- Parpadeo subido para que los párpados coincidan con los ojos.
+- Añadidos **gato siamés** y **gato marrón oscuro/negro**, con caricia y mensaje «miau».
+- La campana del turno cambia de barista sin recargar (easter egg).
+- La carta se abre con una animación de escala, recorte y perspectiva; el contenido se asienta antes de interactuar.
+- Tests: 49 unitarios, 3 E2E, typecheck, lint y build.
+
+**Siguiente:** revisar en móvil el tamaño de la carta y decidir si los gatos deben tener más protagonismo.
+
+---
+
 ## Sesión 032 - 2026-11-23 - Identidad y vida del barista
 
 **Objetivo:** responder a la segunda revisión: el personaje seguía siendo genérico y con poca animación.

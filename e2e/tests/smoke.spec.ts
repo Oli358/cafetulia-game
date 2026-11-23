@@ -74,6 +74,8 @@ test.describe('Cafetulia E2E v10 (barra de café, carta en primer plano, lobbies
       await expect(page.getByTestId('title-greeting')).toBeVisible();
       await expect(page.getByTestId('title-daily-phrase')).toBeVisible();
       await expect(page.getByTestId('title-menu-card')).toBeVisible();
+      await expect(page.getByTestId('title-cat-siames')).toBeVisible();
+      await expect(page.getByTestId('title-cat-dark')).toBeVisible();
 
       const scrollCheck = await page.evaluate(() => ({
         scrollHeight: document.documentElement.scrollHeight,
@@ -87,6 +89,8 @@ test.describe('Cafetulia E2E v10 (barra de café, carta en primer plano, lobbies
       await page.getByTestId('title-menu-card').click();
       await expect(page.getByTestId('title-menu-overlay')).toBeVisible();
       await expect(page.getByTestId('title-menu-heading')).toBeVisible();
+      // La carta se abre con una animación de escala; medimos cuando ya está asentada.
+      await page.waitForTimeout(650);
 
       for (const tid of [
         'title-hero-avatar',
@@ -279,7 +283,9 @@ test.describe('Cafetulia E2E v10 (barra de café, carta en primer plano, lobbies
     });
 
     // Inyectar puntuaciones altas (1234 y 987, y probar también 9999)
-    // Pausamos pollRoom (roomCode: null) para que el servidor no sobreescriba el estado sintético
+    // Pausamos pollRoom (roomCode: null) para que el servidor no sobreescriba el estado sintético.
+    // Esperamos primero a que termine cualquier poll en vuelo de la partida recién creada.
+    await page.waitForTimeout(1800);
     await page.evaluate(() => {
       const store = (window as unknown as { __CAFETULIA_STORE__: TestStoreShape }).__CAFETULIA_STORE__;
       const snap = store.getState().snapshot;
@@ -503,6 +509,22 @@ test.describe('Cafetulia E2E v10 (barra de café, carta en primer plano, lobbies
       );
       expect(finScroll).toBe(true);
     }
+  });
+
+  test('rota el barista al recargar y los dos gatos responden al cariño', async ({ page }) => {
+    await page.goto('/');
+    const firstBarista = await page.getByTestId('title-barista').getAttribute('data-barista');
+    expect(firstBarista).toBeTruthy();
+
+    await page.reload();
+    const secondBarista = await page.getByTestId('title-barista').getAttribute('data-barista');
+    expect(secondBarista).toBeTruthy();
+    expect(secondBarista).not.toBe(firstBarista);
+
+    await expect(page.getByTestId('title-cat-siames')).toBeVisible();
+    await expect(page.getByTestId('title-cat-dark')).toBeVisible();
+    await page.getByTestId('title-cat-siames').click();
+    await expect(page.getByRole('status')).toContainText(/miau/i);
   });
 
   test('avisa y vuelve a la portada si la sala desaparece durante la partida', async ({ page }) => {

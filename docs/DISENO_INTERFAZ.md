@@ -45,8 +45,10 @@ Contrato visual para no volver al aspecto de “plantilla generada”. Se aplica
 
 - Escena completa de barra, sin scroll.
 - Barista detrás de la barra con delantal, copa y paño; el avatar elegido aparece en la placa de la barra.
-- Rasgos del barista: pelo negro con flequillo hacia delante, nariz marcada y lunar en su mejilla izquierda.
+- Rasgos del barista base: pelo negro con flequillo hacia delante, nariz normal y lunar pequeño junto a la nariz.
 - La copa se sostiene con una mano y se seca con la otra; parpadeo, respiración, inclinación de cabeza y mirada a la carta.
+- El turno rota al recargar entre cuatro baristas con piel, pelo y acción distintos: copa, coctelera y cafetera. La campana del turno permite cambiar sin recargar.
+- Dos gatos de la casa: siamés en su repisa y gato oscuro en la barra; ambos responden al cariño.
 - Carta física apoyada en la barra; abre el panel “La carta”.
 - El panel contiene: nombre, avatar, subtítulos, mesa rápida, crear sala, entrar con código, tutorial, reglas y ajustes.
 - La pizarra del día y el saludo por hora son información secundaria.

@@ -355,6 +355,42 @@
   animation: cafe-wipe 3.4s ease-in-out infinite;
 }
 
+@keyframes cafe-shake {
+  0%,
+  100% {
+    transform: rotate(-1.5deg) translateX(0);
+  }
+  25% {
+    transform: rotate(2.5deg) translateX(2px);
+  }
+  50% {
+    transform: rotate(-2deg) translateX(-2px);
+  }
+  75% {
+    transform: rotate(2deg) translateX(1px);
+  }
+}
+
+.cafe-shake {
+  transform-box: fill-box;
+  animation: cafe-shake 0.62s ease-in-out infinite;
+}
+
+@keyframes cafe-pour {
+  0%,
+  100% {
+    transform: rotate(-1.5deg);
+  }
+  50% {
+    transform: rotate(3deg) translateY(-1px);
+  }
+}
+
+.cafe-pour {
+  transform-box: fill-box;
+  animation: cafe-pour 3.8s ease-in-out infinite;
+}
+
 @keyframes cafe-blink {
   0%,
   91%,
@@ -388,6 +424,22 @@
   animation: cafe-glint 4.8s ease-in-out infinite;
 }
 
+@keyframes cafe-bubble {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  12%,
+  78% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
 .cafe-head-gaze {
   transform-box: fill-box;
   transform-origin: 50% 90%;
@@ -400,6 +452,8 @@
   .cafe-head-sway,
   .cafe-hold,
   .cafe-wipe,
+  .cafe-shake,
+  .cafe-pour,
   .cafe-blink,
   .cafe-glint {
     animation: none;
@@ -407,6 +461,10 @@
 
   .cafe-blink {
     opacity: 0;
+  }
+
+  .cafe-head-gaze {
+    transition: none;
   }
 }
 
