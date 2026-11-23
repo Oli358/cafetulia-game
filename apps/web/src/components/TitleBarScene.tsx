@@ -171,9 +171,9 @@ export function TitleBarScene({
             />
             <path
               d="M490 522 V214 A310 178 0 0 1 1110 214 V522 Z"
-              fill="url(#tbMirror)"
+              fill="#1B2A24"
               stroke="#6B432D"
-              strokeWidth="16"
+              strokeWidth="18"
             />
             <path
               d="M498 518 V218 A302 170 0 0 1 1102 218 V518 Z"
@@ -194,24 +194,25 @@ export function TitleBarScene({
 
             {/* Pizarra de la casa */}
             <g fill="#EFE3C9" fontFamily="Fraunces, serif">
-              <text x="958" y="250" textAnchor="middle" fontSize="18" opacity="0.9" fontStyle="italic">
+              <text x="760" y="250" textAnchor="middle" fontSize="20" opacity="0.95" fontStyle="italic">
                 La casa
               </text>
-              <path d="M888 263 H1028" stroke="#C8A12A" strokeWidth="1.5" opacity="0.55" />
-              <g fontSize="17" opacity="0.82">
-                <text x="882" y="302">Café</text>
-                <text x="1032" y="302" textAnchor="end">2,00</text>
-                <text x="882" y="338">Capuchino</text>
-                <text x="1032" y="338" textAnchor="end">2,50</text>
-                <text x="882" y="374">Latte</text>
-                <text x="1032" y="374" textAnchor="end">2,50</text>
-                <text x="882" y="410">Té</text>
-                <text x="1032" y="410" textAnchor="end">1,50</text>
-                <text x="882" y="446">Infusión</text>
-                <text x="1032" y="446" textAnchor="end">1,50</text>
+              <path d="M690 263 H830" stroke="#C8A12A" strokeWidth="1.5" opacity="0.65" />
+              <g fontSize="18" opacity="0.9">
+                <text x="682" y="302">Café</text>
+                <text x="842" y="302" textAnchor="end">2,00</text>
+                <text x="682" y="338">Capuchino</text>
+                <text x="842" y="338" textAnchor="end">2,50</text>
+                <text x="682" y="374">Latte</text>
+                <text x="842" y="374" textAnchor="end">2,50</text>
+                <text x="682" y="410">Té</text>
+                <text x="842" y="410" textAnchor="end">1,50</text>
+                <text x="682" y="446">Infusión</text>
+                <text x="842" y="446" textAnchor="end">1,50</text>
               </g>
-              <path d="M922 476 Q938 489 954 476 Q944 498 938 498 Q932 498 922 476 Z" fill="none" stroke="#C8A12A" strokeWidth="1.4" opacity="0.65" />
-              <path d="M938 468 V480 M932 478 Q938 484 944 478" fill="none" stroke="#EFE3C9" strokeWidth="1.8" opacity="0.55" />
+              <path d="M760 476 Q776 489 792 476 Q782 498 776 498 Q770 498 760 476 Z" fill="none" stroke="#C8A12A" strokeWidth="1.4" opacity="0.65" />
+              <path d="M776 468 V480 M770 478 Q776 484 782 478" fill="none" stroke="#EFE3C9" strokeWidth="1.8" opacity="0.55" />
+              <path d="M620 494 Q630 486 640 494 M880 494 Q890 486 900 494" fill="none" stroke="#EFE3C9" strokeWidth="1.3" opacity="0.25" />
             </g>
 
             {[0, 1, 2].map((i) => (
@@ -448,15 +449,15 @@ export function TitleBarScene({
       </div>
 
       {/* Dos gatos de la casa: siamés en la estantería y oscuro en la barra */}
-      <div className="pointer-events-none absolute bottom-[59.3%] right-[6.5%] z-[3] h-2 w-20 border-y border-[#0B1D17] bg-[#8B5E3C] shadow-[0_2px_0_#0B1D17] sm:right-[16.5%] sm:w-32" />
-      <div className="pointer-events-none absolute bottom-[60.2%] right-[8%] z-[3] h-2.5 w-14 rounded-[50%] bg-[#7A3F32]/80 sm:right-[18.5%] sm:w-24" />
+      <div className="pointer-events-none absolute bottom-[79.3%] right-[6.5%] z-[3] h-2 w-20 border-y border-[#0B1D17] bg-[#8B5E3C] shadow-[0_2px_0_#0B1D17] sm:right-[16.5%] sm:w-32" />
+      <div className="pointer-events-none absolute bottom-[80.2%] right-[8%] z-[3] h-2.5 w-14 rounded-[50%] bg-[#7A3F32]/80 sm:right-[18.5%] sm:w-24" />
       <button
         type="button"
         data-testid="title-cat-siames"
         onClick={() => petCat('Miau. El siamés de la casa te mira con ojos azules.')}
         aria-label="Acariciar al gato siamés"
         title="Acariciar al siamés"
-        className="absolute bottom-[60%] right-[8%] z-[4] w-[72px] cursor-pointer text-left transition-transform hover:-translate-y-0.5 focus:outline-2 focus:outline-offset-4 focus:outline-[#F0D278] sm:right-[18.5%] sm:w-32"
+        className="absolute bottom-[80%] right-[8%] z-[4] w-[72px] cursor-pointer text-left transition-transform hover:-translate-y-0.5 focus:outline-2 focus:outline-offset-4 focus:outline-[#F0D278] sm:right-[18.5%] sm:w-32"
       >
         <SiameseCat reducedMotion={reducedMotion} />
       </button>
