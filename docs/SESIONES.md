@@ -5,6 +5,19 @@
 
 ---
 
+## Sesión 030 - 2026-11-23 - Skills de diseño del proyecto
+
+**Objetivo:** incorporar ayuda de diseño para renovar el menú principal sin depender de Argon.
+
+**Hecho:**
+- Instaladas localmente `frontend-design` (Anthropic, Apache 2.0) y `avoid-ai-design` (MIT, v0.5.0) en `.opencode/skills/`.
+- Documentadas fuentes, licencias y flujo en `docs/SKILLS.md`.
+- OpenCode ya detecta ambas skills en este proyecto.
+
+**Siguiente:** auditar el menú con `avoid-ai-design` en modo `detect`, proponer direcciones y elegir una antes de editar.
+
+---
+
 ## Sesión 029 - 2026-11-23 - Flujo de ramas main/develop
 
 **Objetivo:** dejar una base estable en GitHub y abrir una rama de trabajo para seguir sin arriesgar `main`.
