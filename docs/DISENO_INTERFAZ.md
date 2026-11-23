@@ -44,7 +44,9 @@ Contrato visual para no volver al aspecto de “plantilla generada”. Se aplica
 ## Portada v10
 
 - Escena completa de barra, sin scroll.
-- Barista detrás de la barra con delantal, copa y paño; el avatar elegido va como pin en el delantal.
+- Barista detrás de la barra con delantal, copa y paño; el avatar elegido aparece en la placa de la barra.
+- Rasgos del barista: pelo negro con flequillo hacia delante, nariz marcada y lunar en su mejilla izquierda.
+- La copa se sostiene con una mano y se seca con la otra; parpadeo, respiración, inclinación de cabeza y mirada a la carta.
 - Carta física apoyada en la barra; abre el panel “La carta”.
 - El panel contiene: nombre, avatar, subtítulos, mesa rápida, crear sala, entrar con código, tutorial, reglas y ajustes.
 - La pizarra del día y el saludo por hora son información secundaria.

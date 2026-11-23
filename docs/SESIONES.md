@@ -5,6 +5,21 @@
 
 ---
 
+## Sesión 032 - 2026-11-23 - Identidad y vida del barista
+
+**Objetivo:** responder a la segunda revisión: el personaje seguía siendo genérico y con poca animación.
+
+**Hecho:**
+- Redibujado el barista con pelo negro y flequillo hacia delante, nariz marcada, mandíbula, lunar en su mejilla izquierda, delantal con costuras y libreta.
+- Ahora sujeta la copa con la mano izquierda y la seca con el paño en la derecha; ambas manos tienen articulación y movimiento propio.
+- Añadidos parpadeo, respiración, balanceo de cabeza, mirada hacia la carta al pasar el ratón, brillo en el cristal y vapor del café.
+- Añadidos gato, hierbas colgadas, cuadro, marcas de taza y textura de grano para quitarle frialdad a la escena.
+- Verificado typecheck, lint, build, 49 tests y E2E.
+
+**Siguiente:** revisar en pantalla la expresividad del rostro y decidir si el pelo debe ser más corto, más largo o más despeinado.
+
+---
+
 ## Sesión 031 - 2026-11-23 - Rediseño de la portada: la barra
 
 **Objetivo:** sustituir el menú de tarjetas por una portada de barra de café, más física y menos generada por IA.

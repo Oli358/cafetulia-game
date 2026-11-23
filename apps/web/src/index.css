@@ -292,26 +292,121 @@
   --ink-muted: #D8C4B6;
 }
 
-/* Barista secando una copa en la portada. */
+/* Barista vivo: respira, mira, parpadea y seca la copa con las dos manos. */
+@keyframes cafe-breathe {
+  0%,
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+  50% {
+    transform: translateY(-3px) scaleY(1.01);
+  }
+}
+
+.cafe-breathe {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: cafe-breathe 4.4s ease-in-out infinite;
+}
+
+@keyframes cafe-head-sway {
+  0%,
+  100% {
+    transform: rotate(-1deg) translateY(0);
+  }
+  50% {
+    transform: rotate(1.2deg) translateY(-2px);
+  }
+}
+
+.cafe-head-sway {
+  transform-box: fill-box;
+  transform-origin: 50% 92%;
+  animation: cafe-head-sway 4.6s ease-in-out infinite;
+}
+
+@keyframes cafe-hold {
+  0%,
+  100% {
+    transform: rotate(-1.2deg) translateY(0);
+  }
+  50% {
+    transform: rotate(1.8deg) translateY(-2px);
+  }
+}
+
+.cafe-hold {
+  transform-box: fill-box;
+  animation: cafe-hold 4.8s ease-in-out infinite;
+}
+
 @keyframes cafe-wipe {
   0%,
   100% {
-    transform: rotate(-1.5deg);
+    transform: rotate(-2deg);
   }
   50% {
-    transform: rotate(4.5deg);
+    transform: rotate(5.5deg);
   }
 }
 
 .cafe-wipe {
   transform-box: fill-box;
-  transform-origin: 76% 48%;
-  animation: cafe-wipe 3.8s ease-in-out infinite;
+  animation: cafe-wipe 3.4s ease-in-out infinite;
+}
+
+@keyframes cafe-blink {
+  0%,
+  91%,
+  100% {
+    opacity: 0;
+  }
+  92%,
+  96% {
+    opacity: 1;
+  }
+}
+
+.cafe-blink {
+  animation: cafe-blink 6.2s ease-in-out infinite;
+  animation-delay: 2.1s;
+}
+
+@keyframes cafe-glint {
+  0%,
+  72%,
+  100% {
+    opacity: 0.18;
+  }
+  78%,
+  86% {
+    opacity: 0.95;
+  }
+}
+
+.cafe-glint {
+  animation: cafe-glint 4.8s ease-in-out infinite;
+}
+
+.cafe-head-gaze {
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+  transform: translate(-3px, 1px) rotate(-1.4deg);
+  transition: transform 300ms ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cafe-wipe {
+  .cafe-breathe,
+  .cafe-head-sway,
+  .cafe-hold,
+  .cafe-wipe,
+  .cafe-blink,
+  .cafe-glint {
     animation: none;
+  }
+
+  .cafe-blink {
+    opacity: 0;
   }
 }
 
