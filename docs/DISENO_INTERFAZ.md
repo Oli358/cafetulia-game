@@ -41,17 +41,15 @@ Contrato visual para no volver al aspecto de “plantilla generada”. Se aplica
 - La carta entra desde el plano de la barra al pulsar “Menú”.
 - `prefers-reduced-motion`: sin bucles ni desplazamientos; la carta aparece sin animación.
 
-## Portada v10
+## Portada v11
 
-- Escena completa de barra, sin scroll.
-- Barista detrás de la barra con delantal, copa y paño; el avatar elegido aparece en la placa de la barra.
-- Rasgos del barista base: pelo negro con flequillo hacia delante, nariz normal y lunar pequeño junto a la nariz.
-- La copa se sostiene con una mano y se seca con la otra; parpadeo, respiración, inclinación de cabeza y mirada a la carta.
-- El turno rota al recargar entre cuatro baristas con piel, pelo y acción distintos: copa, coctelera y cafetera. La campana del turno permite cambiar sin recargar.
-- Dos gatos de la casa: siamés en su repisa y gato oscuro en la barra; ambos responden al cariño.
-- Carta física apoyada en la barra; abre el panel “La carta”.
+- Fondo raster de la cafetería de referencia, a pantalla completa.
+- Cuatro baristas PNG con transparencia y acciones propias: copa, coctelera, leche y cafetera.
+- Rotación al recargar sin repetir el anterior; respiración suave de los sprites.
+- Dos gatos raster: siamés y atigrado, con caricia y mensaje.
+- La carta, el nombre, el avatar y los controles son HTML para mantener la interacción.
+- La pizarra central queda visible y despejada; la carta es la entrada a la interfaz de sala.
 - El panel contiene: nombre, avatar, subtítulos, mesa rápida, crear sala, entrar con código, tutorial, reglas y ajustes.
-- La pizarra del día y el saludo por hora son información secundaria.
 
 ## Pendiente
 
