@@ -172,8 +172,15 @@ export function TitleBarScene({
             <path
               d="M490 522 V214 A310 178 0 0 1 1110 214 V522 Z"
               fill="url(#tbMirror)"
-              stroke="url(#tbBrass)"
-              strokeWidth="12"
+              stroke="#6B432D"
+              strokeWidth="16"
+            />
+            <path
+              d="M498 518 V218 A302 170 0 0 1 1102 218 V518 Z"
+              fill="none"
+              stroke="#C8A12A"
+              strokeWidth="2.5"
+              opacity="0.7"
             />
             <path
               d="M520 510 V240 A280 148 0 0 1 1080 240 V510 Z"
@@ -184,6 +191,29 @@ export function TitleBarScene({
             />
             <path d="M590 510 L710 235 L790 235 L670 510 Z" fill="#6F9B83" opacity="0.08" />
             <circle cx="930" cy="280" r="96" fill="#D6A54F" opacity="0.07" />
+
+            {/* Pizarra de la casa */}
+            <g fill="#EFE3C9" fontFamily="Fraunces, serif">
+              <text x="958" y="250" textAnchor="middle" fontSize="18" opacity="0.9" fontStyle="italic">
+                La casa
+              </text>
+              <path d="M888 263 H1028" stroke="#C8A12A" strokeWidth="1.5" opacity="0.55" />
+              <g fontSize="17" opacity="0.82">
+                <text x="882" y="302">Café</text>
+                <text x="1032" y="302" textAnchor="end">2,00</text>
+                <text x="882" y="338">Capuchino</text>
+                <text x="1032" y="338" textAnchor="end">2,50</text>
+                <text x="882" y="374">Latte</text>
+                <text x="1032" y="374" textAnchor="end">2,50</text>
+                <text x="882" y="410">Té</text>
+                <text x="1032" y="410" textAnchor="end">1,50</text>
+                <text x="882" y="446">Infusión</text>
+                <text x="1032" y="446" textAnchor="end">1,50</text>
+              </g>
+              <path d="M922 476 Q938 489 954 476 Q944 498 938 498 Q932 498 922 476 Z" fill="none" stroke="#C8A12A" strokeWidth="1.4" opacity="0.65" />
+              <path d="M938 468 V480 M932 478 Q938 484 944 478" fill="none" stroke="#EFE3C9" strokeWidth="1.8" opacity="0.55" />
+            </g>
+
             {[0, 1, 2].map((i) => (
               <g key={`mirror-glow-${i}`} transform={`translate(${660 + i * 140} 180)`}>
                 <line x1="0" y1="0" x2="0" y2="36" stroke="#C8A12A" strokeWidth="3" opacity="0.4" />
@@ -418,15 +448,15 @@ export function TitleBarScene({
       </div>
 
       {/* Dos gatos de la casa: siamés en la estantería y oscuro en la barra */}
-      <div className="pointer-events-none absolute bottom-[59.3%] right-[6.5%] z-[3] h-2 w-20 border-y border-[#0B1D17] bg-[#8B5E3C] shadow-[0_2px_0_#0B1D17] sm:right-[17.5%] sm:w-28" />
-      <div className="pointer-events-none absolute bottom-[60.2%] right-[8%] z-[3] h-2.5 w-14 rounded-[50%] bg-[#7A3F32]/80 sm:right-[19%] sm:w-20" />
+      <div className="pointer-events-none absolute bottom-[59.3%] right-[6.5%] z-[3] h-2 w-20 border-y border-[#0B1D17] bg-[#8B5E3C] shadow-[0_2px_0_#0B1D17] sm:right-[16.5%] sm:w-32" />
+      <div className="pointer-events-none absolute bottom-[60.2%] right-[8%] z-[3] h-2.5 w-14 rounded-[50%] bg-[#7A3F32]/80 sm:right-[18.5%] sm:w-24" />
       <button
         type="button"
         data-testid="title-cat-siames"
         onClick={() => petCat('Miau. El siamés de la casa te mira con ojos azules.')}
         aria-label="Acariciar al gato siamés"
         title="Acariciar al siamés"
-        className="absolute bottom-[60%] right-[8%] z-[4] w-[72px] cursor-pointer text-left transition-transform hover:-translate-y-0.5 focus:outline-2 focus:outline-offset-4 focus:outline-[#F0D278] sm:right-[19%] sm:w-28"
+        className="absolute bottom-[60%] right-[8%] z-[4] w-[72px] cursor-pointer text-left transition-transform hover:-translate-y-0.5 focus:outline-2 focus:outline-offset-4 focus:outline-[#F0D278] sm:right-[18.5%] sm:w-32"
       >
         <SiameseCat reducedMotion={reducedMotion} />
       </button>
@@ -437,7 +467,7 @@ export function TitleBarScene({
         onClick={() => petCat('Miau. El gato oscuro ronronea desde la barra.')}
         aria-label="Acariciar al gato oscuro"
         title="Acariciar al gato oscuro"
-        className="absolute bottom-[31%] left-[55%] z-[4] w-[72px] -translate-x-1/2 cursor-pointer text-left transition-transform hover:-translate-y-0.5 focus:outline-2 focus:outline-offset-4 focus:outline-[#F0D278] sm:left-[69%] sm:w-24"
+        className="absolute bottom-[31%] left-[55%] z-[4] w-[72px] -translate-x-1/2 cursor-pointer text-left transition-transform hover:-translate-y-0.5 focus:outline-2 focus:outline-offset-4 focus:outline-[#F0D278] sm:left-[69%] sm:w-28"
       >
         <DarkCat reducedMotion={reducedMotion} />
       </button>

@@ -85,6 +85,7 @@ export const BARISTA_VARIANTS: BaristaVariant[] = [
     apronShade: '#1A2C25',
     accent: '#A86A4A',
     hairStyle: 'bun',
+    earring: true,
   },
 ];
 
@@ -161,7 +162,10 @@ export function TitleBarBarista({
           opacity="0.8"
         />
         <path d="M122 112 Q150 130 178 112 L188 150 Q150 168 112 150 Z" fill={variant.skin} stroke="#0B1D17" strokeWidth="3.5" />
-        <path d="M128 129 Q150 143 172 129 L158 160 L150 151 L142 160 Z" fill={variant.accent} stroke="#0B1D17" strokeWidth="3" />
+        {/* Cuello de camisa abierto, sin pañuelo que parezca barba */}
+        <path d="M112 148 Q128 138 150 158 Q172 138 188 148 L184 164 Q150 178 116 164 Z" fill={variant.shirt} stroke="#0B1D17" strokeWidth="2.8" />
+        <path d="M132 145 L150 160 L168 145" fill="none" stroke={variant.shirtShade} strokeWidth="2.2" />
+        <path d="M119 151 L150 169 L181 151" fill="none" stroke="#0B1D17" strokeWidth="1.4" opacity="0.45" />
 
         {/* Delantal y herramientas */}
         <path
@@ -203,10 +207,15 @@ export function TitleBarBarista({
             strokeWidth="4"
           />
 
+          {/* La capa frontal se dibuja después de la cara para que no queden claros de piel en el pelo. */}
+          {isForward && <ForwardFront variant={variant} />}
+          {isWaves && <WavesFront variant={variant} />}
+          {isCurls && <CurlsFront variant={variant} />}
+          {hairStyle === 'bun' && <BunFront variant={variant} />}
+
           {isForward && <ForwardFringe variant={variant} />}
           {isWaves && <WavesFringe variant={variant} />}
           {isCurls && <CurlsFringe variant={variant} />}
-          {hairStyle === 'bun' && <BunFringe variant={variant} />}
 
           <path d="M108 95 Q113 121 139 129" fill="none" stroke={variant.skinShade} strokeWidth="2.6" opacity="0.36" />
           <path d="M178 100 Q181 115 171 126" fill="none" stroke={variant.skinShade} strokeWidth="2" opacity="0.3" />
@@ -233,9 +242,9 @@ export function TitleBarBarista({
 
           {variant.glasses && (
             <g fill="none" stroke="#2A211D" strokeWidth="2">
-              <rect x="120" y="76" width="22" height="15" rx="6" />
-              <rect x="158" y="76" width="22" height="15" rx="6" />
-              <path d="M142 82 H158" />
+              <circle cx="131" cy="82" r="11" />
+              <circle cx="169" cy="82" r="11" />
+              <path d="M142 81 Q150 77 158 81" />
             </g>
           )}
 
@@ -263,6 +272,13 @@ export function TitleBarBarista({
           <path d="M143 120 Q151 124 159 117" fill="none" stroke={variant.skinShade} strokeWidth="1.7" opacity="0.6" />
           <path d="M136 112 Q141 117 147 118" fill="none" stroke="#7D3F35" strokeWidth="1.2" opacity="0.45" />
           <path d="M137 130 Q150 135 163 129" fill="none" stroke={variant.skinShade} strokeWidth="1.5" opacity="0.25" />
+
+          {variant.id === 'noche' && (
+            <g fill={variant.hair} stroke="#0B1D17" strokeWidth="1.6">
+              <path d="M137 117 Q150 131 163 117 Q160 129 150 134 Q140 129 137 117 Z" opacity="0.9" />
+              <path d="M141 108 Q150 113 159 108 Q154 115 150 115 Q146 115 141 108 Z" opacity="0.75" strokeWidth="1.2" />
+            </g>
+          )}
         </g>
       </g>
 
@@ -286,12 +302,56 @@ function ForwardHair({ variant }: { variant: BaristaVariant }): React.ReactEleme
   );
 }
 
+function ForwardFront({ variant }: { variant: BaristaVariant }): React.ReactElement {
+  return (
+    <path
+      d="M102 80 C101 48 117 28 150 28 C183 28 199 48 198 80 C191 65 179 57 165 54 C151 51 137 55 125 62 C114 69 106 76 102 80 Z"
+      fill={variant.hair}
+      stroke="#0B1D17"
+      strokeWidth="3"
+    />
+  );
+}
+
+function WavesFront({ variant }: { variant: BaristaVariant }): React.ReactElement {
+  return (
+    <path
+      d="M104 82 C100 48 117 29 150 29 C183 29 200 48 196 82 C190 68 179 60 166 57 C157 54 153 52 150 47 C147 52 143 54 134 57 C121 60 110 68 104 82 Z"
+      fill={variant.hair}
+      stroke="#0B1D17"
+      strokeWidth="3"
+    />
+  );
+}
+
+function CurlsFront({ variant }: { variant: BaristaVariant }): React.ReactElement {
+  return (
+    <path
+      d="M105 82 C100 47 116 28 150 28 C184 28 200 47 195 82 C188 69 177 62 165 58 C154 55 146 56 136 59 C123 63 111 71 105 82 Z"
+      fill={variant.hair}
+      stroke="#0B1D17"
+      strokeWidth="3"
+    />
+  );
+}
+
+function BunFront({ variant }: { variant: BaristaVariant }): React.ReactElement {
+  return (
+    <path
+      d="M105 76 C102 47 119 30 150 30 C181 30 198 47 195 76 C188 64 177 57 164 54 C151 51 139 55 128 60 C118 65 109 70 105 76 Z"
+      fill={variant.hair}
+      stroke="#0B1D17"
+      strokeWidth="3"
+    />
+  );
+}
+
 function ForwardFringe({ variant }: { variant: BaristaVariant }): React.ReactElement {
   return (
     <g>
       {/* Flequillo barrido hacia delante, con raya lateral y mechones */}
       <path
-        d="M105 61 C111 44 127 35 144 39 C157 42 167 50 180 48 C187 47 192 43 195 40 C196 50 191 60 184 68 C173 77 159 77 147 71 C136 66 126 68 116 74 C109 79 105 72 104 66 Z"
+        d="M105 61 C111 44 127 35 144 39 C157 42 167 50 180 48 C186 47 190 45 192 44 C193 53 189 61 184 68 C173 77 159 77 147 71 C136 66 126 68 116 74 C109 79 105 72 104 66 Z"
         fill={variant.hair}
         stroke="#0B1D17"
         strokeWidth="2.8"
@@ -321,12 +381,12 @@ function WavesHair({ variant }: { variant: BaristaVariant }): React.ReactElement
 
 function WavesFringe({ variant }: { variant: BaristaVariant }): React.ReactElement {
   return (
-    <path
-      d="M103 58 Q112 36 133 31 Q155 26 174 38 Q190 48 195 66 Q176 56 160 54 Q144 51 130 56 Q116 63 107 71 Q102 64 103 58 Z"
-      fill={variant.hair}
-      stroke="#0B1D17"
-      strokeWidth="3"
-    />
+    <g fill={variant.hair} stroke="#0B1D17" strokeWidth="2.4">
+      {/* Raya al centro: solo un mechón, sin tapar la frente */}
+      <path d="M150 47 Q155 54 153 66 Q150 59 147 66 Q145 54 150 47 Z" />
+      <path d="M110 61 Q116 68 121 78 Q113 75 108 68 Z" opacity="0.9" />
+      <path d="M190 61 Q184 68 179 78 Q187 75 192 68 Z" opacity="0.9" />
+    </g>
   );
 }
 
@@ -373,17 +433,6 @@ function BunHair({ variant }: { variant: BaristaVariant }): React.ReactElement {
       <path d="M101 78 Q98 85 101 92 Q105 85 106 77 Z" strokeWidth="2.2" />
       <path d="M199 78 Q202 85 199 92 Q195 85 194 77 Z" strokeWidth="2.2" />
     </g>
-  );
-}
-
-function BunFringe({ variant }: { variant: BaristaVariant }): React.ReactElement {
-  return (
-    <path
-      d="M112 60 Q124 53 139 54 Q153 55 166 61 Q177 65 184 62 Q175 55 162 53 Q146 51 132 55 Q121 58 113 65 Z"
-      fill={variant.hair}
-      stroke="#0B1D17"
-      strokeWidth="2.4"
-    />
   );
 }
 

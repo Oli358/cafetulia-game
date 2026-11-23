@@ -5,6 +5,25 @@
 
 ---
 
+## Sesión 034 - 2026-11-23 - Baristas según los bocetos y pizarra de la casa
+
+**Objetivo:** dejar de corregir el pelo a ciegas y seguir las hojas de referencia del usuario.
+
+**Hecho:**
+- Usada la hoja detallada de baristas (frente, perfil, colores y acciones) y la hoja anotada para ajustar proporciones.
+- Añadida capa frontal de pelo después de la cara para eliminar los claros de piel y las medias calvas.
+- Pelo de Tú corto con flequillo lateral; novia con melena ondulada y raya al centro; rulos con gafas redondas; moño alto con perilla y pendientes.
+- Eliminado el pañuelo oscuro bajo la barbilla que se leía como una barba colgando.
+- Pizarra central con la carta de cafés, plantas, marco de madera y más detalle de cafetería.
+- Gatos recolocados y ampliados; siamés en repisa, gato oscuro en la barra.
+
+**Verificación:**
+- typecheck, lint, build y 3 E2E en verde.
+
+**Siguiente:** validar el flequillo de Tú en pantalla y afinar el trazo de las manos.
+
+---
+
 ## Sesión 033 - 2026-11-23 - Baristas rotativos, gatos y carta que crece
 
 **Objetivo:** pulir la portada con variación real de personajes, los dos gatos de la casa y una apertura de menú más viva.
