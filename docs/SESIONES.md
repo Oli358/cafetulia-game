@@ -5,7 +5,37 @@
 
 ---
 
-## Sesión 028 - 2026-10-27 - Encargo visual v10\n\n**Objetivo:** preparar una pasada visual de Argon sobre la base v9, con prioridades claras y sin tocar reglas.\n\n**Hecho:**\n- Nuevo prompt `docs/ARGON/13-pulido-visual-v10.md`.\n- Diagnóstico visual: tablero pequeño en escritorio, HUD ruidoso, fichas poco táctiles, lobby/postal mejorables y arte de avatares a unificar.\n- Nuevo ZIP `cafetulia-v10-visual.zip` con la base v9 y el encargo v10.\n- Sin cambios de código en esta sesión.\n\n**Siguiente:** enviar el ZIP y el prompt a Argon; al volver, integrar y probar en iPhone.\n\n---\n\n## Sesión 027 - 2026-10-26 - Ajustes de móvil, turno y perfil (v9)
+## Sesión 029 - 2026-11-23 - Flujo de ramas main/develop
+
+**Objetivo:** dejar una base estable en GitHub y abrir una rama de trabajo para seguir sin arriesgar `main`.
+
+**Hecho:**
+- `main` estaba sincronizada con `origin/main` en `e275bf7`; no había cambios de código pendientes.
+- Creada `develop` desde `main` y subida a `origin`; es la rama actual de trabajo.
+- GitHub queda con `main` como rama por defecto y dos ramas: `main` y `develop`.
+- Los tres `.webp` de referencia siguen fuera de Git; no forman parte del juego.
+
+**Decisiones:**
+- `main` = versión estable. `develop` = trabajo diario.
+- Los cambios se prueban en `develop` (typecheck, tests, build y E2E) y solo pasan a `main` cuando el usuario valida la versión.
+
+**Siguiente:** trabajar la pasada visual v10 en `develop`.
+
+---
+
+## Sesión 028 - 2026-10-27 - Encargo visual v10
+
+**Objetivo:** preparar una pasada visual de Argon sobre la base v9, con prioridades claras y sin tocar reglas.
+
+**Hecho:**
+- Nuevo prompt `docs/ARGON/13-pulido-visual-v10.md`.
+- Diagnóstico visual: tablero pequeño en escritorio, HUD ruidoso, fichas poco táctiles, lobby/postal mejorables y arte de avatares a unificar.
+- Nuevo ZIP `cafetulia-v10-visual.zip` con la base v9 y el encargo v10.
+- Sin cambios de código en esta sesión.
+
+**Siguiente:** enviar el ZIP y el prompt a Argon; al volver, integrar y probar en iPhone.
+
+---\n\n## Sesión 027 - 2026-10-26 - Ajustes de móvil, turno y perfil (v9)
 
 **Objetivo:** corregir los problemas detectados en la prueba real de iPhone/PWA de la v8 y preparar el encargo v9.
 
