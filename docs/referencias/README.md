@@ -22,3 +22,20 @@ Fotos **reales** del tablero físico, aportadas por el usuario. No son imágenes
 - `ui-cafe-3d.png` — modal “Café Vivo en 3D” con invitados sentados y los 20 posavasos de la barra.
 
 Las capturas se generaron con Playwright el 2026-10-25.
+
+## Capturas de la v12 (portada póster)
+
+Generadas con `?force3d=1` para que salga la escena WebGL real, no el fallback:
+
+- `ui-v12-portada-1920.png` — póster a 1920×900.
+- `ui-v12-portada-1280.png` — póster a 1280×800.
+- `ui-v12-portada-movil.png` — póster a 390×844.
+- `ui-v12-reserva-1920.png` — menú Tertulia a 1920×900.
+- `ui-v12-reserva-1280.png` — menú Tertulia a 1280×800.
+- `ui-v12-reserva-movil.png` — menú Tertulia a 390×844.
+- `ui-v12-mundo-lluvia-1920.png` — menú Lluvia.
+- `ui-v12-mundo-noche-1920.png` — menú Noche.
+
+La composición sigue la referencia de Dialed (titular gigante, lata recortada y
+papeles flotando) con arte propio de Cafetulia. Los modelos de café, canela y
+anís están acreditados en `docs/CREDITOS.md`.

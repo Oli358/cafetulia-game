@@ -1071,6 +1071,10 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
           Instalar en móvil (PWA)
         </button>
       </div>
+
+      <p className="pt-1 text-[10px] leading-relaxed text-[#8A7365]">
+        Modelos 3D de café, canela y anís: Poly by Google, CC BY 3.0, vía Poly Pizza.
+      </p>
     </div>
   );
 }

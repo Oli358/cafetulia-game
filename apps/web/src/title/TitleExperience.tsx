@@ -5,6 +5,7 @@ import { CafetuliaLogo, PlayerAvatar } from '../art/CharacterPortrait';
 import { soundEngine } from '../audio/soundEngine';
 import { AvatarDropdownPicker, SubtitlesDropdownPicker } from '../components/TitlePickers';
 import { useGameStore } from '../store/gameStore';
+import { FloatingMenuPapers } from './FloatingMenuPapers';
 import { getMenuMode, MENU_MODES, type MenuMode, type MenuModeConfig } from './menuModes';
 
 const LazyCoffeeMenuScene = React.lazy(() => import('./CoffeeMenuScene'));
@@ -251,13 +252,15 @@ function StaticCanStage({
   progress: number;
   layout: Layout;
 }): React.ReactElement {
-  const shift = layout === 'desktop' ? -progress * 12 : 0;
+  const x = layout === 'desktop' ? progress * 18 : 0;
+  const y = layout === 'desktop' ? 34 - progress * 34 : 26 - progress * 26;
+  const scale = layout === 'desktop' ? 1.15 + progress * 0.2 : 1.05 + progress * 0.05;
 
   return (
     <div
       className="absolute inset-0 flex items-center justify-center overflow-hidden"
       style={{
-        transform: `translateX(${shift}%) translateY(${8 - progress * 4}%) scale(${0.92 + progress * 0.06})`,
+        transform: `translateX(${x}%) translateY(${y}%) scale(${scale}) rotate(${layout === 'desktop' ? -4 : -3}deg)`,
       }}
     >
       <div className="pointer-events-none absolute inset-0">
@@ -425,7 +428,7 @@ function ModeTabs({
     <div
       role="tablist"
       aria-label="Tipo de reserva"
-      className="mt-3 grid grid-cols-3 gap-1 rounded-full border border-[#231712]/10 bg-[#F7EEDF] p-1"
+      className="mt-2 grid grid-cols-3 gap-1 rounded-full border border-[#231712]/10 bg-[#F7EEDF] p-1"
     >
       {MENU_MODES.map((item) => {
         const active = item.id === mode;
@@ -483,7 +486,7 @@ function ServeControl({
   const disabled = !canServe || isBusy || serving;
 
   return (
-    <div className="mt-3 flex items-end justify-between gap-3 border-t border-[#231712]/10 pt-3">
+    <div className="mt-2 flex items-end justify-between gap-3 border-t border-[#231712]/10 pt-2">
       <div className="min-w-0">
         <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#B8512F]">
           {canServe ? 'Gira la lata para servir' : 'Completa la reserva'}
@@ -559,25 +562,25 @@ function ReservationCard({
   return (
     <div
       className={`pointer-events-none absolute z-30 ${
-        layout === 'desktop' ? 'right-[3.5%] top-1/2 w-[min(430px,40vw)]' : 'inset-x-2 bottom-2'
+        layout === 'desktop' ? 'bottom-[5%] left-[4%] w-[min(400px,34vw)]' : 'inset-x-2 bottom-2'
       }`}
       style={{
         opacity: smoothstep(0.55, 0.9, progress),
         transform:
           layout === 'desktop'
-            ? `translateY(calc(-50% + ${(1 - progress) * 90}px))`
+            ? `translateY(${(1 - progress) * 60}px)`
             : `translateY(${(1 - progress) * 90}px)`,
       }}
       aria-hidden={!active}
     >
       <motion.section
         data-testid="title-menu-card"
-        className="pointer-events-auto overflow-y-auto overscroll-contain rounded-[24px] border border-[#231712]/15 p-3.5 shadow-[0_18px_60px_rgba(35,23,18,0.24)] backdrop-blur-md sm:p-5"
+        className="pointer-events-auto overflow-y-auto overscroll-contain rounded-[24px] border border-[#231712]/15 p-3.5 shadow-[0_18px_60px_rgba(35,23,18,0.24)] backdrop-blur-md sm:p-4"
         style={{
           backgroundColor: `${theme.paper}f2`,
           color: '#2B1710',
           pointerEvents: active ? 'auto' : 'none',
-          maxHeight: layout === 'mobile' ? '57dvh' : 'calc(100dvh - 96px)',
+          maxHeight: layout === 'mobile' ? '55dvh' : '60dvh',
         }}
         animate={{ borderColor: `${theme.accent}55` }}
         transition={{ duration: 0.45 }}
@@ -590,12 +593,9 @@ function ReservationCard({
             >
               Reserva de la casa · {modeConfig.blend}
             </p>
-            <h2 className="mt-1 font-serif text-xl font-bold leading-tight sm:text-3xl">
+            <h2 className="mt-1 font-serif text-xl font-bold leading-tight sm:text-[26px]">
               {modeConfig.title}
             </h2>
-            <p className="mt-1 text-[11px] leading-snug text-[#6C564A] sm:text-xs">
-              {modeConfig.description}
-            </p>
           </div>
           <button
             type="button"
@@ -613,7 +613,7 @@ function ReservationCard({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.22 }}
-          className="mt-3 space-y-2.5"
+          className="mt-2 space-y-2"
         >
           {mode === 'join' && (
             <label className="block">
@@ -762,7 +762,8 @@ export function TitleExperience(): React.ReactElement {
   const greetingText = useMemo(() => getCafeGreeting(nickname), [nickname]);
   const dailyPhrase = CAFE_DAILY_PHRASES[phraseIndex] ?? CAFE_DAILY_PHRASES[0];
 
-  const heroOpacity = 1 - smoothstep(0.12, 0.5, progress);
+  const heroOpacity = 1 - smoothstep(0.2, 0.58, progress);
+  const worldLayer = smoothstep(0.28, 0.72, progress);
   const reserveVisible = progress > 0.55;
   const canInteractive = progress > 0.84;
   const canServe = nickname.trim().length >= 2 && (mode !== 'join' || joinCode.trim().length >= 4);
@@ -847,28 +848,41 @@ export function TitleExperience(): React.ReactElement {
     >
       <div className="relative h-[200dvh] w-full">
         <div className="sticky top-0 h-[100dvh] w-full overflow-hidden">
-          <motion.div
+          <div
             aria-hidden="true"
-            className="absolute inset-0"
-            animate={{ backgroundColor: theme.bgBottom }}
-            transition={{ duration: reducedMotion ? 0 : 1.05, ease: [0.33, 0, 0.2, 1] }}
+            className="absolute inset-0 bg-[radial-gradient(circle_at_50%_16%,#FCF8F0_0%,#F3E9D9_52%,#E6D2B6_100%)]"
           />
-          <motion.div
+          <div
             aria-hidden="true"
-            className="absolute inset-0"
-            animate={{ backgroundColor: theme.bgTop }}
-            transition={{ duration: reducedMotion ? 0 : 1.05, ease: [0.33, 0, 0.2, 1] }}
-            style={{
-              maskImage: 'linear-gradient(180deg, #000 0%, rgba(0,0,0,0.55) 58%, transparent 100%)',
-              WebkitMaskImage:
-                'linear-gradient(180deg, #000 0%, rgba(0,0,0,0.55) 58%, transparent 100%)',
-            }}
-          />
+            className="absolute inset-0 transition-opacity duration-150"
+            style={{ opacity: worldLayer }}
+          >
+            <motion.div
+              className="absolute inset-0"
+              animate={{ backgroundColor: theme.bgBottom }}
+              transition={{ duration: reducedMotion ? 0 : 1.05, ease: [0.33, 0, 0.2, 1] }}
+            />
+            <motion.div
+              className="absolute inset-0"
+              animate={{ backgroundColor: theme.bgTop }}
+              transition={{ duration: reducedMotion ? 0 : 1.05, ease: [0.33, 0, 0.2, 1] }}
+              style={{
+                maskImage:
+                  'linear-gradient(180deg, #000 0%, rgba(0,0,0,0.55) 58%, transparent 100%)',
+                WebkitMaskImage:
+                  'linear-gradient(180deg, #000 0%, rgba(0,0,0,0.55) 58%, transparent 100%)',
+              }}
+            />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_65%_35%,rgba(255,248,236,0.32),transparent_42%),linear-gradient(180deg,transparent_45%,rgba(35,23,18,0.28))]" />
+          </div>
           <div aria-hidden="true" className="title-grain absolute inset-0 opacity-50" />
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-[radial-gradient(circle_at_65%_35%,rgba(255,248,236,0.32),transparent_42%),linear-gradient(180deg,transparent_45%,rgba(35,23,18,0.28))]"
+            className="absolute inset-0 bg-[radial-gradient(circle_at_50%_44%,rgba(255,252,245,0.5),transparent_58%)] transition-opacity duration-200"
+            style={{ opacity: heroOpacity }}
           />
+
+          <FloatingMenuPapers progress={progress} />
 
           <div data-testid="title-cafe-scene" className="absolute inset-0 z-10">
             {!webglAvailable || sceneError ? (
@@ -899,67 +913,41 @@ export function TitleExperience(): React.ReactElement {
           </div>
 
           <div
+            className="pointer-events-none absolute inset-0 z-[8] overflow-hidden"
+            style={{ opacity: heroOpacity, transform: `translateY(${-progress * 22}px)` }}
+            aria-hidden={heroOpacity < 0.12}
+          >
+            <div className="absolute inset-x-[4%] top-[31.5%] sm:top-[36.5%]">
+              <h1 className="font-serif text-[clamp(3.55rem,15vw,4.8rem)] font-normal uppercase leading-[0.72] tracking-[-0.055em] text-[#2B1710] sm:text-[clamp(4rem,10.8vw,13.5rem)]">
+                Cafetulia<span style={{ color: theme.accent }}>.</span>
+                <br />
+                El juego<span style={{ color: theme.accent }}>.</span>
+              </h1>
+            </div>
+          </div>
+
+          <div
             className="pointer-events-none absolute inset-0 z-20"
             style={{ opacity: heroOpacity }}
             aria-hidden={heroOpacity < 0.12}
           >
             <div
-              className="absolute left-[4%] right-[4%] top-[10%] z-20 flex flex-col items-start text-left sm:left-[5%] sm:right-auto sm:top-[13%] sm:max-w-[54%]"
-              style={{
-                color: '#FFF8EC',
-                transform: `translateY(${-progress * 34}px)`,
-              }}
+              className="absolute left-[4%] right-[4%] top-[22%] sm:top-[27%]"
+              style={{ color: '#2B1710' }}
             >
               <div className="flex items-center gap-2.5 sm:gap-3">
-                <CupSeal
-                  color="#FFF8EC"
-                  accent={theme.glow}
-                  className="h-9 w-9 shrink-0 sm:h-12 sm:w-12"
-                />
-                <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] opacity-80 sm:text-[11px]">
-                  Salón de té y tertulia · O &amp; A
+                <CupSeal color="#2B1710" accent={theme.accent} className="h-8 w-8 shrink-0 sm:h-10 sm:w-10" />
+                <p className="text-[9px] font-extrabold uppercase tracking-[0.24em] opacity-75 sm:text-[11px]">
+                  Salón de té y tertulia · Juego para 2–4
                 </p>
               </div>
-
-              <h1 className="mt-3 font-serif text-[clamp(2.7rem,7.5vw,7rem)] font-extrabold uppercase leading-[0.78] tracking-[-0.06em] sm:mt-5">
-                Cafetulia
-              </h1>
-              <p className="mt-1 text-[9px] font-extrabold uppercase tracking-[0.24em] opacity-55 sm:text-[11px]">
-                El juego de la tertulia · 2–4 comensales
-              </p>
-
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={mode}
-                  initial={reducedMotion ? false : { opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
-                  transition={{ duration: reducedMotion ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] }}
-                  className="mt-4"
-                >
-                  <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] backdrop-blur-sm sm:text-[11px]">
-                    <span
-                      className="h-1.5 w-1.5 rounded-full"
-                      style={{ backgroundColor: theme.glow }}
-                    />
-                    Mezcla de la casa · {modeConfig.blend}
-                  </p>
-                  <p className="mt-2 font-serif text-base italic opacity-90 sm:mt-3 sm:text-2xl">
-                    {modeConfig.blendNote}
-                  </p>
-                  <p className="mt-2 max-w-[420px] text-[11px] font-semibold leading-relaxed opacity-65 sm:text-sm">
-                    {modeConfig.description}
-                  </p>
-                </motion.div>
-              </AnimatePresence>
-
               <p
                 data-testid="title-greeting"
-                className="mt-3 inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-bold backdrop-blur-sm sm:text-xs"
+                className="mt-2 inline-flex max-w-full items-center gap-1.5 text-[10px] font-bold opacity-70 sm:text-xs"
               >
                 <span
                   className="h-1.5 w-1.5 rounded-full"
-                  style={{ backgroundColor: theme.glow }}
+                  style={{ backgroundColor: theme.accent }}
                 />
                 <span className="truncate">{greetingText}</span>
               </p>
@@ -972,7 +960,43 @@ export function TitleExperience(): React.ReactElement {
                   {errorBanner}
                 </div>
               )}
+            </div>
 
+            <aside
+              className="pointer-events-auto absolute bottom-[5.5%] right-[3.5%] hidden w-[min(300px,24vw)] rounded-[22px] border border-[#231712]/12 bg-[#FFF8EC]/72 p-4 shadow-[0_18px_50px_rgba(35,23,18,0.14)] backdrop-blur-md lg:block"
+              style={{ color: '#2B1710' }}
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ backgroundColor: theme.accent }}
+                />
+                <p className="text-[9px] font-extrabold uppercase tracking-[0.2em] text-[#6C564A]">
+                  La casa invita
+                </p>
+              </div>
+              <p className="mt-2 font-serif text-[26px] font-bold leading-[1.02] tracking-[-0.02em]">
+                La lata es el menú.
+              </p>
+              <p className="mt-1.5 text-[11px] font-semibold leading-snug text-[#6C564A]">
+                Gírala para cambiar de mundo. Desliza para reservar tu mesa.
+              </p>
+              <div className="mt-3 flex items-center gap-2 border-t border-[#231712]/10 pt-2.5">
+                {MENU_MODES.map((item) => (
+                  <span key={item.id} className="flex items-center gap-1">
+                    <span
+                      className="block h-2.5 w-1.5 rounded-[2px]"
+                      style={{ backgroundColor: item.theme.canColor }}
+                    />
+                    <span className="text-[9px] font-extrabold uppercase tracking-[0.1em] text-[#6C564A]">
+                      {item.blend}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            </aside>
+
+            <div className="pointer-events-auto absolute bottom-[3.2%] left-[4%] z-30 flex flex-wrap items-center gap-1.5 pr-3 sm:bottom-[5%] sm:gap-2">
               <button
                 type="button"
                 data-testid="title-scroll-hint"
@@ -980,22 +1004,20 @@ export function TitleExperience(): React.ReactElement {
                   soundEngine.unlock();
                   scrollToReserve();
                 }}
-                className="pointer-events-auto mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#231712]/10 bg-[#FFF8EC] px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#2B1710] shadow-[0_3px_0_rgba(35,23,18,0.16)] transition-transform hover:-translate-y-0.5 sm:mt-5 sm:text-[11px]"
+                className="inline-flex min-h-[44px] items-center gap-2 whitespace-nowrap rounded-full border border-[#2B1710] bg-[#2B1710] px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#FFF8EC] shadow-[0_3px_0_rgba(184,81,47,0.9)] transition-transform hover:-translate-y-0.5 sm:text-[11px]"
               >
-                Desliza para reservar
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <span className="sm:hidden">Entrar</span>
+                <span className="hidden sm:inline">Entrar a la tertulia</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path
                     d="M12 4v14M6 12l6 6 6-6"
                     stroke="currentColor"
-                    strokeWidth="1.8"
+                    strokeWidth="1.9"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 </svg>
               </button>
-            </div>
-
-            <div className="pointer-events-auto absolute inset-x-0 bottom-2 flex items-center justify-center gap-1.5 px-3 sm:gap-3">
               {[
                 { label: 'Tutorial', testId: 'title-tutorial-btn', modal: 'tutorial' as const },
                 { label: 'Reglas', testId: 'title-rules-btn', modal: 'rules' as const },
@@ -1008,7 +1030,7 @@ export function TitleExperience(): React.ReactElement {
                     soundEngine.unlock();
                     setActiveModal(item.modal);
                   }}
-                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 text-[10px] font-extrabold uppercase tracking-wider text-[#FFF8EC] backdrop-blur-sm transition-colors hover:bg-white/25 sm:text-[11px]"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-[#231712]/15 bg-[#FFF8EC]/65 px-3 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#2B1710] backdrop-blur-sm transition-colors hover:bg-[#FFF8EC] sm:text-[11px]"
                 >
                   <BookIcon />
                   {item.label}
@@ -1023,25 +1045,40 @@ export function TitleExperience(): React.ReactElement {
             aria-hidden={!reserveVisible}
           >
             <div
-              className="absolute left-3 top-16 sm:left-6 sm:top-20"
+              className="pointer-events-none absolute left-[4%] top-[13%] max-w-[86%] sm:top-[15%] sm:max-w-[62%]"
               style={{ color: '#FFF8EC' }}
             >
-              <button
-                type="button"
-                onClick={handleBack}
-                className="pointer-events-auto inline-flex min-h-[42px] items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 text-[10px] font-extrabold uppercase tracking-wider backdrop-blur-sm hover:bg-white/25"
-              >
-                ← Volver a la carta
-              </button>
+              <p className="text-[9px] font-extrabold uppercase tracking-[0.24em] opacity-70 sm:text-[11px]">
+                Mundo 0{modeConfig.index + 1} · Mezcla de la casa
+              </p>
+              <AnimatePresence mode="wait">
+                <motion.h2
+                  key={mode}
+                  initial={reducedMotion ? false : { opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -14 }}
+                  transition={{ duration: reducedMotion ? 0 : 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  className="mt-1 font-serif text-[clamp(3rem,15vw,4.5rem)] font-semibold uppercase leading-[0.82] tracking-[-0.06em] sm:text-[clamp(3.5rem,8vw,9rem)]"
+                >
+                  {modeConfig.blend}
+                  <span style={{ color: theme.glow }}>.</span>
+                </motion.h2>
+              </AnimatePresence>
+              <p className="mt-1 font-serif text-sm italic opacity-90 sm:mt-2 sm:text-xl">
+                {modeConfig.blendNote}
+              </p>
+              <p className="mt-1 hidden max-w-[380px] text-[11px] font-semibold leading-snug opacity-65 sm:block sm:text-xs">
+                {modeConfig.description}
+              </p>
             </div>
 
             <div
-              className="pointer-events-none absolute bottom-[9%] left-1/2 -translate-x-1/2 text-center lg:left-[30%]"
+              className="pointer-events-none absolute bottom-[4%] right-[5%] hidden text-right sm:block"
               style={{ color: '#FFF8EC' }}
             >
               <p
                 className="text-[10px] font-extrabold uppercase tracking-[0.22em] transition-opacity duration-300"
-                style={{ opacity: canInteractive && !hasInteracted ? 0.65 : 0 }}
+                style={{ opacity: canInteractive && !hasInteracted ? 0.58 : 0 }}
               >
                 Gira la lata · arrastra o usa la rueda
               </p>
@@ -1071,12 +1108,15 @@ export function TitleExperience(): React.ReactElement {
           </div>
 
           <header className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-center justify-between gap-2 px-2.5 py-2 sm:px-5 sm:py-3">
-            <div
-              className="pointer-events-auto inline-flex items-center gap-2 rounded-full border border-[#231712]/10 bg-[#FFF8EC]/85 px-2.5 py-1 shadow-[0_2px_0_rgba(35,23,18,0.08)] backdrop-blur-md"
+            <button
+              type="button"
+              onClick={handleBack}
+              aria-label="Volver a la portada de Cafetulia"
+              className="pointer-events-auto inline-flex items-center gap-2 rounded-full border border-[#231712]/10 bg-[#FFF8EC]/85 px-2.5 py-1 text-left shadow-[0_2px_0_rgba(35,23,18,0.08)] backdrop-blur-md transition-colors hover:bg-[#FFF8EC]"
               style={{ color: '#2B1710' }}
             >
               <CafetuliaLogo compact hideTextOnMobile />
-            </div>
+            </button>
 
             <button
               type="button"

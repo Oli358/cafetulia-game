@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree, type ThreeEvent } from '@react-three/fiber';
-import { Environment, Lightformer } from '@react-three/drei';
+import { Environment, Lightformer, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import {
   getMenuMode,
@@ -12,6 +12,10 @@ import {
   type MenuModeConfig,
 } from './menuModes';
 import { createCanLabelTextures } from './canLabelTexture';
+
+useGLTF.preload('/models/coffee-bean.glb');
+useGLTF.preload('/models/cinnamon-stick.glb');
+useGLTF.preload('/models/star-anise.glb');
 export type CoffeeMenuSceneProps = {
   mode: MenuMode;
   progress: number;
@@ -170,22 +174,23 @@ function CanModel({
     <group>
       {/* Coloured aluminium body behind the printed wraps */}
       <mesh geometry={bodyGeometry} material={bodyMaterial} />
-      {/* Three full-wrap labels crossfade while the can turns */}
+      {/* Three full-wrap labels crossfade while the can turns. The wrap starts a
+          little lower so the aluminium shoulder keeps more presence. */}
       {MENU_MODES.map((item, index) => (
         <mesh
           key={item.id}
-          position={[0, 1.06, 0]}
+          position={[0, 1.01, 0]}
           rotation={[0, -Math.PI / 3, 0]}
           renderOrder={index + 1}
         >
           <cylinderGeometry
-            args={[0.656 + index * 0.0006, 0.656 + index * 0.0006, 2.04, 96, 1, true]}
+            args={[0.656 + index * 0.0006, 0.656 + index * 0.0006, 1.94, 96, 1, true]}
           />
           <primitive object={labelMaterials[item.id]} attach="material" />
         </mesh>
       ))}
       {/* Top and bottom printed edges */}
-      {[0.04, 2.08].map((y) => (
+      {[0.04, 1.98].map((y) => (
         <mesh key={y} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]} material={aluminumDark}>
           <torusGeometry args={[0.669, 0.009, 6, 96]} />
         </mesh>
@@ -229,66 +234,19 @@ function CanModel({
     </group>
   );
 }
-export function Bean(): React.ReactElement {
-  const crease = useMemo(
-    () =>
-      new THREE.CatmullRomCurve3([
-        new THREE.Vector3(0, -0.2, 0.085),
-        new THREE.Vector3(0.018, -0.08, 0.125),
-        new THREE.Vector3(-0.014, 0.05, 0.135),
-        new THREE.Vector3(0.01, 0.2, 0.085),
-      ]),
-    [],
-  );
-
-  return (
-    <group>
-      <mesh scale={[1, 1.32, 0.58]}>
-        <sphereGeometry args={[0.16, 20, 16]} />
-        <meshStandardMaterial color="#4B2A17" roughness={0.48} metalness={0.03} />
-      </mesh>
-      <mesh>
-        <tubeGeometry args={[crease, 20, 0.008, 5, false]} />
-        <meshStandardMaterial color="#241009" roughness={0.66} />
-      </mesh>
-      <mesh position={[-0.04, 0.055, 0.09]} scale={[0.45, 0.6, 0.28]}>
-        <sphereGeometry args={[0.16, 10, 8]} />
-        <meshStandardMaterial color="#8A5A3F" transparent opacity={0.16} roughness={0.35} />
-      </mesh>
-    </group>
-  );
-}
-function CinnamonStick(): React.ReactElement {
-  return (
-    <group>
-      <mesh>
-        <cylinderGeometry args={[0.055, 0.05, 0.84, 12]} />
-        <meshStandardMaterial color="#8C4A2A" roughness={0.78} />
-      </mesh>
-      <mesh position={[0.018, 0.01, 0.02]}>
-        <cylinderGeometry args={[0.035, 0.032, 0.86, 10]} />
-        <meshStandardMaterial color="#A65A32" roughness={0.72} />
-      </mesh>
-      <mesh position={[-0.024, 0, -0.02]}>
-        <cylinderGeometry args={[0.022, 0.02, 0.85, 8]} />
-        <meshStandardMaterial color="#5E2E1B" roughness={0.8} />
-      </mesh>
-    </group>
-  );
-}
 function OrangePeel(): React.ReactElement {
   return (
     <group rotation={[0.5, 0.2, 0.35]}>
-      <mesh rotation={[0.2, 0.4, 0.1]} scale={[1, 1, 0.52]}>
-        <torusGeometry args={[0.29, 0.055, 8, 28, Math.PI * 1.35]} />
+      <mesh rotation={[0.2, 0.4, 0.1]} scale={[1, 1, 0.58]}>
+        <torusGeometry args={[0.27, 0.078, 8, 28, Math.PI * 1.35]} />
         <meshStandardMaterial color="#D9772E" roughness={0.62} />
       </mesh>
-      <mesh rotation={[0.5, 0.1, -0.2]} position={[0.02, 0.02, 0.025]} scale={[1, 1, 0.4]}>
-        <torusGeometry args={[0.25, 0.022, 6, 24, Math.PI * 1.15]} />
+      <mesh rotation={[0.5, 0.1, -0.2]} position={[0.02, 0.02, 0.03]} scale={[1, 1, 0.45]}>
+        <torusGeometry args={[0.235, 0.044, 6, 24, Math.PI * 1.15]} />
         <meshStandardMaterial color="#F2A24D" roughness={0.52} />
       </mesh>
-      <mesh rotation={[0.8, 0.2, -0.3]} position={[-0.01, 0.0, 0.02]} scale={[1, 1, 0.35]}>
-        <torusGeometry args={[0.28, 0.012, 5, 24, Math.PI * 1.2]} />
+      <mesh rotation={[0.8, 0.2, -0.3]} position={[-0.01, 0.0, 0.035]} scale={[1, 1, 0.38]}>
+        <torusGeometry args={[0.255, 0.026, 5, 24, Math.PI * 1.2]} />
         <meshStandardMaterial color="#B8512F" roughness={0.7} />
       </mesh>
     </group>
@@ -413,29 +371,6 @@ function ChocolateChunk(): React.ReactElement {
     </group>
   );
 }
-function StarAnise(): React.ReactElement {
-  return (
-    <group>
-      {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => {
-        const angle = (index / 8) * TWO_PI;
-        return (
-          <mesh
-            key={index}
-            position={[Math.cos(angle) * 0.1, Math.sin(angle) * 0.1, 0]}
-            rotation={[0, 0, angle]}
-          >
-            <coneGeometry args={[0.045, 0.16, 4]} />
-            <meshStandardMaterial color="#5C2F1B" roughness={0.8} />
-          </mesh>
-        );
-      })}
-      <mesh position={[0, 0, 0.03]}>
-        <sphereGeometry args={[0.045, 10, 8]} />
-        <meshStandardMaterial color="#C08442" roughness={0.7} />
-      </mesh>
-    </group>
-  );
-}
 function CocoaNib(): React.ReactElement {
   return (
     <mesh scale={[1, 0.7, 0.9]}>
@@ -444,12 +379,114 @@ function CocoaNib(): React.ReactElement {
     </mesh>
   );
 }
-function IngredientShape({ kind }: { kind: IngredientSpec['kind'] }): React.ReactElement {
+type IngredientModels = {
+  bean: THREE.Group;
+  cinnamon: THREE.Group;
+  anise: THREE.Group;
+};
+
+function useIngredientModels(): IngredientModels {
+  const bean = useGLTF('/models/coffee-bean.glb').scene;
+  const cinnamon = useGLTF('/models/cinnamon-stick.glb').scene;
+  const anise = useGLTF('/models/star-anise.glb').scene;
+  return useMemo(() => ({ bean, cinnamon, anise }), [bean, cinnamon, anise]);
+}
+
+/**
+ * Low-poly Poly by Google models (CC BY 4.0) for the three ingredients that
+ * benefit most from a real silhouette. Each instance gets its own materials so
+ * the mode crossfade can fade whole worlds independently.
+ */
+function MainIngredientModel({
+  source,
+  targetSize,
+  rotation,
+}: {
+  source: THREE.Group;
+  targetSize: number;
+  rotation: [number, number, number];
+}): React.ReactElement {
+  const clone = useMemo(() => {
+    const copy = source.clone(true);
+    copy.traverse((child) => {
+      const mesh = child as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      mesh.frustumCulled = false;
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      const cloned = materials.map((material) => {
+        const copyMaterial = material.clone();
+        if (copyMaterial instanceof THREE.MeshStandardMaterial) {
+          copyMaterial.roughness = Math.max(0.42, copyMaterial.roughness);
+          copyMaterial.metalness = 0.02;
+        }
+        return copyMaterial;
+      });
+      if (Array.isArray(mesh.material)) {
+        mesh.material = cloned;
+      } else if (cloned[0]) {
+        mesh.material = cloned[0];
+      }
+    });
+    const box = new THREE.Box3().setFromObject(copy);
+    const size = box.getSize(new THREE.Vector3());
+    const largest = Math.max(size.x, size.y, size.z, 0.001);
+    copy.scale.multiplyScalar(targetSize / largest);
+    const scaledBox = new THREE.Box3().setFromObject(copy);
+    copy.position.sub(scaledBox.getCenter(new THREE.Vector3()));
+    return copy;
+  }, [source, targetSize]);
+
+  useEffect(
+    () => () => {
+      clone.traverse((child) => {
+        const mesh = child as THREE.Mesh;
+        if (!mesh.isMesh) return;
+        const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+        materials.forEach((material) => material.dispose());
+      });
+    },
+    [clone],
+  );
+
+  return (
+    <group rotation={rotation}>
+      <primitive object={clone} />
+    </group>
+  );
+}
+
+function IngredientShape({
+  kind,
+  models,
+}: {
+  kind: IngredientSpec['kind'];
+  models: IngredientModels;
+}): React.ReactElement {
   switch (kind) {
     case 'bean':
-      return <Bean />;
+      return (
+        <MainIngredientModel
+          source={models.bean}
+          targetSize={0.46}
+          rotation={[Math.PI / 2, 0, 0]}
+        />
+      );
     case 'cinnamon':
-      return <CinnamonStick />;
+      return (
+        <MainIngredientModel
+          source={models.cinnamon}
+          targetSize={1.02}
+          rotation={[Math.PI / 2, 0, 0]}
+        />
+      );
+    case 'anise':
+      return (
+        <MainIngredientModel
+          source={models.anise}
+          targetSize={0.56}
+          rotation={[Math.PI / 2, 0, 0]}
+        />
+      );
     case 'orange':
       return <OrangePeel />;
     case 'flower':
@@ -460,8 +497,6 @@ function IngredientShape({ kind }: { kind: IngredientSpec['kind'] }): React.Reac
       return <Cardamom />;
     case 'chocolate':
       return <ChocolateChunk />;
-    case 'anise':
-      return <StarAnise />;
     case 'cocoa':
     default:
       return <CocoaNib />;
@@ -469,13 +504,13 @@ function IngredientShape({ kind }: { kind: IngredientSpec['kind'] }): React.Reac
 }
 function FloatingIngredient({
   spec,
-  progress,
+  models,
   reducedMotion,
   pointerWorld,
   layout,
 }: {
   spec: IngredientSpec;
-  progress: number;
+  models: IngredientModels;
   reducedMotion: boolean;
   pointerWorld: React.RefObject<THREE.Vector3>;
   layout: 'mobile' | 'desktop';
@@ -510,13 +545,8 @@ function FloatingIngredient({
     }
     offset.current.x = THREE.MathUtils.damp(offset.current.x, targetX, 8, delta);
     offset.current.y = THREE.MathUtils.damp(offset.current.y, targetY, 8, delta);
-    const reserveX =
-      layout === 'desktop' ? -Math.abs(spec.position[0]) * 0.8 - 0.65 : spec.position[0];
-    const reserveY = layout === 'desktop' ? spec.position[1] + 0.1 : spec.position[1];
-    const baseOffsetX = (reserveX - spec.position[0]) * progress;
-    const baseOffsetY = (reserveY - spec.position[1]) * progress;
-    outer.current.position.x = baseOffsetX + offset.current.x;
-    outer.current.position.y = baseOffsetY + offset.current.y;
+    outer.current.position.x = offset.current.x;
+    outer.current.position.y = offset.current.y;
     inner.current.position.y = reducedMotion ? 0 : Math.sin(time * 0.8 + phase * 8) * 0.06;
     inner.current.rotation.z = reducedMotion
       ? 0
@@ -529,7 +559,7 @@ function FloatingIngredient({
     <group position={spec.position} rotation={spec.rotation} scale={spec.scale}>
       <group ref={outer}>
         <group ref={inner}>
-          <IngredientShape kind={spec.kind} />
+          <IngredientShape kind={spec.kind} models={models} />
         </group>
       </group>
     </group>
@@ -539,6 +569,7 @@ function IngredientGroup({
   modeConfig,
   active,
   progress,
+  models,
   reducedMotion,
   pointerWorld,
   layout,
@@ -546,6 +577,7 @@ function IngredientGroup({
   modeConfig: MenuModeConfig;
   active: boolean;
   progress: number;
+  models: IngredientModels;
   reducedMotion: boolean;
   pointerWorld: React.RefObject<THREE.Vector3>;
   layout: 'mobile' | 'desktop';
@@ -576,7 +608,8 @@ function IngredientGroup({
 
   useFrame((_, delta) => {
     if (!root.current) return;
-    const target = active ? 1 : 0;
+    const reveal = THREE.MathUtils.smoothstep(progress, 0.45, 0.88);
+    const target = active ? reveal : 0;
     visibility.current = reducedMotion
       ? target
       : THREE.MathUtils.damp(visibility.current, target, 3.2, delta);
@@ -599,7 +632,7 @@ function IngredientGroup({
         <FloatingIngredient
           key={spec.id}
           spec={spec}
-          progress={progress}
+          models={models}
           reducedMotion={reducedMotion}
           pointerWorld={pointerWorld}
           layout={layout}
@@ -611,12 +644,14 @@ function IngredientGroup({
 function WaveIngredients({
   mode,
   progress,
+  models,
   reducedMotion,
   pointerWorld,
   layout,
 }: {
   mode: MenuMode;
   progress: number;
+  models: IngredientModels;
   reducedMotion: boolean;
   pointerWorld: React.RefObject<THREE.Vector3>;
   layout: 'mobile' | 'desktop';
@@ -629,6 +664,7 @@ function WaveIngredients({
           modeConfig={modeConfig}
           active={modeConfig.id === mode}
           progress={progress}
+          models={models}
           reducedMotion={reducedMotion}
           pointerWorld={pointerWorld}
           layout={layout}
@@ -678,13 +714,13 @@ function CameraRig({
       : THREE.MathUtils.damp(smooth.current, progress, 5, delta);
     const p = smooth.current;
     const heroPosition: [number, number, number] =
-      layout === 'desktop' ? [0, 1.15, 7.6] : [0, 1.55, 11];
+      layout === 'desktop' ? [0, 1.35, 8.2] : [0, 1.2, 9.8];
     const reservePosition: [number, number, number] =
-      layout === 'desktop' ? [0.3, 1.3, 8] : [0, 1.5, 9.5];
+      layout === 'desktop' ? [0.2, 1.25, 7.9] : [0, 1.45, 9.6];
     const heroTarget: [number, number, number] =
-      layout === 'desktop' ? [1.3, 1.02, 0] : [0.3, 2.2, 0];
+      layout === 'desktop' ? [0, 1.35, 0] : [0, 1.2, 0];
     const reserveTarget: [number, number, number] =
-      layout === 'desktop' ? [-0.45, 1.25, 0] : [0, 1.8, 0];
+      layout === 'desktop' ? [1, 0.95, 0] : [0.2, 1.45, 0];
     camera.position.set(
       THREE.MathUtils.lerp(heroPosition[0], reservePosition[0], p),
       THREE.MathUtils.lerp(heroPosition[1], reservePosition[1], p),
@@ -712,6 +748,7 @@ function SceneContent({
 }: CoffeeMenuSceneProps): React.ReactElement {
   const modeConfig = getMenuMode(mode);
   const labelTextures = useCanLabelTextures();
+  const ingredientModels = useIngredientModels();
   const stage = useRef<THREE.Group | null>(null);
   const canFloat = useRef<THREE.Group | null>(null);
   const can = useRef<THREE.Group | null>(null);
@@ -827,9 +864,10 @@ function SceneContent({
       pointerWorld.current.copy(camera.position).add(pointerDirection.multiplyScalar(distance));
     }
     if (stage.current) {
-      const heroX = layout === 'desktop' ? 1.85 : 0.45;
-      const reserveX = layout === 'desktop' ? -0.9 : 0;
-      const reserveY = layout === 'desktop' ? -0.35 : -0.15;
+      const heroX = 0;
+      const reserveX = layout === 'desktop' ? 1.15 : 0.35;
+      const heroY = layout === 'desktop' ? -1.95 : -1.57;
+      const reserveY = layout === 'desktop' ? -0.55 : -0.35;
       stage.current.position.x = THREE.MathUtils.damp(
         stage.current.position.x,
         THREE.MathUtils.lerp(heroX, reserveX, p),
@@ -838,15 +876,15 @@ function SceneContent({
       );
       stage.current.position.y = THREE.MathUtils.damp(
         stage.current.position.y,
-        reserveY * p,
+        THREE.MathUtils.lerp(heroY, reserveY, p),
         5,
         delta,
       );
     }
     if (canFloat.current) {
       canFloat.current.position.y = reducedMotion ? 0 : Math.sin(time * 0.75) * 0.055;
-      canFloat.current.rotation.z = reducedMotion ? -0.11 : -0.11 + Math.sin(time * 0.6) * 0.018;
-      canFloat.current.rotation.x = reducedMotion ? 0.045 : 0.045 + Math.cos(time * 0.5) * 0.018;
+      canFloat.current.rotation.z = reducedMotion ? -0.085 : -0.085 + Math.sin(time * 0.6) * 0.016;
+      canFloat.current.rotation.x = reducedMotion ? 0.04 : 0.04 + Math.cos(time * 0.5) * 0.016;
     }
     if (can.current) {
       // One full, gradual turn as the page moves from the poster to the menu.
@@ -900,15 +938,16 @@ function SceneContent({
           scale={[5, 5, 1]}
         />
       </Environment>
-      <group ref={stage} position={[layout === 'desktop' ? 1.85 : 0.45, 0, 0]}>
+      <group ref={stage} position={[0, layout === 'desktop' ? -1.95 : -1.57, 0]}>
         <group ref={canFloat}>
-          <group ref={can}>
+          <group ref={can} scale={layout === 'desktop' ? 1.12 : 1}>
             <CanModel labelTextures={labelTextures} mode={mode} />
           </group>
         </group>
         <WaveIngredients
           mode={mode}
           progress={progress}
+          models={ingredientModels}
           reducedMotion={reducedMotion}
           pointerWorld={pointerWorld}
           layout={layout}
@@ -925,7 +964,7 @@ export default function CoffeeMenuScene(props: CoffeeMenuSceneProps): React.Reac
   return (
     <Canvas
       dpr={props.layout === 'mobile' ? [1, 1.5] : [1, 1.75]}
-      camera={{ fov: 30, position: [0, 1.15, 7.6], near: 0.1, far: 80 }}
+      camera={{ fov: 30, position: [0, 1.35, 8.2], near: 0.1, far: 80 }}
       gl={{
         antialias: true,
         alpha: true,

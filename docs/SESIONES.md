@@ -5,6 +5,36 @@
 
 ---
 
+## Sesión 031 - 2026-11-25 - Portada póster Dialed, lata recortada y modelos reales
+
+**Objetivo:** acercar la portada a la composición de referencia de Dialed (titular gigante, lata abajo-centro recortada, papeles flotando) sin copiar sus assets, e integrar modelos 3D reales de ingredientes.
+
+**Hecho:**
+- Portada rehecha como póster editorial: fondo crema, **CAFETULIA. / EL JUEGO.** en dos líneas gigantes (Fraunces 400), lata centrada abajo y recortada por el viewport, y nueve papeles de comanda con blur y profundidad detrás del título y la lata.
+- La lata se mantiene por delante del titular; la información secundaria baja a una tarjeta de la casa a la derecha. En móvil la tarjeta desaparece y las acciones (Entrar, Tutorial, Reglas) caben en una sola fila.
+- Menú recompuesto: nombre del mundo gigante a la izquierda, lata a la derecha y carta compacta abajo a la izquierda; las tres pestañas (Unirse / Reservar / Café solo) siguen accesibles sin scroll adicional.
+- Un solo notch de rueda sigue llevando del póster al menú; dentro del menú, la rueda cambia de mundo.
+- La etiqueta baja un poco más su corte superior para dejar más hombro metálico.
+- Integrados tres modelos GLB reales de Poly by Google para café, canela y anís (CC BY 3.0 vía Poly Pizza), normalizados y con materiales clonados para que el crossfade de mundos funcione. El resto de ingredientes sigue siendo procedural.
+- Atribución en `docs/CREDITOS.md` y al final del panel de Ajustes.
+- Nuevas capturas `docs/referencias/ui-v12-*.png` con `?force3d=1` en 1920×900, 1280×800 y 390×844.
+- Verificado: `typecheck`, `lint`, 49 tests unitarios, build y 3 E2E en verde.
+
+**Decisiones:** D-096, D-097, D-098, D-099 y D-100.
+
+**Problemas:**
+- En móvil la carta tapa la mayor parte de la etiqueta de la lata; el mundo se entiende por el título y el color, pero el giro se aprecia menos.
+- Falta validar en un dispositivo real la fluidez del póster, los papeles y la entrada de los modelos.
+- `sodacans.glb` sigue descartado: 13,49 MB y 346.540 triángulos no compensan para una lata que ya funciona y pesa mucho menos.
+
+**Siguiente:**
+1. Probar la v12 en iPhone/Android real y ajustar tiempos del scroll y del giro.
+2. Decidir si la carta móvil se puede plegar o reducir para enseñar más lata.
+3. Valorar si merece la pena sustituir más ingredientes por GLB o mantener el arte procedural.
+4. Preparar `?room=CODE` y la relación entre mundo y música.
+
+---
+
 ## Sesión 030 - 2026-11-24 - Portada cinematográfica y fondo vivo del lobby
 
 **Objetivo:** aplicar el feedback de la primera entrega: jerarquía de juego, scroll cinematográfico, transiciones suaves y fondo del lobby con profundidad.

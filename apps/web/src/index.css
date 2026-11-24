@@ -1,3 +1,4 @@
+@import "@fontsource/fraunces/latin-400.css";
 @import "@fontsource/fraunces/latin-600.css";
 @import "@fontsource/fraunces/latin-600-italic.css";
 @import "@fontsource/fraunces/latin-700.css";
@@ -370,5 +371,79 @@
   .lobby-ingredient {
     animation: none;
     transform: rotate(var(--lobby-rotate, 0deg));
+  }
+}
+
+/* Papeles de menú flotando tras el póster de portada */
+@keyframes paper-drift {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(var(--paper-rotate, 0deg));
+  }
+  50% {
+    transform: translate3d(9px, -20px, 0) rotate(calc(var(--paper-rotate, 0deg) + 4deg));
+  }
+}
+.floating-paper {
+  padding: 10px 12px 8px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.55), transparent 46%),
+    #fbf6eb;
+  border: 1px solid rgba(35, 23, 18, 0.1);
+  border-radius: 2px;
+  box-shadow: 0 14px 24px rgba(35, 23, 18, 0.1);
+  color: #3e2f2a;
+  font-family: var(--font-sans);
+  animation: paper-drift 28s ease-in-out infinite;
+  will-change: transform;
+}
+.floating-paper-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(62, 47, 42, 0.25);
+  font-family: var(--font-serif);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.floating-paper-stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border: 1px solid #c8a12a;
+  border-radius: 50%;
+  color: #7b5236;
+  font-size: 6px;
+  letter-spacing: 0;
+}
+.floating-paper-lines {
+  height: 52px;
+  margin: 8px 0 6px;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(62, 47, 42, 0.5) 0,
+      rgba(62, 47, 42, 0.5) 1px,
+      transparent 1px,
+      transparent 4.5px
+    ),
+    linear-gradient(90deg, transparent 0 68%, rgba(62, 47, 42, 0.26) 68% 69.2%, transparent 69.2%);
+  opacity: 0.52;
+}
+.floating-paper-foot {
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #6c564a;
+}
+@media (prefers-reduced-motion: reduce) {
+  .floating-paper {
+    animation: none;
+    transform: rotate(var(--paper-rotate, 0deg));
   }
 }
