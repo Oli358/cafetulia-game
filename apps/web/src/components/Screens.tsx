@@ -38,8 +38,11 @@ import {
 } from './CoinTray';
 import { IllustratedBoard, type ChairToastInfo } from './IllustratedBoard';
 import { AnchoredPopover } from './Modals';
+import { AvatarDropdownPicker as TitleAvatarPicker } from './TitlePickers';
+import { LobbyTableFallback } from '../title/LobbyTableFallback';
 
 const LazyPapercraftBoard = React.lazy(() => import('./PapercraftBoard'));
+const LazyLobbyCoffeeScene = React.lazy(() => import('../title/LobbyCoffeeScene'));
 
 export type ArcadeCalloutEvent = {
   id: string;
@@ -1377,6 +1380,26 @@ export function LobbyScreen(): React.ReactElement {
 
   const [copied, setCopied] = useState(false);
   const [botDiff, setBotDiff] = useState<'basic' | 'medium' | 'hard'>('medium');
+  const [lobby3d] = useState(() => {
+    if (typeof document === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('no3d')) return false;
+    if (params.has('force3d')) return true;
+    try {
+      const canvas = document.createElement('canvas');
+      const gl = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
+      if (!gl) return false;
+      const context = gl as WebGLRenderingContext;
+      const extension = context.getExtension('WEBGL_debug_renderer_info');
+      const renderer = extension
+        ? context.getParameter(extension.UNMASKED_RENDERER_WEBGL)
+        : context.getParameter(context.RENDERER);
+      context.getExtension('WEBGL_lose_context')?.loseContext();
+      return !/SwiftShader|llvmpipe|softpipe|Software|Basic Render/i.test(String(renderer));
+    } catch {
+      return false;
+    }
+  });
 
   if (!snapshot) return <div />;
 
@@ -1429,16 +1452,21 @@ export function LobbyScreen(): React.ReactElement {
 
   return (
     <div
-      className="relative h-[100dvh] max-h-[100dvh] w-full overflow-hidden p-2 sm:p-5 max-w-6xl mx-auto flex flex-col justify-center select-none safe-bottom"
+      className="relative h-[100dvh] max-h-[100dvh] w-full overflow-hidden p-2 sm:p-4 flex flex-col justify-center select-none safe-bottom"
       data-testid="lobby-screen"
     >
-      <div className="cafe-paper-sheet cafe-double-frame rounded-[24px] border-2 border-[#231712] p-3 sm:p-5 flex flex-col justify-between max-h-[96dvh] overflow-hidden gap-2.5">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_16%,rgba(255,248,236,0.85),transparent_42%),linear-gradient(160deg,#F2D8BC_0%,#E4BE98_48%,#C98A63_100%)]"
+      />
+      <div aria-hidden="true" className="title-grain pointer-events-none absolute inset-0 -z-10 opacity-35" />
+      <div className="relative mx-auto flex max-h-[96dvh] w-full max-w-[1500px] flex-col justify-between gap-2.5 overflow-hidden rounded-[28px] border border-[#231712]/10 bg-[#FFF8EC]/82 p-2.5 shadow-[0_24px_70px_rgba(35,23,18,0.22)] backdrop-blur-md sm:p-4">
         {/* Top Lobby Bar: Paper Napkin Room Code Card + Quick Actions */}
-        <div className="shrink-0 flex flex-wrap items-center justify-between gap-2 cafe-double-rule pb-2">
+        <div className="shrink-0 flex flex-nowrap items-center justify-between gap-1.5 cafe-double-rule pb-2 sm:gap-2">
           {/* Paper Napkin / Coaster Room Code Card with folded corner */}
           <div
             data-testid="lobby-napkin-code"
-            className="group relative flex items-center gap-3 bg-[#FEF6E0] px-3.5 py-1.5 rounded-2xl border-2 border-[#231712] shadow-[3px_3px_0_#231712] -rotate-1 hover:rotate-0 transition-transform"
+            className="group relative flex min-w-0 items-center gap-2 bg-[#FEF6E0] px-2.5 py-1.5 rounded-2xl border-2 border-[#231712] shadow-[3px_3px_0_#231712] -rotate-1 hover:rotate-0 transition-transform sm:gap-3 sm:px-3.5"
           >
             {/* Napkin inner stitch border */}
             <span
@@ -1450,14 +1478,14 @@ export function LobbyScreen(): React.ReactElement {
                 Servilleta de reserva
               </span>
               <div className="flex items-center gap-2.5">
-                <h1 className="font-mono font-extrabold text-xl sm:text-2xl text-[#231712] tracking-wider leading-none">
+                <h1 className="font-mono font-extrabold text-xl sm:text-3xl text-[#231712] tracking-wider leading-none">
                   #{snapshot.code}
                 </h1>
                 <button
                   type="button"
                   data-testid="lobby-copy-code-btn"
                   onClick={() => void copyInvite()}
-                  className={`min-h-[36px] px-3 py-1 rounded-xl text-xs font-extrabold border-2 cursor-pointer inline-flex items-center gap-1.5 ${
+                  className={`min-h-[36px] px-2 sm:px-3 py-1 rounded-xl text-xs font-extrabold border-2 cursor-pointer inline-flex items-center gap-1.5 ${
                     copied
                       ? 'bg-[#3D5B47] text-[#FFFDF8] border-[#231712] shadow-[0_2px_0_#231712]'
                       : 'bg-[#FFFDF8] text-[#231712] border-[#231712] shadow-[0_2px_0_#231712] hover:bg-[#EAD8BE]'
@@ -1479,14 +1507,15 @@ export function LobbyScreen(): React.ReactElement {
                       <path d="M3 11V3h8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                     </svg>
                   )}
-                  <span>{copied ? 'Sello copiado' : 'Copiar invitación'}</span>
+                  <span className="hidden sm:inline">{copied ? 'Sello copiado' : 'Copiar invitación'}</span>
+                  <span className="sm:hidden">{copied ? 'Copiado' : 'Copiar'}</span>
                 </button>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5">
-            <AvatarDropdownPicker compact />
+          <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
+            <TitleAvatarPicker compact iconOnly />
             <button
               type="button"
               onClick={() => setActiveModal('settings')}
@@ -1514,15 +1543,18 @@ export function LobbyScreen(): React.ReactElement {
         )}
 
         {/* Center 2-column grid: Visual Prepared 4-Chair Café Table + Tactile Room Controls */}
-        <div className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12 gap-3 overflow-y-auto pr-0.5 items-stretch">
-          {/* Left 7 cols: Visual Round Café Table with 4 Physical Chairs Around the Tablecloth */}
+        <div className="flex-1 min-h-0 grid grid-cols-2 gap-2.5 overflow-y-auto pr-0.5 items-stretch lg:grid-cols-12 lg:gap-3">
+          {/* Left: prepared table + seats */}
           <div
             data-testid="lobby-table-scene"
-            className="lg:col-span-7 cafe-paper-subpanel p-3 sm:p-4 rounded-2xl border-2 border-[#231712]/25 flex flex-col justify-between gap-2.5 relative overflow-hidden"
+            className="col-span-2 flex flex-col justify-between gap-2.5 overflow-visible rounded-[22px] border border-[#231712]/10 bg-[#FFF8EC]/70 p-3 sm:p-4 lg:col-span-7"
           >
-            <div className="flex flex-wrap items-center justify-between gap-2 relative z-10">
+            <div className="relative z-10 flex flex-wrap items-center justify-between gap-2">
               <div>
-                <h2 className="font-serif font-bold text-sm sm:text-lg text-[#231712]">
+                <span className="text-[9px] font-extrabold uppercase tracking-[0.2em] text-[#B8512F]">
+                  La mesa de la casa · O &amp; A
+                </span>
+                <h2 className="mt-0.5 font-serif text-lg font-bold text-[#231712] sm:text-2xl">
                   Mesa preparada ({activeSeatMembers.length}/{snapshot.config.maxPlayers} comensales)
                 </h2>
                 <p className="text-[11px] text-[#6C564A]">
@@ -1567,11 +1599,30 @@ export function LobbyScreen(): React.ReactElement {
             </div>
 
             {/* VISUAL CAFÉ TABLE STAGE: 3-column grid [Left Chairs | Unobstructed Central Round Table | Right Chairs] */}
-            <div className="relative py-2 my-auto grid grid-cols-1 sm:grid-cols-12 gap-2.5 sm:gap-3 items-center">
-              {/* Central Illustrated Round Café Table with Embroidered Linen Tablecloth (Unobstructed in center col) */}
+            <div className="relative my-auto grid grid-cols-2 items-center gap-2.5 py-2 sm:grid-cols-12 sm:gap-3">
+              {/* 3D coffee still life: the can and beans are playable while you wait */}
+              <div className="col-span-2 flex flex-col items-center justify-center gap-1.5 sm:col-span-4 sm:col-start-5 sm:row-span-2 sm:row-start-1">
+                <div className="relative h-[120px] w-full max-w-[300px] overflow-hidden rounded-[22px] border-2 border-[#3A261D] bg-[#3A261D] shadow-[0_10px_24px_rgba(35,23,18,0.28),0_3px_0_#231712] sm:h-auto sm:aspect-square">
+                  {lobby3d ? (
+                    <Suspense fallback={<LobbyTableFallback />}>
+                      <LazyLobbyCoffeeScene reducedMotion={reducedMotion} />
+                    </Suspense>
+                  ) : (
+                    <LobbyTableFallback />
+                  )}
+                  <span className="pointer-events-none absolute left-2 top-2 rounded-md border border-[#C8A12A]/60 bg-[#231712]/70 px-1.5 py-0.5 text-[8px] font-serif italic text-[#FEF6E0]">
+                    Rincón O &amp; A
+                  </span>
+                </div>
+                <span className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#7B5236]">
+                  Gira la lata · toca los granos
+                </span>
+              </div>
+
+              {/* Legacy table illustration kept as a no-WebGL-friendly fallback reference */}
               <div
                 aria-hidden="true"
-                className="pointer-events-none hidden sm:flex sm:col-span-4 sm:col-start-5 sm:row-start-1 sm:row-span-2 flex-col items-center justify-center py-1"
+                className="pointer-events-none hidden sm:col-span-4 sm:col-start-5 sm:row-start-1 sm:row-span-2 flex-col items-center justify-center py-1"
               >
                 <div className="relative w-38 h-38 xl:w-44 xl:h-44 rounded-full bg-[#7B5236] border-[3px] border-[#231712] shadow-[0_10px_22px_rgba(35,23,18,0.28),0_4px_0_#231712] flex items-center justify-center">
                   {/* Four wooden chair-connector arms extending toward the 4 seats */}
@@ -1779,13 +1830,13 @@ export function LobbyScreen(): React.ReactElement {
           </div>
 
           {/* Right 5 cols: Tactile Café Tokens for Players & Turn Clock */}
-          <div className="lg:col-span-5 cafe-paper-subpanel p-3 sm:p-4 rounded-2xl border-2 border-[#231712]/25 space-y-3 self-stretch flex flex-col justify-between">
+          <div className="col-span-2 flex flex-col justify-between space-y-2 self-stretch rounded-[22px] border border-[#231712]/10 bg-[#FFF8EC]/70 p-3 sm:p-4 sm:space-y-3 lg:col-span-5">
             <div className="space-y-3">
               <div className="cafe-double-rule pb-1.5">
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#C86B46] block">
+                <span className="hidden text-[10px] font-extrabold uppercase tracking-wider text-[#C86B46] sm:block">
                   Comanda del anfitrión
                 </span>
-                <h2 className="font-serif font-bold text-base sm:text-lg text-[#231712]">
+                <h2 className="font-serif font-bold text-sm sm:text-2xl text-[#231712]">
                   Ajustes de la mesa
                 </h2>
               </div>
@@ -1808,7 +1859,7 @@ export function LobbyScreen(): React.ReactElement {
                           soundEngine.playSfx('uiToggle');
                           void updateRoomConfig({ maxPlayers: count });
                         }}
-                        className={`min-h-[42px] px-2.5 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer disabled:opacity-60 ${
+                        className={`min-h-[36px] px-2.5 py-1 rounded-xl text-xs font-extrabold transition-all cursor-pointer disabled:opacity-60 sm:min-h-[42px] sm:py-1.5 ${
                           active
                             ? 'cafe-btn-primary'
                             : 'cafe-btn-paper'
@@ -1826,7 +1877,7 @@ export function LobbyScreen(): React.ReactElement {
                 <span className="block text-xs font-extrabold text-[#231712]">
                   Reloj de cortesía por turno
                 </span>
-                <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-3 gap-1.5">
+                <div className="grid grid-cols-5 gap-1 lg:grid-cols-3">
                   {[
                     { val: 0, label: 'Sin reloj' },
                     { val: 30, label: '30 s' },
@@ -1848,7 +1899,7 @@ export function LobbyScreen(): React.ReactElement {
                             timerSeconds: opt.val > 0 ? opt.val : 60,
                           });
                         }}
-                        className={`min-h-[38px] px-2 py-1 rounded-xl text-xs font-extrabold transition-all cursor-pointer disabled:opacity-60 ${
+                        className={`min-h-[34px] px-2 py-1 rounded-xl text-xs font-extrabold transition-all cursor-pointer disabled:opacity-60 sm:min-h-[38px] ${
                           active
                             ? 'cafe-btn-primary'
                             : 'cafe-btn-paper'
@@ -1862,7 +1913,7 @@ export function LobbyScreen(): React.ReactElement {
               </div>
             </div>
 
-            <div className="pt-2 border-t-2 border-dashed border-[#231712]/15 text-[11px] font-semibold text-[#5A453B] flex items-center justify-between">
+            <div className="hidden sm:flex pt-2 border-t-2 border-dashed border-[#231712]/15 text-[11px] font-semibold text-[#5A453B] items-center justify-between">
               <span>Bolsa de terciopelo: 100 fichas</span>
               <span className="font-serif font-bold text-[#231712] bg-[#FEF6E0] px-2 py-0.5 rounded border border-[#C8A12A]">
                 O &amp; A

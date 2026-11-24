@@ -54,39 +54,45 @@ type TestStoreShape = {
   setState: (patch: Record<string, unknown>) => void;
 };
 
-test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de café en portada/lobby, mano centrada, Sonido del café, Header estable, menús exclusivos y O & A)', () => {
-  test('Cumple dirección visual v8 sin scroll en 1920x900, 1280x800 y 390x844 y genera las 7 capturas ui-v8-*.png', async ({
+test.describe('Cafetulia E2E v11 (menú de reservas 3D, tres mundos, lobby preparado, tablero y O & A)', () => {
+  test('Cumple la portada 3D con scroll interno de dos actos en 1920x900, 1280x800 y 390x844 y genera las capturas ui-v11-*.png', async ({
     page,
   }) => {
-    // 1. Verificar Portada v8 (escena de café completa, avatar protagonista, saludo, pizarra del día y carta de menú) sin scroll en 390x844, 1280x800 y 1920x900
+    // 1. Portada v11: título + lata 3D, scroll interno de un viewport y carta de reservas.
     for (const vp of [
-      { width: 390, height: 844, shot: 'ui-v8-portada-movil.png' },
-      { width: 1280, height: 800, shot: 'ui-v8-portada-1280.png' },
-      { width: 1920, height: 900, shot: 'ui-v8-portada-1920.png' },
+      { width: 390, height: 844, shot: 'ui-v11-portada-movil.png' },
+      { width: 1280, height: 800, shot: 'ui-v11-portada-1280.png' },
+      { width: 1920, height: 900, shot: 'ui-v11-portada-1920.png' },
     ]) {
       await page.setViewportSize({ width: vp.width, height: vp.height });
       if (page.url() === 'about:blank') {
         await page.goto('/');
       }
+      await page.waitForTimeout(150);
       await expect(page.getByTestId('title-screen')).toBeVisible();
       await expect(page.getByTestId('title-cafe-scene')).toBeVisible();
       await expect(page.getByTestId('title-hero-avatar')).toBeVisible();
       await expect(page.getByTestId('title-greeting')).toBeVisible();
       await expect(page.getByTestId('title-daily-phrase')).toBeVisible();
-      await expect(page.getByTestId('title-menu-card')).toBeVisible();
 
-      const scrollCheck = await page.evaluate(() => ({
-        scrollHeight: document.documentElement.scrollHeight,
-        innerHeight: window.innerHeight,
-      }));
-      expect(scrollCheck.scrollHeight).toBeLessThanOrEqual(scrollCheck.innerHeight + 1);
+      const scrollCheck = await page.evaluate(() => {
+        const title = document.querySelector('[data-testid="title-screen"]') as HTMLElement | null;
+        return {
+          documentScrollHeight: document.documentElement.scrollHeight,
+          innerHeight: window.innerHeight,
+          titleScrollHeight: title?.scrollHeight ?? 0,
+          titleClientHeight: title?.clientHeight ?? 0,
+        };
+      });
+      expect(scrollCheck.documentScrollHeight).toBeLessThanOrEqual(scrollCheck.innerHeight + 1);
+      expect(scrollCheck.titleScrollHeight).toBeGreaterThanOrEqual(
+        scrollCheck.titleClientHeight * 2 - 2,
+      );
 
-      // Verificar áreas táctiles >= 44px en botones de menú principales y secundarios
+      // Verificar áreas táctiles >= 44px en los controles visibles de la portada
       for (const tid of [
         'title-hero-avatar',
-        'quick-start-btn',
-        'create-room-btn',
-        'join-room-btn',
+        'title-scroll-hint',
         'title-tutorial-btn',
         'title-rules-btn',
         'title-settings-btn',
@@ -99,22 +105,28 @@ test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de caf�
       await page.screenshot({ path: path.join(REF_DIR, vp.shot) });
     }
 
-    // 2. Verificar que pulsar el avatar protagonista abre el selector de avatar, y exclusión mutua con Subtítulos
+    // 2. Avatar en la barra superior y carta de reservas tras el scroll interno
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.getByTestId('title-hero-avatar').click();
     await expect(page.getByTestId('avatar-dropdown-popover')).toBeVisible();
-
-    // Al abrir Subtítulos directamente, Avatar se cierra automáticamente
-    await page.getByTestId('subtitles-dropdown-btn').click();
-    await expect(page.getByTestId('subtitles-dropdown-popover')).toBeVisible();
+    await page.keyboard.press('Escape');
     await expect(page.getByTestId('avatar-dropdown-popover')).toBeHidden();
 
+    await page.getByTestId('title-screen').evaluate((el) => {
+      el.scrollTop = el.clientHeight;
+    });
+    await page.waitForTimeout(1000);
+    await expect(page.getByTestId('title-menu-card')).toBeVisible();
+    await expect(page.getByTestId('menu-mode-join')).toBeVisible();
+
+    await page.getByTestId('subtitles-dropdown-btn').click();
+    await expect(page.getByTestId('subtitles-dropdown-popover')).toBeVisible();
     await page.getByTestId('subtitle-mode-key').click();
     await page.getByTestId('subtitle-style-comic').click();
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('subtitles-dropdown-popover')).toBeHidden();
 
-    // Seleccionar avatar Gato
+    // Seleccionar avatar Gato desde la barra superior
     await page.getByTestId('avatar-dropdown-btn').click();
     await page.getByTestId('avatar-option-gato').click();
     await expect(page.getByTestId('avatar-dropdown-popover')).toBeHidden();
@@ -143,10 +155,13 @@ test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de caf�
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('settings-sound-section')).toBeHidden();
 
-    // 3. Crear sala y verificar Lobby como mesa preparada de 4 sillas sin scroll en 390x844, 1280x800 y 1920x900
+    // 3. Crear sala desde el segundo mundo del menú y verificar el lobby preparado
     await page.setViewportSize({ width: 1280, height: 800 });
+    await page.getByTestId('menu-mode-create').click();
+    await page.waitForTimeout(500);
+    await expect(page.getByTestId('create-room-btn')).toBeVisible();
     await page.getByTestId('create-room-btn').click();
-    await expect(page.getByTestId('lobby-screen')).toBeVisible();
+    await expect(page.getByTestId('lobby-screen')).toBeVisible({ timeout: 12000 });
     await expect(page.getByTestId('lobby-table-scene')).toBeVisible();
     await expect(page.getByTestId('lobby-napkin-code')).toBeVisible();
     await expect(page.getByTestId('lobby-maxplayers-control')).toBeVisible();
@@ -178,8 +193,8 @@ test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de caf�
       expect(lobbyScroll.scrollHeight).toBeLessThanOrEqual(lobbyScroll.innerHeight + 1);
     }
 
-    // Captura ui-v8-lobby.png en 1280x800 con mesa de 4 sillas, bot sentado y sello de listo
-    await page.screenshot({ path: path.join(REF_DIR, 'ui-v8-lobby.png') });
+    // Captura ui-v11-lobby.png en 1280x800 con mesa de 4 sillas, bot sentado y sello de listo
+    await page.screenshot({ path: path.join(REF_DIR, 'ui-v11-lobby.png') });
 
     // Empezar partida
     await page.getByTestId('start-game-btn').click();
@@ -221,15 +236,15 @@ test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de caf�
       expect(centerCheck.diff).toBeLessThanOrEqual(32);
     }
 
-    // Captura ui-v8-partida-1920.png (partida en 1920x900 con tablero con bisel, mano centrada y etiqueta de cata)
+    // Captura ui-v11-partida-1920.png (partida en 1920x900 con tablero con bisel, mano centrada y etiqueta de cata)
     await page.setViewportSize({ width: 1920, height: 900 });
     const widePlayCheck = await page.evaluate(
       () => document.documentElement.scrollHeight <= window.innerHeight + 1,
     );
     expect(widePlayCheck).toBe(true);
-    await page.screenshot({ path: path.join(REF_DIR, 'ui-v8-partida-1920.png') });
+    await page.screenshot({ path: path.join(REF_DIR, 'ui-v11-partida-1920.png') });
 
-    // 6. Verificar Partida en 390x844 sin scroll ni solape entre tablero y dock y captura ui-v8-partida-movil.png
+    // 6. Verificar Partida en 390x844 sin scroll ni solape entre tablero y dock y captura ui-v11-partida-movil.png
     await page.setViewportSize({ width: 390, height: 844 });
     const mobilePlayCheck = await page.evaluate(() => {
       const board = document.querySelector('[data-testid="papercraft-board"]');
@@ -246,7 +261,7 @@ test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de caf�
     expect(mobilePlayCheck.overlaps).toBe(false);
     expect(mobilePlayCheck.dockClass).toContain('backdrop-blur-lg');
 
-    await page.screenshot({ path: path.join(REF_DIR, 'ui-v8-partida-movil.png') });
+    await page.screenshot({ path: path.join(REF_DIR, 'ui-v11-partida-movil.png') });
 
     // 7. P0.1 & P0.2: Header estable con puntuaciones altas (1234, 987, 9999) + exclusión mutua y popovers dentro del viewport
     await page.setViewportSize({ width: 1280, height: 800 });
@@ -425,7 +440,7 @@ test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de caf�
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('joker-swap-popover')).toBeHidden();
 
-    // 9. P0.3: Pantalla final escenificada a pantalla completa (phase === 'finished') y captura ui-v8-final.png
+    // 9. P0.3: Pantalla final escenificada a pantalla completa (phase === 'finished') y captura ui-v11-final.png
     await page.evaluate(() => {
       const store = (window as unknown as { __CAFETULIA_STORE__: TestStoreShape }).__CAFETULIA_STORE__;
       const snap = store.getState().snapshot;
@@ -471,8 +486,8 @@ test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de caf�
       await skipBtn.click();
     }
 
-    // Captura ui-v8-final.png (postal de despedida escenificada con ganador, ranking, confeti y O & A)
-    await page.screenshot({ path: path.join(REF_DIR, 'ui-v8-final.png') });
+    // Captura ui-v11-final.png (postal de despedida escenificada con ganador, ranking, confeti y O & A)
+    await page.screenshot({ path: path.join(REF_DIR, 'ui-v11-final.png') });
 
     // Verificar ausencia de scroll en FinishedScreen en 1920x900, 1280x800 y 390x844
     for (const vp of [
@@ -489,8 +504,7 @@ test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de caf�
   });
 
   test('avisa y vuelve a la portada si la sala desaparece durante la partida', async ({ page }) => {
-    await page.goto('/');
-    await page.getByTestId('quick-start-btn').click();
+    await page.goto('/?autostart=1');
     await expect(page.getByTestId('papercraft-board')).toBeVisible();
 
     await page.route('**/rooms/*/moves', async (route) => {
@@ -517,5 +531,17 @@ test.describe('Cafetulia E2E v8 (Dirección visual y animaciones, escena de caf�
     expect(result.errorBanner).toContain('La sala ya no existe');
     await expect(page.getByTestId('title-screen')).toBeVisible();
     await expect(page.getByText(/La sala ya no existe/)).toBeVisible();
+  });
+
+  test('mantiene la portada y la carta usables sin WebGL', async ({ page }) => {
+    await page.goto('/?no3d=1');
+    await expect(page.getByTestId('title-screen')).toBeVisible();
+    await expect(page.getByTestId('title-cafe-scene')).toContainText('CAFETULIA');
+    await page.getByTestId('title-screen').evaluate((el) => {
+      el.scrollTop = el.clientHeight;
+    });
+    await page.waitForTimeout(500);
+    await expect(page.getByTestId('menu-mode-join')).toBeVisible();
+    await expect(page.getByTestId('title-menu-card')).toContainText('Tengo una reserva');
   });
 });

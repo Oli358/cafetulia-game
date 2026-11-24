@@ -328,3 +328,26 @@
     opacity: 0.7;
   }
 }
+
+/* Cafetulia v11 — menú 3D de reservas */
+.title-experience {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overscroll-behavior: contain;
+}
+.title-experience::-webkit-scrollbar {
+  display: none;
+}
+.title-grain {
+  background-image:
+    radial-gradient(rgba(62, 47, 42, 0.16) 0.7px, transparent 0.8px),
+    radial-gradient(rgba(255, 248, 236, 0.24) 0.7px, transparent 0.8px);
+  background-size: 9px 9px, 13px 13px;
+  background-position: 0 0, 4px 5px;
+  mix-blend-mode: multiply;
+}
+@media (prefers-reduced-motion: reduce) {
+  .title-experience {
+    scroll-behavior: auto;
+  }
+}

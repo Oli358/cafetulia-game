@@ -5,6 +5,33 @@
 
 ---
 
+## Sesión 029 - 2026-11-24 - Portada v11: menú de reservas 3D (trabajo en casa)
+
+**Objetivo:** sustituir el menú de portada por una experiencia 3D de producto inspirada en Dialed, con tres mundos (Unirse / Reservar / Café solo), scroll interno de dos actos y un lobby con rincón 3D jugable.
+
+**Hecho:**
+- Rama `home/menu-cafe-3d` creada desde `main` (`e275bf7`).
+- Nueva portada en `apps/web/src/title/`: lata procedural, etiquetas canvas de tres paneles, ingredientes 3D (granos, canela, naranja, flores, vainilla, cardamomo, chocolate, anís, cacao), tres temas cromáticos y escena R3F lazy.
+- Scroll interno de un viewport: acto 1 (título + lata + ingredientes) y acto 2 (carta de reservas). El documento sigue sin scroll; los testids de portada se conservan.
+- Formularios de Unirse (código + nombre), Reservar (nombre + avatar) y Café solo (dificultad); el botón «Girar y servir» y un arrastre de vuelta completa sellan la reserva.
+- Lobby restilizado y con rincón 3D: lata y granos interactivos; controles de sala, testids y flujo intactos. En móvil la carta de ajustes queda en el área desplazable.
+- Fallback estático sin WebGL y parámetros `?force3d=1` / `?no3d=1` para pruebas visuales.
+- Verificado: `typecheck`, `lint`, 49 tests unitarios, build y 3 E2E en verde. Capturas `docs/referencias/ui-v11-*.png`.
+
+**Decisiones:** D-088, D-089 y D-090.
+
+**Problemas:**
+- El render 3D tarda más en SwiftShader/headless; el E2E usa el fallback y las capturas 3D se generan aparte con `?force3d=1`.
+- La carta de ajustes del lobby en móvil requiere scroll interno para ver el reloj; pendiente de plegar/compactar en la siguiente pasada.
+
+**Siguiente:**
+1. Validar la portada y el lobby en un iPhone/Android real.
+2. Pulir composición móvil del lobby y el tamaño/posición del rincón 3D.
+3. Decidir si el giro cambia también la atmósfera musical (Tertulia / Lluvia / Noche).
+4. Integrar la portada con `?room=CODE` (precargar código en la carta en lugar de entrar directo).
+
+---
+
 ## Sesión 028 - 2026-10-27 - Encargo visual v10\n\n**Objetivo:** preparar una pasada visual de Argon sobre la base v9, con prioridades claras y sin tocar reglas.\n\n**Hecho:**\n- Nuevo prompt `docs/ARGON/13-pulido-visual-v10.md`.\n- Diagnóstico visual: tablero pequeño en escritorio, HUD ruidoso, fichas poco táctiles, lobby/postal mejorables y arte de avatares a unificar.\n- Nuevo ZIP `cafetulia-v10-visual.zip` con la base v9 y el encargo v10.\n- Sin cambios de código en esta sesión.\n\n**Siguiente:** enviar el ZIP y el prompt a Argon; al volver, integrar y probar en iPhone.\n\n---\n\n## Sesión 027 - 2026-10-26 - Ajustes de móvil, turno y perfil (v9)
 
 **Objetivo:** corregir los problemas detectados en la prueba real de iPhone/PWA de la v8 y preparar el encargo v9.

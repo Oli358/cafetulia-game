@@ -2,12 +2,8 @@ import React, { useEffect } from 'react';
 import { AnimatePresence, motion, MotionConfig } from 'motion/react';
 import { soundEngine } from './audio/soundEngine';
 import { ActiveModalLayer } from './components/Modals';
-import {
-  FinishedScreen,
-  LobbyScreen,
-  PlayingScreen,
-  TitleScreen,
-} from './components/Screens';
+import { FinishedScreen, LobbyScreen, PlayingScreen } from './components/Screens';
+import { TitleExperience } from './title/TitleExperience';
 import { useGameStore } from './store/gameStore';
 
 export function App(): React.ReactElement {
@@ -72,36 +68,22 @@ export function App(): React.ReactElement {
     return () => clearInterval(interval);
   }, [screen, pollRoom]);
 
-  // Global keyboard shortcuts (Enter/Space on Title when not focused in input, Escape to close overlay/modal)
+  // Global keyboard shortcuts. The title now has a reservation form, so we
+  // only keep Escape for closing overlays/modals.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      const tag = (e.target as HTMLElement | null)?.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
-
-      if (e.key === 'Escape') {
-        if (activeOverlay) {
-          setActiveOverlay(null);
-          return;
-        }
-        if (activeModal) {
-          setActiveModal(null);
-          return;
-        }
+      if (e.key !== 'Escape') return;
+      if (activeOverlay) {
+        setActiveOverlay(null);
+        return;
       }
-
-      if (
-        screen === 'title' &&
-        !activeModal &&
-        !activeOverlay &&
-        (e.key === 'Enter' || e.key === ' ')
-      ) {
-        e.preventDefault();
-        void quickStartWithBots(1, 'medium');
+      if (activeModal) {
+        setActiveModal(null);
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [screen, activeModal, activeOverlay, quickStartWithBots, setActiveModal, setActiveOverlay]);
+  }, [activeModal, activeOverlay, setActiveModal, setActiveOverlay]);
 
   return (
     <MotionConfig reducedMotion={reducedMotion ? 'always' : 'never'}>
@@ -144,7 +126,7 @@ export function App(): React.ReactElement {
                 className="pointer-events-none fixed inset-x-0 top-0 h-24 bg-gradient-to-b from-[#FFF9F0]/60 to-transparent z-40"
               />
             )}
-            {screen === 'title' && <TitleScreen />}
+            {screen === 'title' && <TitleExperience />}
             {screen === 'lobby' && <LobbyScreen />}
             {screen === 'playing' && <PlayingScreen />}
             {screen === 'finished' && <FinishedScreen />}
