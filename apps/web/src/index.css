@@ -351,3 +351,24 @@
     scroll-behavior: auto;
   }
 }
+
+/* Ingredientes flotantes del lobby: viven en los márgenes, no en la mesa */
+@keyframes lobby-drift {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(var(--lobby-rotate, 0deg));
+  }
+  50% {
+    transform: translate3d(10px, -16px, 0) rotate(calc(var(--lobby-rotate, 0deg) + 9deg));
+  }
+}
+.lobby-ingredient {
+  animation: lobby-drift 11s ease-in-out infinite;
+  filter: drop-shadow(0 5px 8px rgba(35, 23, 18, 0.2));
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lobby-ingredient {
+    animation: none;
+    transform: rotate(var(--lobby-rotate, 0deg));
+  }
+}

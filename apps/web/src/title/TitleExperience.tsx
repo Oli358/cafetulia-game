@@ -1,19 +1,11 @@
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { CAFE_DAILY_PHRASES, getCafeGreeting } from '@cafetulia/ui';
 import { CafetuliaLogo, PlayerAvatar } from '../art/CharacterPortrait';
 import { soundEngine } from '../audio/soundEngine';
-import {
-  AvatarDropdownPicker,
-  SubtitlesDropdownPicker,
-} from '../components/TitlePickers';
+import { AvatarDropdownPicker, SubtitlesDropdownPicker } from '../components/TitlePickers';
 import { useGameStore } from '../store/gameStore';
-import {
-  getMenuMode,
-  MENU_MODES,
-  type MenuMode,
-  type MenuModeConfig,
-} from './menuModes';
+import { getMenuMode, MENU_MODES, type MenuMode, type MenuModeConfig } from './menuModes';
 
 const LazyCoffeeMenuScene = React.lazy(() => import('./CoffeeMenuScene'));
 
@@ -44,9 +36,7 @@ function useLayout(): Layout {
   return layout;
 }
 
-function useScrollProgress(
-  ref: React.RefObject<HTMLDivElement | null>,
-): [number, () => void] {
+function useScrollProgress(ref: React.RefObject<HTMLDivElement | null>): [number, () => void] {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -77,9 +67,7 @@ function useScrollProgress(
     if (!element) return;
     element.scrollTo({
       top: element.clientHeight,
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        ? 'auto'
-        : 'smooth',
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
     });
   };
 
@@ -137,13 +125,15 @@ function CupSeal({
   className?: string;
 }): React.ReactElement {
   return (
-    <svg
-      viewBox="0 0 64 64"
-      aria-hidden="true"
-      className={className}
-      fill="none"
-    >
-      <circle cx="32" cy="32" r="30" fill="rgba(255,248,236,0.35)" stroke={accent} strokeWidth="1.5" />
+    <svg viewBox="0 0 64 64" aria-hidden="true" className={className} fill="none">
+      <circle
+        cx="32"
+        cy="32"
+        r="30"
+        fill="rgba(255,248,236,0.35)"
+        stroke={accent}
+        strokeWidth="1.5"
+      />
       <ellipse cx="32" cy="52" rx="21" ry="5" fill={accent} opacity="0.9" />
       <path
         d="M17 25 L47 25 L43 44 Q41 50 32 50 Q23 50 21 44 Z"
@@ -207,8 +197,18 @@ function SpeakerIcon({ muted }: { muted: boolean }): React.ReactElement {
         />
       ) : (
         <>
-          <path d="M15.5 9.2a4 4 0 0 1 0 5.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          <path d="M18 7a7 7 0 0 1 0 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path
+            d="M15.5 9.2a4 4 0 0 1 0 5.6"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
+          <path
+            d="M18 7a7 7 0 0 1 0 10"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          />
         </>
       )}
     </svg>
@@ -277,7 +277,7 @@ function StaticCanStage({
               top: `${blob.top}%`,
               width: blob.size,
               height: blob.size * 1.35,
-              background: index % 2 === 0 ? '#4B2A17' : mode.theme.accent,
+              background: index % 2 === 0 ? '#4B2A17' : mode.theme.canAccent,
               opacity: 0.55,
               transform: `rotate(${index * 37}deg)`,
             }}
@@ -291,44 +291,122 @@ function StaticCanStage({
         aria-hidden="true"
       >
         <ellipse cx="130" cy="352" rx="82" ry="14" fill="#2B1710" opacity="0.22" />
-        <rect x="58" y="20" width="144" height="322" rx="26" fill="#B68950" />
-        <ellipse cx="130" cy="22" rx="72" ry="12" fill="#D7AD72" />
-        <rect x="58" y="50" width="144" height="250" fill={mode.theme.paper} />
+        <rect x="58" y="20" width="144" height="322" rx="26" fill={mode.theme.canColor} />
+        <ellipse cx="130" cy="22" rx="72" ry="12" fill="#D9D9D9" />
+        <rect x="58" y="50" width="144" height="250" fill={mode.theme.canColor} />
         <rect x="58" y="50" width="144" height="250" fill="url(#paperGrain)" opacity="0.7" />
-        <rect x="68" y="60" width="124" height="230" fill="none" stroke={mode.theme.accent} strokeWidth="1.4" opacity="0.6" />
-        <rect x="73" y="65" width="114" height="220" fill="none" stroke={mode.theme.accent} strokeWidth="0.8" opacity="0.35" />
-        <circle cx="130" cy="108" r="24" fill="none" stroke={mode.theme.accent} strokeWidth="1.5" />
-        <path
-          d="M116 104h28l-3 14a10 10 0 0 1-22 0z"
-          fill="#FFF8EC"
-          stroke={mode.theme.ink}
+        <rect
+          x="68"
+          y="60"
+          width="124"
+          height="230"
+          fill="none"
+          stroke={mode.theme.canAccent}
+          strokeWidth="1.4"
+          opacity="0.6"
+        />
+        <rect
+          x="73"
+          y="65"
+          width="114"
+          height="220"
+          fill="none"
+          stroke={mode.theme.canAccent}
+          strokeWidth="0.8"
+          opacity="0.35"
+        />
+        <circle
+          cx="130"
+          cy="108"
+          r="24"
+          fill="none"
+          stroke={mode.theme.canAccent}
           strokeWidth="1.5"
         />
-        <text x="130" y="163" textAnchor="middle" fill={mode.theme.ink} fontSize="13" fontWeight="800" fontFamily="Fraunces, Georgia, serif" letterSpacing="2">
+        <path
+          d="M116 104h28l-3 14a10 10 0 0 1-22 0z"
+          fill={mode.theme.canInk}
+          stroke={mode.theme.canInk}
+          strokeWidth="1.5"
+        />
+        <text
+          x="130"
+          y="163"
+          textAnchor="middle"
+          fill={mode.theme.canInk}
+          fontSize="13"
+          fontWeight="800"
+          fontFamily="Fraunces, Georgia, serif"
+          letterSpacing="2"
+        >
           CAFETULIA
         </text>
-        <text x="130" y="198" textAnchor="middle" fill={mode.theme.ink} fontSize="30" fontWeight="800" fontFamily="Fraunces, Georgia, serif">
+        <text
+          x="130"
+          y="198"
+          textAnchor="middle"
+          fill={mode.theme.canInk}
+          fontSize="30"
+          fontWeight="800"
+          fontFamily="Fraunces, Georgia, serif"
+        >
           {mode.blend}
         </text>
-        <text x="130" y="219" textAnchor="middle" fill={mode.theme.accent} fontSize="8" fontWeight="800" fontFamily="Nunito Sans, sans-serif" letterSpacing="1">
+        <text
+          x="130"
+          y="219"
+          textAnchor="middle"
+          fill={mode.theme.canAccent}
+          fontSize="8"
+          fontWeight="800"
+          fontFamily="Nunito Sans, sans-serif"
+          letterSpacing="1"
+        >
           {mode.tab.toUpperCase()}
         </text>
-        <line x1="94" y1="232" x2="166" y2="232" stroke={mode.theme.accent} strokeWidth="1.2" />
-        <text x="130" y="249" textAnchor="middle" fill={mode.theme.ink} fontSize="9" fontWeight="600" fontFamily="Nunito Sans, sans-serif" opacity="0.75">
+        <line x1="94" y1="232" x2="166" y2="232" stroke={mode.theme.canAccent} strokeWidth="1.2" />
+        <text
+          x="130"
+          y="249"
+          textAnchor="middle"
+          fill={mode.theme.canInk}
+          fontSize="9"
+          fontWeight="600"
+          fontFamily="Nunito Sans, sans-serif"
+          opacity="0.75"
+        >
           {mode.blendNote}
         </text>
-        <text x="130" y="280" textAnchor="middle" fill={mode.theme.accent} fontSize="7" fontWeight="800" fontFamily="Nunito Sans, sans-serif" letterSpacing="0.6">
+        <text
+          x="130"
+          y="280"
+          textAnchor="middle"
+          fill={mode.theme.canAccent}
+          fontSize="7"
+          fontWeight="800"
+          fontFamily="Nunito Sans, sans-serif"
+          letterSpacing="0.6"
+        >
           MEZCLA DE LA CASA · O &amp; A
         </text>
-        <rect x="58" y="300" width="144" height="42" fill={mode.theme.accent} />
-        <text x="130" y="325" textAnchor="middle" fill={mode.theme.paper} fontSize="8" fontWeight="800" fontFamily="Nunito Sans, sans-serif" letterSpacing="1">
+        <rect x="58" y="300" width="144" height="42" fill={mode.theme.canAccent} />
+        <text
+          x="130"
+          y="325"
+          textAnchor="middle"
+          fill="#2B1710"
+          fontSize="8"
+          fontWeight="800"
+          fontFamily="Nunito Sans, sans-serif"
+          letterSpacing="1"
+        >
           RESERVA DE LA CASA
         </text>
-        <ellipse cx="130" cy="342" rx="66" ry="8" fill="#7A542F" opacity="0.55" />
+        <ellipse cx="130" cy="342" rx="66" ry="8" fill="#9C9C9C" opacity="0.55" />
         <defs>
           <pattern id="paperGrain" width="6" height="6" patternUnits="userSpaceOnUse">
-            <circle cx="1" cy="1" r="0.5" fill="#3E2F2A" opacity="0.16" />
-            <circle cx="4" cy="4" r="0.35" fill="#3E2F2A" opacity="0.1" />
+            <circle cx="1" cy="1" r="0.5" fill="#FFF8EC" opacity="0.22" />
+            <circle cx="4" cy="4" r="0.35" fill="#FFF8EC" opacity="0.14" />
           </pattern>
         </defs>
       </svg>
@@ -364,11 +442,16 @@ function ModeTabs({
               onChange(item.id);
             }}
             className={`min-h-[42px] rounded-full px-2 text-[11px] sm:text-xs font-extrabold transition-all cursor-pointer ${
-              active ? 'shadow-[0_2px_0_rgba(35,23,18,0.25)]' : 'text-[#6C564A] hover:text-[#2B1710]'
+              active
+                ? 'shadow-[0_2px_0_rgba(35,23,18,0.25)]'
+                : 'text-[#6C564A] hover:text-[#2B1710]'
             }`}
             style={
               active
-                ? { backgroundColor: item.theme.accent, color: item.theme.paper }
+                ? {
+                    backgroundColor: item.theme.accent,
+                    color: item.id === 'solo' ? '#2B1710' : '#FFF8EC',
+                  }
                 : undefined
             }
           >
@@ -395,7 +478,8 @@ function ServeControl({
 }): React.ReactElement {
   const testId =
     mode === 'join' ? 'join-room-btn' : mode === 'create' ? 'create-room-btn' : 'quick-start-btn';
-  const label = mode === 'join' ? 'Entrar a la mesa' : mode === 'create' ? 'Reservar mesa' : 'Servir café';
+  const label =
+    mode === 'join' ? 'Entrar a la mesa' : mode === 'create' ? 'Reservar mesa' : 'Servir café';
   const disabled = !canServe || isBusy || serving;
 
   return (
@@ -424,7 +508,9 @@ function ServeControl({
           <span className="block text-[10px] font-extrabold uppercase tracking-wider opacity-80">
             {serving ? 'Sirviendo…' : 'Girar y'}
           </span>
-          <span className="block font-serif text-sm font-bold">{serving ? 'un momento' : label}</span>
+          <span className="block font-serif text-sm font-bold">
+            {serving ? 'un momento' : label}
+          </span>
         </span>
       </button>
     </div>
@@ -473,16 +559,12 @@ function ReservationCard({
   return (
     <div
       className={`pointer-events-none absolute z-30 ${
-        layout === 'desktop'
-          ? 'right-[3.5%] top-1/2 w-[min(430px,40vw)]'
-          : 'inset-x-2 bottom-2'
+        layout === 'desktop' ? 'right-[3.5%] top-1/2 w-[min(430px,40vw)]' : 'inset-x-2 bottom-2'
       }`}
       style={{
         opacity: smoothstep(0.32, 0.72, progress),
         transform:
-          layout === 'desktop'
-            ? 'translateY(-50%)'
-            : `translateY(${(1 - progress) * 32}px)`,
+          layout === 'desktop' ? 'translateY(-50%)' : `translateY(${(1 - progress) * 32}px)`,
       }}
       aria-hidden={!active}
     >
@@ -681,8 +763,7 @@ export function TitleExperience(): React.ReactElement {
   const heroOpacity = 1 - smoothstep(0.18, 0.62, progress);
   const reserveVisible = progress > 0.48;
   const canInteractive = progress > 0.84;
-  const canServe =
-    nickname.trim().length >= 2 && (mode !== 'join' || joinCode.trim().length >= 4);
+  const canServe = nickname.trim().length >= 2 && (mode !== 'join' || joinCode.trim().length >= 4);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -704,7 +785,7 @@ export function TitleExperience(): React.ReactElement {
     setServing(true);
     setHasInteracted(true);
     await new Promise((resolve) => {
-      window.setTimeout(resolve, reducedMotion ? 160 : 1100);
+      window.setTimeout(resolve, reducedMotion ? 160 : 1500);
     });
     let ok = false;
     if (mode === 'join') {
@@ -746,8 +827,20 @@ export function TitleExperience(): React.ReactElement {
           <div aria-hidden="true" className="title-grain absolute inset-0 opacity-50" />
           <div
             aria-hidden="true"
-            className="absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(255,248,236,0.5),transparent_38%),linear-gradient(180deg,transparent_55%,rgba(35,23,18,0.18))]"
+            className="absolute inset-0 bg-[radial-gradient(circle_at_65%_35%,rgba(255,248,236,0.32),transparent_42%),linear-gradient(180deg,transparent_45%,rgba(35,23,18,0.28))]"
           />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={mode}
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 z-[5]"
+              initial={{ clipPath: 'inset(0 0 0 100%)' }}
+              animate={{ clipPath: 'inset(0 0 0 0%)' }}
+              exit={{ clipPath: 'inset(0 100% 0 0)' }}
+              transition={{ duration: reducedMotion ? 0 : 0.8, ease: [0.22, 0.8, 0.36, 1] }}
+              style={{ backgroundColor: theme.bgTop, opacity: 0.45 }}
+            />
+          </AnimatePresence>
 
           <div data-testid="title-cafe-scene" className="absolute inset-0 z-10">
             {!webglAvailable || sceneError ? (
@@ -783,69 +876,89 @@ export function TitleExperience(): React.ReactElement {
             aria-hidden={heroOpacity < 0.12}
           >
             <div
-              className="absolute inset-x-0 top-[10%] flex flex-col items-center px-4 text-center"
+              className="absolute left-[4%] right-[4%] top-[10%] z-20 flex flex-col items-start text-left sm:left-[5%] sm:right-auto sm:top-[13%] sm:max-w-[54%]"
               style={{
-                color: theme.ink,
-                transform: `translateY(${-progress * 26}px)`,
+                color: '#FFF8EC',
+                transform: `translateY(${-progress * 34}px)`,
               }}
             >
-              <p className="text-[9px] font-extrabold uppercase tracking-[0.28em] opacity-60 sm:text-[11px]">
-                Café de autor · 2–4 comensales
-              </p>
-              <div className="mt-2 flex items-center justify-center gap-2.5 sm:gap-4">
+              <div className="flex items-center gap-2.5 sm:gap-3">
                 <CupSeal
-                  color={theme.ink}
-                  accent={theme.accent}
-                  className="h-10 w-10 shrink-0 sm:h-16 sm:w-16"
+                  color="#FFF8EC"
+                  accent={theme.glow}
+                  className="h-9 w-9 shrink-0 sm:h-12 sm:w-12"
                 />
-                <h1 className="font-serif text-[clamp(3.35rem,11.5vw,7.8rem)] font-extrabold leading-[0.8] tracking-[-0.055em]">
-                  Cafetulia
-                </h1>
+                <div>
+                  <p className="text-[10px] font-extrabold uppercase tracking-[0.32em] opacity-85 sm:text-[12px]">
+                    Cafetulia
+                  </p>
+                  <p className="text-[8px] font-bold uppercase tracking-[0.2em] opacity-50 sm:text-[10px]">
+                    Salón de té y tertulia internacional · O &amp; A
+                  </p>
+                </div>
               </div>
-              <p className="mt-2 font-serif text-sm italic opacity-80 sm:text-lg">
-                Salón de té y tertulia internacional
+
+              <AnimatePresence mode="wait">
+                <motion.h1
+                  key={mode}
+                  initial={reducedMotion ? false : { opacity: 0, y: 28 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -24 }}
+                  transition={{ duration: reducedMotion ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}
+                  className="mt-4 font-serif text-[clamp(2.9rem,8vw,7.4rem)] font-extrabold uppercase leading-[0.78] tracking-[-0.06em] sm:mt-6"
+                >
+                  {modeConfig.blend}
+                </motion.h1>
+              </AnimatePresence>
+
+              <p className="mt-2 font-serif text-base italic opacity-90 sm:mt-3 sm:text-2xl">
+                {modeConfig.blendNote}
               </p>
-              <p className="mt-1 text-[9px] font-extrabold uppercase tracking-[0.24em] opacity-55 sm:text-[11px]">
-                O &amp; A · treinta años de sobremesa
+              <p className="mt-2 max-w-[420px] text-[11px] font-semibold leading-relaxed opacity-65 sm:text-sm">
+                {modeConfig.description}
               </p>
+
               <p
                 data-testid="title-greeting"
-                className="mt-3 inline-flex max-w-full items-center gap-1.5 rounded-full border border-current/15 bg-[#FFF8EC]/35 px-3 py-1 text-[10px] font-bold backdrop-blur-sm sm:text-xs"
+                className="mt-3 inline-flex max-w-full items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-bold backdrop-blur-sm sm:text-xs"
               >
-                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: theme.accent }} />
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ backgroundColor: theme.glow }}
+                />
                 <span className="truncate">{greetingText}</span>
               </p>
+
               {errorBanner && progress < 0.2 && (
                 <div
                   role="alert"
-                  className="pointer-events-auto mt-3 max-w-[min(92vw,520px)] rounded-xl border border-[#A63F34]/40 bg-[#FDECEB] px-3 py-2 text-xs font-bold text-[#A63F34] shadow-sm"
+                  className="pointer-events-auto mt-3 max-w-[min(92vw,520px)] rounded-xl border border-[#A63F34]/30 bg-[#FFF8EC] px-3 py-2 text-xs font-bold text-[#A63F34] shadow-sm"
                 >
                   {errorBanner}
                 </div>
               )}
-            </div>
 
-            <button
-              type="button"
-              data-testid="title-scroll-hint"
-              onClick={() => {
-                soundEngine.unlock();
-                scrollToReserve();
-              }}
-              className="pointer-events-auto absolute bottom-[8%] left-1/2 inline-flex -translate-x-1/2 flex-col items-center gap-1 rounded-full border border-[#231712]/10 bg-[#FFF8EC]/85 px-3.5 py-2 text-[10px] font-extrabold uppercase tracking-[0.2em] shadow-[0_2px_0_rgba(35,23,18,0.12)] backdrop-blur-md transition-opacity hover:opacity-100"
-              style={{ color: '#2B1710', opacity: 0.8 * (1 - progress * 4) }}
-            >
-              Desliza para reservar
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path
-                  d="M12 4v14M6 12l6 6 6-6"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
+              <button
+                type="button"
+                data-testid="title-scroll-hint"
+                onClick={() => {
+                  soundEngine.unlock();
+                  scrollToReserve();
+                }}
+                className="pointer-events-auto mt-4 inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#231712]/10 bg-[#FFF8EC] px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#2B1710] shadow-[0_3px_0_rgba(35,23,18,0.16)] transition-transform hover:-translate-y-0.5 sm:mt-5 sm:text-[11px]"
+              >
+                Desliza para reservar
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M12 4v14M6 12l6 6 6-6"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
 
             <div className="pointer-events-auto absolute inset-x-0 bottom-2 flex items-center justify-center gap-1.5 px-3 sm:gap-3">
               {[
@@ -860,8 +973,7 @@ export function TitleExperience(): React.ReactElement {
                     soundEngine.unlock();
                     setActiveModal(item.modal);
                   }}
-                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-current/15 bg-[#FFF8EC]/35 px-3 text-[10px] font-extrabold uppercase tracking-wider backdrop-blur-sm transition-colors hover:bg-[#FFF8EC]/65 sm:text-[11px]"
-                  style={{ color: theme.ink }}
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 text-[10px] font-extrabold uppercase tracking-wider text-[#FFF8EC] backdrop-blur-sm transition-colors hover:bg-white/25 sm:text-[11px]"
                 >
                   <BookIcon />
                   {item.label}
@@ -877,26 +989,20 @@ export function TitleExperience(): React.ReactElement {
           >
             <div
               className="absolute left-3 top-16 sm:left-6 sm:top-20"
-              style={{ color: theme.ink }}
+              style={{ color: '#FFF8EC' }}
             >
               <button
                 type="button"
                 onClick={handleBack}
-                className="pointer-events-auto inline-flex min-h-[42px] items-center gap-1.5 rounded-full border border-current/15 bg-[#FFF8EC]/30 px-3 text-[10px] font-extrabold uppercase tracking-wider backdrop-blur-sm hover:bg-[#FFF8EC]/60"
+                className="pointer-events-auto inline-flex min-h-[42px] items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 text-[10px] font-extrabold uppercase tracking-wider backdrop-blur-sm hover:bg-white/25"
               >
                 ← Volver a la carta
               </button>
-              <p className="mt-4 hidden font-serif text-5xl font-bold italic opacity-25 lg:block">
-                {modeConfig.blend}
-              </p>
-              <p className="mt-1 hidden max-w-[190px] text-xs font-semibold leading-snug opacity-45 lg:block">
-                {modeConfig.blendNote}
-              </p>
             </div>
 
             <div
               className="pointer-events-none absolute bottom-[9%] left-1/2 -translate-x-1/2 text-center lg:left-[30%]"
-              style={{ color: theme.ink }}
+              style={{ color: '#FFF8EC' }}
             >
               <p
                 className="text-[10px] font-extrabold uppercase tracking-[0.22em] transition-opacity duration-300"

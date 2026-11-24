@@ -259,3 +259,11 @@ Crea una escena mínima en React Three Fiber para validar el estilo visual de Ca
 - Paleta definitiva de cada país.
 - Logo y wordmark de Cafetulia.
 - Modo noche en la v1.0 o en v1.1.
+
+## 20. Portada v11 — menú de reservas 3D
+
+- **Lata moderna flotante** sobre el fondo cromático del mundo activo, con etiqueta a todo color (una textura completa por mundo) y crossfade suave al girar. Sin barra ni mesa 3D en la portada.
+- **Texto editorial arriba a la izquierda**: wordmark pequeño de Cafetulia, nombre del mundo enorme en Fraunces (Tertulia / Lluvia / Noche), notas de cata y CTA de scroll.
+- **Ingredientes 3D en onda** alrededor de la lata: granos, canela, naranja, flores de café, vainilla, cardamomo, chocolate, anís y cacao. Entran y salen de lado al cambiar de mundo; se repelen y rotan levemente al pasar el cursor.
+- **Lobby con la mesa redonda 2D de siempre** y sus comensales; los ingredientes decorativos viven en los márgenes de la sala, no en un rincón 3D.
+- **Móvil**: carta de reservas como hoja inferior y ajustes de sala plegables para que la mesa y los comensales sigan siendo el foco.

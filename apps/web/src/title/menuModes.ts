@@ -19,6 +19,9 @@ export type MenuTheme = {
   ink: string;
   paper: string;
   glow: string;
+  canColor: string;
+  canInk: string;
+  canAccent: string;
 };
 
 export type IngredientSpec = {
@@ -42,34 +45,33 @@ export type MenuModeConfig = {
   ingredients: IngredientSpec[];
 };
 
-const slots: Array<{
+/**
+ * Ingredients sit on a loose wave around the floating can: above, then down
+ * the right side, with a couple of foreground accents. Keeping the same slots
+ * for all modes lets the outgoing set slide away and the incoming set flow in
+ * through the same rhythm.
+ */
+const waveSlots: Array<{
   position: [number, number, number];
   rotation: [number, number, number];
   scale: number;
 }> = [
-  { position: [-1.6, 0.25, 0.65], rotation: [0.3, 0.5, 0.8], scale: 0.95 },
-  { position: [1.55, 0.1, 0.5], rotation: [0.6, 0.2, -0.4], scale: 0.85 },
-  { position: [-1.95, 0.95, -0.15], rotation: [0.2, -0.5, 0.5], scale: 0.72 },
-  { position: [1.9, 1.05, -0.3], rotation: [0.8, 0.3, 0.2], scale: 0.82 },
-  { position: [-1.15, -0.55, 1.15], rotation: [0.4, 0.2, 0.9], scale: 1.05 },
-  { position: [1.25, -0.6, 1.2], rotation: [0.1, 0.7, -0.6], scale: 0.95 },
-  { position: [-2.25, -0.15, 0.05], rotation: [0.5, -0.3, 0.2], scale: 0.82 },
-  { position: [2.2, -0.2, -0.05], rotation: [0.3, 0.4, -0.8], scale: 0.92 },
-  { position: [-0.95, 1.25, 0.25], rotation: [0.9, 0.1, 0.3], scale: 0.65 },
-  { position: [1.05, 1.3, 0.05], rotation: [0.2, 0.6, 0.7], scale: 0.75 },
-  { position: [-1.7, 0.7, 1.35], rotation: [0.7, -0.2, 0.4], scale: 0.68 },
-  { position: [1.75, 0.75, 1.3], rotation: [0.3, 0.8, -0.2], scale: 0.72 },
+  { position: [-1.3, 2.05, 0.15], rotation: [0.3, 0.5, 0.8], scale: 0.82 },
+  { position: [1.15, 2.25, -0.35], rotation: [0.6, 0.2, -0.4], scale: 0.72 },
+  { position: [1.35, 1.95, 0.25], rotation: [0.2, -0.5, 0.5], scale: 0.78 },
+  { position: [2.05, 1.25, -0.15], rotation: [0.8, 0.3, 0.2], scale: 0.85 },
+  { position: [2.35, 0.45, 0.35], rotation: [0.4, 0.2, 0.9], scale: 0.9 },
+  { position: [2.0, -0.35, 0.85], rotation: [0.1, 0.7, -0.6], scale: 0.82 },
+  { position: [2.45, -1.05, 0.15], rotation: [0.5, -0.3, 0.2], scale: 0.78 },
+  { position: [1.25, -1.15, 0.75], rotation: [0.3, 0.4, -0.8], scale: 0.83 },
+  { position: [1.5, 0.9, 1.15], rotation: [0.9, 0.1, 0.3], scale: 0.66 },
+  { position: [-1.35, 1.45, 0.75], rotation: [0.2, 0.6, 0.7], scale: 0.7 },
 ];
-
-const DEFAULT_SLOT = {
-  position: [-1.6, 0.25, 0.65] as [number, number, number],
-  rotation: [0.3, 0.5, 0.8] as [number, number, number],
-  scale: 0.95,
-};
 
 function ingredients(kinds: IngredientKind[]): IngredientSpec[] {
   return kinds.map((kind, index) => {
-    const slot = slots[index % slots.length] ?? DEFAULT_SLOT;
+    const slot = waveSlots[index % waveSlots.length];
+    if (!slot) throw new Error('The ingredient wave needs at least one slot');
     return {
       id: `${kind}-${index}`,
       kind,
@@ -91,24 +93,27 @@ export const MENU_MODES: MenuModeConfig[] = [
     blend: 'Tertulia',
     blendNote: 'Caramelo, naranja y canela',
     theme: {
-      bgTop: '#F7E1C6',
-      bgBottom: '#D98E63',
+      bgTop: '#D08A5C',
+      bgBottom: '#A9482E',
       accent: '#B8512F',
       accentSoft: '#E9B590',
       ink: '#2B1710',
       paper: '#FFF8EC',
       glow: '#FFD9A0',
+      canColor: '#C05A35',
+      canInk: '#FFF6E4',
+      canAccent: '#F2C14E',
     },
     ingredients: ingredients([
       'bean',
+      'cinnamon',
+      'orange',
       'bean',
       'cinnamon',
       'orange',
       'bean',
-      'orange',
       'cinnamon',
       'bean',
-      'cinnamon',
       'orange',
     ]),
   },
@@ -122,13 +127,16 @@ export const MENU_MODES: MenuModeConfig[] = [
     blend: 'Lluvia',
     blendNote: 'Cacao, avellana y vainilla',
     theme: {
-      bgTop: '#E9EEDC',
-      bgBottom: '#9DAF88',
+      bgTop: '#8FA37B',
+      bgBottom: '#3F5E4A',
       accent: '#3F5E4A',
       accentSoft: '#C6D2B4',
       ink: '#1F2B21',
       paper: '#FBF8EC',
       glow: '#EAF2C9',
+      canColor: '#4F6B52',
+      canInk: '#FFF6E4',
+      canAccent: '#D9E4C5',
     },
     ingredients: ingredients([
       'flower',
@@ -160,6 +168,9 @@ export const MENU_MODES: MenuModeConfig[] = [
       ink: '#F7EEDF',
       paper: '#F7EEDF',
       glow: '#F4C15D',
+      canColor: '#26364D',
+      canInk: '#F7EEDF',
+      canAccent: '#C8A12A',
     },
     ingredients: ingredients([
       'chocolate',
