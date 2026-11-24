@@ -24,14 +24,16 @@
 
 **Problemas:**
 - En móvil la carta tapa la mayor parte de la etiqueta de la lata; el mundo se entiende por el título y el color, pero el giro se aprecia menos.
+- Feedback pendiente de la prueba en teléfono: con la ventana de PC a media anchura (~960 px) el menú entra en modo móvil, la carta ocupa todo el ancho y tapa la lata. Hay que revisar el breakpoint o el layout de esa franja **después** de la prueba en móvil, sin convertirlo en el foco principal.
 - Falta validar en un dispositivo real la fluidez del póster, los papeles y la entrada de los modelos.
 - `sodacans.glb` sigue descartado: 13,49 MB y 346.540 triángulos no compensan para una lata que ya funciona y pesa mucho menos.
 
 **Siguiente:**
 1. Probar la v12 en iPhone/Android real y ajustar tiempos del scroll y del giro.
-2. Decidir si la carta móvil se puede plegar o reducir para enseñar más lata.
-3. Valorar si merece la pena sustituir más ingredientes por GLB o mantener el arte procedural.
-4. Preparar `?room=CODE` y la relación entre mundo y música.
+2. Corregir la carta a media anchura de escritorio (~960 px) para que no se comporte como hoja móvil gigante.
+3. Decidir si la carta móvil se puede plegar o reducir para enseñar más lata.
+4. Valorar si merece la pena sustituir más ingredientes por GLB o mantener el arte procedural.
+5. Preparar `?room=CODE` y la relación entre mundo y música.
 
 ---
 
