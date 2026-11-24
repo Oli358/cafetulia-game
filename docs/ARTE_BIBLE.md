@@ -274,3 +274,12 @@ Crea una escena mínima en React Three Fiber para validar el estilo visual de Ca
 - El scroll de la portada es una secuencia: giro completo de la lata, descenso suave y subida de la carta de reservas. La portada se desvanece antes de que aparezca la carta; no hay dos interfaces superpuestas.
 - El fondo cambia con **gradiente y crossfade**, sin barridos duros. Los ingredientes salen y entran con opacidad y desplazamiento lateral.
 - **Lobby**: tres capas de ingredientes de fondo (lejos, medio y cerca) con blur, tamaño, opacidad y velocidad distintos; el panel central es translúcido y los ajustes se pliegan en móvil.
+
+## 21. Portada v13 — vaso de café para llevar
+
+- El objeto flotante pasa de lata a **vaso de papel para llevar**: cuerpo troncocónico, tapa crema con boquilla, falda de cartón kraft y sello dorado. Se lee como café, no como refresco.
+- Conserva **tres etiquetas completas** (una por mundo) con crossfade al girar, y el cuerpo del vaso también cambia de color con el mundo.
+- **Titular de póster**: `CAFETULIA. / EL JUEGO.` en dos líneas, vaso centro-abajo recortado por el viewport y papeles de comanda con blur detrás.
+- **Menú de escritorio**: mundo gigante a la izquierda, vaso a la derecha y carta compacta abajo a la izquierda. La franja 901–1099 px usa una cámara más abierta y una carta algo más ancha para no comportarse como móvil.
+- **Móvil**: la carta es una hoja inferior más corta; se oculta la fila de ficha/subtítulos y el CTA ocupa todo el ancho. El vaso queda visible por encima de la hoja.
+- La versión sin WebGL dibuja un **vaso SVG** con la misma jerarquía y etiqueta para conservar la composición y los testids.

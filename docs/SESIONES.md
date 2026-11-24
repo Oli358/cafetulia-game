@@ -5,6 +5,35 @@
 
 ---
 
+## Sesión 032 - 2026-11-25 - Vaso para llevar y arreglo de pantallas reducidas
+
+**Objetivo:** corregir el menú en ventanas de PC a media anchura y en móvil, y sustituir la lata por un vaso de café para llevar, que encaja mejor con Cafetulia.
+
+**Hecho:**
+- El layout de escritorio empieza en **901 px** (antes 1023 px). La ventana de ~960 px deja de usar la hoja móvil a todo el ancho.
+- Entre **901 y 1099 px** hay una composición de escritorio compacta: cámara más abierta, vaso más bajo/derecha y carta de 38vw. A 960×800 el título, el vaso y la carta ya no se pisan.
+- La carta móvil se acorta: se oculta la fila de ficha/subtítulos en teléfono, el CTA ocupa todo el ancho y el máximo baja a 50dvh. El vaso se ve por encima de la hoja.
+- La lata se sustituye por un **vaso de café para llevar** procedural: cuerpo troncocónico, tapa crema con boquilla, falda de cartón kraft, sello dorado y tres etiquetas completas con crossfade. El color del cuerpo y de la etiqueta cambia con el mundo.
+- La etiqueta dice **CAFÉ PARA LLEVAR** en lugar de “cold brew”. El resto de la jerarquía se mantiene.
+- El fallback sin WebGL también dibuja un vaso SVG con tapa, etiqueta y falda kraft.
+- Copys actualizados: “El vaso es el menú”, “Gira el vaso…”.
+- Capturas nuevas `docs/referencias/ui-v13-*.png` en 1920×900, 1280×800, **960×800** y 390×844.
+
+**Decisiones:** D-101, D-102 y D-103.
+
+**Problemas:**
+- En móvil la hoja inferior sigue tapando la parte baja del vaso y el nombre del sabor; arriba se ven marca, motivo y color. Habrá que valorar una hoja plegable si el usuario quiere ver la etiqueta completa.
+- Falta validar en el teléfono real el nuevo vaso, la falda y los tiempos del giro.
+- `sodacans.glb` sigue sin usarse; ya no aplica al objeto principal.
+
+**Siguiente:**
+1. Probar el vaso y la franja de 960 px en el teléfono/PC del usuario.
+2. Valorar una carta móvil plegable o un botón “ver vaso”.
+3. Afinar el tamaño del vaso en 1920 si domina demasiado.
+4. Preparar `?room=CODE` y la relación entre mundo y música.
+
+---
+
 ## Sesión 031 - 2026-11-25 - Portada póster Dialed, lata recortada y modelos reales
 
 **Objetivo:** acercar la portada a la composición de referencia de Dialed (titular gigante, lata abajo-centro recortada, papeles flotando) sin copiar sus assets, e integrar modelos 3D reales de ingredientes.

@@ -11,7 +11,7 @@ import {
   type MenuMode,
   type MenuModeConfig,
 } from './menuModes';
-import { createCanLabelTextures } from './canLabelTexture';
+import { createCupLabelTextures } from './cupLabelTexture';
 
 useGLTF.preload('/models/coffee-bean.glb');
 useGLTF.preload('/models/cinnamon-stick.glb');
@@ -31,12 +31,12 @@ const TWO_PI = Math.PI * 2;
 function nearestEquivalent(target: number, reference: number): number {
   return target + Math.round((reference - target) / TWO_PI) * TWO_PI;
 }
-export function useCanLabelTextures(): Record<MenuMode, THREE.CanvasTexture> | null {
+export function useCupLabelTextures(): Record<MenuMode, THREE.CanvasTexture> | null {
   const [textures, setTextures] = useState<Record<MenuMode, THREE.CanvasTexture> | null>(null);
   const texturesRef = useRef<Record<MenuMode, THREE.CanvasTexture> | null>(null);
   useEffect(() => {
     let cancelled = false;
-    void createCanLabelTextures().then((created) => {
+    void createCupLabelTextures().then((created) => {
       if (cancelled) {
         Object.values(created).forEach((texture) => texture.dispose());
         return;
@@ -54,44 +54,57 @@ export function useCanLabelTextures(): Record<MenuMode, THREE.CanvasTexture> | n
   }, []);
   return textures;
 }
-function useCanBodyGeometry(): THREE.LatheGeometry {
+
+function useCupBodyGeometry(): THREE.LatheGeometry {
   return useMemo(() => {
     const points = [
       new THREE.Vector2(0, 0),
-      new THREE.Vector2(0.46, 0),
-      new THREE.Vector2(0.57, 0.02),
-      new THREE.Vector2(0.63, 0.06),
-      new THREE.Vector2(0.65, 0.12),
-      new THREE.Vector2(0.65, 2.18),
-      new THREE.Vector2(0.63, 2.28),
-      new THREE.Vector2(0.57, 2.45),
-      new THREE.Vector2(0.54, 2.56),
-      new THREE.Vector2(0.54, 2.62),
-      new THREE.Vector2(0.58, 2.64),
-      new THREE.Vector2(0.58, 2.68),
-      new THREE.Vector2(0, 2.68),
+      new THREE.Vector2(0.48, 0),
+      new THREE.Vector2(0.5, 0.02),
+      new THREE.Vector2(0.51, 0.08),
+      new THREE.Vector2(0.69, 2.34),
+      new THREE.Vector2(0.705, 2.42),
+      new THREE.Vector2(0.705, 2.44),
+      new THREE.Vector2(0, 2.44),
     ];
     return new THREE.LatheGeometry(points, 96);
   }, []);
 }
-function CanModel({
+
+function CoffeeCupModel({
   labelTextures,
   mode,
 }: {
   labelTextures: Record<MenuMode, THREE.CanvasTexture> | null;
   mode: MenuMode;
 }): React.ReactElement {
-  const bodyGeometry = useCanBodyGeometry();
-  const aluminum = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#D9D9D9', metalness: 0.9, roughness: 0.22 }),
+  const bodyGeometry = useCupBodyGeometry();
+  const lidMaterial = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#F7EEDF', roughness: 0.42, metalness: 0.04 }),
     [],
   );
-  const aluminumDark = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#9C9C9C', metalness: 0.82, roughness: 0.3 }),
+  const lidShade = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#DCCDBA', roughness: 0.55, metalness: 0.03 }),
     [],
   );
   const bodyMaterial = useMemo(
-    () => new THREE.MeshStandardMaterial({ color: '#C05A35', metalness: 0.52, roughness: 0.38 }),
+    () => new THREE.MeshStandardMaterial({ color: '#C05A35', roughness: 0.68, metalness: 0.02 }),
+    [],
+  );
+  const sleeveMaterial = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#C79A6B', roughness: 0.92, metalness: 0 }),
+    [],
+  );
+  const sleeveInk = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#7A5236', roughness: 0.9, metalness: 0 }),
+    [],
+  );
+  const sipMaterial = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#3A2A22', roughness: 0.62, metalness: 0 }),
+    [],
+  );
+  const sealMaterial = useMemo(
+    () => new THREE.MeshStandardMaterial({ color: '#D9B25F', roughness: 0.38, metalness: 0.25 }),
     [],
   );
   const labelMaterials = useMemo(
@@ -104,8 +117,8 @@ function CanModel({
             transparent: true,
             opacity: item.id === mode ? 1 : 0,
             depthWrite: false,
-            roughness: 0.34,
-            metalness: 0.18,
+            roughness: 0.6,
+            metalness: 0.02,
           });
           return materials;
         },
@@ -113,23 +126,13 @@ function CanModel({
       ),
     /* The mode at mount only decides the initial opacity; later changes are damped in useFrame and must not recreate the materials. eslint-disable-next-line react-hooks/exhaustive-deps */ [],
   );
-  const dropletMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: '#FFF8EC',
-        transparent: true,
-        opacity: 0.44,
-        roughness: 0.12,
-        metalness: 0.1,
-      }),
-    [],
-  );
   const bodyTarget = useMemo(() => new THREE.Color(getMenuMode(mode).theme.canColor), [mode]);
   const opacities = useRef<Record<MenuMode, number>>({
     join: mode === 'join' ? 1 : 0,
     create: mode === 'create' ? 1 : 0,
     solo: mode === 'solo' ? 1 : 0,
   });
+
   useEffect(() => {
     MENU_MODES.forEach((item) => {
       const material = labelMaterials[item.id];
@@ -138,17 +141,32 @@ function CanModel({
       material.needsUpdate = true;
     });
   }, [labelTextures, labelMaterials]);
+
   useEffect(
     () => () => {
       bodyGeometry.dispose();
-      aluminum.dispose();
-      aluminumDark.dispose();
+      lidMaterial.dispose();
+      lidShade.dispose();
       bodyMaterial.dispose();
-      dropletMaterial.dispose();
+      sleeveMaterial.dispose();
+      sleeveInk.dispose();
+      sipMaterial.dispose();
+      sealMaterial.dispose();
       Object.values(labelMaterials).forEach((material) => material.dispose());
     },
-    [bodyGeometry, aluminum, aluminumDark, bodyMaterial, dropletMaterial, labelMaterials],
+    [
+      bodyGeometry,
+      lidMaterial,
+      lidShade,
+      bodyMaterial,
+      sleeveMaterial,
+      sleeveInk,
+      sipMaterial,
+      sealMaterial,
+      labelMaterials,
+    ],
   );
+
   useFrame((_, delta) => {
     bodyMaterial.color.lerp(bodyTarget, 1 - Math.exp(-4 * delta));
     MENU_MODES.forEach((item) => {
@@ -161,79 +179,64 @@ function CanModel({
       material.visible = next > 0.002;
     });
   });
-  const droplets = useMemo(
-    () =>
-      Array.from({ length: 14 }, (_, index) => {
-        const angle = -0.9 + (index / 13) * 1.8;
-        const y = 0.28 + ((index * 0.73) % 1.7);
-        return { angle, y, radius: 0.668, size: 0.012 + (index % 3) * 0.005 };
-      }),
-    [],
-  );
+
   return (
     <group>
-      {/* Coloured aluminium body behind the printed wraps */}
+      {/* Tapered paper cup with a printed wrap, a cream lid and a kraft sleeve. */}
       <mesh geometry={bodyGeometry} material={bodyMaterial} />
-      {/* Three full-wrap labels crossfade while the can turns. The wrap starts a
-          little lower so the aluminium shoulder keeps more presence. */}
       {MENU_MODES.map((item, index) => (
         <mesh
           key={item.id}
-          position={[0, 1.01, 0]}
+          position={[0, 1.22, 0]}
           rotation={[0, -Math.PI / 3, 0]}
           renderOrder={index + 1}
         >
-          <cylinderGeometry
-            args={[0.656 + index * 0.0006, 0.656 + index * 0.0006, 1.94, 96, 1, true]}
-          />
+          <cylinderGeometry args={[0.708, 0.518, 2.2, 96, 1, true]} />
           <primitive object={labelMaterials[item.id]} attach="material" />
         </mesh>
       ))}
-      {/* Top and bottom printed edges */}
-      {[0.04, 1.98].map((y) => (
-        <mesh key={y} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]} material={aluminumDark}>
-          <torusGeometry args={[0.669, 0.009, 6, 96]} />
+
+      {/* Lid: rim, plate and a small sip tab, like a takeaway coffee cup. */}
+      <mesh position={[0, 2.49, 0]} material={lidMaterial}>
+        <cylinderGeometry args={[0.74, 0.72, 0.1, 96]} />
+      </mesh>
+      <mesh position={[0, 2.555, 0]} material={lidMaterial}>
+        <cylinderGeometry args={[0.725, 0.725, 0.045, 96]} />
+      </mesh>
+      <mesh position={[0, 2.58, 0]} rotation={[Math.PI / 2, 0, 0]} material={lidShade}>
+        <torusGeometry args={[0.725, 0.012, 6, 96]} />
+      </mesh>
+      <mesh position={[0, 2.585, 0.53]} material={lidMaterial}>
+        <boxGeometry args={[0.3, 0.05, 0.14]} />
+      </mesh>
+      <mesh position={[0, 2.614, 0.57]} rotation={[Math.PI / 2, 0, 0]} material={sipMaterial}>
+        <cylinderGeometry args={[0.045, 0.045, 0.012, 20]} />
+      </mesh>
+
+      {/* Kraft heat sleeve with a small stamped seal. */}
+      <mesh position={[0, 0.64, 0]} material={sleeveMaterial}>
+        <cylinderGeometry args={[0.622, 0.538, 0.9, 96, 1, true]} />
+      </mesh>
+      {[0.19, 1.09].map((y) => (
+        <mesh key={y} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]} material={sleeveInk}>
+          <torusGeometry args={[y === 0.19 ? 0.539 : 0.623, 0.006, 4, 96]} />
         </mesh>
       ))}
-      {/* Bottom rim */}
-      <mesh position={[0, 0.055, 0]} rotation={[Math.PI / 2, 0, 0]} material={aluminumDark}>
-        <torusGeometry args={[0.61, 0.018, 8, 96]} />
+      <mesh position={[0, 0.72, 0.592]} rotation={[Math.PI / 2, 0, 0]} material={sealMaterial}>
+        <cylinderGeometry args={[0.072, 0.072, 0.008, 24]} />
       </mesh>
-      {/* Lid, rim and pull tab */}
-      <mesh position={[0, 2.665, 0]} material={aluminum}>
-        <cylinderGeometry args={[0.56, 0.56, 0.035, 96]} />
+
+      {/* Paper seams at the base and under the lid. */}
+      <mesh position={[0, 0.06, 0]} rotation={[Math.PI / 2, 0, 0]} material={lidShade}>
+        <torusGeometry args={[0.505, 0.008, 5, 96]} />
       </mesh>
-      <mesh position={[0, 2.683, 0]} rotation={[Math.PI / 2, 0, 0]} material={aluminumDark}>
-        <torusGeometry args={[0.57, 0.018, 8, 96]} />
+      <mesh position={[0, 2.42, 0]} rotation={[Math.PI / 2, 0, 0]} material={lidShade}>
+        <torusGeometry args={[0.708, 0.008, 5, 96]} />
       </mesh>
-      <group position={[0.18, 2.71, 0.08]} rotation={[0, -0.35, 0]}>
-        <mesh material={aluminumDark}>
-          <boxGeometry args={[0.22, 0.018, 0.1]} />
-        </mesh>
-        <mesh position={[0.13, 0.002, 0]} rotation={[Math.PI / 2, 0, 0]} material={aluminum}>
-          <torusGeometry args={[0.045, 0.011, 6, 20]} />
-        </mesh>
-        <mesh position={[-0.09, 0.001, 0]} material={aluminumDark}>
-          <cylinderGeometry args={[0.014, 0.014, 0.012, 12]} />
-        </mesh>
-      </group>
-      {/* Cold condensation */}
-      {droplets.map((droplet, index) => (
-        <mesh
-          key={index}
-          position={[
-            Math.sin(droplet.angle) * droplet.radius,
-            droplet.y,
-            Math.cos(droplet.angle) * droplet.radius,
-          ]}
-          material={dropletMaterial}
-        >
-          <sphereGeometry args={[droplet.size, 6, 5]} />
-        </mesh>
-      ))}
     </group>
   );
 }
+
 function OrangePeel(): React.ReactElement {
   return (
     <group rotation={[0.5, 0.2, 0.35]}>
@@ -706,6 +709,8 @@ function CameraRig({
   reducedMotion: boolean;
 }): null {
   const camera = useThree((state) => state.camera);
+  const viewportWidth = useThree((state) => state.size.width);
+  const compact = layout === 'desktop' && viewportWidth < 1100;
   const smooth = useRef(0);
   const target = useRef(new THREE.Vector3());
   useFrame((_, delta) => {
@@ -716,11 +721,19 @@ function CameraRig({
     const heroPosition: [number, number, number] =
       layout === 'desktop' ? [0, 1.35, 8.2] : [0, 1.2, 9.8];
     const reservePosition: [number, number, number] =
-      layout === 'desktop' ? [0.2, 1.25, 7.9] : [0, 1.45, 9.6];
+      layout === 'desktop'
+        ? compact
+          ? [0.2, 1.35, 9.2]
+          : [0.2, 1.25, 7.9]
+        : [0, 1.45, 9.6];
     const heroTarget: [number, number, number] =
       layout === 'desktop' ? [0, 1.35, 0] : [0, 1.2, 0];
     const reserveTarget: [number, number, number] =
-      layout === 'desktop' ? [1, 0.95, 0] : [0.2, 1.45, 0];
+      layout === 'desktop'
+        ? compact
+          ? [1, 1.1, 0]
+          : [1, 0.95, 0]
+        : [0.2, 1.45, 0];
     camera.position.set(
       THREE.MathUtils.lerp(heroPosition[0], reservePosition[0], p),
       THREE.MathUtils.lerp(heroPosition[1], reservePosition[1], p),
@@ -747,11 +760,11 @@ function SceneContent({
   onServe,
 }: CoffeeMenuSceneProps): React.ReactElement {
   const modeConfig = getMenuMode(mode);
-  const labelTextures = useCanLabelTextures();
+  const labelTextures = useCupLabelTextures();
   const ingredientModels = useIngredientModels();
   const stage = useRef<THREE.Group | null>(null);
-  const canFloat = useRef<THREE.Group | null>(null);
-  const can = useRef<THREE.Group | null>(null);
+  const cupFloat = useRef<THREE.Group | null>(null);
+  const cup = useRef<THREE.Group | null>(null);
   const targetRotation = useRef(MODE_ROTATIONS[mode]);
   const smoothProgress = useRef(0);
   const lastMode = useRef<MenuMode>(mode);
@@ -766,6 +779,8 @@ function SceneContent({
   const pointerNdc = useMemo(() => new THREE.Vector3(), []);
   const pointerDirection = useMemo(() => new THREE.Vector3(), []);
   const { gl, camera } = useThree();
+  const viewportWidth = useThree((state) => state.size.width);
+  const compact = layout === 'desktop' && viewportWidth < 1100;
   const onModeChangeRef = useRef(onModeChange);
   const onServeRef = useRef(onServe);
   const canServeRef = useRef(canServe);
@@ -865,9 +880,9 @@ function SceneContent({
     }
     if (stage.current) {
       const heroX = 0;
-      const reserveX = layout === 'desktop' ? 1.15 : 0.35;
-      const heroY = layout === 'desktop' ? -1.95 : -1.57;
-      const reserveY = layout === 'desktop' ? -0.55 : -0.35;
+      const reserveX = layout === 'desktop' ? (compact ? 1.2 : 1.15) : 0.35;
+      const heroY = layout === 'desktop' ? -1.82 : -1.57;
+      const reserveY = layout === 'desktop' ? (compact ? -0.85 : -0.55) : -0.35;
       stage.current.position.x = THREE.MathUtils.damp(
         stage.current.position.x,
         THREE.MathUtils.lerp(heroX, reserveX, p),
@@ -881,18 +896,18 @@ function SceneContent({
         delta,
       );
     }
-    if (canFloat.current) {
-      canFloat.current.position.y = reducedMotion ? 0 : Math.sin(time * 0.75) * 0.055;
-      canFloat.current.rotation.z = reducedMotion ? -0.085 : -0.085 + Math.sin(time * 0.6) * 0.016;
-      canFloat.current.rotation.x = reducedMotion ? 0.04 : 0.04 + Math.cos(time * 0.5) * 0.016;
+    if (cupFloat.current) {
+      cupFloat.current.position.y = reducedMotion ? 0 : Math.sin(time * 0.75) * 0.055;
+      cupFloat.current.rotation.z = reducedMotion ? -0.085 : -0.085 + Math.sin(time * 0.6) * 0.016;
+      cupFloat.current.rotation.x = reducedMotion ? 0.04 : 0.04 + Math.cos(time * 0.5) * 0.016;
     }
-    if (can.current) {
+    if (cup.current) {
       // One full, gradual turn as the page moves from the poster to the menu.
       const scrollSpin = (1 - p) * TWO_PI;
       const desired = targetRotation.current + scrollSpin + (1 - p) * 0.12;
-      can.current.rotation.y = reducedMotion
+      cup.current.rotation.y = reducedMotion
         ? desired
-        : THREE.MathUtils.damp(can.current.rotation.y, desired, 4.5, delta);
+        : THREE.MathUtils.damp(cup.current.rotation.y, desired, 4.5, delta);
     }
   });
   const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {
@@ -938,10 +953,10 @@ function SceneContent({
           scale={[5, 5, 1]}
         />
       </Environment>
-      <group ref={stage} position={[0, layout === 'desktop' ? -1.95 : -1.57, 0]}>
-        <group ref={canFloat}>
-          <group ref={can} scale={layout === 'desktop' ? 1.12 : 1}>
-            <CanModel labelTextures={labelTextures} mode={mode} />
+      <group ref={stage} position={[0, layout === 'desktop' ? -1.82 : -1.57, 0]}>
+        <group ref={cupFloat}>
+          <group ref={cup} scale={layout === 'desktop' ? 1.12 : 1}>
+            <CoffeeCupModel labelTextures={labelTextures} mode={mode} />
           </group>
         </group>
         <WaveIngredients

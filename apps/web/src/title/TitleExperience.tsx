@@ -24,11 +24,11 @@ function smoothstep(edge0: number, edge1: number, value: number): number {
 function useLayout(): Layout {
   const [layout, setLayout] = useState<Layout>(() => {
     if (typeof window === 'undefined') return 'desktop';
-    return window.matchMedia('(max-width: 1023px)').matches ? 'mobile' : 'desktop';
+    return window.matchMedia('(max-width: 900px)').matches ? 'mobile' : 'desktop';
   });
 
   useEffect(() => {
-    const query = window.matchMedia('(max-width: 1023px)');
+    const query = window.matchMedia('(max-width: 900px)');
     const onChange = () => setLayout(query.matches ? 'mobile' : 'desktop');
     query.addEventListener('change', onChange);
     return () => query.removeEventListener('change', onChange);
@@ -243,7 +243,7 @@ function BookIcon(): React.ReactElement {
   );
 }
 
-function StaticCanStage({
+function StaticCupStage({
   mode,
   progress,
   layout,
@@ -293,51 +293,47 @@ function StaticCanStage({
         className="relative h-[min(48vh,430px)] w-auto drop-shadow-[0_24px_28px_rgba(35,23,18,0.32)]"
         aria-hidden="true"
       >
-        <ellipse cx="130" cy="352" rx="82" ry="14" fill="#2B1710" opacity="0.22" />
-        <rect x="58" y="20" width="144" height="322" rx="26" fill={mode.theme.canColor} />
-        <ellipse cx="130" cy="22" rx="72" ry="12" fill="#D9D9D9" />
-        <rect x="58" y="50" width="144" height="250" fill={mode.theme.canColor} />
-        <rect x="58" y="50" width="144" height="250" fill="url(#paperGrain)" opacity="0.7" />
-        <rect
-          x="68"
-          y="60"
-          width="124"
-          height="230"
+        <ellipse cx="130" cy="356" rx="80" ry="13" fill="#2B1710" opacity="0.22" />
+
+        {/* Cup body, tapered like a takeaway paper cup */}
+        <path
+          d="M56 70 L204 70 L184 338 Q182 346 174 346 L86 346 Q78 346 76 338 Z"
+          fill={mode.theme.canColor}
+        />
+        <path
+          d="M56 70 L204 70 L184 338 Q182 346 174 346 L86 346 Q78 346 76 338 Z"
+          fill="url(#paperGrain)"
+          opacity="0.75"
+        />
+
+        {/* Printed label frame and cup mark */}
+        <path
+          d="M68 82 L192 82 L176 228 L84 228 Z"
           fill="none"
           stroke={mode.theme.canAccent}
           strokeWidth="1.4"
-          opacity="0.6"
-        />
-        <rect
-          x="73"
-          y="65"
-          width="114"
-          height="220"
-          fill="none"
-          stroke={mode.theme.canAccent}
-          strokeWidth="0.8"
-          opacity="0.35"
+          opacity="0.65"
         />
         <circle
           cx="130"
-          cy="108"
-          r="24"
+          cy="136"
+          r="23"
           fill="none"
           stroke={mode.theme.canAccent}
           strokeWidth="1.5"
         />
         <path
-          d="M116 104h28l-3 14a10 10 0 0 1-22 0z"
+          d="M116 132h28l-3 14a10 10 0 0 1-22 0z"
           fill={mode.theme.canInk}
           stroke={mode.theme.canInk}
           strokeWidth="1.5"
         />
         <text
           x="130"
-          y="163"
+          y="108"
           textAnchor="middle"
           fill={mode.theme.canInk}
-          fontSize="13"
+          fontSize="12"
           fontWeight="800"
           fontFamily="Fraunces, Georgia, serif"
           letterSpacing="2"
@@ -346,7 +342,7 @@ function StaticCanStage({
         </text>
         <text
           x="130"
-          y="198"
+          y="194"
           textAnchor="middle"
           fill={mode.theme.canInk}
           fontSize="30"
@@ -357,7 +353,7 @@ function StaticCanStage({
         </text>
         <text
           x="130"
-          y="219"
+          y="215"
           textAnchor="middle"
           fill={mode.theme.canAccent}
           fontSize="8"
@@ -367,45 +363,45 @@ function StaticCanStage({
         >
           {mode.tab.toUpperCase()}
         </text>
-        <line x1="94" y1="232" x2="166" y2="232" stroke={mode.theme.canAccent} strokeWidth="1.2" />
+
+        {/* Kraft heat sleeve */}
+        <path d="M62 240 L198 240 L191 316 L69 316 Z" fill="#C79A6B" />
+        <path d="M62 240 L198 240 L197 248 L63 248 Z" fill="#7A5236" opacity="0.55" />
+        <path d="M69 308 L191 308 L191 316 L69 316 Z" fill="#7A5236" opacity="0.45" />
+        <circle cx="130" cy="280" r="10" fill="none" stroke="#F7EEDF" strokeWidth="1.2" opacity="0.8" />
         <text
           x="130"
-          y="249"
+          y="283"
           textAnchor="middle"
-          fill={mode.theme.canInk}
-          fontSize="9"
-          fontWeight="600"
-          fontFamily="Nunito Sans, sans-serif"
-          opacity="0.75"
-        >
-          {mode.blendNote}
-        </text>
-        <text
-          x="130"
-          y="280"
-          textAnchor="middle"
-          fill={mode.theme.canAccent}
-          fontSize="7"
+          fill="#F7EEDF"
+          fontSize="5"
           fontWeight="800"
           fontFamily="Nunito Sans, sans-serif"
-          letterSpacing="0.6"
+          letterSpacing="0.5"
+          opacity="0.9"
         >
-          MEZCLA DE LA CASA · O &amp; A
+          O &amp; A
         </text>
-        <rect x="58" y="300" width="144" height="42" fill={mode.theme.canAccent} />
         <text
           x="130"
-          y="325"
+          y="300"
           textAnchor="middle"
-          fill="#2B1710"
-          fontSize="8"
+          fill="#7A5236"
+          fontSize="6.5"
           fontWeight="800"
           fontFamily="Nunito Sans, sans-serif"
           letterSpacing="1"
         >
-          RESERVA DE LA CASA
+          CAFETULIA · MEZCLA DE LA CASA
         </text>
-        <ellipse cx="130" cy="342" rx="66" ry="8" fill="#9C9C9C" opacity="0.55" />
+
+        {/* Cream lid with a sip tab */}
+        <rect x="48" y="44" width="164" height="14" rx="7" fill="#F7EEDF" />
+        <rect x="54" y="30" width="152" height="18" rx="8" fill="#EFE5D6" />
+        <rect x="112" y="19" width="36" height="9" rx="4.5" fill="#F7EEDF" />
+        <ellipse cx="130" cy="23" rx="7" ry="3.5" fill="#3A2A22" opacity="0.65" />
+        <rect x="58" y="58" width="144" height="8" rx="4" fill="#DCCDBA" opacity="0.8" />
+
         <defs>
           <pattern id="paperGrain" width="6" height="6" patternUnits="userSpaceOnUse">
             <circle cx="1" cy="1" r="0.5" fill="#FFF8EC" opacity="0.22" />
@@ -486,10 +482,10 @@ function ServeControl({
   const disabled = !canServe || isBusy || serving;
 
   return (
-    <div className="mt-2 flex items-end justify-between gap-3 border-t border-[#231712]/10 pt-2">
-      <div className="min-w-0">
+    <div className="mt-2 flex items-stretch justify-between gap-3 border-t border-[#231712]/10 pt-2 lg:items-end">
+      <div className="hidden min-w-0 lg:block">
         <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#B8512F]">
-          {canServe ? 'Gira la lata para servir' : 'Completa la reserva'}
+          {canServe ? 'Gira el vaso para servir' : 'Completa la reserva'}
         </p>
         <p className="mt-0.5 text-[11px] leading-snug text-[#6C564A]">
           {canServe
@@ -504,7 +500,7 @@ function ServeControl({
         data-testid={testId}
         disabled={disabled}
         onClick={onServe}
-        className="group inline-flex min-h-[52px] shrink-0 items-center gap-2 rounded-2xl border-2 border-[#231712] bg-[#B8512F] px-3.5 py-2 text-left text-[#FFF8EC] shadow-[0_3px_0_#231712] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45"
+        className="group inline-flex min-h-[52px] w-full shrink-0 items-center justify-center gap-2 rounded-2xl border-2 border-[#231712] bg-[#B8512F] px-3.5 py-2 text-left text-[#FFF8EC] shadow-[0_3px_0_#231712] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 lg:w-auto"
       >
         <RotateIcon className="h-5 w-5 transition-transform group-hover:rotate-45" />
         <span className="leading-tight">
@@ -562,7 +558,7 @@ function ReservationCard({
   return (
     <div
       className={`pointer-events-none absolute z-30 ${
-        layout === 'desktop' ? 'bottom-[5%] left-[4%] w-[min(400px,34vw)]' : 'inset-x-2 bottom-2'
+        layout === 'desktop' ? 'bottom-[5%] left-[4%] w-[min(400px,38vw)]' : 'inset-x-2 bottom-2'
       }`}
       style={{
         opacity: smoothstep(0.55, 0.9, progress),
@@ -575,12 +571,12 @@ function ReservationCard({
     >
       <motion.section
         data-testid="title-menu-card"
-        className="pointer-events-auto overflow-y-auto overscroll-contain rounded-[24px] border border-[#231712]/15 p-3.5 shadow-[0_18px_60px_rgba(35,23,18,0.24)] backdrop-blur-md sm:p-4"
+        className="pointer-events-auto overflow-y-auto overscroll-contain rounded-[24px] border border-[#231712]/15 p-3 shadow-[0_18px_60px_rgba(35,23,18,0.24)] backdrop-blur-md sm:p-4"
         style={{
           backgroundColor: `${theme.paper}f2`,
           color: '#2B1710',
           pointerEvents: active ? 'auto' : 'none',
-          maxHeight: layout === 'mobile' ? '55dvh' : '60dvh',
+          maxHeight: layout === 'mobile' ? '50dvh' : '60dvh',
         }}
         animate={{ borderColor: `${theme.accent}55` }}
         transition={{ duration: 0.45 }}
@@ -688,7 +684,7 @@ function ReservationCard({
             </div>
           )}
 
-          <div className="flex items-center justify-between gap-2 rounded-xl border border-[#231712]/10 bg-[#FFF8EC]/55 px-2.5 py-2">
+          <div className="hidden items-center justify-between gap-2 rounded-xl border border-[#231712]/10 bg-[#FFF8EC]/55 px-2.5 py-2 sm:flex">
             <button
               type="button"
               onClick={() => toggleOverlay('avatar')}
@@ -886,12 +882,12 @@ export function TitleExperience(): React.ReactElement {
 
           <div data-testid="title-cafe-scene" className="absolute inset-0 z-10">
             {!webglAvailable || sceneError ? (
-              <StaticCanStage mode={modeConfig} progress={progress} layout={layout} />
+              <StaticCupStage mode={modeConfig} progress={progress} layout={layout} />
             ) : (
               <SceneBoundary onError={() => setSceneError(true)}>
                 <Suspense
                   fallback={
-                    <StaticCanStage mode={modeConfig} progress={progress} layout={layout} />
+                    <StaticCupStage mode={modeConfig} progress={progress} layout={layout} />
                   }
                 >
                   <LazyCoffeeMenuScene
@@ -976,10 +972,10 @@ export function TitleExperience(): React.ReactElement {
                 </p>
               </div>
               <p className="mt-2 font-serif text-[26px] font-bold leading-[1.02] tracking-[-0.02em]">
-                La lata es el menú.
+                El vaso es el menú.
               </p>
               <p className="mt-1.5 text-[11px] font-semibold leading-snug text-[#6C564A]">
-                Gírala para cambiar de mundo. Desliza para reservar tu mesa.
+                Gíralo para cambiar de mundo. Desliza para reservar tu mesa.
               </p>
               <div className="mt-3 flex items-center gap-2 border-t border-[#231712]/10 pt-2.5">
                 {MENU_MODES.map((item) => (
@@ -1080,7 +1076,7 @@ export function TitleExperience(): React.ReactElement {
                 className="text-[10px] font-extrabold uppercase tracking-[0.22em] transition-opacity duration-300"
                 style={{ opacity: canInteractive && !hasInteracted ? 0.58 : 0 }}
               >
-                Gira la lata · arrastra o usa la rueda
+                Gira el vaso · arrastra o usa la rueda
               </p>
             </div>
 

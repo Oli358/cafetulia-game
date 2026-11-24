@@ -212,7 +212,7 @@ function drawPanel(
   ctx.fillStyle = background;
   ctx.fillRect(x, 0, PANEL_WIDTH, LABEL_HEIGHT);
 
-  // Painted-can grain and light band
+  // Printed paper grain and light band
   for (let index = 0; index < 2200; index += 1) {
     const px = x + random() * PANEL_WIDTH;
     const py = random() * LABEL_HEIGHT;
@@ -240,7 +240,7 @@ function drawPanel(
   ctx.fillText('CAFETULIA', x + 154, 112);
   ctx.fillStyle = `${ink}aa`;
   ctx.font = '700 17px "Nunito Sans", system-ui, sans-serif';
-  ctx.fillText('COLD BREW DE LA CASA', x + 156, 145);
+  ctx.fillText('CAFÉ PARA LLEVAR', x + 156, 145);
 
   // Large motif
   drawMotif(ctx, mode, x + PANEL_WIDTH / 2, 430);
@@ -286,7 +286,7 @@ function drawPanel(
   ctx.font = '800 19px "Nunito Sans", system-ui, sans-serif';
   ctx.fillText('RESERVA DE LA CASA', x + 76, 1418);
   ctx.textAlign = 'right';
-  ctx.fillText('250 ml', x + PANEL_WIDTH - 76, 1418);
+  ctx.fillText('350 ml', x + PANEL_WIDTH - 76, 1418);
 
   // Brass seal
   const sealX = x + PANEL_WIDTH - 110;
@@ -304,9 +304,9 @@ function drawPanel(
   ctx.restore();
 }
 
-export async function createCanLabelTextures(): Promise<Record<MenuMode, CanvasTexture>> {
+export async function createCupLabelTextures(): Promise<Record<MenuMode, CanvasTexture>> {
   if (typeof document === 'undefined') {
-    throw new Error('createCanLabelTexture requires a browser document');
+    throw new Error('createCupLabelTexture requires a browser document');
   }
 
   await Promise.all([
@@ -331,7 +331,7 @@ export async function createCanLabelTextures(): Promise<Record<MenuMode, CanvasT
     }
 
     // Separators at the panel seams. The design repeats three times, so every
-    // 120° stop presents the same face while the whole can changes colour.
+    // 120° stop presents the same face while the whole cup changes colour.
     ctx.strokeStyle = 'rgba(255, 248, 236, 0.16)';
     ctx.lineWidth = 5;
     for (let index = 1; index < 3; index += 1) {

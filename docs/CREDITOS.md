@@ -16,7 +16,7 @@ La atribución también aparece al final del panel de **Ajustes** del juego.
 
 ## Arte procedural
 
-La lata, las etiquetas, los ingredientes restantes (naranja, flor de café,
+El vaso de café para llevar, sus etiquetas, los ingredientes restantes (naranja, flor de café,
 vainilla, cardamomo, chocolate y cacao), los papeles de la portada y el resto de
 la interfaz son arte original de Cafetulia generado en el propio proyecto.
 

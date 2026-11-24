@@ -36,6 +36,18 @@ Generadas con `?force3d=1` para que salga la escena WebGL real, no el fallback:
 - `ui-v12-mundo-lluvia-1920.png` — menú Lluvia.
 - `ui-v12-mundo-noche-1920.png` — menú Noche.
 
-La composición sigue la referencia de Dialed (titular gigante, lata recortada y
+La composición sigue la referencia de Dialed (titular gigante, vaso recortado y
 papeles flotando) con arte propio de Cafetulia. Los modelos de café, canela y
 anís están acreditados en `docs/CREDITOS.md`.
+
+## Capturas de la v13 (vaso para llevar y pantallas reducidas)
+
+- `ui-v13-portada-1920.png`, `ui-v13-portada-1280.png`, `ui-v13-portada-960.png`
+  y `ui-v13-portada-movil.png` — póster con el vaso recortado.
+- `ui-v13-reserva-1920.png`, `ui-v13-reserva-1280.png`, `ui-v13-reserva-960.png`
+  y `ui-v13-reserva-movil.png` — menú con el vaso y la carta compacta.
+- `ui-v13-mundo-lluvia-1920.png` y `ui-v13-mundo-noche-1920.png` — los otros dos
+  mundos.
+
+La franja de 960 px usa la composición de escritorio compacta: carta a la
+izquierda y vaso a la derecha, sin hoja inferior a todo el ancho.
