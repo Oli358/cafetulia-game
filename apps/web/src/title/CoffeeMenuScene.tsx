@@ -174,18 +174,18 @@ function CanModel({
       {MENU_MODES.map((item, index) => (
         <mesh
           key={item.id}
-          position={[0, 1.12, 0]}
+          position={[0, 1.06, 0]}
           rotation={[0, -Math.PI / 3, 0]}
           renderOrder={index + 1}
         >
           <cylinderGeometry
-            args={[0.656 + index * 0.0006, 0.656 + index * 0.0006, 2.12, 96, 1, true]}
+            args={[0.656 + index * 0.0006, 0.656 + index * 0.0006, 2.04, 96, 1, true]}
           />
           <primitive object={labelMaterials[item.id]} attach="material" />
         </mesh>
       ))}
       {/* Top and bottom printed edges */}
-      {[0.065, 2.175].map((y) => (
+      {[0.04, 2.08].map((y) => (
         <mesh key={y} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]} material={aluminumDark}>
           <torusGeometry args={[0.669, 0.009, 6, 96]} />
         </mesh>

@@ -358,7 +358,7 @@
     transform: translate3d(0, 0, 0) rotate(var(--lobby-rotate, 0deg));
   }
   50% {
-    transform: translate3d(10px, -16px, 0) rotate(calc(var(--lobby-rotate, 0deg) + 9deg));
+    transform: translate3d(18px, -28px, 0) rotate(calc(var(--lobby-rotate, 0deg) + 14deg));
   }
 }
 .lobby-ingredient {

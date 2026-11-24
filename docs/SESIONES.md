@@ -12,9 +12,11 @@
 **Hecho:**
 - La portada prioriza **CAFETULIA** como título enorme; el mundo/mezcla (`Tertulia`, `Lluvia`, `Noche`) pasa a etiqueta secundaria con sus notas.
 - El scroll ahora es una secuencia: la lata **gira una vuelta completa**, desciende, la portada se desvanece y la carta de reservas sube desde abajo. La carta no se cruza con el título: primera mitad escena, segunda mitad reserva.
+- Un solo gesto de rueda desde el póster lanza la transición completa hasta el menú; el scroll manual fino sigue disponible.
 - Fuera el barrido duro de color: el fondo usa dos capas con máscara de gradiente y crossfade de 1 s; los ingredientes entran y salen con **opacidad y desplazamiento laterales**, y la lata funde etiqueta y color del cuerpo.
 - Ingredientes más táctiles: granos con cresta curva y brillo, flores de café con pétalos interiores, tallo y hoja, piel de naranja más gruesa, chocolate en trozos biselados y vainas de vainilla compactas.
-- Lobby: tres capas de ingredientes de fondo (lejos/medio/cerca) con distinto tamaño, opacidad y **blur**, en movimiento lento; panel más translúcido y ajustes de sala plegables en móvil.
+- Lobby: tres capas de ingredientes de fondo (lejos/medio/cerca) con distinto tamaño, opacidad y **blur**, en movimiento más vivo; panel más translúcido y ajustes de sala plegables en móvil.
+- La etiqueta de la lata baja su corte superior para que el hombro metálico respire y la lata no se vea tan estirada.
 - La mesa 2D con comensales se mantiene como centro del lobby.
 
 **Decisiones:** D-092, D-093 y D-094.

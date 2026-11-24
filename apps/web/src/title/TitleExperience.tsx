@@ -775,6 +775,39 @@ export function TitleExperience(): React.ReactElement {
     return () => window.clearInterval(timer);
   }, [reducedMotion]);
 
+  // A single wheel notch on the poster commits the whole transition to the
+  // reservation card. Once the user is at the card, the wheel belongs to the
+  // can (mode switching), not to the page.
+  useEffect(() => {
+    const element = scrollRef.current;
+    if (!element) return;
+    let locked = false;
+    let unlockTimer = 0;
+    const onWheel = (event: WheelEvent) => {
+      if (event.ctrlKey || event.deltaY <= 0) return;
+      const atPoster = element.scrollTop < element.clientHeight * 0.12;
+      if (!atPoster) return;
+      event.preventDefault();
+      if (locked) return;
+      locked = true;
+      element.scrollTo({
+        top: element.clientHeight,
+        behavior: reducedMotion ? 'auto' : 'smooth',
+      });
+      unlockTimer = window.setTimeout(
+        () => {
+          locked = false;
+        },
+        reducedMotion ? 120 : 900,
+      );
+    };
+    element.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      element.removeEventListener('wheel', onWheel);
+      window.clearTimeout(unlockTimer);
+    };
+  }, [reducedMotion]);
+
   const handleModeChange = (next: MenuMode) => {
     setMode(next);
     setHasInteracted(true);

@@ -408,7 +408,7 @@ export function LobbyFloatingIngredients(): React.ReactElement {
             filter: `blur(${piece.blur}px) drop-shadow(0 10px 18px rgba(35, 23, 18, 0.18))`,
             ['--lobby-rotate' as string]: `${piece.rotate}deg`,
             animationDelay: `${piece.delay}s`,
-            animationDuration: `${piece.duration}s`,
+            animationDuration: `${piece.duration * (piece.layer === 'far' ? 0.8 : piece.layer === 'mid' ? 0.65 : 0.55)}s`,
             zIndex: piece.layer === 'far' ? 1 : piece.layer === 'mid' ? 2 : 3,
           }}
         >
