@@ -5,6 +5,32 @@
 
 ---
 
+## Sesión 030 - 2026-11-24 - Portada cinematográfica y fondo vivo del lobby
+
+**Objetivo:** aplicar el feedback de la primera entrega: jerarquía de juego, scroll cinematográfico, transiciones suaves y fondo del lobby con profundidad.
+
+**Hecho:**
+- La portada prioriza **CAFETULIA** como título enorme; el mundo/mezcla (`Tertulia`, `Lluvia`, `Noche`) pasa a etiqueta secundaria con sus notas.
+- El scroll ahora es una secuencia: la lata **gira una vuelta completa**, desciende, la portada se desvanece y la carta de reservas sube desde abajo. La carta no se cruza con el título: primera mitad escena, segunda mitad reserva.
+- Fuera el barrido duro de color: el fondo usa dos capas con máscara de gradiente y crossfade de 1 s; los ingredientes entran y salen con **opacidad y desplazamiento laterales**, y la lata funde etiqueta y color del cuerpo.
+- Ingredientes más táctiles: granos con cresta curva y brillo, flores de café con pétalos interiores, tallo y hoja, piel de naranja más gruesa, chocolate en trozos biselados y vainas de vainilla compactas.
+- Lobby: tres capas de ingredientes de fondo (lejos/medio/cerca) con distinto tamaño, opacidad y **blur**, en movimiento lento; panel más translúcido y ajustes de sala plegables en móvil.
+- La mesa 2D con comensales se mantiene como centro del lobby.
+
+**Decisiones:** D-092, D-093 y D-094.
+
+**Problemas:**
+- La percepción exacta de los tiempos del scroll y del crossfade hay que validarla en un iPhone/Android real; las capturas headless no reproducen bien la fluidez.
+- Las vainas de vainilla y la canela aún pueden ganar detalle; los ingredientes siguen siendo estilizados, no fotorrealistas.
+
+**Siguiente:**
+1. Probar en dispositivo real y ajustar velocidad del giro/scroll.
+2. Afinar la curva y densidad de ingredientes en portada y márgenes del lobby.
+3. Cambiar colores/etiquetas cuando toque.
+4. `?room=CODE` y música por mundo, más adelante.
+
+---
+
 ## Sesión 029 - 2026-11-24 - Portada v11: menú de reservas 3D (trabajo en casa)
 
 **Objetivo:** sustituir el menú de portada por una experiencia 3D de producto inspirada en Dialed, con tres mundos (Unirse / Reservar / Café solo), scroll interno de dos actos y un lobby que recupera la mesa 2D.

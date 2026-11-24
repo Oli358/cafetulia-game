@@ -554,7 +554,7 @@ function ReservationCard({
   const setNickname = useGameStore((s) => s.setNickname);
   const avatarId = useGameStore((s) => s.avatarId);
   const toggleOverlay = useGameStore((s) => s.toggleOverlay);
-  const active = progress > 0.52;
+  const active = progress > 0.55;
 
   return (
     <div
@@ -562,9 +562,11 @@ function ReservationCard({
         layout === 'desktop' ? 'right-[3.5%] top-1/2 w-[min(430px,40vw)]' : 'inset-x-2 bottom-2'
       }`}
       style={{
-        opacity: smoothstep(0.32, 0.72, progress),
+        opacity: smoothstep(0.55, 0.9, progress),
         transform:
-          layout === 'desktop' ? 'translateY(-50%)' : `translateY(${(1 - progress) * 32}px)`,
+          layout === 'desktop'
+            ? `translateY(calc(-50% + ${(1 - progress) * 90}px))`
+            : `translateY(${(1 - progress) * 90}px)`,
       }}
       aria-hidden={!active}
     >
@@ -760,8 +762,8 @@ export function TitleExperience(): React.ReactElement {
   const greetingText = useMemo(() => getCafeGreeting(nickname), [nickname]);
   const dailyPhrase = CAFE_DAILY_PHRASES[phraseIndex] ?? CAFE_DAILY_PHRASES[0];
 
-  const heroOpacity = 1 - smoothstep(0.18, 0.62, progress);
-  const reserveVisible = progress > 0.48;
+  const heroOpacity = 1 - smoothstep(0.12, 0.5, progress);
+  const reserveVisible = progress > 0.55;
   const canInteractive = progress > 0.84;
   const canServe = nickname.trim().length >= 2 && (mode !== 'join' || joinCode.trim().length >= 4);
 
@@ -816,31 +818,24 @@ export function TitleExperience(): React.ReactElement {
             aria-hidden="true"
             className="absolute inset-0"
             animate={{ backgroundColor: theme.bgBottom }}
-            transition={{ duration: 0.7 }}
+            transition={{ duration: reducedMotion ? 0 : 1.05, ease: [0.33, 0, 0.2, 1] }}
           />
           <motion.div
             aria-hidden="true"
             className="absolute inset-0"
-            animate={{ backgroundColor: theme.bgTop, opacity: 0.72 }}
-            transition={{ duration: 0.7 }}
+            animate={{ backgroundColor: theme.bgTop }}
+            transition={{ duration: reducedMotion ? 0 : 1.05, ease: [0.33, 0, 0.2, 1] }}
+            style={{
+              maskImage: 'linear-gradient(180deg, #000 0%, rgba(0,0,0,0.55) 58%, transparent 100%)',
+              WebkitMaskImage:
+                'linear-gradient(180deg, #000 0%, rgba(0,0,0,0.55) 58%, transparent 100%)',
+            }}
           />
           <div aria-hidden="true" className="title-grain absolute inset-0 opacity-50" />
           <div
             aria-hidden="true"
             className="absolute inset-0 bg-[radial-gradient(circle_at_65%_35%,rgba(255,248,236,0.32),transparent_42%),linear-gradient(180deg,transparent_45%,rgba(35,23,18,0.28))]"
           />
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={mode}
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 z-[5]"
-              initial={{ clipPath: 'inset(0 0 0 100%)' }}
-              animate={{ clipPath: 'inset(0 0 0 0%)' }}
-              exit={{ clipPath: 'inset(0 100% 0 0)' }}
-              transition={{ duration: reducedMotion ? 0 : 0.8, ease: [0.22, 0.8, 0.36, 1] }}
-              style={{ backgroundColor: theme.bgTop, opacity: 0.45 }}
-            />
-          </AnimatePresence>
 
           <div data-testid="title-cafe-scene" className="absolute inset-0 z-10">
             {!webglAvailable || sceneError ? (
@@ -888,35 +883,42 @@ export function TitleExperience(): React.ReactElement {
                   accent={theme.glow}
                   className="h-9 w-9 shrink-0 sm:h-12 sm:w-12"
                 />
-                <div>
-                  <p className="text-[10px] font-extrabold uppercase tracking-[0.32em] opacity-85 sm:text-[12px]">
-                    Cafetulia
-                  </p>
-                  <p className="text-[8px] font-bold uppercase tracking-[0.2em] opacity-50 sm:text-[10px]">
-                    Salón de té y tertulia internacional · O &amp; A
-                  </p>
-                </div>
+                <p className="text-[9px] font-extrabold uppercase tracking-[0.22em] opacity-80 sm:text-[11px]">
+                  Salón de té y tertulia · O &amp; A
+                </p>
               </div>
 
-              <AnimatePresence mode="wait">
-                <motion.h1
-                  key={mode}
-                  initial={reducedMotion ? false : { opacity: 0, y: 28 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -24 }}
-                  transition={{ duration: reducedMotion ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  className="mt-4 font-serif text-[clamp(2.9rem,8vw,7.4rem)] font-extrabold uppercase leading-[0.78] tracking-[-0.06em] sm:mt-6"
-                >
-                  {modeConfig.blend}
-                </motion.h1>
-              </AnimatePresence>
+              <h1 className="mt-3 font-serif text-[clamp(2.7rem,7.5vw,7rem)] font-extrabold uppercase leading-[0.78] tracking-[-0.06em] sm:mt-5">
+                Cafetulia
+              </h1>
+              <p className="mt-1 text-[9px] font-extrabold uppercase tracking-[0.24em] opacity-55 sm:text-[11px]">
+                El juego de la tertulia · 2–4 comensales
+              </p>
 
-              <p className="mt-2 font-serif text-base italic opacity-90 sm:mt-3 sm:text-2xl">
-                {modeConfig.blendNote}
-              </p>
-              <p className="mt-2 max-w-[420px] text-[11px] font-semibold leading-relaxed opacity-65 sm:text-sm">
-                {modeConfig.description}
-              </p>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={mode}
+                  initial={reducedMotion ? false : { opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -12 }}
+                  transition={{ duration: reducedMotion ? 0 : 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  className="mt-4"
+                >
+                  <p className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] backdrop-blur-sm sm:text-[11px]">
+                    <span
+                      className="h-1.5 w-1.5 rounded-full"
+                      style={{ backgroundColor: theme.glow }}
+                    />
+                    Mezcla de la casa · {modeConfig.blend}
+                  </p>
+                  <p className="mt-2 font-serif text-base italic opacity-90 sm:mt-3 sm:text-2xl">
+                    {modeConfig.blendNote}
+                  </p>
+                  <p className="mt-2 max-w-[420px] text-[11px] font-semibold leading-relaxed opacity-65 sm:text-sm">
+                    {modeConfig.description}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
 
               <p
                 data-testid="title-greeting"
@@ -984,7 +986,7 @@ export function TitleExperience(): React.ReactElement {
 
           <div
             className="pointer-events-none absolute inset-0 z-30"
-            style={{ opacity: smoothstep(0.35, 0.75, progress) }}
+            style={{ opacity: smoothstep(0.55, 0.9, progress) }}
             aria-hidden={!reserveVisible}
           >
             <div

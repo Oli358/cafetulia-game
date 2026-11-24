@@ -267,3 +267,10 @@ Crea una escena mínima en React Three Fiber para validar el estilo visual de Ca
 - **Ingredientes 3D en onda** alrededor de la lata: granos, canela, naranja, flores de café, vainilla, cardamomo, chocolate, anís y cacao. Entran y salen de lado al cambiar de mundo; se repelen y rotan levemente al pasar el cursor.
 - **Lobby con la mesa redonda 2D de siempre** y sus comensales; los ingredientes decorativos viven en los márgenes de la sala, no en un rincón 3D.
 - **Móvil**: carta de reservas como hoja inferior y ajustes de sala plegables para que la mesa y los comensales sigan siendo el foco.
+
+### Jerarquía y secuencia de portada
+
+- **CAFETULIA** es el titular; el mundo (Tertulia / Lluvia / Noche) es una etiqueta secundaria. La escena vende un juego de tertulia, no una lata de café.
+- El scroll de la portada es una secuencia: giro completo de la lata, descenso suave y subida de la carta de reservas. La portada se desvanece antes de que aparezca la carta; no hay dos interfaces superpuestas.
+- El fondo cambia con **gradiente y crossfade**, sin barridos duros. Los ingredientes salen y entran con opacidad y desplazamiento lateral.
+- **Lobby**: tres capas de ingredientes de fondo (lejos, medio y cerca) con blur, tamaño, opacidad y velocidad distintos; el panel central es translúcido y los ajustes se pliegan en móvil.

@@ -56,16 +56,16 @@ const waveSlots: Array<{
   rotation: [number, number, number];
   scale: number;
 }> = [
-  { position: [-1.3, 2.05, 0.15], rotation: [0.3, 0.5, 0.8], scale: 0.82 },
-  { position: [1.15, 2.25, -0.35], rotation: [0.6, 0.2, -0.4], scale: 0.72 },
-  { position: [1.35, 1.95, 0.25], rotation: [0.2, -0.5, 0.5], scale: 0.78 },
-  { position: [2.05, 1.25, -0.15], rotation: [0.8, 0.3, 0.2], scale: 0.85 },
-  { position: [2.35, 0.45, 0.35], rotation: [0.4, 0.2, 0.9], scale: 0.9 },
-  { position: [2.0, -0.35, 0.85], rotation: [0.1, 0.7, -0.6], scale: 0.82 },
-  { position: [2.45, -1.05, 0.15], rotation: [0.5, -0.3, 0.2], scale: 0.78 },
-  { position: [1.25, -1.15, 0.75], rotation: [0.3, 0.4, -0.8], scale: 0.83 },
-  { position: [1.5, 0.9, 1.15], rotation: [0.9, 0.1, 0.3], scale: 0.66 },
-  { position: [-1.35, 1.45, 0.75], rotation: [0.2, 0.6, 0.7], scale: 0.7 },
+  { position: [-1.2, 2.3, 0.15], rotation: [0.3, 0.5, 0.8], scale: 0.82 },
+  { position: [-0.35, 2.6, -0.35], rotation: [0.6, 0.2, -0.4], scale: 0.72 },
+  { position: [0.5, 2.45, 0.25], rotation: [0.2, -0.5, 0.5], scale: 0.78 },
+  { position: [1.25, 2.0, -0.15], rotation: [0.8, 0.3, 0.2], scale: 0.85 },
+  { position: [1.8, 1.3, 0.35], rotation: [0.4, 0.2, 0.9], scale: 0.9 },
+  { position: [2.1, 0.5, 0.85], rotation: [0.1, 0.7, -0.6], scale: 0.82 },
+  { position: [2.0, -0.35, 0.15], rotation: [0.5, -0.3, 0.2], scale: 0.78 },
+  { position: [1.55, -1.1, 0.75], rotation: [0.3, 0.4, -0.8], scale: 0.83 },
+  { position: [0.7, -1.5, 1.15], rotation: [0.9, 0.1, 0.3], scale: 0.66 },
+  { position: [-0.45, -1.25, 0.75], rotation: [0.2, 0.6, 0.7], scale: 0.7 },
 ];
 
 function ingredients(kinds: IngredientKind[]): IngredientSpec[] {

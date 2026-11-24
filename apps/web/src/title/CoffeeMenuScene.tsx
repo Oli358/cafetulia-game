@@ -230,15 +230,30 @@ function CanModel({
   );
 }
 export function Bean(): React.ReactElement {
+  const crease = useMemo(
+    () =>
+      new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, -0.2, 0.085),
+        new THREE.Vector3(0.018, -0.08, 0.125),
+        new THREE.Vector3(-0.014, 0.05, 0.135),
+        new THREE.Vector3(0.01, 0.2, 0.085),
+      ]),
+    [],
+  );
+
   return (
     <group>
       <mesh scale={[1, 1.32, 0.58]}>
-        <sphereGeometry args={[0.16, 16, 12]} />
-        <meshStandardMaterial color="#4B2A17" roughness={0.56} metalness={0.02} />
+        <sphereGeometry args={[0.16, 20, 16]} />
+        <meshStandardMaterial color="#4B2A17" roughness={0.48} metalness={0.03} />
       </mesh>
-      <mesh position={[0, 0, 0.094]} scale={[0.16, 1.05, 0.16]}>
-        <boxGeometry args={[0.035, 0.24, 0.035]} />
-        <meshStandardMaterial color="#2A140B" roughness={0.7} />
+      <mesh>
+        <tubeGeometry args={[crease, 20, 0.008, 5, false]} />
+        <meshStandardMaterial color="#241009" roughness={0.66} />
+      </mesh>
+      <mesh position={[-0.04, 0.055, 0.09]} scale={[0.45, 0.6, 0.28]}>
+        <sphereGeometry args={[0.16, 10, 8]} />
+        <meshStandardMaterial color="#8A5A3F" transparent opacity={0.16} roughness={0.35} />
       </mesh>
     </group>
   );
@@ -264,13 +279,17 @@ function CinnamonStick(): React.ReactElement {
 function OrangePeel(): React.ReactElement {
   return (
     <group rotation={[0.5, 0.2, 0.35]}>
-      <mesh rotation={[0.2, 0.4, 0.1]}>
-        <torusGeometry args={[0.3, 0.035, 6, 26, Math.PI * 1.35]} />
-        <meshStandardMaterial color="#D9772E" roughness={0.68} />
+      <mesh rotation={[0.2, 0.4, 0.1]} scale={[1, 1, 0.52]}>
+        <torusGeometry args={[0.29, 0.055, 8, 28, Math.PI * 1.35]} />
+        <meshStandardMaterial color="#D9772E" roughness={0.62} />
       </mesh>
-      <mesh rotation={[0.5, 0.1, -0.2]} position={[0.02, 0.02, 0.02]}>
-        <torusGeometry args={[0.26, 0.012, 5, 22, Math.PI * 1.15]} />
-        <meshStandardMaterial color="#F2A24D" roughness={0.6} />
+      <mesh rotation={[0.5, 0.1, -0.2]} position={[0.02, 0.02, 0.025]} scale={[1, 1, 0.4]}>
+        <torusGeometry args={[0.25, 0.022, 6, 24, Math.PI * 1.15]} />
+        <meshStandardMaterial color="#F2A24D" roughness={0.52} />
+      </mesh>
+      <mesh rotation={[0.8, 0.2, -0.3]} position={[-0.01, 0.0, 0.02]} scale={[1, 1, 0.35]}>
+        <torusGeometry args={[0.28, 0.012, 5, 24, Math.PI * 1.2]} />
+        <meshStandardMaterial color="#B8512F" roughness={0.7} />
       </mesh>
     </group>
   );
@@ -282,19 +301,41 @@ function CoffeeFlower(): React.ReactElement {
         const angle = (index / 5) * TWO_PI;
         return (
           <mesh
-            key={index}
+            key={`outer-${index}`}
             position={[Math.cos(angle) * 0.09, Math.sin(angle) * 0.09, 0]}
             rotation={[0, 0, angle]}
             scale={[1, 0.42, 0.25]}
           >
-            <sphereGeometry args={[0.13, 10, 8]} />
-            <meshStandardMaterial color="#FFF8EC" roughness={0.82} />
+            <sphereGeometry args={[0.13, 12, 9]} />
+            <meshStandardMaterial color="#FFF8EC" roughness={0.78} />
+          </mesh>
+        );
+      })}
+      {[0, 1, 2, 3, 4].map((index) => {
+        const angle = (index / 5) * TWO_PI + 0.35;
+        return (
+          <mesh
+            key={`inner-${index}`}
+            position={[Math.cos(angle) * 0.05, Math.sin(angle) * 0.05, 0.018]}
+            rotation={[0, 0, angle]}
+            scale={[0.72, 0.3, 0.2]}
+          >
+            <sphereGeometry args={[0.1, 10, 8]} />
+            <meshStandardMaterial color="#FFF8EC" roughness={0.78} />
           </mesh>
         );
       })}
       <mesh position={[0, 0, 0.035]}>
-        <sphereGeometry args={[0.06, 12, 10]} />
-        <meshStandardMaterial color="#E5B93C" roughness={0.6} />
+        <sphereGeometry args={[0.06, 14, 10]} />
+        <meshStandardMaterial color="#E5B93C" roughness={0.52} metalness={0.04} />
+      </mesh>
+      <mesh position={[0, -0.12, -0.02]} rotation={[0.08, 0, 0.06]}>
+        <cylinderGeometry args={[0.008, 0.008, 0.2, 6]} />
+        <meshStandardMaterial color="#5C7A4B" roughness={0.8} />
+      </mesh>
+      <mesh position={[0.055, -0.18, 0.01]} rotation={[0.2, 0.3, -0.5]} scale={[1, 0.35, 0.5]}>
+        <sphereGeometry args={[0.07, 10, 8]} />
+        <meshStandardMaterial color="#5C7A4B" roughness={0.78} />
       </mesh>
     </group>
   );
@@ -332,11 +373,44 @@ function Cardamom(): React.ReactElement {
   );
 }
 function ChocolateChunk(): React.ReactElement {
+  const chunkGeometry = useMemo(() => {
+    const shape = new THREE.Shape();
+    shape.moveTo(-0.18, -0.08);
+    shape.lineTo(-0.06, -0.18);
+    shape.lineTo(0.12, -0.15);
+    shape.lineTo(0.2, -0.02);
+    shape.lineTo(0.12, 0.16);
+    shape.lineTo(-0.08, 0.15);
+    shape.lineTo(-0.19, 0.04);
+    shape.closePath();
+    const geometry = new THREE.ExtrudeGeometry(shape, {
+      depth: 0.12,
+      bevelEnabled: true,
+      bevelSize: 0.025,
+      bevelThickness: 0.02,
+      bevelSegments: 3,
+      curveSegments: 3,
+    });
+    geometry.center();
+    return geometry;
+  }, []);
+
+  useEffect(() => () => chunkGeometry.dispose(), [chunkGeometry]);
+
   return (
-    <mesh scale={[1.05, 0.78, 0.9]}>
-      <dodecahedronGeometry args={[0.18, 0]} />
-      <meshStandardMaterial color="#3B2118" roughness={0.58} metalness={0.02} />
-    </mesh>
+    <group>
+      <mesh geometry={chunkGeometry} scale={[1.05, 1.05, 0.95]}>
+        <meshStandardMaterial color="#4A2A18" roughness={0.34} metalness={0.05} />
+      </mesh>
+      <mesh
+        geometry={chunkGeometry}
+        position={[0.17, -0.08, 0.03]}
+        rotation={[0.25, 0.5, 0.2]}
+        scale={0.48}
+      >
+        <meshStandardMaterial color="#3B2118" roughness={0.4} metalness={0.04} />
+      </mesh>
+    </group>
   );
 }
 function StarAnise(): React.ReactElement {
@@ -478,20 +552,46 @@ function IngredientGroup({
 }): React.ReactElement {
   const root = useRef<THREE.Group | null>(null);
   const visibility = useRef(active ? 1 : 0);
+  const materials = useRef<THREE.Material[]>([]);
+
+  useEffect(() => {
+    const node = root.current;
+    if (!node) return;
+    const collected: THREE.Material[] = [];
+    node.traverse((child) => {
+      const mesh = child as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      const childMaterials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+      childMaterials.forEach((material) => {
+        material.transparent = true;
+        material.opacity = active ? 1 : 0;
+        material.depthWrite = false;
+        material.needsUpdate = true;
+        collected.push(material);
+      });
+    });
+    materials.current = collected;
+    // Only the mount matters here: opacity is animated in useFrame afterwards.
+  }, []);
+
   useFrame((_, delta) => {
     if (!root.current) return;
     const target = active ? 1 : 0;
     visibility.current = reducedMotion
       ? target
-      : THREE.MathUtils.damp(visibility.current, target, 4, delta);
+      : THREE.MathUtils.damp(visibility.current, target, 3.2, delta);
     const visible = visibility.current;
-    root.current.visible = visible > 0.12;
-    root.current.position.x = (1 - visible) * 2.1;
+    root.current.visible = visible > 0.005;
+    root.current.position.x = (1 - visible) * 1.6;
     root.current.position.y = (1 - visible) * -0.1;
     root.current.position.z = (1 - visible) * -0.3;
-    root.current.rotation.y = (1 - visible) * 0.32;
+    root.current.rotation.y = (1 - visible) * 0.25;
     const baseScale = layout === 'mobile' ? 0.62 : 1;
-    root.current.scale.setScalar(baseScale * (0.4 + visible * 0.6));
+    root.current.scale.setScalar(baseScale * (0.35 + visible * 0.65));
+    materials.current.forEach((material) => {
+      material.opacity = visible;
+      material.depthWrite = visible > 0.98;
+    });
   });
   return (
     <group ref={root}>
@@ -729,9 +829,16 @@ function SceneContent({
     if (stage.current) {
       const heroX = layout === 'desktop' ? 1.85 : 0.45;
       const reserveX = layout === 'desktop' ? -0.9 : 0;
+      const reserveY = layout === 'desktop' ? -0.35 : -0.15;
       stage.current.position.x = THREE.MathUtils.damp(
         stage.current.position.x,
         THREE.MathUtils.lerp(heroX, reserveX, p),
+        5,
+        delta,
+      );
+      stage.current.position.y = THREE.MathUtils.damp(
+        stage.current.position.y,
+        reserveY * p,
         5,
         delta,
       );
@@ -742,10 +849,12 @@ function SceneContent({
       canFloat.current.rotation.x = reducedMotion ? 0.045 : 0.045 + Math.cos(time * 0.5) * 0.018;
     }
     if (can.current) {
-      const desired = targetRotation.current + (1 - p) * 0.12;
+      // One full, gradual turn as the page moves from the poster to the menu.
+      const scrollSpin = (1 - p) * TWO_PI;
+      const desired = targetRotation.current + scrollSpin + (1 - p) * 0.12;
       can.current.rotation.y = reducedMotion
         ? desired
-        : THREE.MathUtils.damp(can.current.rotation.y, desired, 4.2, delta);
+        : THREE.MathUtils.damp(can.current.rotation.y, desired, 4.5, delta);
     }
   });
   const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {

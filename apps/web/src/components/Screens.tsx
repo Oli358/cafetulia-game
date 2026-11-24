@@ -1553,7 +1553,7 @@ export function LobbyScreen(): React.ReactElement {
         className="title-grain pointer-events-none absolute inset-0 -z-10 opacity-35"
       />
       <LobbyFloatingIngredients />
-      <div className="relative z-10 mx-auto flex max-h-[96dvh] w-full max-w-[1500px] flex-col justify-between gap-2.5 overflow-hidden rounded-[28px] border border-[#231712]/10 bg-[#FFF8EC]/82 p-2.5 shadow-[0_24px_70px_rgba(35,23,18,0.22)] backdrop-blur-md sm:p-4">
+      <div className="relative z-10 mx-auto flex max-h-[96dvh] w-full max-w-[1500px] flex-col justify-between gap-2.5 overflow-hidden rounded-[28px] border border-[#231712]/10 bg-[#FFF8EC]/66 p-2.5 shadow-[0_24px_70px_rgba(35,23,18,0.22)] backdrop-blur-2xl sm:p-4">
         {/* Top Lobby Bar: Paper Napkin Room Code Card + Quick Actions */}
         <div className="shrink-0 flex flex-nowrap items-center justify-between gap-1.5 cafe-double-rule pb-2 sm:gap-2">
           {/* Paper Napkin / Coaster Room Code Card with folded corner */}
