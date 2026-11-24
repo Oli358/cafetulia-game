@@ -18,6 +18,7 @@
 - El fallback sin WebGL también dibuja un vaso SVG con tapa, etiqueta y falda kraft.
 - Copys actualizados: “El vaso es el menú”, “Gira el vaso…”.
 - Capturas nuevas `docs/referencias/ui-v13-*.png` en 1920×900, 1280×800, **960×800** y 390×844.
+- Transcripción completa de la sesión y anexo de traspaso en `docs/CHAT-2026-11-25.md`.
 
 **Decisiones:** D-101, D-102 y D-103.
 
