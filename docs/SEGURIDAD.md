@@ -54,6 +54,7 @@ La versión actual exige un token de sesión secreto para toda acción de sala. 
 ### Dependencias
 
 - Eliminado `drizzle-orm`: solo se usaban definiciones de esquema, nunca el query builder; las consultas reales son SQL parametrizado con `node:sqlite`.
+- Eliminados `@google/genai` y `dotenv`: no se importaban en ningún punto del código.
 - Overrides de `body-parser >=1.20.9 <2` y `nanoid >=3.3.18` en `pnpm-workspace.yaml`.
 - `pnpm install --frozen-lockfile` verificado.
 - `pnpm audit --prod` baja de 9 a 3 avisos: 1 high de Zod (mitigado por el límite de 32 KB y esquemas acotados), 1 moderate de `uuid` y 1 low de `elliptic`, ambos en la pila de autenticación de Colyseus, que no se monta en el entrypoint actual.
