@@ -19,6 +19,7 @@
 - Los `AnchoredPopover` se anclan siempre a su botón, también en móvil; dejan de ser hojas inferiores. Entrada/salida de 0.24 s con escala, desplazamiento y origen en el ancla. Aplica a partida, lobby y portada.
 - **Aviso de orientación:** en móvil horizontal se cubre la pantalla con «Gira el teléfono». El manifest PWA se marca `portrait` y se intenta `screen.orientation.lock('portrait')`. El service worker sube a v14.
 - E2E: el top móvil queda entre cabecera y tablero, el aviso de orientación aparece/desaparece y los desplegables nacen pegados a su botón. Capturas `ui-v11-partida-*` y `ui-v11-lobby` actualizadas.
+- Transcripción de la continuación en `docs/CHAT-2026-11-25-sesion-034.md`.
 - Verificado: `typecheck`, `lint`, 49 tests, build, 3 E2E en verde. Build de producción servido por el túnel del móvil.
 
 **Decisiones:** D-109, D-110, D-111, D-112 y D-113.
