@@ -18,8 +18,9 @@
 - El cambio de mundo ya no desliza los ingredientes en horizontal: el grupo activo baja y se desvanece, y el nuevo entra desde arriba y se asienta, con una duración más lenta (~1,5 s). Sin cambios de escala ni rotaciones extra.
 - Se suavizan las luces (color interpolado), el color del cuerpo del vaso, el crossfade de etiquetas, el fondo y la rotación del vaso.
 - La prueba en el navegador real (1397×607) confirmó que la carta no tiene scroll y que el título no se tapa. También reveló dos fallos, ya corregidos: (1) los eventos residuales de la rueda que abre el menú podían cambiar de mundo; ahora la rueda solo cambia de mundo con el menú abierto (`progress ≥ 0.985`) y tras 900 ms de gracia; (2) el título usaba `AnimatePresence mode="wait"` y dejaba un hueco entre mundos; ahora hace crossfade solapado con `popLayout`.
+- La rueda hacia arriba en el menú devuelve a la portada con un solo tick, también si el cursor está sobre la carta, el logo, el avatar, el sonido, Ajustes o la escena 3D. Al volver se cierran los overlays abiertos. El vaso solo usa la rueda hacia abajo para ciclar mundos, así que un tick arriba nunca cambia de mundo.
 - Nuevo test E2E: en 1280×700, para los tres mundos, la carta no tiene scroll y su borde superior queda por debajo del título.
-- Verificado: typecheck, lint, 49 tests, build y 3 E2E en verde. Prueba manual con navegador real: póster → un notch → pestañas → arrastre del vaso → vuelta a la carta → reentrada conservando el mundo → partida rápida cargada.
+- Verificado: typecheck, lint, 49 tests, build y 3 E2E en verde. Prueba manual con navegador real: póster → un notch → pestañas → arrastre del vaso → vuelta a la carta → reentrada conservando el mundo → partida rápida cargada; tick arriba sobre carta, logo, avatar, sonido, Ajustes y escena.
 
 **Decisiones:** D-104, D-105 y D-106.
 

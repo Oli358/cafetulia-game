@@ -144,6 +144,23 @@ test.describe('Cafetulia E2E v11 (menú de reservas 3D, tres mundos, lobby prepa
       expect(menuLayout!.cardScrolls).toBe(false);
       expect(menuLayout!.cardTop).toBeGreaterThan(menuLayout!.titleBottom);
     }
+
+    // 2b. Un tick de rueda hacia arriba sobre la carta vuelve al póster.
+    await page.getByTestId('title-menu-card').dispatchEvent('wheel', {
+      deltaY: -120,
+      bubbles: true,
+      cancelable: true,
+    });
+    await expect
+      .poll(async () => page.getByTestId('title-screen').evaluate((el) => el.scrollTop), {
+        timeout: 4000,
+      })
+      .toBeLessThanOrEqual(2);
+    await page.getByTestId('title-screen').evaluate((el) => {
+      el.scrollTop = el.clientHeight;
+    });
+    await page.waitForTimeout(600);
+
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.waitForTimeout(400);
 

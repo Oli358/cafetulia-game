@@ -771,23 +771,28 @@ export function TitleExperience(): React.ReactElement {
     return () => window.clearInterval(timer);
   }, [reducedMotion]);
 
-  // A single wheel notch on the poster commits the whole transition to the
-  // reservation card. Once the user is at the card, the wheel belongs to the
-  // can (mode switching), not to the page.
+  // A single wheel notch moves between the two acts: down opens the
+  // reservation card; up returns to the poster. The listener lives on the
+  // scroll container, so it also works over the card, the header, the logo and
+  // any open overlay. Inside the menu, the cup only uses downward wheel to
+  // cycle worlds, so an upward tick always leaves the menu.
   useEffect(() => {
     const element = scrollRef.current;
     if (!element) return;
     let locked = false;
     let unlockTimer = 0;
     const onWheel = (event: WheelEvent) => {
-      if (event.ctrlKey || event.deltaY <= 0) return;
+      if (event.ctrlKey || Math.abs(event.deltaY) < 2) return;
+      const goingDown = event.deltaY > 0;
       const atPoster = element.scrollTop < element.clientHeight * 0.12;
-      if (!atPoster) return;
+      const atMenu = element.scrollTop > element.clientHeight * 0.88;
+      if (goingDown ? !atPoster : !atMenu) return;
       event.preventDefault();
       if (locked) return;
       locked = true;
+      if (!goingDown) setActiveOverlay(null);
       element.scrollTo({
-        top: element.clientHeight,
+        top: goingDown ? element.clientHeight : 0,
         behavior: reducedMotion ? 'auto' : 'smooth',
       });
       unlockTimer = window.setTimeout(
@@ -802,7 +807,7 @@ export function TitleExperience(): React.ReactElement {
       element.removeEventListener('wheel', onWheel);
       window.clearTimeout(unlockTimer);
     };
-  }, [reducedMotion]);
+  }, [reducedMotion, setActiveOverlay]);
 
   const handleModeChange = (next: MenuMode) => {
     setMode(next);

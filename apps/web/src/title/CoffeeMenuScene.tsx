@@ -891,18 +891,19 @@ function SceneContent({
     const element = gl.domElement;
     const onWheel = (event: WheelEvent) => {
       if (!interactive) return;
+      // Upward wheel is page navigation: it returns to the poster, so let it
+      // bubble to the scroll container instead of cycling worlds backwards.
+      if (event.deltaY <= 0) return;
       // Ignore the tail of the scroll gesture that opens the menu: a single
       // notch must reveal the card without also switching worlds.
       if (progressRef.current < 0.985) return;
       if (performance.now() - menuOpenedAt.current < 900) return;
-      if (Math.abs(event.deltaY) < 2) return;
       event.preventDefault();
       const now = performance.now();
       if (now - lastWheelAt.current < 380) return;
       lastWheelAt.current = now;
       const currentIndex = getMenuMode(modeRef.current).index;
-      const offset = event.deltaY > 0 ? 1 : MENU_MODES.length - 1;
-      const next = MENU_MODES[(currentIndex + offset) % MENU_MODES.length];
+      const next = MENU_MODES[(currentIndex + 1) % MENU_MODES.length];
       if (next) selectMode(next.id);
     };
     element.addEventListener('wheel', onWheel, { passive: false });
