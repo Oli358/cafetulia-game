@@ -2629,622 +2629,616 @@ export function PlayingScreen(): React.ReactElement {
 
   return (
     <>
-      <div
-        aria-hidden="true"
-        className="cafe-playing-bg pointer-events-none fixed inset-0 z-0"
-      />
+      <div aria-hidden="true" className="cafe-playing-bg pointer-events-none fixed inset-0 z-0" />
       <div
         className="relative z-10 h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between px-1.5 py-1 sm:px-4 sm:py-1.5 gap-0.5 sm:gap-1 max-w-[1440px] mx-auto select-none safe-bottom"
         data-testid="playing-viewport"
       >
-      {isMyTurn && (
-        <div
-          data-testid="my-turn-glow"
-          aria-hidden="true"
-          className="cafe-turn-glow pointer-events-none fixed inset-0 z-20"
-        />
-      )}
-      {/* 3D Coin Flip Animation Overlay */}
-      <FlyingCoinsLayer flights={coinFlights} reducedMotion={reducedMotion} />
-
-      {/* ORIGINAL HANDCRAFTED EVENT SUBTITLE CALLOUT OVERLAY (Cómic / Café / Arcade) */}
-      {activeCallout && (
-        <div
-          role="status"
-          aria-live="polite"
-          data-testid="arcade-event-callout"
-          data-subtitle-style={subtitleStyle}
-          className={`pointer-events-none fixed top-16 left-1/2 -translate-x-1/2 z-50 text-center transition-transform ${
-            reducedMotion ? '' : 'animate-bounce'
-          } ${
-            subtitleStyle === 'comic'
-              ? 'bg-[#FFF9F0] text-[#231712] border-[3px] border-[#231712] shadow-[5px_5px_0px_#231712] rounded-2xl px-5 py-2 -rotate-1'
-              : subtitleStyle === 'cafe'
-                ? 'bg-[#F7EEDF] text-[#3E2F2A] border-2 border-[#8B5E3C] ring-2 ring-inset ring-[#C9A227]/75 shadow-[0_10px_24px_rgba(62,47,42,0.28)] rounded-xl px-5 py-2'
-                : activeCallout.tone === 'gold'
-                  ? 'bg-[#3E2F2A] border-2 border-[#F2C14E] text-[#FFF9F0] rounded-2xl px-5 py-2 shadow-xl'
-                  : activeCallout.tone === 'green'
-                    ? 'bg-[#224A36] border-2 border-[#8CE0B5] text-[#FFF9F0] rounded-2xl px-5 py-2 shadow-xl'
-                    : activeCallout.tone === 'red'
-                      ? 'bg-[#6E1B16] border-2 border-[#FFB4AB] text-[#FFF9F0] rounded-2xl px-5 py-2 shadow-xl'
-                      : 'bg-[#1E4E8C] border-2 border-[#FFF9F0] text-[#FFF9F0] rounded-2xl px-5 py-2 shadow-xl'
-          }`}
-        >
+        {isMyTurn && (
           <div
-            className={`font-serif font-extrabold text-lg sm:text-2xl tracking-wider uppercase ${
+            data-testid="my-turn-glow"
+            aria-hidden="true"
+            className="cafe-turn-glow pointer-events-none fixed inset-0 z-20"
+          />
+        )}
+        {/* 3D Coin Flip Animation Overlay */}
+        <FlyingCoinsLayer flights={coinFlights} reducedMotion={reducedMotion} />
+
+        {/* ORIGINAL HANDCRAFTED EVENT SUBTITLE CALLOUT OVERLAY (Cómic / Café / Arcade) */}
+        {activeCallout && (
+          <div
+            role="status"
+            aria-live="polite"
+            data-testid="arcade-event-callout"
+            data-subtitle-style={subtitleStyle}
+            className={`pointer-events-none fixed top-16 left-1/2 -translate-x-1/2 z-50 text-center transition-transform ${
+              reducedMotion ? '' : 'animate-bounce'
+            } ${
               subtitleStyle === 'comic'
-                ? activeCallout.tone === 'red'
-                  ? 'text-[#A94438]'
-                  : activeCallout.tone === 'green'
-                    ? 'text-[#2E7D52]'
-                    : 'text-[#C96F4A]'
+                ? 'bg-[#FFF9F0] text-[#231712] border-[3px] border-[#231712] shadow-[5px_5px_0px_#231712] rounded-2xl px-5 py-2 -rotate-1'
                 : subtitleStyle === 'cafe'
-                  ? 'text-[#3E2F2A]'
-                  : 'text-[#F2C14E]'
+                  ? 'bg-[#F7EEDF] text-[#3E2F2A] border-2 border-[#8B5E3C] ring-2 ring-inset ring-[#C9A227]/75 shadow-[0_10px_24px_rgba(62,47,42,0.28)] rounded-xl px-5 py-2'
+                  : activeCallout.tone === 'gold'
+                    ? 'bg-[#3E2F2A] border-2 border-[#F2C14E] text-[#FFF9F0] rounded-2xl px-5 py-2 shadow-xl'
+                    : activeCallout.tone === 'green'
+                      ? 'bg-[#224A36] border-2 border-[#8CE0B5] text-[#FFF9F0] rounded-2xl px-5 py-2 shadow-xl'
+                      : activeCallout.tone === 'red'
+                        ? 'bg-[#6E1B16] border-2 border-[#FFB4AB] text-[#FFF9F0] rounded-2xl px-5 py-2 shadow-xl'
+                        : 'bg-[#1E4E8C] border-2 border-[#FFF9F0] text-[#FFF9F0] rounded-2xl px-5 py-2 shadow-xl'
             }`}
           >
-            {activeCallout.title}
-          </div>
-          <div
-            className={`text-[11px] sm:text-xs font-bold ${
-              subtitleStyle === 'comic' || subtitleStyle === 'cafe'
-                ? 'text-[#6F5A4E]'
-                : 'text-[#FFF9F0]/95'
-            }`}
-          >
-            {activeCallout.subtitle}
-          </div>
-          {subtitleStyle === 'comic' && (
-            <svg
-              width="20"
-              height="12"
-              viewBox="0 0 20 12"
-              aria-hidden="true"
-              className="mx-auto -mb-4 mt-0.5"
-            >
-              <polygon points="2,0 18,0 10,11" fill="#FFF9F0" stroke="#231712" strokeWidth="3" />
-            </svg>
-          )}
-        </div>
-      )}
-
-      {/* P0.1 TWO-ROW STABLE HEADER (Never wraps action buttons even with 9.999 pts) */}
-      <header
-        data-testid="playing-header"
-        className="shrink-0 bg-[#FFF9F0] rounded-2xl border-2 border-[#231712]/25 px-2 py-1 sm:px-3 sm:py-1.5 shadow-[0_3px_10px_rgba(35,23,18,0.08)] flex flex-col gap-1 z-30"
-      >
-        {/* ROW 1: Brand + Turn Indicator (Left) & Non-Wrapping Action Buttons (Right) */}
-        <div
-          data-testid="header-top-row"
-          className="flex items-center justify-between gap-1.5 flex-nowrap min-w-0"
-        >
-          {/* Left: Brand, Room Code, Turn Pill, Timer */}
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 shrink">
-            <CafetuliaLogo compact hideTextOnMobile />
-            <span className="hidden md:inline-block text-[11px] font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-2 py-0.5 rounded-lg border border-[#231712]/10 shrink-0">
-              #{snapshot.code}
-            </span>
             <div
-              className={`px-2 py-0.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 whitespace-nowrap truncate max-w-[130px] sm:max-w-[190px] ${
-                isMyTurn
-                  ? 'bg-[#C96F4A] text-[#FFF9F0] border border-[#231712] shadow-2xs'
-                  : 'bg-[#F7EEDF] text-[#3E2F2A] border border-[#231712]/15'
+              className={`font-serif font-extrabold text-lg sm:text-2xl tracking-wider uppercase ${
+                subtitleStyle === 'comic'
+                  ? activeCallout.tone === 'red'
+                    ? 'text-[#A94438]'
+                    : activeCallout.tone === 'green'
+                      ? 'text-[#2E7D52]'
+                      : 'text-[#C96F4A]'
+                  : subtitleStyle === 'cafe'
+                    ? 'text-[#3E2F2A]'
+                    : 'text-[#F2C14E]'
               }`}
-              data-testid="turn-indicator"
             >
-              {isMyTurn ? 'Tu turno' : `Turno: ${activePlayerObj?.nickname ?? 'Rival'}`}
+              {activeCallout.title}
             </div>
-            {remainingSeconds !== null && (
-              <span
-                className={`text-[11px] font-mono font-bold tabular-nums px-1.5 py-0.5 rounded-lg shrink-0 ${
-                  remainingSeconds <= 10
-                    ? 'bg-[#FDECEB] text-[#A94438]'
-                    : 'bg-[#F7EEDF] text-[#3E2F2A]'
-                }`}
+            <div
+              className={`text-[11px] sm:text-xs font-bold ${
+                subtitleStyle === 'comic' || subtitleStyle === 'cafe'
+                  ? 'text-[#6F5A4E]'
+                  : 'text-[#FFF9F0]/95'
+              }`}
+            >
+              {activeCallout.subtitle}
+            </div>
+            {subtitleStyle === 'comic' && (
+              <svg
+                width="20"
+                height="12"
+                viewBox="0 0 20 12"
+                aria-hidden="true"
+                className="mx-auto -mb-4 mt-0.5"
               >
-                ⏱ {remainingSeconds}s
-              </span>
+                <polygon points="2,0 18,0 10,11" fill="#FFF9F0" stroke="#231712" strokeWidth="3" />
+              </svg>
             )}
           </div>
+        )}
 
-          {/* Right: Single-line Action Buttons (flex-nowrap, never jumps to x=0) */}
-          <div
-            data-testid="header-actions-row"
-            className="flex items-center gap-1 text-xs flex-nowrap shrink-0"
-          >
-            {/* Board Legend '?' Button */}
-            <button
-              ref={legendBtnRef}
-              type="button"
-              data-testid="board-legend-btn"
-              onClick={() => toggleOverlay('legend')}
-              aria-expanded={legendOpen}
-              aria-controls="board-legend-popover"
-              aria-label="Leyenda del tablero"
-              title="Leyenda del tablero: mesa, silla, silla compartida, ficha, barra y cambiar comodín"
-              className="min-h-[32px] w-8 rounded-xl bg-[#FEF6E0] border border-[#C9A227] font-serif font-extrabold text-sm text-[#3E2F2A] hover:bg-[#F2C14E]/40 cursor-pointer shrink-0"
-            >
-              ?
-            </button>
-
-            {/* Rival Public Hands Button */}
-            <button
-              ref={rivalHandsBtnRef}
-              type="button"
-              data-testid="rival-hands-btn"
-              onClick={() => toggleOverlay('hands')}
-              aria-expanded={rivalHandsOpen}
-              aria-controls="rival-hands-popover"
-              className="min-h-[32px] px-2 sm:px-2.5 py-1 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer whitespace-nowrap shrink-0"
-            >
-              Manos
-            </button>
-
-            {/* Subtitles Dropdown (visible on lg+) */}
-            <div className="hidden lg:block shrink-0">
-              <SubtitlesDropdownPicker compact />
-            </div>
-
-            {/* 3D Café Button */}
-            <button
-              type="button"
-              data-testid="open-3d-cafe-btn"
-              onClick={() => setActiveOverlay('cafe3d')}
-              className="min-h-[32px] px-2 sm:px-2.5 py-1 rounded-xl bg-[#3F5E4A] text-[#FFF9F0] border border-[#231712] font-bold hover:opacity-95 cursor-pointer whitespace-nowrap shrink-0"
-            >
-              Ver café
-            </button>
-
-            {/* Desktop/Tablet direct buttons */}
-            <button
-              type="button"
-              data-testid="open-drawer-btn"
-              onClick={() => toggleOverlay('drawer')}
-              aria-expanded={drawerOpen}
-              className="hidden sm:inline-flex items-center min-h-[32px] px-2.5 py-1 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer whitespace-nowrap shrink-0"
-            >
-              Tertulia ({gameState.log.length})
-            </button>
-
-            <button
-              type="button"
-              data-testid="header-settings-btn"
-              onClick={() => setActiveModal('settings')}
-              aria-label="Ajustes"
-              className="hidden sm:inline-flex items-center min-h-[32px] px-2.5 py-1 rounded-xl bg-[#F7EEDF] border border-[#231712]/15 font-semibold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer whitespace-nowrap shrink-0"
-            >
-              Ajustes
-            </button>
-
-            <button
-              type="button"
-              data-testid="header-leave-btn"
-              onClick={leaveRoom}
-              aria-label="Salir de la partida"
-              className="hidden sm:inline-flex items-center min-h-[32px] px-2 py-1 rounded-xl text-[#A94438] font-bold hover:bg-[#FDECEB] cursor-pointer whitespace-nowrap shrink-0"
-            >
-              Salir
-            </button>
-
-            {/* Compact Mobile 'Más' Menu Button (< 640px) */}
-            <button
-              ref={moreMenuBtnRef}
-              type="button"
-              data-testid="header-more-btn"
-              aria-expanded={moreMenuOpen}
-              aria-controls="header-more-popover"
-              onClick={() => toggleOverlay('more_menu')}
-              className="sm:hidden min-h-[32px] px-2 py-1 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 font-bold text-[#3E2F2A] cursor-pointer whitespace-nowrap shrink-0 inline-flex items-center gap-1"
-            >
-              <span>Más</span>
-              <svg width="9" height="6" viewBox="0 0 10 6" aria-hidden="true">
-                <path
-                  d="M1 1l4 4 4-4"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* PORTAL POPOVER: Board Legend '?' (P0.2 & P0.5) */}
-      <AnchoredPopover
-        open={legendOpen}
-        onClose={() => setActiveOverlay(null)}
-        anchorRef={legendBtnRef}
-        id="board-legend-popover"
-        role="dialog"
-        ariaLabel="Leyenda visual del tablero"
-        testId="board-legend-popover"
-        maxWidth={340}
-        preferPlacement="bottom-end"
-      >
-        <div className="space-y-2 text-xs">
-          <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-1.5">
-            <span className="font-serif font-bold text-sm">Cómo leer el tablero</span>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveOverlay(null);
-                legendBtnRef.current?.focus();
-              }}
-              aria-label="Cerrar leyenda"
-              className="text-xs font-bold text-[#6F5A4E] hover:text-[#3E2F2A] px-1.5 py-1 cursor-pointer inline-flex items-center justify-center"
-            >
-              <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
-                <path
-                  d="M1.5 1.5l7 7M8.5 1.5l-7 7"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <ul className="space-y-1.5 text-[11px] leading-snug">
-            <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
-              <span className="w-6 h-6 rounded-full bg-[#FFF9F0] border-2 border-[#3B5BA5] flex items-center justify-center shrink-0">
-                <FlagBadge nation="fr" size={11} />
-              </span>
-              <div>
-                <strong>Mesa nacional:</strong> mantel crema con su bandera en el centro. Tócala
-                para activar el <em>Modo enfoque</em>.
-              </div>
-            </li>
-            <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
-              <span className="w-6 h-6 rounded-md bg-[#FFF9F0] border border-[#231712] flex items-center justify-center shrink-0 overflow-hidden">
-                <CharacterPortrait nation="fr" gender="F" size={22} />
-              </span>
-              <div>
-                <strong>Ficha sentada:</strong> mini-ficha cuadrada prominente con bandera de fondo
-                y caricatura del invitado.
-              </div>
-            </li>
-            <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
-              <span className="w-6 h-6 rounded-md bg-[#FFF9F0] border-2 border-[#5C3A21] flex items-center justify-center gap-0.5 shrink-0">
-                <FlagBadge nation="fr" size={6} />
-                <FlagBadge nation="en" size={6} />
-              </span>
-              <div>
-                <strong>Silla compartida:</strong> cojín bicolor con 2 banderitas; puntúa en ambas
-                mesas.
-              </div>
-            </li>
-            <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
-              <span className="w-6 h-6 rounded-md bg-[#8B5E3C] border border-[#5C3A21] flex items-center justify-center shrink-0">
-                <span className="w-3.5 h-3.5 rounded-xs bg-[#F7EEDF]" />
-              </span>
-              <div>
-                <strong>Silla vacía:</strong> madera y cojín neutro crema, sin bandera.
-              </div>
-            </li>
-            <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
-              <span className="w-6 h-6 rounded-full bg-[#F2C14E] border border-[#231712] font-mono font-bold text-[9px] flex items-center justify-center shrink-0">
-                +1
-              </span>
-              <div>
-                <strong>Barra central:</strong> 20 posavasos (+1 a +5 y luego -2 a -14).
-              </div>
-            </li>
-            <li className="flex items-center gap-2 bg-[#FEF6E0] p-1.5 rounded-xl border border-[#C9A227]/50">
-              <span className="w-6 h-6 rounded-md bg-[#FFF9F0] border border-[#231712] flex items-center justify-center shrink-0 overflow-hidden">
-                <CharacterPortrait nation="joker" gender="M" size={22} />
-              </span>
-              <div>
-                <strong>Cambiar comodín:</strong> sustituye un comodín sentado por la ficha natural
-                exacta de tu mano (sin puntuar ni robar).
-              </div>
-            </li>
-          </ul>
-        </div>
-      </AnchoredPopover>
-
-      {/* PORTAL POPOVER: Rival Public Hands (P0.2) */}
-      <AnchoredPopover
-        open={rivalHandsOpen}
-        onClose={() => setActiveOverlay(null)}
-        anchorRef={rivalHandsBtnRef}
-        id="rival-hands-popover"
-        role="dialog"
-        ariaLabel="Manos públicas de los jugadores"
-        testId="rival-hands-popover"
-        maxWidth={350}
-        preferPlacement="bottom-end"
-      >
-        <div className="space-y-2 text-xs">
-          <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-1.5">
-            <span className="font-serif font-bold text-sm">Manos públicas y monedas</span>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveOverlay(null);
-                rivalHandsBtnRef.current?.focus();
-              }}
-              aria-label="Cerrar manos públicas"
-              className="text-xs font-bold text-[#6F5A4E] hover:text-[#3E2F2A] px-1.5 py-1 cursor-pointer inline-flex items-center justify-center"
-            >
-              <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
-                <path
-                  d="M1.5 1.5l7 7M8.5 1.5l-7 7"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
-          </div>
-          {gameState.players.map((p) => {
-            const pHand = gameState.hands[p.id] ?? [];
-            const pAvatar = avatarByPlayerId[p.id] ?? p.avatarId ?? 'moka';
-            return (
-              <div key={p.id} className="bg-[#F7EEDF] p-2 rounded-xl space-y-1.5">
-                <div className="flex items-center justify-between text-xs gap-2">
-                  <span className="inline-flex items-center gap-1.5 font-bold min-w-0 truncate">
-                    <PlayerAvatar avatarId={pAvatar} size={18} />
-                    <span className="truncate">
-                      {p.nickname} {p.id === myPlayerId ? '(Tú)' : ''}
-                    </span>
-                  </span>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <CoinTray
-                      score={p.score}
-                      playerId={`popover-${p.id}`}
-                      compact
-                      reducedMotion={reducedMotion}
-                    />
-                    <span className="font-mono text-[10px] text-[#6F5A4E]">· {pHand.length}c</span>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {pHand.map((t) => {
-                    const prof = getCharacterProfile(t.nation, t.gender, t.jokerNation, t.id);
-                    return (
-                      <div
-                        key={t.id}
-                        aria-label={`${prof.name}, ${prof.countryName}, ${
-                          t.gender === 'F' ? 'Mujer' : 'Hombre'
-                        }`}
-                        title={`${prof.name} · ${prof.countryName} (${prof.genderBadge})`}
-                        className="inline-flex items-center gap-1 bg-[#FFF9F0] p-0.5 pr-1.5 rounded-lg border border-[#231712]/20 text-[10px]"
-                      >
-                        <CharacterPortrait
-                          nation={t.nation}
-                          gender={t.gender}
-                          tileId={t.id}
-                          size={22}
-                        />
-                        <span className="font-bold">{prof.name}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </AnchoredPopover>
-
-      {/* PORTAL POPOVER: Mobile 'Más' Menu (< 640px) */}
-      <AnchoredPopover
-        open={moreMenuOpen}
-        onClose={() => setActiveOverlay(null)}
-        anchorRef={moreMenuBtnRef}
-        id="header-more-popover"
-        role="dialog"
-        ariaLabel="Más opciones de partida"
-        testId="header-more-popover"
-        maxWidth={280}
-        preferPlacement="bottom-end"
-      >
-        <div className="space-y-1.5 text-xs">
-          <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-1">
-            <span className="font-serif font-bold text-sm">Opciones de mesa</span>
-            <button
-              type="button"
-              onClick={() => setActiveOverlay(null)}
-              className="px-1.5 py-1 text-[#6F5A4E] font-bold cursor-pointer inline-flex items-center justify-center"
-            >
-              <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
-                <path
-                  d="M1.5 1.5l7 7M8.5 1.5l-7 7"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
-          </div>
-          <button
-            type="button"
-            onClick={() => setActiveOverlay('drawer')}
-            className="w-full text-left px-3 py-2 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
-          >
-            Tertulia y registro ({gameState.log.length})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveOverlay('subtitles')}
-            className="w-full text-left px-3 py-2 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
-          >
-            Subtítulos de eventos
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveModal('settings')}
-            className="w-full text-left px-3 py-2 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
-          >
-            Ajustes y sonido
-          </button>
-          <button
-            type="button"
-            onClick={leaveRoom}
-            className="w-full text-left px-3 py-2 rounded-xl bg-[#FDECEB] font-bold text-[#A94438] cursor-pointer"
-          >
-            Salir de la partida
-          </button>
-        </div>
-      </AnchoredPopover>
-
-      {/* PORTAL POPOVER: Cambiar comodín explanation & confirmation (P0.5) */}
-      <AnchoredPopover
-        open={jokerSwapOpen}
-        onClose={() => setActiveOverlay(null)}
-        anchorRef={jokerSwapBtnRef}
-        id="joker-swap-popover"
-        role="dialog"
-        ariaLabel="Cambiar comodín sentado en el tablero"
-        testId="joker-swap-popover"
-        maxWidth={350}
-        preferPlacement="top-end"
-      >
-        <div className="space-y-2.5 text-xs">
-          <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-1.5">
-            <span className="font-serif font-bold text-sm text-[#3E2F2A]">Cambiar comodín</span>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveOverlay(null);
-                jokerSwapBtnRef.current?.focus();
-              }}
-              aria-label="Cerrar cambio de comodín"
-              className="px-1.5 py-1 rounded-lg bg-[#F7EEDF] text-[#6F5A4E] font-bold cursor-pointer inline-flex items-center justify-center"
-            >
-              <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
-                <path
-                  d="M1.5 1.5l7 7M8.5 1.5l-7 7"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <p
-            data-testid="joker-swap-explanation"
-            className="bg-[#FEF6E0] p-2.5 rounded-xl border border-[#C9A227]/60 text-[11px] text-[#3E2F2A] leading-relaxed"
-          >
-            {JOKER_SWAP_EXPLANATION}
-          </p>
-
-          <div className="space-y-1.5">
-            {detailedSwapOptions.map((opt, idx) => (
-              <div
-                key={`${opt.move.seatId}-${opt.move.tileId}-${idx}`}
-                className="flex items-center justify-between gap-2 bg-[#F7EEDF] p-2 rounded-xl border border-[#231712]/15"
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  {opt.handTile && (
-                    <CharacterPortrait
-                      nation={opt.handTile.nation}
-                      gender={opt.handTile.gender}
-                      tileId={opt.handTile.id}
-                      size={30}
-                    />
-                  )}
-                  <div className="min-w-0">
-                    <span className="font-bold text-[#3E2F2A] block truncate">
-                      Por {opt.profile?.name ?? 'invitado'} ({opt.profile?.countryName ?? ''})
-                    </span>
-                    <span className="text-[10px] text-[#6F5A4E] block truncate">
-                      Silla: {opt.seatNations} · 0 pts · Sin robo
-                    </span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  data-testid="confirm-joker-swap-btn"
-                  onClick={() => {
-                    setActiveOverlay(null);
-                    void submitMove(opt.move);
-                  }}
-                  className="px-2.5 py-1.5 rounded-xl bg-[#C9A227] text-[#231712] border border-[#231712] font-bold text-[11px] hover:opacity-95 cursor-pointer whitespace-nowrap shrink-0"
-                >
-                  Confirmar
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </AnchoredPopover>
-
-      {/* CONTENT: ledger on top (mobile) / floating left (desktop), board centered */}
-      <div className="relative flex-1 min-h-0 w-full flex flex-col items-center justify-center gap-1.5 sm:gap-2 pt-3 lg:pt-0 lg:flex-row lg:items-start">
-        <aside
-          data-testid="compact-scoreboard"
-          className="cafe-paper-sheet shrink-0 w-full rounded-2xl border-2 border-[#231712]/25 p-2 lg:w-[248px] xl:absolute xl:left-0 xl:top-0 xl:z-20 xl:w-[270px]"
+        {/* P0.1 TWO-ROW STABLE HEADER (Never wraps action buttons even with 9.999 pts) */}
+        <header
+          data-testid="playing-header"
+          className="shrink-0 bg-[#FFF9F0] rounded-2xl border-2 border-[#231712]/25 px-2 py-1 sm:px-3 sm:py-1.5 shadow-[0_3px_10px_rgba(35,23,18,0.08)] flex flex-col gap-1 z-30"
         >
-          <div className="flex items-center justify-between gap-2 pb-1 mb-1 border-b-2 border-[#3E2F2A]/15">
-            <span className="font-serif font-bold text-sm text-[#2B1710]">La mesa</span>
-            <span className="text-[9px] font-mono font-bold text-[#6F5A4E]">#{snapshot.code}</span>
-          </div>
-          <div className="hidden lg:grid grid-cols-[1fr_auto] gap-2 px-1 pb-1 text-[8px] font-extrabold uppercase tracking-[0.14em] text-[#7B5236]/80">
-            <span>Jugador</span>
-            <span>Monedas · total</span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-1.5 lg:flex lg:flex-col lg:gap-1">
-            {gameState.players.map((p) => {
-              const pHandCount = (gameState.hands[p.id] ?? []).length;
-              const isTurn = gameState.turn === p.id;
-              const pAvatar = avatarByPlayerId[p.id] ?? p.avatarId ?? 'moka';
-              return (
-                <div
-                  key={p.id}
-                  data-testid={`scoreboard-player-${p.id}`}
-                  className={`cafe-score-card flex flex-col gap-1 rounded-xl border px-1.5 py-1 text-xs transition-colors duration-200 ${
-                    isTurn
-                      ? `${reducedMotion ? 'cafe-score-active-static' : 'cafe-score-active'} bg-[#FEF6E0] border-[#C96F4A]`
-                      : 'bg-[#F7EEDF]/85 border-[#231712]/12'
+          {/* ROW 1: Brand + Turn Indicator (Left) & Non-Wrapping Action Buttons (Right) */}
+          <div
+            data-testid="header-top-row"
+            className="flex items-center justify-between gap-1.5 flex-nowrap min-w-0"
+          >
+            {/* Left: Brand, Room Code, Turn Pill, Timer */}
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 shrink">
+              <CafetuliaLogo compact hideTextOnMobile />
+              <span className="hidden md:inline-block text-[11px] font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-2 py-0.5 rounded-lg border border-[#231712]/10 shrink-0">
+                #{snapshot.code}
+              </span>
+              <div
+                className={`px-2 py-0.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 whitespace-nowrap truncate max-w-[130px] sm:max-w-[190px] ${
+                  isMyTurn
+                    ? 'bg-[#C96F4A] text-[#FFF9F0] border border-[#231712] shadow-2xs'
+                    : 'bg-[#F7EEDF] text-[#3E2F2A] border border-[#231712]/15'
+                }`}
+                data-testid="turn-indicator"
+              >
+                {isMyTurn ? 'Tu turno' : `Turno: ${activePlayerObj?.nickname ?? 'Rival'}`}
+              </div>
+              {remainingSeconds !== null && (
+                <span
+                  className={`text-[11px] font-mono font-bold tabular-nums px-1.5 py-0.5 rounded-lg shrink-0 ${
+                    remainingSeconds <= 10
+                      ? 'bg-[#FDECEB] text-[#A94438]'
+                      : 'bg-[#F7EEDF] text-[#3E2F2A]'
                   }`}
                 >
-                  <div className="flex items-center gap-1.5 min-w-0">
-                    <PlayerAvatar avatarId={pAvatar} size={18} />
-                    <span className="font-bold text-[#3E2F2A] truncate flex-1">{p.nickname}</span>
-                    <span
-                      className="text-[9px] font-mono font-semibold text-[#6F5A4E] bg-[#FFF9F0] px-1 py-0.2 rounded border border-[#231712]/15 tabular-nums"
-                      title={`${pHandCount} fichas en mano`}
-                    >
-                      {pHandCount}c
+                  ⏱ {remainingSeconds}s
+                </span>
+              )}
+            </div>
+
+            {/* Right: Single-line Action Buttons (flex-nowrap, never jumps to x=0) */}
+            <div
+              data-testid="header-actions-row"
+              className="flex items-center gap-1 text-xs flex-nowrap shrink-0"
+            >
+              {/* Board Legend '?' Button */}
+              <button
+                ref={legendBtnRef}
+                type="button"
+                data-testid="board-legend-btn"
+                onClick={() => toggleOverlay('legend')}
+                aria-expanded={legendOpen}
+                aria-controls="board-legend-popover"
+                aria-label="Leyenda del tablero"
+                title="Leyenda del tablero: mesa, silla, silla compartida, ficha, barra y cambiar comodín"
+                className="min-h-[32px] w-8 rounded-xl bg-[#FEF6E0] border border-[#C9A227] font-serif font-extrabold text-sm text-[#3E2F2A] hover:bg-[#F2C14E]/40 cursor-pointer shrink-0"
+              >
+                ?
+              </button>
+
+              {/* Rival Public Hands Button */}
+              <button
+                ref={rivalHandsBtnRef}
+                type="button"
+                data-testid="rival-hands-btn"
+                onClick={() => toggleOverlay('hands')}
+                aria-expanded={rivalHandsOpen}
+                aria-controls="rival-hands-popover"
+                className="min-h-[32px] px-2 sm:px-2.5 py-1 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer whitespace-nowrap shrink-0"
+              >
+                Manos
+              </button>
+
+              {/* Subtitles Dropdown (visible on lg+) */}
+              <div className="hidden lg:block shrink-0">
+                <SubtitlesDropdownPicker compact />
+              </div>
+
+              {/* 3D Café Button */}
+              <button
+                type="button"
+                data-testid="open-3d-cafe-btn"
+                onClick={() => setActiveOverlay('cafe3d')}
+                className="min-h-[32px] px-2 sm:px-2.5 py-1 rounded-xl bg-[#3F5E4A] text-[#FFF9F0] border border-[#231712] font-bold hover:opacity-95 cursor-pointer whitespace-nowrap shrink-0"
+              >
+                Ver café
+              </button>
+
+              {/* Desktop/Tablet direct buttons */}
+              <button
+                type="button"
+                data-testid="open-drawer-btn"
+                onClick={() => toggleOverlay('drawer')}
+                aria-expanded={drawerOpen}
+                className="hidden sm:inline-flex items-center min-h-[32px] px-2.5 py-1 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer whitespace-nowrap shrink-0"
+              >
+                Tertulia ({gameState.log.length})
+              </button>
+
+              <button
+                type="button"
+                data-testid="header-settings-btn"
+                onClick={() => setActiveModal('settings')}
+                aria-label="Ajustes"
+                className="hidden sm:inline-flex items-center min-h-[32px] px-2.5 py-1 rounded-xl bg-[#F7EEDF] border border-[#231712]/15 font-semibold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer whitespace-nowrap shrink-0"
+              >
+                Ajustes
+              </button>
+
+              <button
+                type="button"
+                data-testid="header-leave-btn"
+                onClick={leaveRoom}
+                aria-label="Salir de la partida"
+                className="hidden sm:inline-flex items-center min-h-[32px] px-2 py-1 rounded-xl text-[#A94438] font-bold hover:bg-[#FDECEB] cursor-pointer whitespace-nowrap shrink-0"
+              >
+                Salir
+              </button>
+
+              {/* Compact Mobile 'Más' Menu Button (< 640px) */}
+              <button
+                ref={moreMenuBtnRef}
+                type="button"
+                data-testid="header-more-btn"
+                aria-expanded={moreMenuOpen}
+                aria-controls="header-more-popover"
+                onClick={() => toggleOverlay('more_menu')}
+                className="sm:hidden min-h-[32px] px-2 py-1 rounded-xl bg-[#F7EEDF] border border-[#231712]/20 font-bold text-[#3E2F2A] cursor-pointer whitespace-nowrap shrink-0 inline-flex items-center gap-1"
+              >
+                <span>Más</span>
+                <svg width="9" height="6" viewBox="0 0 10 6" aria-hidden="true">
+                  <path
+                    d="M1 1l4 4 4-4"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </header>
+
+        {/* PORTAL POPOVER: Board Legend '?' (P0.2 & P0.5) */}
+        <AnchoredPopover
+          open={legendOpen}
+          onClose={() => setActiveOverlay(null)}
+          anchorRef={legendBtnRef}
+          id="board-legend-popover"
+          role="dialog"
+          ariaLabel="Leyenda visual del tablero"
+          testId="board-legend-popover"
+          maxWidth={340}
+          preferPlacement="bottom-end"
+        >
+          <div className="space-y-2 text-xs">
+            <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-1.5">
+              <span className="font-serif font-bold text-sm">Cómo leer el tablero</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveOverlay(null);
+                  legendBtnRef.current?.focus();
+                }}
+                aria-label="Cerrar leyenda"
+                className="text-xs font-bold text-[#6F5A4E] hover:text-[#3E2F2A] px-1.5 py-1 cursor-pointer inline-flex items-center justify-center"
+              >
+                <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+                  <path
+                    d="M1.5 1.5l7 7M8.5 1.5l-7 7"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <ul className="space-y-1.5 text-[11px] leading-snug">
+              <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
+                <span className="w-6 h-6 rounded-full bg-[#FFF9F0] border-2 border-[#3B5BA5] flex items-center justify-center shrink-0">
+                  <FlagBadge nation="fr" size={11} />
+                </span>
+                <div>
+                  <strong>Mesa nacional:</strong> mantel crema con su bandera en el centro. Tócala
+                  para activar el <em>Modo enfoque</em>.
+                </div>
+              </li>
+              <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
+                <span className="w-6 h-6 rounded-md bg-[#FFF9F0] border border-[#231712] flex items-center justify-center shrink-0 overflow-hidden">
+                  <CharacterPortrait nation="fr" gender="F" size={22} />
+                </span>
+                <div>
+                  <strong>Ficha sentada:</strong> mini-ficha cuadrada prominente con bandera de
+                  fondo y caricatura del invitado.
+                </div>
+              </li>
+              <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
+                <span className="w-6 h-6 rounded-md bg-[#FFF9F0] border-2 border-[#5C3A21] flex items-center justify-center gap-0.5 shrink-0">
+                  <FlagBadge nation="fr" size={6} />
+                  <FlagBadge nation="en" size={6} />
+                </span>
+                <div>
+                  <strong>Silla compartida:</strong> cojín bicolor con 2 banderitas; puntúa en ambas
+                  mesas.
+                </div>
+              </li>
+              <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
+                <span className="w-6 h-6 rounded-md bg-[#8B5E3C] border border-[#5C3A21] flex items-center justify-center shrink-0">
+                  <span className="w-3.5 h-3.5 rounded-xs bg-[#F7EEDF]" />
+                </span>
+                <div>
+                  <strong>Silla vacía:</strong> madera y cojín neutro crema, sin bandera.
+                </div>
+              </li>
+              <li className="flex items-center gap-2 bg-[#F7EEDF] p-1.5 rounded-xl">
+                <span className="w-6 h-6 rounded-full bg-[#F2C14E] border border-[#231712] font-mono font-bold text-[9px] flex items-center justify-center shrink-0">
+                  +1
+                </span>
+                <div>
+                  <strong>Barra central:</strong> 20 posavasos (+1 a +5 y luego -2 a -14).
+                </div>
+              </li>
+              <li className="flex items-center gap-2 bg-[#FEF6E0] p-1.5 rounded-xl border border-[#C9A227]/50">
+                <span className="w-6 h-6 rounded-md bg-[#FFF9F0] border border-[#231712] flex items-center justify-center shrink-0 overflow-hidden">
+                  <CharacterPortrait nation="joker" gender="M" size={22} />
+                </span>
+                <div>
+                  <strong>Cambiar comodín:</strong> sustituye un comodín sentado por la ficha
+                  natural exacta de tu mano (sin puntuar ni robar).
+                </div>
+              </li>
+            </ul>
+          </div>
+        </AnchoredPopover>
+
+        {/* PORTAL POPOVER: Rival Public Hands (P0.2) */}
+        <AnchoredPopover
+          open={rivalHandsOpen}
+          onClose={() => setActiveOverlay(null)}
+          anchorRef={rivalHandsBtnRef}
+          id="rival-hands-popover"
+          role="dialog"
+          ariaLabel="Manos públicas de los jugadores"
+          testId="rival-hands-popover"
+          maxWidth={350}
+          preferPlacement="bottom-end"
+        >
+          <div className="space-y-2 text-xs">
+            <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-1.5">
+              <span className="font-serif font-bold text-sm">Manos públicas y monedas</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveOverlay(null);
+                  rivalHandsBtnRef.current?.focus();
+                }}
+                aria-label="Cerrar manos públicas"
+                className="text-xs font-bold text-[#6F5A4E] hover:text-[#3E2F2A] px-1.5 py-1 cursor-pointer inline-flex items-center justify-center"
+              >
+                <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+                  <path
+                    d="M1.5 1.5l7 7M8.5 1.5l-7 7"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+            </div>
+            {gameState.players.map((p) => {
+              const pHand = gameState.hands[p.id] ?? [];
+              const pAvatar = avatarByPlayerId[p.id] ?? p.avatarId ?? 'moka';
+              return (
+                <div key={p.id} className="bg-[#F7EEDF] p-2 rounded-xl space-y-1.5">
+                  <div className="flex items-center justify-between text-xs gap-2">
+                    <span className="inline-flex items-center gap-1.5 font-bold min-w-0 truncate">
+                      <PlayerAvatar avatarId={pAvatar} size={18} />
+                      <span className="truncate">
+                        {p.nickname} {p.id === myPlayerId ? '(Tú)' : ''}
+                      </span>
                     </span>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <CoinTray
+                        score={p.score}
+                        playerId={`popover-${p.id}`}
+                        compact
+                        reducedMotion={reducedMotion}
+                      />
+                      <span className="font-mono text-[10px] text-[#6F5A4E]">
+                        · {pHand.length}c
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-wrap items-center gap-1 min-w-0">
-                    <CoinTray
-                      score={p.score}
-                      playerId={p.id}
-                      compact
-                      reducedMotion={reducedMotion}
-                    />
+                  <div className="flex flex-wrap gap-1.5">
+                    {pHand.map((t) => {
+                      const prof = getCharacterProfile(t.nation, t.gender, t.jokerNation, t.id);
+                      return (
+                        <div
+                          key={t.id}
+                          aria-label={`${prof.name}, ${prof.countryName}, ${
+                            t.gender === 'F' ? 'Mujer' : 'Hombre'
+                          }`}
+                          title={`${prof.name} · ${prof.countryName} (${prof.genderBadge})`}
+                          className="inline-flex items-center gap-1 bg-[#FFF9F0] p-0.5 pr-1.5 rounded-lg border border-[#231712]/20 text-[10px]"
+                        >
+                          <CharacterPortrait
+                            nation={t.nation}
+                            gender={t.gender}
+                            tileId={t.id}
+                            size={22}
+                          />
+                          <span className="font-bold">{prof.name}</span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               );
             })}
           </div>
+        </AnchoredPopover>
 
-          <div
-            data-testid="bag-counter-pill"
-            className="mt-2 rounded-xl border-2 border-[#C9A227]/55 bg-[#FEF6E0] px-2 py-1.5"
-            title={`Fichas restantes en la bolsa: ${gameState.bag.length} de 100`}
-          >
-            <div className="flex items-center gap-2">
-              <BagIcon className="h-5 w-5 shrink-0 text-[#7B5236]" />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-[#7B5236]">
-                    Bolsa de fichas
-                  </span>
-                  <span className="font-mono text-xs font-extrabold text-[#3E2F2A] tabular-nums">
-                    {gameState.bag.length}
-                    <span className="text-[9px] font-bold text-[#6F5A4E]"> / 100</span>
-                  </span>
+        {/* PORTAL POPOVER: Mobile 'Más' Menu (< 640px) */}
+        <AnchoredPopover
+          open={moreMenuOpen}
+          onClose={() => setActiveOverlay(null)}
+          anchorRef={moreMenuBtnRef}
+          id="header-more-popover"
+          role="dialog"
+          ariaLabel="Más opciones de partida"
+          testId="header-more-popover"
+          maxWidth={280}
+          preferPlacement="bottom-end"
+        >
+          <div className="space-y-1.5 text-xs">
+            <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-1">
+              <span className="font-serif font-bold text-sm">Opciones de mesa</span>
+              <button
+                type="button"
+                onClick={() => setActiveOverlay(null)}
+                className="px-1.5 py-1 text-[#6F5A4E] font-bold cursor-pointer inline-flex items-center justify-center"
+              >
+                <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+                  <path
+                    d="M1.5 1.5l7 7M8.5 1.5l-7 7"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveOverlay('drawer')}
+              className="w-full text-left px-3 py-2 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+            >
+              Tertulia y registro ({gameState.log.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveOverlay('subtitles')}
+              className="w-full text-left px-3 py-2 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+            >
+              Subtítulos de eventos
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveModal('settings')}
+              className="w-full text-left px-3 py-2 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+            >
+              Ajustes y sonido
+            </button>
+            <button
+              type="button"
+              onClick={leaveRoom}
+              className="w-full text-left px-3 py-2 rounded-xl bg-[#FDECEB] font-bold text-[#A94438] cursor-pointer"
+            >
+              Salir de la partida
+            </button>
+          </div>
+        </AnchoredPopover>
+
+        {/* PORTAL POPOVER: Cambiar comodín explanation & confirmation (P0.5) */}
+        <AnchoredPopover
+          open={jokerSwapOpen}
+          onClose={() => setActiveOverlay(null)}
+          anchorRef={jokerSwapBtnRef}
+          id="joker-swap-popover"
+          role="dialog"
+          ariaLabel="Cambiar comodín sentado en el tablero"
+          testId="joker-swap-popover"
+          maxWidth={350}
+          preferPlacement="top-end"
+        >
+          <div className="space-y-2.5 text-xs">
+            <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-1.5">
+              <span className="font-serif font-bold text-sm text-[#3E2F2A]">Cambiar comodín</span>
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveOverlay(null);
+                  jokerSwapBtnRef.current?.focus();
+                }}
+                aria-label="Cerrar cambio de comodín"
+                className="px-1.5 py-1 rounded-lg bg-[#F7EEDF] text-[#6F5A4E] font-bold cursor-pointer inline-flex items-center justify-center"
+              >
+                <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+                  <path
+                    d="M1.5 1.5l7 7M8.5 1.5l-7 7"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <p
+              data-testid="joker-swap-explanation"
+              className="bg-[#FEF6E0] p-2.5 rounded-xl border border-[#C9A227]/60 text-[11px] text-[#3E2F2A] leading-relaxed"
+            >
+              {JOKER_SWAP_EXPLANATION}
+            </p>
+
+            <div className="space-y-1.5">
+              {detailedSwapOptions.map((opt, idx) => (
+                <div
+                  key={`${opt.move.seatId}-${opt.move.tileId}-${idx}`}
+                  className="flex items-center justify-between gap-2 bg-[#F7EEDF] p-2 rounded-xl border border-[#231712]/15"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    {opt.handTile && (
+                      <CharacterPortrait
+                        nation={opt.handTile.nation}
+                        gender={opt.handTile.gender}
+                        tileId={opt.handTile.id}
+                        size={30}
+                      />
+                    )}
+                    <div className="min-w-0">
+                      <span className="font-bold text-[#3E2F2A] block truncate">
+                        Por {opt.profile?.name ?? 'invitado'} ({opt.profile?.countryName ?? ''})
+                      </span>
+                      <span className="text-[10px] text-[#6F5A4E] block truncate">
+                        Silla: {opt.seatNations} · 0 pts · Sin robo
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    data-testid="confirm-joker-swap-btn"
+                    onClick={() => {
+                      setActiveOverlay(null);
+                      void submitMove(opt.move);
+                    }}
+                    className="px-2.5 py-1.5 rounded-xl bg-[#C9A227] text-[#231712] border border-[#231712] font-bold text-[11px] hover:opacity-95 cursor-pointer whitespace-nowrap shrink-0"
+                  >
+                    Confirmar
+                  </button>
                 </div>
-                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#231712]/12">
+              ))}
+            </div>
+          </div>
+        </AnchoredPopover>
+
+        {/* CONTENT: ledger on top (mobile) / floating left (desktop), board centered */}
+        <div className="relative flex-1 min-h-0 w-full flex flex-col items-center justify-start gap-1.5 sm:gap-2 pt-2 sm:pt-3 lg:pt-0 lg:flex-row lg:items-start lg:justify-center">
+          <aside
+            data-testid="compact-scoreboard"
+            className="cafe-paper-sheet shrink-0 w-full rounded-2xl border-2 border-[#231712]/25 px-2 py-1.5 lg:w-[248px] lg:p-2 xl:absolute xl:left-0 xl:top-0 xl:z-20 xl:w-[270px]"
+          >
+            <div className="flex items-center justify-between gap-2 pb-0.5 mb-0.5 border-b-2 border-[#3E2F2A]/15 lg:pb-1 lg:mb-1">
+              <span className="font-serif font-bold text-sm text-[#2B1710]">La mesa</span>
+              <span className="text-[9px] font-mono font-bold text-[#6F5A4E]">
+                #{snapshot.code}
+              </span>
+            </div>
+            <div className="hidden lg:grid grid-cols-[1fr_auto] gap-2 px-1 pb-1 text-[8px] font-extrabold uppercase tracking-[0.14em] text-[#7B5236]/80">
+              <span>Jugador</span>
+              <span>Monedas · total</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-1 lg:flex lg:flex-col lg:gap-1">
+              {gameState.players.map((p) => {
+                const pHandCount = (gameState.hands[p.id] ?? []).length;
+                const isTurn = gameState.turn === p.id;
+                const pAvatar = avatarByPlayerId[p.id] ?? p.avatarId ?? 'moka';
+                return (
+                  <div
+                    key={p.id}
+                    data-testid={`scoreboard-player-${p.id}`}
+                    className={`cafe-score-card flex flex-col gap-0.5 rounded-xl border px-1.5 py-0.5 text-xs transition-colors duration-200 lg:gap-1 lg:py-1 ${
+                      isTurn
+                        ? `${reducedMotion ? 'cafe-score-active-static' : 'cafe-score-active'} bg-[#FEF6E0] border-[#C96F4A]`
+                        : 'bg-[#F7EEDF]/85 border-[#231712]/12'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <PlayerAvatar avatarId={pAvatar} size={18} />
+                      <span className="font-bold text-[#3E2F2A] truncate flex-1">{p.nickname}</span>
+                      <span
+                        className="text-[9px] font-mono font-semibold text-[#6F5A4E] bg-[#FFF9F0] px-1 py-0.2 rounded border border-[#231712]/15 tabular-nums"
+                        title={`${pHandCount} fichas en mano`}
+                      >
+                        {pHandCount}c
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-1 min-w-0">
+                      <CoinTray
+                        score={p.score}
+                        playerId={p.id}
+                        compact
+                        reducedMotion={reducedMotion}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div
+              data-testid="bag-counter-pill"
+              className="mt-1.5 rounded-xl border-2 border-[#C9A227]/55 bg-[#FEF6E0] px-2 py-1 lg:mt-2 lg:py-1.5"
+              title={`Fichas restantes en la bolsa: ${gameState.bag.length} de 100`}
+            >
+              <div className="flex items-center gap-1.5 lg:gap-2">
+                <BagIcon className="h-4 w-4 shrink-0 text-[#7B5236] lg:h-5 lg:w-5" />
+                <span className="shrink-0 text-[8px] font-extrabold uppercase tracking-[0.12em] text-[#7B5236] lg:text-[9px]">
+                  Bolsa
+                </span>
+                <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-[#231712]/12">
                   <div
                     className="h-full rounded-full bg-[#C9A227] transition-[width] duration-500"
                     style={{
@@ -3252,621 +3246,628 @@ export function PlayingScreen(): React.ReactElement {
                     }}
                   />
                 </div>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        <div className="w-full lg:flex-1 lg:min-h-0 lg:self-stretch flex items-center justify-center relative overflow-hidden">
-          {errorBanner && (
-            <div
-              role="alert"
-              className="absolute top-1.5 left-1/2 -translate-x-1/2 z-40 px-3.5 py-1 rounded-xl bg-[#FDECEB] border border-[#A94438] text-xs font-bold text-[#A94438] shadow-md"
-            >
-              {errorBanner}
-            </div>
-          )}
-
-          <IllustratedBoard
-            gameState={gameState}
-            selectedTile={selectedTile}
-            draftPlacements={draftPlacements}
-            seatInspections={seatInspections}
-            focusedTableId={focusedTableId}
-            nightMode={nightMode}
-            reducedMotion={reducedMotion}
-            chairToast={chairToast}
-            onDismissToast={() => setChairToast(null)}
-            onSeatClick={handleSeatClick}
-            onTableClick={handleTableClick}
-            onBarClick={handleBarClick}
-          />
-        </div>
-      </div>
-
-      {/* BOTTOM TRANSLUCENT HAND DOCK (P1.2 — bg-[#FFF9F0]/45 backdrop-blur-lg + centered 3-col grid + cardboard tiles with subtle fan) */}
-      <section
-        aria-label="Tu mano de invitados"
-        data-testid="player-hand-dock"
-        className="shrink-0 bg-[#FFF9F0]/55 backdrop-blur-lg rounded-2xl border-2 border-[#231712]/35 px-2 py-1 sm:px-3.5 sm:py-1.5 shadow-[0_-6px_20px_rgba(35,23,18,0.14)] z-30 flex flex-col sm:grid sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center justify-between sm:justify-normal gap-1.5"
-      >
-        {/* Left / Top: Printed Café Tasting Note / Luggage Tag for Selected Guest */}
-        <div className="flex flex-wrap items-center justify-between w-full sm:w-full sm:min-w-0 sm:max-w-[305px] gap-1.5 sm:justify-self-start">
-          {selectedTile && selectedProfile ? (
-            <div
-              data-testid="selected-tile-detail"
-              className="relative flex items-center gap-2 bg-[#FFF9F0] pl-5 pr-2.5 py-1 rounded-xl border-2 border-[#C96F4A] shadow-[0_3px_0_#1E130E] w-full"
-            >
-              {/* Brass luggage-tag eyelet */}
-              <span
-                aria-hidden="true"
-                className="absolute left-1.5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#3E2F2A] border-[1.5px] border-[#C9A227]"
-              />
-              <FlagBadge nation={selectedTile.nation} size={20} />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-serif font-bold text-xs sm:text-sm text-[#231712] truncate">
-                    {selectedProfile.name}
-                  </span>
-                  <span className="text-[10px] font-bold text-[#6F5A4E] truncate">
-                    · {selectedProfile.countryName}
-                  </span>
-                  <span
-                    data-testid="selected-gender-badge"
-                    className={`ml-auto px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase border ${
-                      selectedTile.gender === 'F'
-                        ? 'bg-[#FDECEB] text-[#9E2A2B] border-[#9E2A2B]/30'
-                        : 'bg-[#E6EEF8] text-[#1E4E8C] border-[#1E4E8C]/30'
-                    }`}
-                  >
-                    {selectedProfile.genderBadge}
-                  </span>
-                </div>
-                <span className="block text-[10px] text-[#6F5A4E] italic truncate">
-                  «{selectedProfile.quote}»
+                <span className="shrink-0 font-mono text-[10px] font-extrabold text-[#3E2F2A] tabular-nums lg:text-xs">
+                  {gameState.bag.length}
+                  <span className="text-[8px] font-bold text-[#6F5A4E] lg:text-[9px]"> / 100</span>
                 </span>
               </div>
             </div>
-          ) : (
-            <div className="text-xs min-w-0 bg-[#FFF9F0]/92 px-2.5 py-1 rounded-xl border border-[#231712]/20 shadow-[0_2px_0_rgba(35,23,18,0.12)] w-full sm:w-auto">
-              <span className="font-serif font-bold text-[#231712] block leading-tight">
-                Tu mano ({myHand.length}/{gameState.handSize[myPlayerId ?? activePlayerId] ?? 5})
-              </span>
-              <span className="text-[10px] sm:text-[11px] text-[#6F5A4E] truncate block max-w-[245px]">
-                {draftPlacements.length > 0
-                  ? draftEvaluation.summaryText
-                  : 'Toca o arrastra una ficha para ver sillas'}
-              </span>
-            </div>
-          )}
+          </aside>
 
-          {selectedTile?.nation === 'joker' && (
-            <label className="inline-flex items-center gap-1 text-[11px] font-bold text-[#3E2F2A] bg-[#FFF9F0]/95 px-2 py-0.5 rounded-lg border border-[#231712]/25">
-              <span>País:</span>
-              <select
-                aria-label="Nacionalidad para el comodín"
-                value={preferredJokerNation ?? ''}
-                onChange={(e) =>
-                  setPreferredJokerNation(e.target.value ? (e.target.value as Nation) : undefined)
-                }
-                className="h-6 px-1.5 rounded bg-[#FFF9F0] border border-[#231712]/25 text-xs font-bold text-[#3E2F2A]"
+          <div className="w-full flex-1 min-h-0 lg:self-stretch flex items-center justify-center relative overflow-hidden">
+            {errorBanner && (
+              <div
+                role="alert"
+                className="absolute top-1.5 left-1/2 -translate-x-1/2 z-40 px-3.5 py-1 rounded-xl bg-[#FDECEB] border border-[#A94438] text-xs font-bold text-[#A94438] shadow-md"
               >
-                <option value="">Automático</option>
-                {Object.values(NATION_VISUALS).map((n) => (
-                  <option key={n.code} value={n.code}>
-                    {n.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-        </div>
-
-        {/* Center: 5 Opaque Square Rounded Cardboard Tiles (Flag Background + Caricature, ZERO visible text) */}
-        <div
-          className="flex items-center justify-center gap-1.5 w-full max-w-[356px] sm:max-w-none sm:w-auto sm:justify-self-center sm:gap-2.5 py-0.5"
-          data-testid="hand-tiles-row"
-        >
-          {myHand.map((tile, idx) => {
-            const isSelected = selectedTileId === tile.id;
-            const isInDraft = draftPlacements.some((d) => d.tileId === tile.id);
-            const profile = getCharacterProfile(
-              tile.nation,
-              tile.gender,
-              tile.jokerNation,
-              tile.id,
-            );
-            const genderWord = tile.gender === 'F' ? 'Mujer' : 'Hombre';
-            const mid = (myHand.length - 1) / 2;
-            const fanDeg = !reducedMotion && !isSelected ? (idx - mid) * 1.4 : 0;
-            const fanLift = !reducedMotion && !isSelected ? Math.abs(idx - mid) * 1.2 : 0;
-
-            return (
-              <button
-                key={tile.id}
-                type="button"
-                data-tile-id={tile.id}
-                data-testid="hand-square-tile"
-                disabled={isInDraft}
-                draggable={!isInDraft && isMyTurn}
-                onDragStart={() => {
-                  if (!isSelected) selectTile(tile.id);
-                }}
-                onClick={() => selectTile(isSelected ? null : tile.id)}
-                aria-label={`${profile.name}, ${profile.countryName}, ${genderWord}`}
-                title={`${profile.name} · ${profile.countryName} (${genderWord})`}
-                style={{
-                  transform:
-                    isSelected && !reducedMotion
-                      ? 'translateY(-7px) scale(1.07)'
-                      : !reducedMotion
-                        ? `translateY(${fanLift.toFixed(1)}px) rotate(${fanDeg.toFixed(1)}deg)`
-                        : undefined,
-                }}
-                className={`group relative w-[64px] h-[64px] sm:w-[72px] sm:h-[72px] rounded-[14px] p-0.5 flex items-center justify-center transition-all duration-150 cursor-pointer select-none shrink-0 ${
-                  isInDraft
-                    ? 'opacity-35 bg-[#FFF9F0] ring-1 ring-[#3E2F2A]/20'
-                    : isSelected
-                      ? 'bg-[#FFF9F0] cafe-cardboard-tile-selected ring-2 ring-[#C96F4A] z-20'
-                      : 'bg-[#FFF9F0] cafe-cardboard-tile hover:-translate-y-1 hover:scale-103'
-                }`}
-              >
-                <CharacterPortrait
-                  nation={tile.nation}
-                  gender={tile.gender}
-                  tileId={tile.id}
-                  size={62}
-                  sipping={isSelected}
-                />
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Right: Confirm Move / Clear Draft / Contextual Deprioritized "Cambiar comodín" (P0.5) */}
-        <div className="flex items-center justify-end gap-1.5 w-full sm:w-auto sm:justify-self-end">
-          {draftPlacements.length > 0 && (
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  soundEngine.playSfx('uiCancel');
-                  clearDraft();
-                }}
-                className="min-h-[38px] px-3 py-1 rounded-xl cafe-btn-paper text-xs font-bold text-[#3E2F2A] cursor-pointer"
-              >
-                Limpiar
-              </button>
-              <button
-                type="button"
-                data-testid="confirm-move-btn"
-                disabled={!draftEvaluation.isValidCompleteMove}
-                onClick={() => {
-                  soundEngine.playSfx('uiConfirm');
-                  const first = draftPlacements[0];
-                  if (!first) return;
-                  const second = draftPlacements[1];
-                  void submitMove({
-                    type: 'seat',
-                    placements: second ? [first, second] : [first],
-                  });
-                }}
-                className="min-h-[38px] px-4 py-1 rounded-xl cafe-btn-sage text-xs font-bold disabled:opacity-40 cursor-pointer whitespace-nowrap"
-              >
-                Confirmar (+{draftEvaluation.totalPoints})
-              </button>
-            </>
-          )}
-
-          {detailedSwapOptions.length > 0 && (
-            <button
-              ref={jokerSwapBtnRef}
-              type="button"
-              data-testid="joker-swap-btn"
-              aria-expanded={jokerSwapOpen}
-              aria-controls="joker-swap-popover"
-              title={JOKER_SWAP_EXPLANATION}
-              onClick={() => toggleOverlay('joker_swap')}
-              className="min-h-[36px] px-2.5 py-1 rounded-xl bg-[#FEF6E0] text-[#3E2F2A] border border-[#C9A227] shadow-[0_2px_0_#1E130E] text-[11px] font-bold hover:bg-[#F2C14E]/35 cursor-pointer whitespace-nowrap inline-flex items-center gap-1"
-            >
-              <span>
-                {detailedSwapOptions[0]?.profile
-                  ? `Cambiar comodín por ${detailedSwapOptions[0].profile.name}${
-                      detailedSwapOptions.length > 1 ? ` (${detailedSwapOptions.length})` : ''
-                    }`
-                  : `Cambiar comodín (${detailedSwapOptions.length})`}
-              </span>
-              <span
-                aria-hidden="true"
-                className="w-4 h-4 rounded-full bg-[#C9A227]/40 text-[#231712] text-[10px] font-serif font-extrabold inline-flex items-center justify-center"
-              >
-                ?
-              </span>
-            </button>
-          )}
-        </div>
-      </section>
-
-      {/* ON-DEMAND LAZY-LOADED "VER CAFÉ" 3D DIORAMA MODAL WITH CAMERA PRESETS */}
-      <AnimatePresence>
-        {cafeModalOpen && (
-          <motion.div
-            initial={reducedMotion ? { opacity: 1 } : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
-            transition={{ duration: reducedMotion ? 0 : 0.16 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#231712]/65 p-3 sm:p-6"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="cafe-3d-modal-title"
-            data-testid="cafe-3d-modal"
-            onClick={(e) => {
-              if (e.target === e.currentTarget) setActiveOverlay(null);
-            }}
-          >
-            <motion.div
-              initial={reducedMotion ? false : { opacity: 0, scale: 0.96, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
-              transition={{ duration: reducedMotion ? 0 : 0.18 }}
-              className="w-full max-w-4xl cafe-paper-sheet text-[#3E2F2A] rounded-[24px] p-4 sm:p-6 space-y-3"
-            >
-              <div className="flex flex-wrap items-center justify-between gap-2 cafe-double-rule pb-2.5">
-                <div>
-                  <h2 id="cafe-3d-modal-title" className="font-serif font-bold text-xl sm:text-2xl">
-                    Café Vivo en 3D
-                  </h2>
-                  <p className="text-xs text-[#6F5A4E]">
-                    Invitados 3D tomando café en las 24 mesas y los 20 posavasos de la barra · Placa
-                    O &amp; A
-                  </p>
-                </div>
-                <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                  <button
-                    type="button"
-                    data-testid="camera-preset-general"
-                    onClick={() => setCameraPreset('general')}
-                    className={`px-2.5 py-1.5 rounded-xl font-bold cursor-pointer ${
-                      cameraPreset === 'general' && !focusedTableId
-                        ? 'bg-[#3F5E4A] text-[#FFF9F0]'
-                        : 'bg-[#F7EEDF] text-[#3E2F2A] hover:bg-[#EAD9C0]'
-                    }`}
-                  >
-                    Plano general
-                  </button>
-                  <button
-                    type="button"
-                    data-testid="camera-preset-tables"
-                    onClick={() => setCameraPreset('tables')}
-                    className={`px-2.5 py-1.5 rounded-xl font-bold cursor-pointer ${
-                      cameraPreset === 'tables'
-                        ? 'bg-[#3F5E4A] text-[#FFF9F0]'
-                        : 'bg-[#F7EEDF] text-[#3E2F2A] hover:bg-[#EAD9C0]'
-                    }`}
-                  >
-                    Mesas
-                  </button>
-                  <button
-                    type="button"
-                    data-testid="camera-preset-bar"
-                    onClick={() => setCameraPreset('bar')}
-                    className={`px-2.5 py-1.5 rounded-xl font-bold cursor-pointer ${
-                      cameraPreset === 'bar'
-                        ? 'bg-[#3F5E4A] text-[#FFF9F0]'
-                        : 'bg-[#F7EEDF] text-[#3E2F2A] hover:bg-[#EAD9C0]'
-                    }`}
-                  >
-                    Barra
-                  </button>
-                  <button
-                    type="button"
-                    data-testid="focus-table-3d-btn"
-                    onClick={handleCycleFocusedTable3D}
-                    className="px-2.5 py-1.5 rounded-xl bg-[#FEF6E0] border border-[#C9A227] font-bold text-[#3E2F2A] hover:bg-[#F2C14E]/35 cursor-pointer"
-                  >
-                    Enfocar mesa
-                  </button>
-                  <button
-                    type="button"
-                    onClick={cycleCameraAngle}
-                    className="px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
-                  >
-                    Girar 90°
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCameraZoom(cameraZoom + 0.15)}
-                    aria-label="Acercar cámara"
-                    className="px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
-                  >
-                    +
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCameraZoom(cameraZoom - 0.15)}
-                    aria-label="Alejar cámara"
-                    className="px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
-                  >
-                    −
-                  </button>
-                  <button
-                    type="button"
-                    onClick={resetCamera}
-                    className="px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] font-semibold text-[#6F5A4E] hover:text-[#3E2F2A] cursor-pointer"
-                  >
-                    Centrar
-                  </button>
-                  <button
-                    type="button"
-                    data-testid="close-3d-cafe-btn"
-                    onClick={() => setActiveOverlay(null)}
-                    className="px-3.5 py-1.5 rounded-xl cafe-btn-primary font-bold cursor-pointer"
-                  >
-                    Volver al tablero
-                  </button>
-                </div>
+                {errorBanner}
               </div>
+            )}
 
-              <Suspense
-                fallback={
-                  <div
-                    className="w-full h-[360px] sm:h-[460px] rounded-2xl bg-[#F7EEDF] flex items-center justify-center text-sm font-serif font-bold text-[#6F5A4E]"
-                    data-testid="cafe-3d-diorama"
-                  >
-                    Preparando el salón 3D del café...
-                  </div>
-                }
+            <IllustratedBoard
+              gameState={gameState}
+              selectedTile={selectedTile}
+              draftPlacements={draftPlacements}
+              seatInspections={seatInspections}
+              focusedTableId={focusedTableId}
+              nightMode={nightMode}
+              reducedMotion={reducedMotion}
+              chairToast={chairToast}
+              onDismissToast={() => setChairToast(null)}
+              onSeatClick={handleSeatClick}
+              onTableClick={handleTableClick}
+              onBarClick={handleBarClick}
+            />
+          </div>
+        </div>
+
+        {/* BOTTOM TRANSLUCENT HAND DOCK (P1.2 — bg-[#FFF9F0]/45 backdrop-blur-lg + centered 3-col grid + cardboard tiles with subtle fan) */}
+        <section
+          aria-label="Tu mano de invitados"
+          data-testid="player-hand-dock"
+          className="shrink-0 bg-[#FFF9F0]/55 backdrop-blur-lg rounded-2xl border-2 border-[#231712]/35 px-2 py-1 sm:px-3.5 sm:py-1.5 shadow-[0_-6px_20px_rgba(35,23,18,0.14)] z-30 flex flex-col sm:grid sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center justify-between sm:justify-normal gap-1.5"
+        >
+          {/* Left / Top: Printed Café Tasting Note / Luggage Tag for Selected Guest */}
+          <div className="flex flex-wrap items-center justify-between w-full sm:w-full sm:min-w-0 sm:max-w-[305px] gap-1.5 sm:justify-self-start">
+            {selectedTile && selectedProfile ? (
+              <div
+                data-testid="selected-tile-detail"
+                className="relative flex items-center gap-2 bg-[#FFF9F0] pl-5 pr-2.5 py-1 rounded-xl border-2 border-[#C96F4A] shadow-[0_3px_0_#1E130E] w-full"
               >
-                <LazyPapercraftBoard
-                  gameState={gameState}
-                  selectedTile={selectedTile}
-                  draftPlacements={draftPlacements}
-                  seatInspections={seatInspections}
-                  focusedTableId={focusedTableId}
-                  viewMode="3d"
-                  cameraPreset={cameraPreset}
-                  cameraAngleIndex={cameraAngleIndex}
-                  cameraZoom={cameraZoom}
-                  nightMode={nightMode}
-                  reducedMotion={reducedMotion}
-                  onSeatClick={handleSeatClick}
-                  onTableClick={handleTableClick}
-                  onBarClick={handleBarClick}
+                {/* Brass luggage-tag eyelet */}
+                <span
+                  aria-hidden="true"
+                  className="absolute left-1.5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#3E2F2A] border-[1.5px] border-[#C9A227]"
                 />
-              </Suspense>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ON-DEMAND SLIDE-OVER LATERAL DRAWER FOR MOVE LOG & CHAT (Waiter's Notepad / Cuaderno de Tertulia) */}
-      <AnimatePresence>
-        {drawerOpen && (
-          <motion.div
-            initial={reducedMotion ? { opacity: 1 } : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
-            transition={{ duration: reducedMotion ? 0 : 0.16 }}
-            className="fixed inset-0 z-50 flex justify-end bg-[#231712]/45"
-            role="dialog"
-            aria-modal="true"
-            aria-label="Registro de jugadas y chat"
-            data-testid="log-chat-drawer"
-            onClick={(e) => {
-              if (e.target === e.currentTarget) setActiveOverlay(null);
-            }}
-          >
-            <motion.div
-              initial={reducedMotion ? false : { x: 80, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={reducedMotion ? { opacity: 0 } : { x: 80, opacity: 0 }}
-              transition={{ duration: reducedMotion ? 0 : 0.18, ease: 'easeOut' }}
-              className="w-full max-w-sm h-full cafe-paper-sheet text-[#3E2F2A] p-4 border-l-3 border-[#1E130E] flex flex-col justify-between"
-            >
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-[#C96F4A]">
-                    Cuaderno de camarero · O &amp; A
+                <FlagBadge nation={selectedTile.nation} size={20} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-serif font-bold text-xs sm:text-sm text-[#231712] truncate">
+                      {selectedProfile.name}
+                    </span>
+                    <span className="text-[10px] font-bold text-[#6F5A4E] truncate">
+                      · {selectedProfile.countryName}
+                    </span>
+                    <span
+                      data-testid="selected-gender-badge"
+                      className={`ml-auto px-1.5 py-0.2 rounded text-[9px] font-extrabold uppercase border ${
+                        selectedTile.gender === 'F'
+                          ? 'bg-[#FDECEB] text-[#9E2A2B] border-[#9E2A2B]/30'
+                          : 'bg-[#E6EEF8] text-[#1E4E8C] border-[#1E4E8C]/30'
+                      }`}
+                    >
+                      {selectedProfile.genderBadge}
+                    </span>
+                  </div>
+                  <span className="block text-[10px] text-[#6F5A4E] italic truncate">
+                    «{selectedProfile.quote}»
                   </span>
                 </div>
-                <div className="flex items-center justify-between cafe-double-rule pb-3">
-                  <div className="flex items-center gap-1 bg-[#F7EEDF] p-1 rounded-xl border border-[#231712]/15">
+              </div>
+            ) : (
+              <div className="text-xs min-w-0 bg-[#FFF9F0]/92 px-2.5 py-1 rounded-xl border border-[#231712]/20 shadow-[0_2px_0_rgba(35,23,18,0.12)] w-full sm:w-auto">
+                <span className="font-serif font-bold text-[#231712] block leading-tight">
+                  Tu mano ({myHand.length}/{gameState.handSize[myPlayerId ?? activePlayerId] ?? 5})
+                </span>
+                <span className="text-[10px] sm:text-[11px] text-[#6F5A4E] truncate block max-w-[245px]">
+                  {draftPlacements.length > 0
+                    ? draftEvaluation.summaryText
+                    : 'Toca o arrastra una ficha para ver sillas'}
+                </span>
+              </div>
+            )}
+
+            {selectedTile?.nation === 'joker' && (
+              <label className="inline-flex items-center gap-1 text-[11px] font-bold text-[#3E2F2A] bg-[#FFF9F0]/95 px-2 py-0.5 rounded-lg border border-[#231712]/25">
+                <span>País:</span>
+                <select
+                  aria-label="Nacionalidad para el comodín"
+                  value={preferredJokerNation ?? ''}
+                  onChange={(e) =>
+                    setPreferredJokerNation(e.target.value ? (e.target.value as Nation) : undefined)
+                  }
+                  className="h-6 px-1.5 rounded bg-[#FFF9F0] border border-[#231712]/25 text-xs font-bold text-[#3E2F2A]"
+                >
+                  <option value="">Automático</option>
+                  {Object.values(NATION_VISUALS).map((n) => (
+                    <option key={n.code} value={n.code}>
+                      {n.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+          </div>
+
+          {/* Center: 5 Opaque Square Rounded Cardboard Tiles (Flag Background + Caricature, ZERO visible text) */}
+          <div
+            className="flex items-center justify-center gap-1.5 w-full max-w-[356px] sm:max-w-none sm:w-auto sm:justify-self-center sm:gap-2.5 py-0.5"
+            data-testid="hand-tiles-row"
+          >
+            {myHand.map((tile, idx) => {
+              const isSelected = selectedTileId === tile.id;
+              const isInDraft = draftPlacements.some((d) => d.tileId === tile.id);
+              const profile = getCharacterProfile(
+                tile.nation,
+                tile.gender,
+                tile.jokerNation,
+                tile.id,
+              );
+              const genderWord = tile.gender === 'F' ? 'Mujer' : 'Hombre';
+              const mid = (myHand.length - 1) / 2;
+              const fanDeg = !reducedMotion && !isSelected ? (idx - mid) * 1.4 : 0;
+              const fanLift = !reducedMotion && !isSelected ? Math.abs(idx - mid) * 1.2 : 0;
+
+              return (
+                <button
+                  key={tile.id}
+                  type="button"
+                  data-tile-id={tile.id}
+                  data-testid="hand-square-tile"
+                  disabled={isInDraft}
+                  draggable={!isInDraft && isMyTurn}
+                  onDragStart={() => {
+                    if (!isSelected) selectTile(tile.id);
+                  }}
+                  onClick={() => selectTile(isSelected ? null : tile.id)}
+                  aria-label={`${profile.name}, ${profile.countryName}, ${genderWord}`}
+                  title={`${profile.name} · ${profile.countryName} (${genderWord})`}
+                  style={{
+                    transform:
+                      isSelected && !reducedMotion
+                        ? 'translateY(-7px) scale(1.07)'
+                        : !reducedMotion
+                          ? `translateY(${fanLift.toFixed(1)}px) rotate(${fanDeg.toFixed(1)}deg)`
+                          : undefined,
+                  }}
+                  className={`group relative w-[64px] h-[64px] sm:w-[72px] sm:h-[72px] rounded-[14px] p-0.5 flex items-center justify-center transition-all duration-150 cursor-pointer select-none shrink-0 ${
+                    isInDraft
+                      ? 'opacity-35 bg-[#FFF9F0] ring-1 ring-[#3E2F2A]/20'
+                      : isSelected
+                        ? 'bg-[#FFF9F0] cafe-cardboard-tile-selected ring-2 ring-[#C96F4A] z-20'
+                        : 'bg-[#FFF9F0] cafe-cardboard-tile hover:-translate-y-1 hover:scale-103'
+                  }`}
+                >
+                  <CharacterPortrait
+                    nation={tile.nation}
+                    gender={tile.gender}
+                    tileId={tile.id}
+                    size={62}
+                    sipping={isSelected}
+                  />
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Right: Confirm Move / Clear Draft / Contextual Deprioritized "Cambiar comodín" (P0.5) */}
+          <div className="flex items-center justify-end gap-1.5 w-full sm:w-auto sm:justify-self-end">
+            {draftPlacements.length > 0 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    soundEngine.playSfx('uiCancel');
+                    clearDraft();
+                  }}
+                  className="min-h-[38px] px-3 py-1 rounded-xl cafe-btn-paper text-xs font-bold text-[#3E2F2A] cursor-pointer"
+                >
+                  Limpiar
+                </button>
+                <button
+                  type="button"
+                  data-testid="confirm-move-btn"
+                  disabled={!draftEvaluation.isValidCompleteMove}
+                  onClick={() => {
+                    soundEngine.playSfx('uiConfirm');
+                    const first = draftPlacements[0];
+                    if (!first) return;
+                    const second = draftPlacements[1];
+                    void submitMove({
+                      type: 'seat',
+                      placements: second ? [first, second] : [first],
+                    });
+                  }}
+                  className="min-h-[38px] px-4 py-1 rounded-xl cafe-btn-sage text-xs font-bold disabled:opacity-40 cursor-pointer whitespace-nowrap"
+                >
+                  Confirmar (+{draftEvaluation.totalPoints})
+                </button>
+              </>
+            )}
+
+            {detailedSwapOptions.length > 0 && (
+              <button
+                ref={jokerSwapBtnRef}
+                type="button"
+                data-testid="joker-swap-btn"
+                aria-expanded={jokerSwapOpen}
+                aria-controls="joker-swap-popover"
+                title={JOKER_SWAP_EXPLANATION}
+                onClick={() => toggleOverlay('joker_swap')}
+                className="min-h-[36px] px-2.5 py-1 rounded-xl bg-[#FEF6E0] text-[#3E2F2A] border border-[#C9A227] shadow-[0_2px_0_#1E130E] text-[11px] font-bold hover:bg-[#F2C14E]/35 cursor-pointer whitespace-nowrap inline-flex items-center gap-1"
+              >
+                <span>
+                  {detailedSwapOptions[0]?.profile
+                    ? `Cambiar comodín por ${detailedSwapOptions[0].profile.name}${
+                        detailedSwapOptions.length > 1 ? ` (${detailedSwapOptions.length})` : ''
+                      }`
+                    : `Cambiar comodín (${detailedSwapOptions.length})`}
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="w-4 h-4 rounded-full bg-[#C9A227]/40 text-[#231712] text-[10px] font-serif font-extrabold inline-flex items-center justify-center"
+                >
+                  ?
+                </span>
+              </button>
+            )}
+          </div>
+        </section>
+
+        {/* ON-DEMAND LAZY-LOADED "VER CAFÉ" 3D DIORAMA MODAL WITH CAMERA PRESETS */}
+        <AnimatePresence>
+          {cafeModalOpen && (
+            <motion.div
+              initial={reducedMotion ? { opacity: 1 } : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
+              transition={{ duration: reducedMotion ? 0 : 0.16 }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-[#231712]/65 p-3 sm:p-6"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="cafe-3d-modal-title"
+              data-testid="cafe-3d-modal"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) setActiveOverlay(null);
+              }}
+            >
+              <motion.div
+                initial={reducedMotion ? false : { opacity: 0, scale: 0.96, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={reducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
+                transition={{ duration: reducedMotion ? 0 : 0.18 }}
+                className="w-full max-w-4xl cafe-paper-sheet text-[#3E2F2A] rounded-[24px] p-4 sm:p-6 space-y-3"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2 cafe-double-rule pb-2.5">
+                  <div>
+                    <h2
+                      id="cafe-3d-modal-title"
+                      className="font-serif font-bold text-xl sm:text-2xl"
+                    >
+                      Café Vivo en 3D
+                    </h2>
+                    <p className="text-xs text-[#6F5A4E]">
+                      Invitados 3D tomando café en las 24 mesas y los 20 posavasos de la barra ·
+                      Placa O &amp; A
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1.5 text-xs">
                     <button
                       type="button"
-                      onClick={() => setSideTab('log')}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
-                        sideTab === 'log'
-                          ? 'bg-[#FFF9F0] text-[#231712] shadow-2xs border border-[#231712]/15'
-                          : 'text-[#6F5A4E]'
+                      data-testid="camera-preset-general"
+                      onClick={() => setCameraPreset('general')}
+                      className={`px-2.5 py-1.5 rounded-xl font-bold cursor-pointer ${
+                        cameraPreset === 'general' && !focusedTableId
+                          ? 'bg-[#3F5E4A] text-[#FFF9F0]'
+                          : 'bg-[#F7EEDF] text-[#3E2F2A] hover:bg-[#EAD9C0]'
                       }`}
                     >
-                      Registro ({gameState.log.length})
+                      Plano general
                     </button>
                     <button
                       type="button"
-                      onClick={() => setSideTab('chat')}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
-                        sideTab === 'chat'
-                          ? 'bg-[#FFF9F0] text-[#231712] shadow-2xs border border-[#231712]/15'
-                          : 'text-[#6F5A4E]'
+                      data-testid="camera-preset-tables"
+                      onClick={() => setCameraPreset('tables')}
+                      className={`px-2.5 py-1.5 rounded-xl font-bold cursor-pointer ${
+                        cameraPreset === 'tables'
+                          ? 'bg-[#3F5E4A] text-[#FFF9F0]'
+                          : 'bg-[#F7EEDF] text-[#3E2F2A] hover:bg-[#EAD9C0]'
                       }`}
                     >
-                      Chat ({snapshot.chat.length})
+                      Mesas
+                    </button>
+                    <button
+                      type="button"
+                      data-testid="camera-preset-bar"
+                      onClick={() => setCameraPreset('bar')}
+                      className={`px-2.5 py-1.5 rounded-xl font-bold cursor-pointer ${
+                        cameraPreset === 'bar'
+                          ? 'bg-[#3F5E4A] text-[#FFF9F0]'
+                          : 'bg-[#F7EEDF] text-[#3E2F2A] hover:bg-[#EAD9C0]'
+                      }`}
+                    >
+                      Barra
+                    </button>
+                    <button
+                      type="button"
+                      data-testid="focus-table-3d-btn"
+                      onClick={handleCycleFocusedTable3D}
+                      className="px-2.5 py-1.5 rounded-xl bg-[#FEF6E0] border border-[#C9A227] font-bold text-[#3E2F2A] hover:bg-[#F2C14E]/35 cursor-pointer"
+                    >
+                      Enfocar mesa
+                    </button>
+                    <button
+                      type="button"
+                      onClick={cycleCameraAngle}
+                      className="px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+                    >
+                      Girar 90°
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCameraZoom(cameraZoom + 0.15)}
+                      aria-label="Acercar cámara"
+                      className="px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+                    >
+                      +
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setCameraZoom(cameraZoom - 0.15)}
+                      aria-label="Alejar cámara"
+                      className="px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
+                    >
+                      −
+                    </button>
+                    <button
+                      type="button"
+                      onClick={resetCamera}
+                      className="px-2.5 py-1.5 rounded-xl bg-[#F7EEDF] font-semibold text-[#6F5A4E] hover:text-[#3E2F2A] cursor-pointer"
+                    >
+                      Centrar
+                    </button>
+                    <button
+                      type="button"
+                      data-testid="close-3d-cafe-btn"
+                      onClick={() => setActiveOverlay(null)}
+                      className="px-3.5 py-1.5 rounded-xl cafe-btn-primary font-bold cursor-pointer"
+                    >
+                      Volver al tablero
                     </button>
                   </div>
-                  <button
-                    type="button"
-                    data-testid="close-drawer-btn"
-                    onClick={() => setActiveOverlay(null)}
-                    className="px-3 py-1 rounded-xl cafe-btn-paper text-xs font-bold text-[#3E2F2A] cursor-pointer inline-flex items-center gap-1.5"
-                  >
-                    <span>Cerrar</span>
-                    <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
-                      <path
-                        d="M1.5 1.5l7 7M8.5 1.5l-7 7"
-                        stroke="currentColor"
-                        strokeWidth="1.8"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </button>
                 </div>
-              </div>
 
-              {sideTab === 'log' ? (
-                <div
-                  className="flex-1 overflow-y-auto space-y-2 py-3 pr-1 text-xs"
-                  data-testid="move-log-list"
+                <Suspense
+                  fallback={
+                    <div
+                      className="w-full h-[360px] sm:h-[460px] rounded-2xl bg-[#F7EEDF] flex items-center justify-center text-sm font-serif font-bold text-[#6F5A4E]"
+                      data-testid="cafe-3d-diorama"
+                    >
+                      Preparando el salón 3D del café...
+                    </div>
+                  }
                 >
-                  {gameState.log.length === 0 ? (
-                    <p className="text-[#6F5A4E] italic">
-                      Aún no se han realizado jugadas. El jugador inicial abre el café.
-                    </p>
-                  ) : (
-                    gameState.log
-                      .slice()
-                      .reverse()
-                      .map((ev, i) => {
-                        let pid = '';
-                        let desc = '';
-                        let delta: number | null = null;
-                        if (ev.type === 'tile_seated') {
-                          const prof = getCharacterProfile(
-                            ev.tile.nation,
-                            ev.tile.gender,
-                            ev.tile.jokerNation,
-                            ev.tile.id,
-                          );
-                          pid = ev.playerId;
-                          desc = `sentó a ${prof.name} (${prof.countryName})`;
-                          delta = ev.pointsEarned;
-                        } else if (ev.type === 'tile_bar') {
-                          const prof = getCharacterProfile(
-                            ev.tile.nation,
-                            ev.tile.gender,
-                            ev.tile.jokerNation,
-                            ev.tile.id,
-                          );
-                          pid = ev.playerId;
-                          desc = `sirvió a ${prof.name} en la barra (#${ev.barIndex + 1})`;
-                          delta = ev.pointsDelta;
-                        } else if (ev.type === 'joker_swapped') {
-                          pid = ev.playerId;
-                          desc = `cambió el comodín en mesa`;
-                          delta = 0;
-                        } else if (ev.type === 'turn_timeout_auto_move') {
-                          pid = ev.playerId;
-                          desc = 'jugada automática por tiempo';
-                        } else if (ev.type === 'hand_size_reduced') {
-                          pid = ev.playerId;
-                          desc = `completó mesa nacional (mano máx. ${ev.newHandSize})`;
-                        } else if (ev.type === 'game_started') {
-                          pid = ev.startingPlayerId;
-                          desc = 'abrió las puertas del café';
-                        } else {
-                          return null;
-                        }
-                        const pl = gameState.players.find((p) => p.id === pid);
-                        const plAvatar = avatarByPlayerId[pid] ?? pl?.avatarId ?? 'moka';
-                        return (
-                          <div
-                            key={`${ev.type}-${i}`}
-                            className="p-2.5 rounded-xl cafe-paper-subpanel text-[#3E2F2A] flex items-center justify-between gap-2"
-                          >
-                            <div className="flex items-center gap-1.5 min-w-0">
-                              <PlayerAvatar avatarId={plAvatar} size={18} />
-                              <div className="truncate">
-                                <span className="font-bold">{pl?.nickname ?? pid}:</span>{' '}
-                                <span>{desc}</span>
-                              </div>
-                            </div>
-                            {delta !== null && (
-                              <span
-                                className={`font-serif font-bold tabular-nums shrink-0 ${
-                                  delta >= 0 ? 'text-[#3F5E4A]' : 'text-[#A94438]'
-                                }`}
-                              >
-                                {delta >= 0 ? `+${delta}` : delta}
-                              </span>
-                            )}
-                          </div>
-                        );
-                      })
-                  )}
+                  <LazyPapercraftBoard
+                    gameState={gameState}
+                    selectedTile={selectedTile}
+                    draftPlacements={draftPlacements}
+                    seatInspections={seatInspections}
+                    focusedTableId={focusedTableId}
+                    viewMode="3d"
+                    cameraPreset={cameraPreset}
+                    cameraAngleIndex={cameraAngleIndex}
+                    cameraZoom={cameraZoom}
+                    nightMode={nightMode}
+                    reducedMotion={reducedMotion}
+                    onSeatClick={handleSeatClick}
+                    onTableClick={handleTableClick}
+                    onBarClick={handleBarClick}
+                  />
+                </Suspense>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ON-DEMAND SLIDE-OVER LATERAL DRAWER FOR MOVE LOG & CHAT (Waiter's Notepad / Cuaderno de Tertulia) */}
+        <AnimatePresence>
+          {drawerOpen && (
+            <motion.div
+              initial={reducedMotion ? { opacity: 1 } : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={reducedMotion ? { opacity: 0 } : { opacity: 0 }}
+              transition={{ duration: reducedMotion ? 0 : 0.16 }}
+              className="fixed inset-0 z-50 flex justify-end bg-[#231712]/45"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Registro de jugadas y chat"
+              data-testid="log-chat-drawer"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) setActiveOverlay(null);
+              }}
+            >
+              <motion.div
+                initial={reducedMotion ? false : { x: 80, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={reducedMotion ? { opacity: 0 } : { x: 80, opacity: 0 }}
+                transition={{ duration: reducedMotion ? 0 : 0.18, ease: 'easeOut' }}
+                className="w-full max-w-sm h-full cafe-paper-sheet text-[#3E2F2A] p-4 border-l-3 border-[#1E130E] flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] font-extrabold uppercase tracking-[0.15em] text-[#C96F4A]">
+                      Cuaderno de camarero · O &amp; A
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between cafe-double-rule pb-3">
+                    <div className="flex items-center gap-1 bg-[#F7EEDF] p-1 rounded-xl border border-[#231712]/15">
+                      <button
+                        type="button"
+                        onClick={() => setSideTab('log')}
+                        className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
+                          sideTab === 'log'
+                            ? 'bg-[#FFF9F0] text-[#231712] shadow-2xs border border-[#231712]/15'
+                            : 'text-[#6F5A4E]'
+                        }`}
+                      >
+                        Registro ({gameState.log.length})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSideTab('chat')}
+                        className={`px-3 py-1 rounded-lg text-xs font-bold cursor-pointer ${
+                          sideTab === 'chat'
+                            ? 'bg-[#FFF9F0] text-[#231712] shadow-2xs border border-[#231712]/15'
+                            : 'text-[#6F5A4E]'
+                        }`}
+                      >
+                        Chat ({snapshot.chat.length})
+                      </button>
+                    </div>
+                    <button
+                      type="button"
+                      data-testid="close-drawer-btn"
+                      onClick={() => setActiveOverlay(null)}
+                      className="px-3 py-1 rounded-xl cafe-btn-paper text-xs font-bold text-[#3E2F2A] cursor-pointer inline-flex items-center gap-1.5"
+                    >
+                      <span>Cerrar</span>
+                      <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+                        <path
+                          d="M1.5 1.5l7 7M8.5 1.5l-7 7"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
-              ) : (
-                <div className="flex-1 flex flex-col min-h-0 py-3">
-                  <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 text-xs mb-2">
-                    {snapshot.chat.length === 0 ? (
+
+                {sideTab === 'log' ? (
+                  <div
+                    className="flex-1 overflow-y-auto space-y-2 py-3 pr-1 text-xs"
+                    data-testid="move-log-list"
+                  >
+                    {gameState.log.length === 0 ? (
                       <p className="text-[#6F5A4E] italic">
-                        Saluda a la mesa o envía una reacción rápida.
+                        Aún no se han realizado jugadas. El jugador inicial abre el café.
                       </p>
                     ) : (
-                      snapshot.chat.map((msg) => {
-                        const msgAvatar = msg.avatarId ?? avatarByPlayerId[msg.senderId] ?? 'moka';
-                        return (
-                          <div
-                            key={msg.id}
-                            className="p-2 rounded-xl cafe-paper-subpanel flex items-center gap-2"
-                          >
-                            <PlayerAvatar avatarId={msgAvatar} size={20} />
-                            <div>
-                              <span className="font-bold text-[#3E2F2A]">{msg.nickname}: </span>
-                              <span className={msg.emote ? 'text-base' : 'text-[#6F5A4E]'}>
-                                {msg.emote ?? msg.text}
-                              </span>
+                      gameState.log
+                        .slice()
+                        .reverse()
+                        .map((ev, i) => {
+                          let pid = '';
+                          let desc = '';
+                          let delta: number | null = null;
+                          if (ev.type === 'tile_seated') {
+                            const prof = getCharacterProfile(
+                              ev.tile.nation,
+                              ev.tile.gender,
+                              ev.tile.jokerNation,
+                              ev.tile.id,
+                            );
+                            pid = ev.playerId;
+                            desc = `sentó a ${prof.name} (${prof.countryName})`;
+                            delta = ev.pointsEarned;
+                          } else if (ev.type === 'tile_bar') {
+                            const prof = getCharacterProfile(
+                              ev.tile.nation,
+                              ev.tile.gender,
+                              ev.tile.jokerNation,
+                              ev.tile.id,
+                            );
+                            pid = ev.playerId;
+                            desc = `sirvió a ${prof.name} en la barra (#${ev.barIndex + 1})`;
+                            delta = ev.pointsDelta;
+                          } else if (ev.type === 'joker_swapped') {
+                            pid = ev.playerId;
+                            desc = `cambió el comodín en mesa`;
+                            delta = 0;
+                          } else if (ev.type === 'turn_timeout_auto_move') {
+                            pid = ev.playerId;
+                            desc = 'jugada automática por tiempo';
+                          } else if (ev.type === 'hand_size_reduced') {
+                            pid = ev.playerId;
+                            desc = `completó mesa nacional (mano máx. ${ev.newHandSize})`;
+                          } else if (ev.type === 'game_started') {
+                            pid = ev.startingPlayerId;
+                            desc = 'abrió las puertas del café';
+                          } else {
+                            return null;
+                          }
+                          const pl = gameState.players.find((p) => p.id === pid);
+                          const plAvatar = avatarByPlayerId[pid] ?? pl?.avatarId ?? 'moka';
+                          return (
+                            <div
+                              key={`${ev.type}-${i}`}
+                              className="p-2.5 rounded-xl cafe-paper-subpanel text-[#3E2F2A] flex items-center justify-between gap-2"
+                            >
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <PlayerAvatar avatarId={plAvatar} size={18} />
+                                <div className="truncate">
+                                  <span className="font-bold">{pl?.nickname ?? pid}:</span>{' '}
+                                  <span>{desc}</span>
+                                </div>
+                              </div>
+                              {delta !== null && (
+                                <span
+                                  className={`font-serif font-bold tabular-nums shrink-0 ${
+                                    delta >= 0 ? 'text-[#3F5E4A]' : 'text-[#A94438]'
+                                  }`}
+                                >
+                                  {delta >= 0 ? `+${delta}` : delta}
+                                </span>
+                              )}
                             </div>
-                          </div>
-                        );
-                      })
+                          );
+                        })
                     )}
                   </div>
+                ) : (
+                  <div className="flex-1 flex flex-col min-h-0 py-3">
+                    <div className="flex-1 overflow-y-auto space-y-1.5 pr-1 text-xs mb-2">
+                      {snapshot.chat.length === 0 ? (
+                        <p className="text-[#6F5A4E] italic">
+                          Saluda a la mesa o envía una reacción rápida.
+                        </p>
+                      ) : (
+                        snapshot.chat.map((msg) => {
+                          const msgAvatar =
+                            msg.avatarId ?? avatarByPlayerId[msg.senderId] ?? 'moka';
+                          return (
+                            <div
+                              key={msg.id}
+                              className="p-2 rounded-xl cafe-paper-subpanel flex items-center gap-2"
+                            >
+                              <PlayerAvatar avatarId={msgAvatar} size={20} />
+                              <div>
+                                <span className="font-bold text-[#3E2F2A]">{msg.nickname}: </span>
+                                <span className={msg.emote ? 'text-base' : 'text-[#6F5A4E]'}>
+                                  {msg.emote ?? msg.text}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })
+                      )}
+                    </div>
 
-                  <div className="flex items-center justify-between gap-1 mb-2">
-                    {['☕ ¡Salud!', '🥐 ¡Buena mesa!', '👏 ¡Bravo!', '🎩 ¡Qué elegancia!'].map(
-                      (emote) => (
-                        <button
-                          key={emote}
-                          type="button"
-                          onClick={() => void sendChat(emote, true)}
-                          className="px-2.5 py-1.5 rounded-lg cafe-btn-paper text-xs font-semibold cursor-pointer"
-                        >
-                          {emote.split(' ')[0]}
-                        </button>
-                      ),
-                    )}
-                  </div>
+                    <div className="flex items-center justify-between gap-1 mb-2">
+                      {['☕ ¡Salud!', '🥐 ¡Buena mesa!', '👏 ¡Bravo!', '🎩 ¡Qué elegancia!'].map(
+                        (emote) => (
+                          <button
+                            key={emote}
+                            type="button"
+                            onClick={() => void sendChat(emote, true)}
+                            className="px-2.5 py-1.5 rounded-lg cafe-btn-paper text-xs font-semibold cursor-pointer"
+                          >
+                            {emote.split(' ')[0]}
+                          </button>
+                        ),
+                      )}
+                    </div>
 
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      if (!chatInput.trim()) return;
-                      void sendChat(chatInput, false);
-                      setChatInput('');
-                    }}
-                    className="flex gap-1.5"
-                  >
-                    <input
-                      type="text"
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      placeholder="Mensaje corto..."
-                      maxLength={120}
-                      className="flex-1 h-10 px-3 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/25 text-xs"
-                    />
-                    <button
-                      type="submit"
-                      className="px-3.5 h-10 rounded-xl cafe-btn-primary text-xs font-bold cursor-pointer"
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        if (!chatInput.trim()) return;
+                        void sendChat(chatInput, false);
+                        setChatInput('');
+                      }}
+                      className="flex gap-1.5"
                     >
-                      Enviar
-                    </button>
-                  </form>
-                </div>
-              )}
+                      <input
+                        type="text"
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                        placeholder="Mensaje corto..."
+                        maxLength={120}
+                        className="flex-1 h-10 px-3 rounded-xl bg-[#F7EEDF] border border-[#3E2F2A]/25 text-xs"
+                      />
+                      <button
+                        type="submit"
+                        className="px-3.5 h-10 rounded-xl cafe-btn-primary text-xs font-bold cursor-pointer"
+                      >
+                        Enviar
+                      </button>
+                    </form>
+                  </div>
+                )}
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
       </div>
     </>
   );

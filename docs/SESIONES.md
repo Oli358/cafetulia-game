@@ -5,11 +5,46 @@
 
 ---
 
+## Sesión 035 - 2026-11-25 - Móvil sin lupa, tutorial jugable y ajustes por capítulos
+
+**Objetivo:** verificar el estado del repo al llegar al PC de casa, arrancar la app con Chrome MCP y aplicar el feedback de móvil más el rediseño de tutorial, reglas y ajustes.
+
+**Hecho:**
+
+- Verificación inicial: repo limpio y sincronizado con `origin/home/menu-cafe-3d` en `4442d05`, Node 25.2.1, `typecheck`, 49 tests, `build` y 3 E2E en verde. App arrancada en `http://localhost:3000` y controlada con el MCP de Chrome.
+- **Móvil:** se elimina el botón «Lupa 1.35×» y todo el paneo del tablero. El tablero pasa a `min(96vw, calc(100dvh - 365px))` y se centra en el espacio libre entre la tabla y la mano.
+- **Tabla de la casa en móvil:** de 148 px a 119 px. La bolsa pasa a una sola fila con icono, barra y contador; se reducen paddings y gaps de las tarjetas de jugador.
+- Comprobado en 390×844: tablero 374×374, 76 px hasta la mano. En 390×667: tablero 302×302, 24 px hasta la mano. Sin solape y con las sillas inferiores visibles. PC intacto (tablero centrado, tabla flotante a la izquierda).
+- **Tutorial nuevo a pantalla completa:** usa el tablero real (`IllustratedBoard` embebido), mano de 5 fichas, barra, marcador y foco suave sobre la mesa. Tres lecciones autocontenidas con estado sintético: pareja que abre mesa, silla compartida que puntúa en dos mesas y barra. La acción se lanza con el botón o tocando la silla/posavasos marcado; incluye sonido, resultado, progreso lateral y repone la mano a 5 fichas.
+- **Reglas nuevas:** cuatro capítulos navegables (La mesa, Sentar invitados, Puntos y monedas, Final y comodines) con tarjetas visuales, banderas, ejemplos de equilibrio 2H/2M, monedas 1/5/10, los 20 valores de barra y las condiciones de final. Sin scroll por defecto; nav fija por capítulos.
+- **Ajustes nuevos:** panel de dos columnas con nav fija (Perfil, Sonido, Accesibilidad, Sistema), scroll interno con barra de la casa, switches y sliders propios, subtítulos como controles segmentados, avatares en rejilla y sección de sistema. Se conservan todos los `data-testid` que usa E2E.
+- Nuevas primitivas CSS: `cafe-scroll`, `cafe-switch` y `cafe-range`; se elimina la barra gris nativa de los modales.
+- Verificado de nuevo: `typecheck`, `lint`, 49 tests, `build` y 3 E2E en verde. Capturas `ui-v11-partida-*` actualizadas.
+
+**Decisiones:** D-114, D-115 y D-116.
+
+**Problemas:**
+
+- El tutorial usa un estado de demostración sintético y no valida cada jugada contra el motor; es intencional para mantener las tres lecciones autocontenidas.
+- En móviles muy bajos el tutorial necesita scroll interno para llegar al CTA.
+- Reglas y ajustes siguen siendo largos en móvil; la nav fija permite saltar, pero se puede valorar plegar secciones.
+- El fondo de bar sigue pendiente de confirmar licencia antes de publicar.
+
+**Siguiente:**
+
+1. Probar tutorial, reglas y ajustes en el móvil real.
+2. Revisar el tono de los textos con el usuario y ajustar lo que pida.
+3. Confirmar la licencia del fondo de bar.
+4. Valorar plegar secciones de Ajustes en móvil si se pide.
+
+---
+
 ## Sesión 034 - 2026-11-25 - Top de puntuaciones, fondo de bar y desplegables suaves
 
 **Objetivo:** aprovechar el espacio vacío de la partida en móvil y PC, mejorar la lectura de puntuaciones y del turno, suavizar todos los desplegables y dar ambiente de bar al fondo.
 
 **Hecho:**
+
 - La partida se reorganiza en una cabecera compacta de una fila y una **tabla de la casa** independiente. En móvil es una rejilla 2×2 con los 4 jugadores visibles a la vez, sin slider; en PC es una lista vertical que flota arriba a la izquierda sobre el fondo. El tablero recupera el centro exacto del ancho completo.
 - Cada fila muestra avatar, nombre, fichas en mano y el **desglose de monedas 10/5/1 con su total**. El jugador con el turno tiene un **glow animado** (estático con `reducedMotion`).
 - La **bolsa de fichas** es un bloque destacado con icono, contador `X / 100` y barra de progreso.
@@ -25,11 +60,13 @@
 **Decisiones:** D-109, D-110, D-111, D-112 y D-113.
 
 **Problemas:**
+
 - Bloquear la orientación desde el navegador no es posible al 100 %; el aviso CSS cubre el juego y el manifest lo fija en la PWA instalada. En Safari móvil el `orientation.lock` puede requerir pantalla completa.
 - El fondo es una imagen aportada por el usuario; falta confirmar su fuente/licencia antes de publicar.
 - En móvil el tablero sigue limitado por el ancho (96vw); el aire vertical se usa para el top y el fondo, no para agrandar el tablero.
 
 **Siguiente:**
+
 1. Probar en el móvil real el top, el glow, los desplegables y el aviso de horizontal.
 2. Confirmar la licencia del fondo de bar.
 3. Valorar si el top móvil debe poder plegarse o quedarse fijo.
@@ -42,6 +79,7 @@
 **Objetivo:** aplicar el feedback de la prueba en portátil: la carta no debe tener scroll propio ni tapar el nombre del mundo, el vaso debe llevar una falda más pequeña y los ingredientes deben ser más numerosos y fluir hacia abajo al cambiar de mundo.
 
 **Hecho:**
+
 - La carta de reservas deja de tener `overflow-y-auto` y altura máxima. Se compacta (paddings, pestañas, campos y CTA) para caber sin scroll en 1920×900, 1280×800, **1280×700**, 960×800 y 390×844.
 - En alturas ≤760 px se oculta la descripción larga del mundo y en ≤700 px la fila de ficha/subtítulos; la carta nunca tapa el título.
 - El título del mundo baja de tamaño y sube de posición; el bloque `LLUVIA.` + notas queda siempre visible por encima de la carta.
@@ -57,11 +95,13 @@
 **Decisiones:** D-104, D-105 y D-106.
 
 **Problemas:**
+
 - Los ingredientes procedurales (flor, vainilla, cardamomo, chocolate, naranja) siguen sin ser fotorrealistas; el usuario valora bajar GLB para sustituirlos.
 - En móvil la hoja inferior sigue tapando la parte baja de la etiqueta del vaso; es el siguiente punto a valorar.
 - Las capturas `ui-v11-portada-*` se regeneraron con la falda nueva; las de lobby/partida/final se revirtieron por ruido de renderizado.
 
 **Siguiente:**
+
 1. Valorar GLB para flor de café, vainilla, cardamomo, chocolate, naranja y cacao.
 2. Decidir si la carta móvil se pliega o se deja como hoja inferior.
 3. Probar el flujo de giro/río en el portátil y ajustar tiempos si hace falta.
@@ -74,6 +114,7 @@
 **Objetivo:** corregir el menú en ventanas de PC a media anchura y en móvil, y sustituir la lata por un vaso de café para llevar, que encaja mejor con Cafetulia.
 
 **Hecho:**
+
 - El layout de escritorio empieza en **901 px** (antes 1023 px). La ventana de ~960 px deja de usar la hoja móvil a todo el ancho.
 - Entre **901 y 1099 px** hay una composición de escritorio compacta: cámara más abierta, vaso más bajo/derecha y carta de 38vw. A 960×800 el título, el vaso y la carta ya no se pisan.
 - La carta móvil se acorta: se oculta la fila de ficha/subtítulos en teléfono, el CTA ocupa todo el ancho y el máximo baja a 50dvh. El vaso se ve por encima de la hoja.
@@ -87,11 +128,13 @@
 **Decisiones:** D-101, D-102 y D-103.
 
 **Problemas:**
+
 - En móvil la hoja inferior sigue tapando la parte baja del vaso y el nombre del sabor; arriba se ven marca, motivo y color. Habrá que valorar una hoja plegable si el usuario quiere ver la etiqueta completa.
 - Falta validar en el teléfono real el nuevo vaso, la falda y los tiempos del giro.
 - `sodacans.glb` sigue sin usarse; ya no aplica al objeto principal.
 
 **Siguiente:**
+
 1. Probar el vaso y la franja de 960 px en el teléfono/PC del usuario.
 2. Valorar una carta móvil plegable o un botón “ver vaso”.
 3. Afinar el tamaño del vaso en 1920 si domina demasiado.
@@ -104,6 +147,7 @@
 **Objetivo:** acercar la portada a la composición de referencia de Dialed (titular gigante, lata abajo-centro recortada, papeles flotando) sin copiar sus assets, e integrar modelos 3D reales de ingredientes.
 
 **Hecho:**
+
 - Portada rehecha como póster editorial: fondo crema, **CAFETULIA. / EL JUEGO.** en dos líneas gigantes (Fraunces 400), lata centrada abajo y recortada por el viewport, y nueve papeles de comanda con blur y profundidad detrás del título y la lata.
 - La lata se mantiene por delante del titular; la información secundaria baja a una tarjeta de la casa a la derecha. En móvil la tarjeta desaparece y las acciones (Entrar, Tutorial, Reglas) caben en una sola fila.
 - Menú recompuesto: nombre del mundo gigante a la izquierda, lata a la derecha y carta compacta abajo a la izquierda; las tres pestañas (Unirse / Reservar / Café solo) siguen accesibles sin scroll adicional.
@@ -117,12 +161,14 @@
 **Decisiones:** D-096, D-097, D-098, D-099 y D-100.
 
 **Problemas:**
+
 - En móvil la carta tapa la mayor parte de la etiqueta de la lata; el mundo se entiende por el título y el color, pero el giro se aprecia menos.
 - Feedback pendiente de la prueba en teléfono: con la ventana de PC a media anchura (~960 px) el menú entra en modo móvil, la carta ocupa todo el ancho y tapa la lata. Hay que revisar el breakpoint o el layout de esa franja **después** de la prueba en móvil, sin convertirlo en el foco principal.
 - Falta validar en un dispositivo real la fluidez del póster, los papeles y la entrada de los modelos.
 - `sodacans.glb` sigue descartado: 13,49 MB y 346.540 triángulos no compensan para una lata que ya funciona y pesa mucho menos.
 
 **Siguiente:**
+
 1. Probar la v12 en iPhone/Android real y ajustar tiempos del scroll y del giro.
 2. Corregir la carta a media anchura de escritorio (~960 px) para que no se comporte como hoja móvil gigante.
 3. Decidir si la carta móvil se puede plegar o reducir para enseñar más lata.
@@ -136,6 +182,7 @@
 **Objetivo:** aplicar el feedback de la primera entrega: jerarquía de juego, scroll cinematográfico, transiciones suaves y fondo del lobby con profundidad.
 
 **Hecho:**
+
 - La portada prioriza **CAFETULIA** como título enorme; el mundo/mezcla (`Tertulia`, `Lluvia`, `Noche`) pasa a etiqueta secundaria con sus notas.
 - El scroll ahora es una secuencia: la lata **gira una vuelta completa**, desciende, la portada se desvanece y la carta de reservas sube desde abajo. La carta no se cruza con el título: primera mitad escena, segunda mitad reserva.
 - Un solo gesto de rueda desde el póster lanza la transición completa hasta el menú; el scroll manual fino sigue disponible.
@@ -148,10 +195,12 @@
 **Decisiones:** D-092, D-093 y D-094.
 
 **Problemas:**
+
 - La percepción exacta de los tiempos del scroll y del crossfade hay que validarla en un iPhone/Android real; las capturas headless no reproducen bien la fluidez.
 - Las vainas de vainilla y la canela aún pueden ganar detalle; los ingredientes siguen siendo estilizados, no fotorrealistas.
 
 **Siguiente:**
+
 1. Probar en dispositivo real y ajustar velocidad del giro/scroll.
 2. Afinar la curva y densidad de ingredientes en portada y márgenes del lobby.
 3. Cambiar colores/etiquetas cuando toque.
@@ -164,6 +213,7 @@
 **Objetivo:** sustituir el menú de portada por una experiencia 3D de producto inspirada en Dialed, con tres mundos (Unirse / Reservar / Café solo), scroll interno de dos actos y un lobby que recupera la mesa 2D.
 
 **Hecho:**
+
 - Rama `home/menu-cafe-3d` creada desde `main` (`e275bf7`).
 - Nueva portada en `apps/web/src/title/`: lata moderna flotante, tres etiquetas completas (una por mundo) que se funden con el giro, ingredientes 3D (granos, canela, naranja, flores, vainilla, cardamomo, chocolate, anís, cacao), tres temas cromáticos y escena R3F lazy.
 - Segunda iteración según feedback: texto editorial arriba a la izquierda con el nombre del mundo en grande, lata flotante a la derecha, ingredientes en onda, entrada/salida lateral al cambiar de mundo, repulsión y rotación al pasar el cursor, y crossfade de color de toda la lata.
@@ -176,10 +226,12 @@
 **Decisiones:** D-088, D-089, D-090 y D-091.
 
 **Problemas:**
+
 - El render 3D tarda más en SwiftShader/headless; el E2E usa el fallback y las capturas 3D se generan aparte con `?force3d=1`.
 - La transición de la lata está limitada por el render por software en las capturas; falta verla en un dispositivo real para afinar tiempos.
 
 **Siguiente:**
+
 1. Validar la portada y el lobby en un iPhone/Android real.
 2. Afinar la onda de ingredientes y el tamaño de la lata según la prueba real.
 3. Decidir si el giro cambia también la atmósfera musical (Tertulia / Lluvia / Noche).
@@ -192,6 +244,7 @@
 **Objetivo:** corregir los problemas detectados en la prueba real de iPhone/PWA de la v8 y preparar el encargo v9.
 
 **Hecho:**
+
 - Movido el control de zoom fuera del cuadrado del tablero, para que no tape la última silla de España.
 - Mano convertida a fila flexible centrada: 3, 4 o 5 fichas quedan centradas.
 - `Bolsa: N` separada del scroll de jugadores en móvil.
@@ -204,13 +257,16 @@
 - Captura de referencia en `docs/referencias/ui-v9-movil-fixes.png`.
 
 **Decisiones:**
+
 - La vibración en iPhone no se puede implementar por limitación de iOS; el aviso alternativo es sonido + marco visual.
 - El zoom móvil vive fuera del tablero.
 
 **Problemas:**
+
 - La validación de la banda de estado de iOS requiere el dispositivo real; se ha aplicado `theme-color`/viewport-fit como mejor esfuerzo.
 
 **Siguiente:**
+
 1. Enviar ZIP + prompt 12 a Argon.
 2. Integrar v9 y probar en iPhone.
 3. Render y keep-alive.
@@ -222,6 +278,7 @@
 **Objetivo:** integrar la entrega visual v8, comprobar que no rompe nada y dejarla disponible en local/PWA para probarla en el teléfono.
 
 **Hecho:**
+
 - Extraído e integrado `cafetulia (2).zip` (la v8 visual): `apps/web/src`, `apps/web/package.json`, `apps/web/src/index.css`, `src/index.css`, `e2e/tests/smoke.spec.ts` y docs.
 - Añadidas las dependencias autoalojadas `@fontsource/fraunces` y `@fontsource/nunito-sans` al `package.json` raíz; `pnpm install` correcto.
 - **No** se copiaron `.aistudio/`, `metadata.json`, `bun.lock` ni `public/assets/aistudio/cafetulia-v8-visual_*.zip`.
@@ -243,15 +300,18 @@
   - Iconos, manifest y service worker funcionando.
 
 **Decisiones:**
+
 - La v8 visual queda integrada; no se añaden funcionalidades nuevas en este pase.
 - Antes de tocar más diseño, probar en el teléfono real y decidir si el siguiente paso es pulir nombres/legibilidad o cerrar la v1.0.
 
 **Problemas:**
+
 - Los nombres largos del lobby se recortan en 1280.
 - El tablero sigue siendo denso en móvil; hay que valorar si necesita más zoom o simplificación.
 - El túnel HTTPS es temporal y depende del PC.
 
 **Siguiente:**
+
 1. Probar la v8 en el teléfono con la URL HTTPS.
 2. Anotar legibilidad, audio, tacto y rendimiento.
 3. Corregir nombres/legibilidad si molesta y preparar Render.
@@ -263,6 +323,7 @@
 **Objetivo:** ejecutar el encargo `docs/ARGON/11-pulido-visual-animaciones.md` para transformar Cafetulia en un juego de café de autor (papel de algodón, tinta, madera, cerámica, imprenta y luz de tarde) sin tocar motor, reglas ni servidor.
 
 **Hecho:**
+
 - **Tipografía autoalojada (`@fontsource/fraunces` y `@fontsource/nunito-sans`)**: configuradas en `apps/web/src/index.css` y `src/index.css` con grano de papel de algodón, filetes dobles de imprenta (`.cafe-double-rule`, `.cafe-double-frame`), fichas con canto de cartón 3D (`.cafe-cardboard-tile`) y botones táctiles con sombra de contacto.
 - **Portada envolvente (`TitleScreen`)**: añadido fondo arquitectónico SVG a pantalla completa (ventanal francés con haz de sol, tres lámparas colgantes de latón, estanterías con botes de café y zócalo de madera), barra de café integrada (`title-cafe-scene`) con parallax suave y animaciones vivas (vapor, planta, cola del gato, vinilo) y `Carta de la Casa` (`title-menu-card`) con iconos SVG de línea de tinta hechos a medida.
 - **Lobby como mesa redonda preparada (`LobbyScreen`)**: dispuesta la escena en 3 columnas (`[Sillas 1 y 3 | Mesa redonda central con mantel bordado, 4 tazas, cruasanes y placa O & A | Sillas 2 y 4]`) para que la mesa redonda se vea completa y sin solapes; servilleta de reserva con pespunte y sello de copiado.
@@ -275,12 +336,15 @@
 - **Verificación completa en verde**: `pnpm typecheck`, `pnpm test` (49/49), `pnpm build`, `pnpm lint` y `pnpm test:e2e` (2/2).
 
 **Decisiones:**
+
 - En el lobby, la mesa redonda ocupa su propia columna central entre los dos pares de sillas para no quedar tapada por las tarjetas de asiento (D-087).
 
 **Problemas:**
+
 - Ninguno. Todos los chequeos y capturas en verde.
 
 **Siguiente:**
+
 1. Probar en teléfono real (iOS/Android) y desplegar en Render.
 
 ---
@@ -290,6 +354,7 @@
 **Objetivo:** preparar el último encargo fuerte de Argon antes de que termine la suscripción, priorizando dirección visual y animaciones sobre nuevas mecánicas.
 
 **Hecho:**
+
 - Creado `docs/ARGON/11-pulido-visual-animaciones.md` con el encargo completo.
 - Añadida una auditoría crítica de la v7: portada/lobby aún demasiado “dashboard”, botones e iconos genéricos, tipografía sin Fraunces/Nunito, falta de profundidad y de lenguaje de movimiento.
 - Añadida una sección específica de **fondos vivos y hover**: parallax suave, vapor, luz ambiental y micro-reacciones en menú/lobby/tablero, con límite de 60 fps y respeto a táctil/reduced motion.
@@ -298,14 +363,17 @@
 - Preparado el ZIP `cafetulia-v8-visual.zip` con el prompt, el código base, capturas de referencia y las fotos de cartas en `references/cards/` (solo inspiración, fuera del build).
 
 **Decisiones:**
+
 - La v8 será un pase visual/animación, no una entrega de funcionalidades (D-085).
 - La referencia de materiales y paleta es `docs/ARTE_BIBLE.md`; la tipografía objetivo es Fraunces + Nunito Sans autoalojadas (D-086).
 
 **Problemas:**
+
 - El tiempo de Argon es limitado; si hay que recortar, primero portada, lobby, tablero y movimiento; después ajustes y arte fino.
 - La prueba final seguirá siendo en móvil real.
 
 **Siguiente:**
+
 1. Enviar ZIP + prompt 11 a Argon.
 2. Integrar, verificar tests y comparar capturas.
 3. Probar en teléfono y desplegar.
@@ -317,12 +385,14 @@
 **Objetivo:** localizar el fallo que dejaba a un jugador sin poder colocar cartas aunque fuera su turno y las jugadas parecieran válidas.
 
 **Diagnóstico:**
+
 - El mensaje genérico **“Jugada inválida.”** solo aparece cuando la respuesta del servidor no trae un `message` de regla. Las reglas sí devuelven mensajes concretos (“No es tu turno”, “La silla ya está ocupada”, etc.).
 - El caso que encaja es un **404 `ROOM_NOT_FOUND`**: la sala había desaparecido del servidor (reinicio de AI Studio/local, recarga del proceso o pérdida de la sala). El cliente seguía mostrando el tablero antiguo y cada intento recibía un 404 que se mostraba como “Jugada inválida.”.
 - `pollRoom` ignoraba silenciosamente los 404, así que la UI se quedaba congelada en una partida que ya no existía.
 - También había dos riesgos menores: se podía enviar dos veces la misma jugada (doble clic) y un borrador viejo podía sobrevivir a un cambio de turno/rechazo.
 
 **Hecho:**
+
 - `submitMove` y `pollRoom` detectan `404`/`ROOM_NOT_FOUND` y vuelven a la portada con el aviso:
   “La sala ya no existe. Puede que el servidor se haya reiniciado; vuelve a crear una sala.”
 - Los errores usan ahora `data.message` o `data.error.message`; ya no se muestra “Jugada inválida.” si el servidor explica el motivo.
@@ -332,6 +402,7 @@
 - Añadido E2E: simula un 404 al enviar una jugada y comprueba que aparece el aviso y se vuelve a la portada.
 
 **Verificación:**
+
 - `typecheck` ✅
 - **49 tests** ✅
 - `build` ✅
@@ -339,10 +410,12 @@
 - E2E: **2 tests** ✅ (suite completa + sala desaparecida).
 
 **Problemas:**
+
 - Las salas viven en memoria; si el servidor se reinicia, la partida no se puede recuperar. Ahora al menos se avisa y no se queda bloqueada.
 - Si vuelve a pasar, el mensaje ya dirá si es sala perdida, turno, silla ocupada u otra regla.
 
 **Siguiente:**
+
 1. Repetir la partida con dos jugadores y confirmar que no vuelve a quedarse bloqueada.
 2. Si aparece otro rechazo, anotar el mensaje exacto y la acción.
 
@@ -353,6 +426,7 @@
 **Objetivo:** dejar de exponer el puerto local en la Wi-Fi y mantener la web accesible por HTTPS para la prueba en teléfono.
 
 **Hecho:**
+
 - `server.ts` acepta `HOST` (por defecto `0.0.0.0` para Render).
 - Servidor de producción reiniciado con `HOST=127.0.0.1`: el puerto `3000` ya no escucha en la LAN.
 - `http://172.20.10.6:3000` queda cerrado; `http://127.0.0.1:3000` sigue funcionando para el túnel.
@@ -360,12 +434,15 @@
 - Verificado `/health` por localhost y por el túnel; la LAN devuelve conexión rechazada.
 
 **Decisiones:**
+
 - El túnel HTTPS se mantiene mientras el PC y `cloudflared` estén encendidos; el acceso directo por LAN queda cerrado.
 
 **Problemas:**
+
 - Si se apaga el PC o se reinicia `cloudflared`, la URL temporal deja de estar disponible.
 
 **Siguiente:**
+
 1. Probar la v7 en el teléfono con la URL HTTPS.
 2. Continuar mañana con los ajustes que salgan de la prueba.
 
@@ -376,6 +453,7 @@
 **Objetivo:** integrar la entrega v7, corregir el descentrado de la mano que se ve en la captura del usuario y dejar una versión de producción montada en local para instalar la PWA desde el teléfono.
 
 **Hecho:**
+
 - Extraído e integrado `cafetulia (6).zip`: `apps/web/src`, `packages/ui/src` y E2E. No se copiaron `.aistudio`, `metadata.json` ni ZIPs antiguos.
 - Verificado: `typecheck`, **49 tests**, `build`, `lint` y E2E completos en verde.
 - Corregido el **mazo/mano descentrado**: el dock usa una rejilla `minmax(0,1fr) auto minmax(0,1fr)` en escritorio; la fila de fichas queda exactamente en el centro del dock, tanto con 3 como con 5 cartas.
@@ -391,15 +469,18 @@
 - La PWA se puede instalar desde el túnel HTTPS; el HTTP local sirve para jugar en la misma Wi-Fi, pero no para service worker/PWA en móvil.
 
 **Decisiones:**
+
 - La mano se centra siempre respecto al dock completo, no respecto al espacio que deja el panel de detalle (D-081).
 - Para probar la PWA en teléfono se usa un túnel HTTPS temporal y iconos PNG 192/512/maskable; el túnel no es permanente (D-082).
 
 **Problemas:**
+
 - El túnel de Cloudflare es temporal y cambia si se reinicia; depende de que el PC y el proceso sigan encendidos.
 - Queda la prueba real en iPhone/Android: audio tras el primer toque, safe areas, táctil y rendimiento.
 - El aviso de chunk `three-vendor` de 683 kB sigue ahí, aunque el 3D es lazy.
 
 **Siguiente:**
+
 1. Que el usuario pruebe la v7 en el teléfono con la URL HTTPS.
 2. Corregir lo que salga de la prueba real.
 3. Desplegar en Render.
@@ -411,6 +492,7 @@
 **Objetivo:** aplicar al completo el encargo `docs/ARGON/10-menu-sonido-musica.md` sobre la base v6 verificada: convertir la portada y el lobby en una escena viva de café, añadir SFX de UI diferenciados por acción, evolucionar la música lo-fi a una progresión de 24 compases con capas y crossfades, y dejar lista la entrega para probar en iPhone/Android.
 
 **Hecho:**
+
 - **P0 — Portada, Lobby, Ajustes «Sonido del café» y transiciones (`Screens.tsx`, `Modals.tsx`, `App.tsx`, `packages/ui`):**
   - Portada rediseñada con escena ilustrada en SVG (`CafeCornerIllustration`: ventana arqueada, planta colgante, gato dormido, tocadiscos con vinilo, mesa con taza humeante y placa `O & A`), avatar protagonista en la barra (`title-hero-avatar`) que abre el selector de avatares, saludo horario personalizado (`getCafeGreeting`), frase rotatoria de pizarra (`CAFE_DAILY_PHRASES`) y carta de menú (`title-menu-card`) con iconos SVG, microcopy y áreas táctiles `>= 44 px`.
   - Lobby rediseñado como mesa preparada con 4 sillas (`lobby-table-scene`, `lobby-seat-0..3`), código de sala en servilleta con sello de copiado (`lobby-napkin-code`), sello visual de «Listo en mesa» (`lobby-ready-stamp`), entrada animada de bots y controles táctiles segmentados para sillas y reloj (`lobby-maxplayers-control`, `lobby-timer-control`).
@@ -425,12 +507,15 @@
   - Generadas y verificadas visualmente las 5 capturas requeridas en `docs/referencias/ui-v7-portada-1920.png`, `ui-v7-portada-1280.png`, `ui-v7-portada-movil.png`, `ui-v7-lobby.png` y `ui-v7-ajustes-sonido.png`.
 
 **Decisiones:**
+
 - Se cierran e implementan en código D-075 (portada y lobby como escena de café), D-076 (20 SFX de UI diferenciados con ducking y háptica opcional), D-077 (música lo-fi de 24 compases con scheduler Web Audio y 3 atmósferas) y D-080 (`window.__CAFETULIA_STORE__` restringido a desarrollo/test).
 
 **Problemas:**
+
 - Queda pendiente la validación física en un iPhone/Android real y el despliegue final en Render (el entorno de CI/Playwright ejecuta Chromium sin hardware de audio físico, por lo que se incluye checklist manual en `CAMBIOS.md`).
 
 **Siguiente:**
+
 1. Probar `cafetulia-v7.zip` en iPhone/Android real con la checklist manual de `CAMBIOS.md`.
 2. Desplegar en Render.
 
@@ -441,6 +526,7 @@
 **Objetivo:** cerrar el alcance del siguiente pase de Argon y preparar un ZIP limpio y un prompt corto para copiar y pegar, sin hacerle leer documentación larga.
 
 **Hecho:**
+
 - Alcance cerrado: portada/lobby como escena de café personalizada, SFX de UI por acción y música lo-fi con capas, variación y transiciones.
 - Se mantiene todo lo bueno de la v6 y no se tocan reglas, tablero, servidor ni arte oficial.
 - La v7 se prepara para que el usuario la pruebe directamente en iPhone/Android; el audio, las safe areas, el táctil y la PWA entran en el alcance.
@@ -448,13 +534,16 @@
 - No se han integrado los ZIPs antiguos que venían en `public/assets/aistudio/`; el ZIP de entrega va limpio.
 
 **Decisiones:**
+
 - Se implementan D-075 (portada escena), D-076 (SFX de UI) y D-077 (música con variación). D-078 y D-079 se mantienen como salvaguardas.
 
 **Problemas:**
+
 - La prueba real en teléfono queda para cuando vuelva la v7.
 - El E2E no puede validar audio ni fluidez real; se añade checklist manual.
 
 **Siguiente:**
+
 1. Enviar `cafetulia-v7.zip` y el prompt 10 a Argon.
 2. Integrar la v7, ejecutar tests y preparar la prueba en móvil.
 3. Corregir lo que falle en el teléfono y desplegar en Render.
@@ -466,6 +555,7 @@
 **Objetivo:** integrar la entrega v6 de Argon, comprobar que los P0/P1 del prompt 09 están realmente resueltos y detectar lo que falta para el siguiente pase centrado en menú, sonido y música.
 
 **Hecho:**
+
 - Extraído y analizado `cafetulia (5).zip`.
 - Integrados `apps/web/src`, `packages/ui/src`, `apps/web/package.json`, `e2e/tests/smoke.spec.ts` y `.gitignore`, conservando las salvaguardas del proyecto.
 - **No** se han integrado los artefactos accidentales del ZIP: `.aistudio/`, `metadata.json` ni `public/assets/aistudio/*.zip` (5,9 MB de ZIPs antiguos). Se ha añadido su exclusión a `.gitignore`.
@@ -492,6 +582,7 @@
 - Capturas nuevas en `docs/referencias/ui-v6-desktop.png`, `ui-v6-mobile.png`, `ui-v6-high-scores.png`, `ui-v6-menus.png`, `ui-v6-joker-swap.png` y `ui-v6-finished.png`.
 
 **Decisiones:**
+
 - El menú dejará de ser un formulario estático y pasará a ser una escena de café personalizada (D-075).
 - Cada acción de UI tendrá un SFX corto y diferenciado, con volumen bajo y mute global (D-076).
 - La música mantendrá el estilo lo-fi de café, pero con capas, melodía, variación y transiciones; no un bucle de cuatro acordes (D-077).
@@ -499,6 +590,7 @@
 - Antes del siguiente encargo se probará la v6 en teléfono real (D-079).
 
 **Problemas:**
+
 - El menú, el lobby y los ajustes se perciben estáticos y poco personalizados.
 - No hay sonido de UI por acción; la experiencia táctil queda muda.
 - La música es repetitiva y no cambia entre portada, lobby, partida y final.
@@ -506,6 +598,7 @@
 - El ZIP de Argon incluyó artefactos antiguos que habría que borrar si se copiara entero.
 
 **Siguiente:**
+
 1. Decidir el alcance del pase v7 (menú, sonido, música y pruebas en teléfono).
 2. Preparar el prompt y el ZIP con solo los archivos necesarios.
 3. Integrar la v7 y probar en móvil real antes de Render.
@@ -517,6 +610,7 @@
 **Objetivo:** aplicar al completo el encargo `docs/ARGON/09-pulido-ui-v6.md` (P0 bugs de cabecera, menús, pantalla final, placa `O & A` y `Cambiar comodín`; P1 jerarquía del tablero, caricaturas 3/4, dock translúcido, transiciones `motion/react`, sonido arcade de monedas y drag opcional; P2 salvaguardas y verificación E2E).
 
 **Hecho:**
+
 - **P0.1 — Cabecera estable en dos filas (`Screens.tsx`, `CoinTray.tsx`, `packages/ui`):**
   - Separada la fila 1 de acciones (`flex-nowrap`, altura fija) de la fila 2 del marcador compacto (`avatar + apodo + 1 icono de moneda + saldo formateado con formatScoreEs + cartas` y `Bolsa: N`).
   - Probado con puntuaciones de `1234`, `987` y `9999`: la cabecera no cambia de altura ni empuja los botones a una segunda línea.
@@ -541,12 +635,15 @@
   - Generadas y revisadas las 6 capturas en `docs/referencias/ui-v6-desktop.png`, `ui-v6-mobile.png`, `ui-v6-high-scores.png`, `ui-v6-menus.png`, `ui-v6-joker-swap.png` y `ui-v6-finished.png`.
 
 **Decisiones:**
+
 - Se consolidan e implementan en código D-070 (`O & A`), D-071 (clic/tap principal + drag opcional), D-072 (sonido arcade de dos notas), D-073 (cabecera en dos filas + `activeOverlay` exclusivo + `<AnchoredPopover>` con clamp de viewport) y D-074 (`FinishedScreen` escenificada por fases).
 
 **Problemas:**
+
 - Ninguno en local: todos los tests unitarios, de servidor, de simulación y E2E están en verde.
 
 **Siguiente:**
+
 1. Desplegar en Render y verificar en iPhone/Android reales.
 
 ---
@@ -556,6 +653,7 @@
 **Objetivo:** integrar la entrega v5 de Argon (claridad de tablero, fichas cuadradas, dock translúcido, desplegables y 3D cercano), comprobar sus afirmaciones y preparar el siguiente encargo con los nuevos errores detectados.
 
 **Hecho:**
+
 - Extraído y analizado `cafetulia (4).zip`.
 - Integrados `apps/web/src`, `packages/ui/src`, `e2e/tests/smoke.spec.ts` y `apps/web/src/main.tsx`, conservando las salvaguardas del proyecto (Node 24.20.0, `pathToFileURL`, `DATABASE_URL`/`SQLITE_DB_PATH`, timeout de Vitest, Playwright local, `lib: ["ES2022", "DOM"]` en e2e, `React.lazy` del 3D y service worker solo en producción).
 - Corregidos:
@@ -573,6 +671,7 @@
 - Preparado el prompt `docs/ARGON/09-pulido-ui-v6.md` y el ZIP `cafetulia-ui-v6.zip` para la siguiente iteración de Argon.
 
 **Decisiones:**
+
 - La placa conmemorativa usa **O & A** (D-070).
 - La interacción principal será clic/tap; arrastrar será una mejora opcional, nunca la única forma (D-071).
 - El sonido de moneda será sintetizado e inspirado en el arcade clásico, sin samples de Nintendo (D-072).
@@ -580,12 +679,14 @@
 - Final escenificado por fases: FINAL → ganador → confeti → ranking → créditos (D-074).
 
 **Problemas:**
+
 - Los bugs de cabecera, menús y final siguen abiertos; el siguiente ZIP debe corregirlos.
 - La UI todavía se percibe genérica y con pocas transiciones; falta un pase de movimiento global.
 - El cambio de comodín necesita explicación contextual y menos protagonismo.
 - Render y las pruebas en iPhone/Android reales siguen pendientes.
 
 **Siguiente:**
+
 1. Enviar `cafetulia-ui-v6.zip` y el prompt 09 a Argon.
 2. Integrar y verificar la v6 con puntuaciones altas, menús y final forzado.
 3. Desplegar en Render y probar en móviles reales.
@@ -597,6 +698,7 @@
 **Objetivo:** integrar la cuarta versión de Argon con los bugs P0 corregidos y las mejoras de cartas, monedas, avatares, subtítulos, 3D y PWA.
 
 **Hecho:**
+
 - Extraído y analizado `cafetulia (3).zip`.
 - Integrados:
   - Colores de monedas 1 negra / 5 roja / 10 azul, pilas exactas y coin flip con arco, giro 3D y sombra.
@@ -623,6 +725,7 @@
 - Capturas nuevas en `docs/referencias/ui-portada.png`, `ui-portada-movil.png`, `ui-partida.png`, `ui-partida-movil.png` y `ui-cafe-3d.png`.
 
 **Decisiones:**
+
 - v1.2 integrada y verificada (D-065).
 - 16 avatares prehechos y `avatarId` compartido (D-066).
 - Subtítulos de eventos activables (D-067).
@@ -630,12 +733,14 @@
 - Café Vivo 3D con carga diferida (D-069).
 
 **Problemas:**
+
 - En el modal 3D las personas se ven pequeñas con el zoom por defecto; conviene acercar la cámara o añadir enfoque de mesa.
 - Las frases de las cartas pequeñas se recortan; habría que acortarlas o moverlas a un panel de detalle.
 - Render free usa SQLite en `/tmp` (efímero); para persistencia real haría falta un plan con disco o Postgres.
 - Falta probar en iPhone/Android reales y desplegar.
 
 **Siguiente:**
+
 1. Desplegar en Render y probar en móviles reales.
 2. Ajustar zoom 3D por defecto y legibilidad de cartas.
 3. QA final con la novia.
@@ -647,6 +752,7 @@
 **Objetivo:** integrar la nueva versión de Argon con el rediseño visual: pantalla única, tablero ilustrado, cartas con personalidad y monedas animadas.
 
 **Hecho:**
+
 - Extraído y analizado `cafetulia (2).zip`.
 - Integrados los nuevos componentes:
   - `IllustratedBoard.tsx`: tablero ilustrado con mesas, sillas, fichas, barra central y nombres.
@@ -674,17 +780,20 @@
   - Capturas nuevas en `docs/referencias/ui-partida.png`, `ui-partida-movil.png` y `ui-cafe-3d.png`.
 
 **Decisiones:**
+
 - Rediseño de UI v1.1 integrado y verificado (D-062).
 - 24 personajes con nombre y frase + 2 comodines (D-063).
 - Monedas 1/5/10 con animación de ida y vuelta (D-064).
 
 **Problemas:**
+
 - El tablero ilustrado sigue siendo muy denso: 24 mesas + 68 sillas con banderas compiten entre sí. Habría que reducir el ruido visual de las sillas vacías.
 - El bundle principal pesa ~830 KB (Three.js incluido).
 - La PWA no tiene service worker/offline.
 - Falta probar en iPhone/Android reales y desplegar en Render.
 
 **Siguiente:**
+
 1. Desplegar en Render.
 2. Probar en móviles reales.
 3. Simplificar el tablero: sillas vacías con color/forma, no bandera; bandera solo en mesas y sillas compartidas.
@@ -697,6 +806,7 @@
 **Objetivo:** analizar `cafetulia (1).zip`, integrar la nueva versión y comprobar si realmente funciona.
 
 **Hecho:**
+
 - Extraído y analizado el ZIP nuevo: incluye servidor Colyseus con salas, SQLite, bots, temporizador, reconexión, chat, revancha, UI 2.5D + 2D, audio, tutorial, PWA y CI.
 - Detectado que el `package.json` raíz venía vacío y que el servidor usa `node:sqlite` (Node 22.5+).
 - Instalado **Node 24.20.0 LTS** con `winget` (el sistema tenía Node 20.20.2).
@@ -721,18 +831,21 @@
 - Revisada la UI con captura real: portada y partida 2.5D + 2D se ven correctamente.
 
 **Decisiones:**
+
 - La v2 se considera integrada y la **v1.0 implementada** (D-058).
 - Node 24 LTS es el entorno local; Node 22.5+ mínimo (D-059).
 - `npx pnpm dev` arranca el servidor full-stack (D-060).
 - La rejilla 2D usa coordenadas 0–12 (D-061).
 
 **Problemas:**
+
 - El viewport 3D superior es pequeño y recorta parte del diorama; funciona como vista decorativa, pero hay que pulirlo.
 - El bundle principal pesa ~811 KB (Three.js incluido); conviene code-splitting.
 - Falta probar en iPhone/Android reales y desplegar en Render.
 - `node:sqlite` obliga a Node 22.5+; hay que documentarlo y fijarlo en Render.
 
 **Siguiente:**
+
 1. Desplegar en Render con `DATABASE_URL` y volumen persistente.
 2. Probar en móviles reales y ajustar la UI táctil.
 3. Pulir el diorama 3D y el code-splitting.
@@ -745,6 +858,7 @@
 **Objetivo:** revisar el ZIP de Cafetulia generado por Gemini 4 Argon, evaluar su calidad e integrarlo en el repositorio.
 
 **Hecho:**
+
 - Extraído `cafetulia.zip` de Descargas y revisado su contenido.
 - Confirmado que Argon completó:
   - Scaffolding del monorepo con pnpm workspaces.
@@ -767,16 +881,19 @@
   - `GET http://localhost:2567/health` → **200 `{"status":"ok"}`**.
 
 **Decisiones:**
+
 - El trabajo de Argon se considera **Fase 2 completada** (D-055).
 - El test de simulación se mantiene en 1.000 partidas, con timeout ampliado y yields (D-056).
 - ESLint permite non-null assertions en tests (D-057).
 
 **Problemas:**
+
 - El cliente es solo un esqueleto: muestra el título, sin tablero ni UI de juego.
 - El servidor solo tiene `/health`; las salas, la reconexión y la persistencia son placeholders.
 - `packages/ui`, `tools` y `e2e` son placeholders.
 
 **Siguiente:**
+
 1. Empezar la Fase 3: servidor online con Colyseus, salas, reconexión y persistencia.
 2. Después, Fase 4: cliente 2.5D y UI completa.
 3. Mantener el motor congelado salvo bugs.
@@ -788,6 +905,7 @@
 **Objetivo:** dejar el tipo visual del juego completamente descrito para que Argon no improvise.
 
 **Hecho:**
+
 - Creada `docs/ARTE_BIBLE.md` con:
   - Concepto y referencias.
   - Paleta base y acentos por país.
@@ -799,12 +917,15 @@
 - Actualizados `ARTE.md`, `README.md`, `AGENTS.md`, `ARGON/00-contexto.md` y `ARGON/04-cliente-2.5d.md` para enlazarla.
 
 **Decisiones:**
+
 - La biblia visual queda como referencia obligatoria para arte, UI y 3D (D-054).
 
 **Problemas:**
+
 - Quedan abiertas decisiones menores: proporción final de personajes, paleta definitiva por país, logo y modo noche.
 
 **Siguiente:**
+
 1. Arrancar la fase 1 con Argon.
 2. Hacer el style test de la fase 5 antes de producir los 28 personajes.
 3. Elegir logo y proporciones definitivas.
@@ -816,6 +937,7 @@
 **Objetivo:** generar los datos definitivos del tablero y preparar las instrucciones de programación para Gemini 4 Argon.
 
 **Hecho:**
+
 - Confirmado el mapeo de las 24 mesas con el usuario.
 - Ajustadas las filas del centro y de la parte inferior para cuadrar con las cuentas oficiales.
 - Generado `packages/content/board.json`:
@@ -835,14 +957,17 @@
   8. Despliegue.
 
 **Decisiones:**
+
 - El mapeo de mesas queda cerrado (D-051).
 - `board.json` queda validado (D-052).
 - La programación se reserva a Gemini 4 Argon, con los prompts de `docs/ARGON/` (D-053).
 
 **Problemas:**
+
 - Ninguno bloqueante. Queda elegir cuándo se arranca la programación.
 
 **Siguiente:**
+
 1. Arrancar con Gemini 4 Argon por la fase 1 (scaffolding).
 2. Revisar el resultado de cada fase y actualizar el registro.
 3. Preparar la prueba de estilo con Gemini 4 Argon cuando toque la fase de arte.
@@ -854,6 +979,7 @@
 **Objetivo:** preparar el borrador de las 24 mesas a partir de las fotos y dejar claro el uso de Gemini 4 Argon.
 
 **Hecho:**
+
 - Creado `docs/referencias/mapeo-mesas-borrador.md` con:
   - Rejilla 13×13 con los códigos de país propuestos.
   - Detalle de las 24 mesas: posición, etiqueta impresa (no fiable) y país propuesto.
@@ -862,13 +988,16 @@
 - Anotado que **Gemini 4 Argon** se reserva para la programación y los modelos que se usen.
 
 **Decisiones:**
+
 - La programación se reserva para Gemini 4 Argon; este agente no escribirá código.
 - El mapeo de mesas queda pendiente de revisión del usuario.
 
 **Problemas:**
+
 - El mapeo es un borrador; hay que confirmar las 24 mesas.
 
 **Siguiente:**
+
 1. Revisar el borrador de mapeo y corregir lo que haga falta.
 2. Preparar la especificación y los datos para que Gemini 4 Argon programe.
 3. Definir la prueba de estilo con Gemini 4 Argon.
@@ -880,17 +1009,21 @@
 **Objetivo:** cerrar la lista completa de países y su orden.
 
 **Hecho:**
+
 - Confirmados los dos que faltaban: **Inglaterra** y **Francia**.
 - Orden completo en sentido horario desde arriba a la izquierda: **África, Italia, China, España, URS (Rusia), India, América, Alemania, Turquía, Cuba, Inglaterra y Francia**.
 - Actualizados `REGLAS.md` y `DECISIONES.md` (D-002 y D-050).
 
 **Decisiones:**
+
 - La lista de 12 países y su orden cíclico quedan cerrados.
 
 **Problemas:**
+
 - Falta traducir ese orden a las 24 mesas concretas del tablero (2 por país).
 
 **Siguiente:**
+
 1. Preparar el mapeo de las 24 mesas por posición.
 2. Probar Gemini 4 Argon en la prueba de estilo.
 3. Preparar el scaffolding del monorepo (cuando el usuario dé el visto bueno).
@@ -902,6 +1035,7 @@
 **Objetivo:** cerrar el nombre, conectar el repositorio remoto, registrar el orden de países y anotar el modelo de IA a probar.
 
 **Hecho:**
+
 - Nombre decidido: **Cafetulia**.
 - Repositorio remoto configurado: <https://github.com/Oli358/cafetulia-game.git>.
 - Rama `main` subida a GitHub.
@@ -910,16 +1044,19 @@
 - Anotado **Gemini 4 Argon** como modelo de IA a probar.
 
 **Decisiones:**
+
 - Nombre comercial: **Cafetulia** (D-041).
 - Repositorio remoto: `cafetulia-game` (D-048).
 - Modelo de IA a probar: Gemini 4 Argon (D-049).
 - Orden de países: 10 confirmados; faltan 2 (D-050).
 
 **Problemas:**
+
 - La lista de países tiene 10; el juego original tiene 12. Probablemente faltan Francia e Inglaterra.
 - Falta confirmar el mapeo definitivo de las 24 mesas.
 
 **Siguiente:**
+
 1. Confirmar los 2 países que faltan y el orden completo.
 2. Probar Gemini 4 Argon en la prueba de estilo.
 3. Preparar el scaffolding del monorepo (cuando el usuario dé el visto bueno).
@@ -931,6 +1068,7 @@
 **Objetivo:** corregir la interpretación de las fotos, preparar el repositorio local y generar nombres más originales.
 
 **Hecho:**
+
 - Confirmado que las fotos son reales; el tablero tiene 24 mesas y 12 países, 2 por país.
 - Corregidos `REGLAS.md`, `DECISIONES.md` y `SESIONES.md`: se ignoran las etiquetas impresas erróneas (por ejemplo, “CANADÁ” donde debe ser Inglaterra).
 - Movidas las fotos a `docs/referencias/` con nombres claros: `tablero-real-sin-fichas.png` y `tablero-real-con-fichas.jpg`.
@@ -939,16 +1077,19 @@
 - Generada la ronda 3 de nombres, con comprobación de dominios; actualizado `docs/NOMBRES.md`.
 
 **Decisiones:**
+
 - Las fotos son la referencia real del tablero.
 - Los nombres y banderas impresas no son fiables; se mapean los 12 países oficiales por posición.
 - Repositorio local listo; el remoto de GitHub se crea cuando haya nombre.
 - La ronda 3 de nombres queda pendiente de elección.
 
 **Problemas:**
+
 - Falta confirmar el mapeo definitivo de los 12 países en las 24 mesas.
 - El nombre sigue sin decidirse.
 
 **Siguiente:**
+
 1. Elegir nombre de la ronda 3.
 2. Confirmar el mapeo de países por posición.
 3. Crear el repositorio remoto y subir.
@@ -961,6 +1102,7 @@
 **Objetivo:** revisar las imágenes añadidas al directorio para usarlas como referencia del tablero real.
 
 **Hecho:**
+
 - Analizadas `Tablero Café International sin fichas.png` e `Imagen de ChatGPT 22 oct 2026, 13_02_20.jpg`.
 - Confirmado: **son fotos reales del tablero físico**, no imágenes generadas.
 - El tablero tiene **24 mesas y 12 países, 2 mesas por país**.
@@ -968,15 +1110,18 @@
 - Las fotos sirven como **referencia real de topología y de estilo 2.5D**: tablero plano, sillas y mesas con volumen suave, barra central en rombo.
 
 **Decisiones:**
+
 - Usar estas fotos como referencia real del tablero.
 - Ignorar los nombres y banderas impresas cuando no coincidan.
 - Mantener los 12 países oficiales: África, Alemania, China, Cuba, España, Estados Unidos, Francia, India, Inglaterra, Italia, Rusia y Turquía, mapeados por posición.
 - Pendiente: confirmar el mapeo definitivo de cada mesa con el tablero delante.
 
 **Problemas:**
+
 - Hay que fijar qué país corresponde a cada una de las 24 mesas ignorando las etiquetas erróneas.
 
 **Siguiente:**
+
 1. Confirmar el mapeo de los 12 países por posición.
 2. Elegir nombre entre las nuevas opciones.
 3. Crear el `board.json` definitivo y validarlo.
@@ -988,6 +1133,7 @@
 **Objetivo:** cerrar las decisiones de producto y dejar preparada la documentación y la estructura del proyecto, sin programar todavía.
 
 **Hecho:**
+
 - Investigación del juego: reglamento AMIGO 2009, Rio Grande 2015, Spiel des Jahres, BoardGameGeek y fotos del tablero.
 - Resumen operativo de reglas y del tablero (13×13, 24 mesas, 68 sillas, 28 sillas compartidas, 20 plazas de barra).
 - Definición de la visión: 2.5D papercraft, tablero 2D fiel + fichas y mobiliario 3D.
@@ -995,6 +1141,7 @@
 - Creación de la estructura de carpetas y de la documentación inicial.
 
 **Decisiones destacadas:**
+
 - 2–4 jugadores desde la v1.0.
 - Sin variante de 4 del mismo sexo por ahora.
 - Comodines no van a la barra.
@@ -1011,11 +1158,13 @@
 - Arte original, cómico y papercraft.
 
 **Problemas:**
+
 - Falta la foto del tablero vacío para transcribir con seguridad las 68 sillas.
 - Nombre comercial aún pendiente.
 - El modo asíncrono depende de que el servidor gratuito esté siempre levantado.
 
 **Siguiente:**
+
 1. Recibir la foto del tablero y crear el primer `board.json`.
 2. Elegir nombre y crear el repositorio definitivo.
 3. Montar el scaffolding del monorepo.

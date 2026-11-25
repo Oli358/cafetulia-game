@@ -1,32 +1,32 @@
-@import "@fontsource/fraunces/latin-400.css";
-@import "@fontsource/fraunces/latin-600.css";
-@import "@fontsource/fraunces/latin-600-italic.css";
-@import "@fontsource/fraunces/latin-700.css";
-@import "@fontsource/fraunces/latin-800.css";
-@import "@fontsource/nunito-sans/latin-400.css";
-@import "@fontsource/nunito-sans/latin-600.css";
-@import "@fontsource/nunito-sans/latin-700.css";
-@import "@fontsource/nunito-sans/latin-800.css";
-@import "tailwindcss";
+@import '@fontsource/fraunces/latin-400.css';
+@import '@fontsource/fraunces/latin-600.css';
+@import '@fontsource/fraunces/latin-600-italic.css';
+@import '@fontsource/fraunces/latin-700.css';
+@import '@fontsource/fraunces/latin-800.css';
+@import '@fontsource/nunito-sans/latin-400.css';
+@import '@fontsource/nunito-sans/latin-600.css';
+@import '@fontsource/nunito-sans/latin-700.css';
+@import '@fontsource/nunito-sans/latin-800.css';
+@import 'tailwindcss';
 
 @layer base {
   :root {
-    --bg-cream: #F6EFE4;
-    --bg-card: #FFFDF8;
-    --bg-paper: #EFE3CE;
-    --bg-paper-warm: #F4E8D4;
-    --ink-main: #2F211C;
+    --bg-cream: #f6efe4;
+    --bg-card: #fffdf8;
+    --bg-paper: #efe3ce;
+    --bg-paper-warm: #f4e8d4;
+    --ink-main: #2f211c;
     --ink-strong: #231712;
-    --ink-muted: #6C564A;
-    --wood-warm: #7B5236;
-    --wood-deep: #5A3A26;
-    --terracotta: #C86B46;
-    --caramel: #D69B43;
-    --sage: #3D5B47;
-    --gold: #C8A12A;
-    --danger: #A63F34;
-    --font-serif: "Fraunces", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
-    --font-sans: "Nunito Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    --ink-muted: #6c564a;
+    --wood-warm: #7b5236;
+    --wood-deep: #5a3a26;
+    --terracotta: #c86b46;
+    --caramel: #d69b43;
+    --sage: #3d5b47;
+    --gold: #c8a12a;
+    --danger: #a63f34;
+    --font-serif: 'Fraunces', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+    --font-sans: 'Nunito Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 
@@ -46,7 +46,9 @@
   h3,
   .font-serif {
     font-family: var(--font-serif);
-    font-feature-settings: "kern" 1, "liga" 1;
+    font-feature-settings:
+      'kern' 1,
+      'liga' 1;
   }
 
   .font-sans {
@@ -56,12 +58,14 @@
 
 /* Tactile Cotton Paper & Printmaking Surfaces (ARTE_BIBLE.md) */
 .cafe-paper-sheet {
-  background-color: #FFFDF8;
+  background-color: #fffdf8;
   background-image:
     radial-gradient(rgba(123, 82, 54, 0.045) 1px, transparent 0),
-    radial-gradient(rgba(200, 161, 42, 0.035) 1px, #FFFDF8 0);
+    radial-gradient(rgba(200, 161, 42, 0.035) 1px, #fffdf8 0);
   background-size: 18px 18px;
-  background-position: 0 0, 9px 9px;
+  background-position:
+    0 0,
+    9px 9px;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
     inset 0 0 0 1px rgba(200, 161, 42, 0.28),
@@ -70,8 +74,12 @@
 }
 
 .cafe-paper-subpanel {
-  background-color: #F5EBDD;
-  background-image: linear-gradient(180deg, rgba(255, 253, 248, 0.55) 0%, rgba(239, 227, 206, 0.35) 100%);
+  background-color: #f5ebdd;
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 253, 248, 0.55) 0%,
+    rgba(239, 227, 206, 0.35) 100%
+  );
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.75),
     0 2px 0 rgba(35, 23, 18, 0.18);
@@ -84,7 +92,7 @@
 
 .cafe-double-frame {
   box-shadow:
-    inset 0 0 0 3px #FFFDF8,
+    inset 0 0 0 3px #fffdf8,
     inset 0 0 0 4.5px rgba(200, 161, 42, 0.55),
     0 4px 0 #231712,
     0 14px 30px rgba(35, 23, 18, 0.18);
@@ -102,21 +110,24 @@
 .cafe-cardboard-tile-selected {
   box-shadow:
     inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
-    0 0 0 2.5px #C86B46,
+    0 0 0 2.5px #c86b46,
     0 5px 0 #231712,
     0 12px 22px rgba(200, 107, 70, 0.36);
 }
 
 /* Tactile Pressable Paper Buttons */
 .cafe-btn-primary {
-  background: linear-gradient(180deg, #D1744E 0%, #BE5F3A 100%);
-  color: #FFFDF8;
+  background: linear-gradient(180deg, #d1744e 0%, #be5f3a 100%);
+  color: #fffdf8;
   border: 2px solid #231712;
   box-shadow:
     inset 0 1.5px 0 rgba(255, 253, 248, 0.38),
     0 3.5px 0 #231712,
     0 7px 14px rgba(35, 23, 18, 0.2);
-  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms cubic-bezier(0.22, 1, 0.36, 1), filter 150ms ease;
+  transition:
+    transform 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 150ms ease;
 }
 
 .cafe-btn-primary:hover:not(:disabled) {
@@ -137,19 +148,22 @@
 }
 
 .cafe-btn-paper {
-  background: linear-gradient(180deg, #FFFDF8 0%, #F3E6D3 100%);
-  color: #2F211C;
+  background: linear-gradient(180deg, #fffdf8 0%, #f3e6d3 100%);
+  color: #2f211c;
   border: 2px solid #231712;
   box-shadow:
     inset 0 1.5px 0 rgba(255, 255, 255, 0.9),
     0 3px 0 #231712,
     0 5px 10px rgba(35, 23, 18, 0.12);
-  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms cubic-bezier(0.22, 1, 0.36, 1), background-color 150ms ease;
+  transition:
+    transform 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 150ms ease;
 }
 
 .cafe-btn-paper:hover:not(:disabled) {
   transform: translateY(-1.5px);
-  background: linear-gradient(180deg, #FFFDF8 0%, #EAD8BE 100%);
+  background: linear-gradient(180deg, #fffdf8 0%, #ead8be 100%);
   box-shadow:
     inset 0 1.5px 0 rgba(255, 255, 255, 0.95),
     0 4.5px 0 #231712,
@@ -164,14 +178,16 @@
 }
 
 .cafe-btn-sage {
-  background: linear-gradient(180deg, #466852 0%, #35513E 100%);
-  color: #FFFDF8;
+  background: linear-gradient(180deg, #466852 0%, #35513e 100%);
+  color: #fffdf8;
   border: 2px solid #231712;
   box-shadow:
     inset 0 1.5px 0 rgba(255, 253, 248, 0.3),
     0 3px 0 #231712,
     0 5px 10px rgba(35, 23, 18, 0.16);
-  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition:
+    transform 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 150ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .cafe-btn-sage:hover:not(:disabled) {
@@ -275,9 +291,9 @@
 }
 
 .high-contrast {
-  --bg-cream: #FFFDF9;
-  --ink-main: #140D0B;
-  --ink-muted: #2B1F1B;
+  --bg-cream: #fffdf9;
+  --ink-main: #140d0b;
+  --ink-muted: #2b1f1b;
   filter: contrast(1.12);
 }
 
@@ -286,11 +302,11 @@
 }
 
 .night-lamps {
-  --bg-cream: #1F1815;
-  --bg-card: #2B221E;
+  --bg-cream: #1f1815;
+  --bg-card: #2b221e;
   --bg-paper: #342823;
-  --ink-main: #FDF5E6;
-  --ink-muted: #D8C4B6;
+  --ink-main: #fdf5e6;
+  --ink-muted: #d8c4b6;
 }
 
 /* Turn-to-play cue: a warm frame around the whole table. */
@@ -361,15 +377,138 @@
 }
 @media (max-width: 640px) {
   .cafe-playing-bg {
-    background-size: 200% auto, 200% auto;
-    background-position: 18% top, 18% top;
+    background-size:
+      200% auto,
+      200% auto;
+    background-position:
+      18% top,
+      18% top;
     -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 58%, transparent 94%);
     mask-image: linear-gradient(180deg, #000 0%, #000 58%, transparent 94%);
   }
   .cafe-lobby-bg {
-    background-size: cover, cover, 200% auto;
-    background-position: center, center, 18% top;
+    background-size:
+      cover,
+      cover,
+      200% auto;
+    background-position:
+      center,
+      center,
+      18% top;
   }
+}
+
+/* Scroll de la casa: fino, cálido y nada de barras grises del navegador */
+.cafe-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #c9a227 rgba(35, 23, 18, 0.08);
+  overscroll-behavior: contain;
+}
+.cafe-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.cafe-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+  margin: 6px 2px;
+}
+.cafe-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(201, 162, 39, 0.55) 0%, rgba(139, 94, 60, 0.6) 100%);
+  border-radius: 999px;
+  border: 2px solid #fffdf8;
+  box-shadow: inset 0 0 0 1px rgba(35, 23, 18, 0.08);
+}
+.cafe-scroll::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(209, 116, 78, 0.9) 0%, rgba(184, 90, 55, 0.9) 100%);
+}
+.cafe-scroll-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.cafe-scroll-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Interruptor de la casa */
+.cafe-switch {
+  position: relative;
+  display: inline-flex;
+  width: 44px;
+  height: 26px;
+  flex: none;
+  align-items: center;
+  border-radius: 999px;
+  border: 2px solid #231712;
+  background: #e6d6c0;
+  box-shadow: inset 0 1px 2px rgba(35, 23, 18, 0.18);
+  transition: background-color 180ms ease;
+}
+.cafe-switch::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #fffdf8;
+  border: 1.5px solid #231712;
+  box-shadow: 0 1.5px 0 #231712;
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cafe-switch[data-on='true'] {
+  background: #c96f4a;
+}
+.cafe-switch[data-on='true']::after {
+  transform: translateX(18px);
+}
+
+/* Deslizadores de volumen */
+.cafe-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(35, 23, 18, 0.25);
+  background: linear-gradient(
+    90deg,
+    #c96f4a 0%,
+    #c96f4a var(--fill, 50%),
+    #e6d6c0 var(--fill, 50%),
+    #e6d6c0 100%
+  );
+  box-shadow: inset 0 1px 2px rgba(35, 23, 18, 0.12);
+  cursor: pointer;
+}
+.cafe-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 19px;
+  height: 19px;
+  border-radius: 999px;
+  background: #fffdf8;
+  border: 2px solid #231712;
+  box-shadow: 0 2px 0 #231712;
+  cursor: grab;
+}
+.cafe-range::-webkit-slider-thumb:active {
+  cursor: grabbing;
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #231712;
+}
+.cafe-range::-moz-range-thumb {
+  width: 17px;
+  height: 17px;
+  border-radius: 999px;
+  background: #fffdf8;
+  border: 2px solid #231712;
+  box-shadow: 0 2px 0 #231712;
+  cursor: grab;
+}
+.cafe-range::-moz-range-track {
+  height: 7px;
+  border-radius: 999px;
+  background: transparent;
 }
 
 /* Aviso de orientación: en móvil horizontal el juego no es legible */
@@ -426,8 +565,12 @@
   background-image:
     radial-gradient(rgba(62, 47, 42, 0.16) 0.7px, transparent 0.8px),
     radial-gradient(rgba(255, 248, 236, 0.24) 0.7px, transparent 0.8px);
-  background-size: 9px 9px, 13px 13px;
-  background-position: 0 0, 4px 5px;
+  background-size:
+    9px 9px,
+    13px 13px;
+  background-position:
+    0 0,
+    4px 5px;
   mix-blend-mode: multiply;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -455,7 +598,8 @@
 
 /* Ingredientes flotantes del lobby: viven en los márgenes, no en la mesa */
 @keyframes lobby-drift {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate3d(0, 0, 0) rotate(var(--lobby-rotate, 0deg));
   }
   50% {
@@ -476,7 +620,8 @@
 
 /* Papeles de menú flotando tras el póster de portada */
 @keyframes paper-drift {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate3d(0, 0, 0) rotate(var(--paper-rotate, 0deg));
   }
   50% {
@@ -485,9 +630,7 @@
 }
 .floating-paper {
   padding: 10px 12px 8px;
-  background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.55), transparent 46%),
-    #fbf6eb;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.55), transparent 46%), #fbf6eb;
   border: 1px solid rgba(35, 23, 18, 0.1);
   border-radius: 2px;
   box-shadow: 0 14px 24px rgba(35, 23, 18, 0.1);
