@@ -414,6 +414,47 @@ describe('Phase 3: Online Server, Rooms, Reconnection, Timer & Persistence', () 
       });
       expect(hostStart.status).toBe(200);
 
+      const authRoom = await fetch(`${baseUrl}/rooms/${created.code}`, {
+        headers: { Authorization: `Bearer ${created.hostToken}` },
+      });
+      const authSnapshot = (await authRoom.json()) as {
+        snapshot: {
+          gameState: {
+            turn: string;
+            hands: Record<string, { id: string; nation: string }[]>;
+          };
+        };
+      };
+      const turnId = authSnapshot.snapshot.gameState.turn;
+      const turnToken = turnId === created.hostId ? created.hostToken : guestToken;
+      const wrongToken = turnId === created.hostId ? guestToken : created.hostToken;
+      const turnTile = authSnapshot.snapshot.gameState.hands[turnId]?.find(
+        (tile) => tile.nation !== 'joker',
+      );
+      expect(turnTile).toBeDefined();
+
+      const wrongMove = await fetch(`${baseUrl}/rooms/${created.code}/moves`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${wrongToken}`,
+        },
+        body: JSON.stringify({ move: { type: 'bar', tileId: turnTile?.id } }),
+      });
+      expect(wrongMove.status).toBe(422);
+      const wrongMoveBody = (await wrongMove.json()) as { error?: { code?: string } };
+      expect(wrongMoveBody.error?.code).toBe('NOT_PLAYER_TURN');
+
+      const rightMove = await fetch(`${baseUrl}/rooms/${created.code}/moves`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${turnToken}`,
+        },
+        body: JSON.stringify({ move: { type: 'bar', tileId: turnTile?.id } }),
+      });
+      expect(rightMove.status).toBe(200);
+
       // A token that shares the host token prefix must become a new member, never overwrite the host.
       const prefixToken = `${created.hostToken.slice(0, 10)}${'x'.repeat(40)}`;
       const spoofJoin = await fetch(`${baseUrl}/rooms/${created.code}/join`, {
