@@ -1,16 +1,9 @@
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import {
-  finalScores,
-  getLegalMoves,
-  type Nation,
-  type Seat,
-  type Table,
-  type Tile,
-} from '@cafetulia/engine';
+import { getLegalMoves, type Nation, type Seat, type Table, type Tile } from '@cafetulia/engine';
 import {
   CAFE_DAILY_PHRASES,
-  formatScoreEs,
+  decomposeCoins,
   getCafeGreeting,
   getCharacterProfile,
   NATION_VISUALS,
@@ -31,7 +24,7 @@ import {
   getNationName,
   inspectSeatsForSelectedTile,
 } from '../utils/moveHelper';
-import { CoinTray, FlyingCoinsLayer, type CoinFlightEvent } from './CoinTray';
+import { AnimatedScore, CoinTray, FlyingCoinsLayer, type CoinFlightEvent } from './CoinTray';
 import { IllustratedBoard, type ChairToastInfo } from './IllustratedBoard';
 import { AnchoredPopover } from './Modals';
 import { AvatarDropdownPicker as TitleAvatarPicker } from './TitlePickers';
@@ -2214,6 +2207,17 @@ export function PlayingScreen(): React.ReactElement {
     return map;
   }, [snapshot?.members, gameState?.players]);
 
+  // Live rank by total coins. Ties share position; the turn glow is independent.
+  const rankByPlayerId = useMemo(() => {
+    const players = [...(gameState?.players ?? [])].sort((a, b) => b.score - a.score);
+    const uniqueScores = [...new Set(players.map((p) => p.score))];
+    const ranks = new Map<string, number>();
+    for (const player of players) {
+      ranks.set(player.id, uniqueScores.indexOf(player.score) + 1);
+    }
+    return ranks;
+  }, [gameState?.players]);
+
   // Turn countdown timer
   useEffect(() => {
     const deadline = snapshot?.turnDeadlineMs ?? null;
@@ -3195,33 +3199,70 @@ export function PlayingScreen(): React.ReactElement {
                 const pHandCount = (gameState.hands[p.id] ?? []).length;
                 const isTurn = gameState.turn === p.id;
                 const pAvatar = avatarByPlayerId[p.id] ?? p.avatarId ?? 'moka';
+                const rank = rankByPlayerId.get(p.id) ?? 1;
+                const breakdown = decomposeCoins(p.score);
+                const coinLine =
+                  p.score === 0
+                    ? 'sin monedas'
+                    : `${breakdown.isNegative ? '−' : ''}${breakdown.stacks
+                        .map((stack) => `${stack.denomination}×${stack.count}`)
+                        .join(' · ')}`;
+                const rankStyle =
+                  rank === 1
+                    ? 'border-[#231712] bg-[#C9A227] text-[#231712] shadow-[0_1.5px_0_#231712]'
+                    : rank === 2
+                      ? 'border-[#8A7365]/45 bg-[#E7DFD2] text-[#4B3A31]'
+                      : rank === 3
+                        ? 'border-[#7B5236] bg-[#C98A5A] text-[#FFF9F0]'
+                        : 'border-[#231712]/20 bg-[#FFF9F0] text-[#6F5A4E]';
                 return (
                   <div
                     key={p.id}
                     data-testid={`scoreboard-player-${p.id}`}
-                    className={`cafe-score-card flex flex-col gap-0.5 rounded-xl border px-1.5 py-0.5 text-xs transition-colors duration-200 lg:gap-1 lg:py-1 ${
+                    className={`cafe-score-card flex flex-col gap-0.5 rounded-xl border px-1.5 py-1 text-xs transition-colors duration-200 lg:py-1.5 ${
                       isTurn
                         ? `${reducedMotion ? 'cafe-score-active-static' : 'cafe-score-active'} bg-[#FEF6E0] border-[#C96F4A]`
                         : 'bg-[#F7EEDF]/85 border-[#231712]/12'
                     }`}
                   >
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <PlayerAvatar avatarId={pAvatar} size={18} />
-                      <span className="font-bold text-[#3E2F2A] truncate flex-1">{p.nickname}</span>
+                    <div className="flex min-w-0 items-center gap-1.5">
                       <span
-                        className="text-[9px] font-mono font-semibold text-[#6F5A4E] bg-[#FFF9F0] px-1 py-0.2 rounded border border-[#231712]/15 tabular-nums"
+                        className={`flex h-[19px] w-[19px] shrink-0 items-center justify-center rounded-full border font-serif text-[10px] font-extrabold leading-none ${rankStyle}`}
+                        title={`Posición ${rank}º por monedas`}
+                      >
+                        {rank}º
+                      </span>
+                      <PlayerAvatar avatarId={pAvatar} size={18} />
+                      <span className="min-w-0 flex-1 truncate font-bold text-[#3E2F2A]">
+                        {p.nickname}
+                      </span>
+                      <span
+                        className="shrink-0 rounded border border-[#231712]/15 bg-[#FFF9F0] px-1 py-0.2 font-mono text-[9px] font-semibold tabular-nums text-[#6F5A4E]"
                         title={`${pHandCount} fichas en mano`}
                       >
                         {pHandCount}c
                       </span>
                     </div>
-                    <div className="flex flex-wrap items-center gap-1 min-w-0">
-                      <CoinTray
-                        score={p.score}
-                        playerId={p.id}
-                        compact
-                        reducedMotion={reducedMotion}
-                      />
+                    <div className="flex items-end justify-between gap-1">
+                      <span
+                        className="min-w-0 truncate font-mono text-[8px] font-semibold tabular-nums text-[#8A7365]"
+                        title="Desglose de monedas 10 / 5 / 1"
+                      >
+                        {coinLine}
+                      </span>
+                      <span className="shrink-0 text-right leading-none">
+                        <AnimatedScore
+                          value={p.score}
+                          reducedMotion={reducedMotion}
+                          font="serif"
+                          className={`text-2xl leading-none sm:text-3xl ${
+                            p.score < 0 ? 'text-[#A94438]' : 'text-[#231712]'
+                          }`}
+                        />
+                        <span className="ml-0.5 text-[8px] font-extrabold uppercase tracking-wide text-[#8A7365]">
+                          pts
+                        </span>
+                      </span>
                     </div>
                   </div>
                 );
@@ -3873,442 +3914,4 @@ export function PlayingScreen(): React.ReactElement {
   );
 }
 
-const PAPER_CONFETTI_PIECES = Array.from({ length: 36 }, (_, idx) => ({
-  id: idx,
-  leftPct: 3 + ((idx * 29) % 94),
-  color:
-    idx % 5 === 0
-      ? '#C9A227'
-      : idx % 5 === 1
-        ? '#B3261E'
-        : idx % 5 === 2
-          ? '#1E4E8C'
-          : idx % 5 === 3
-            ? '#3F5E4A'
-            : '#C96F4A',
-  delay: (idx % 7) * 0.12,
-  duration: 2.0 + (idx % 4) * 0.35,
-  rotate: (idx % 2 === 0 ? 1 : -1) * (180 + idx * 14),
-}));
-
-/**
- * P0.3 — Full-Screen Staged Closing Celebration & Farewell Café Postcard (FinishedScreen)
- */
-export function FinishedScreen(): React.ReactElement {
-  const snapshot = useGameStore((s) => s.snapshot);
-  const shareResult = useGameStore((s) => s.shareResult);
-  const reducedMotion = useGameStore((s) => s.reducedMotion);
-  const voteRematch = useGameStore((s) => s.voteRematch);
-  const leaveRoom = useGameStore((s) => s.leaveRoom);
-  const [postcardUrl, setPostcardUrl] = useState<string | null>(null);
-  const [recountStep, setRecountStep] = useState<'table' | 'penalty' | 'final'>(
-    reducedMotion ? 'final' : 'table',
-  );
-  const [sequenceSkipped, setSequenceSkipped] = useState<boolean>(reducedMotion);
-
-  useEffect(() => {
-    if (reducedMotion || sequenceSkipped) {
-      setRecountStep('final');
-      return;
-    }
-    soundEngine.playSfx('bell');
-    const t1 = setTimeout(() => {
-      soundEngine.playSfx('coinPenalty');
-      setRecountStep('penalty');
-    }, 550);
-    const t2 = setTimeout(() => {
-      soundEngine.playSfx('victoryFanfare');
-      setRecountStep('final');
-    }, 1150);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-    };
-  }, [reducedMotion, sequenceSkipped]);
-
-  if (!snapshot || !snapshot.gameState) return <div />;
-
-  const summary = finalScores(snapshot.gameState);
-  const standings = snapshot.gameState.players
-    .map((p) => {
-      const s = summary.scores[p.id];
-      const member = snapshot.members.find((m) => m.id === p.id);
-      const isBot = p.isBot || member?.role === 'bot';
-      return {
-        id: p.id,
-        nickname: p.nickname,
-        isBot,
-        avatarId: member?.avatarId ?? p.avatarId ?? 'moka',
-        tablePoints: s?.tableAndBarScore ?? p.score,
-        naturalLeft: s?.naturalTilesRemaining ?? 0,
-        jokerLeft: s?.jokersRemaining ?? 0,
-        penalty: s?.handPenalty ?? 0,
-        finalScore: s?.finalScore ?? p.score,
-        isWinner: summary.winners.includes(p.id),
-      };
-    })
-    .sort((a, b) => b.finalScore - a.finalScore);
-
-  const isSharedVictory = summary.winners.length > 1;
-  const topWinner = standings.find((st) => st.isWinner) ?? standings[0];
-
-  const humanPlayers = snapshot.members.filter((m) => m.role === 'player');
-  const rematchVotesCount = humanPlayers.filter((m) => m.rematchVote === true).length;
-
-  const reasonLabels: Record<string, string> = {
-    last_seat_occupied: 'Se ha ocupado la última silla del café.',
-    bar_full: 'Se ha llenado la vigésima plaza de la barra.',
-    player_empty_hand: 'Un jugador ha agotado su mano sin fichas para robar.',
-    bag_threshold_reached: 'Quedan solo 3 fichas en la bolsa de terciopelo.',
-    last_player_standing: 'El resto de jugadores abandonaron la mesa.',
-  };
-
-  const generatePostcard = () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 800;
-    canvas.height = 460;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.fillStyle = '#F7EEDF';
-    ctx.fillRect(0, 0, 800, 460);
-    ctx.strokeStyle = '#C9A227';
-    ctx.lineWidth = 6;
-    ctx.strokeRect(18, 18, 764, 424);
-
-    ctx.fillStyle = '#3E2F2A';
-    ctx.font = 'bold 36px serif';
-    ctx.fillText('Cafetulia — una tertulia de café', 48, 72);
-
-    ctx.fillStyle = '#6F5A4E';
-    ctx.font = '18px sans-serif';
-    ctx.fillText(
-      `Mesa #${snapshot.code} · ${new Date().toLocaleDateString('es-ES')} · O & A`,
-      48,
-      106,
-    );
-
-    standings.forEach((row, idx) => {
-      const y = 168 + idx * 56;
-      ctx.fillStyle = row.isWinner ? '#FEF6E0' : '#FFF9F0';
-      ctx.fillRect(48, y - 34, 704, 46);
-      ctx.fillStyle = '#3E2F2A';
-      ctx.font = 'bold 21px sans-serif';
-      ctx.fillText(
-        `${idx + 1}. ${row.nickname}${row.isBot ? ' (Bot)' : ''} ${row.isWinner ? '★ Ganador' : ''}`,
-        66,
-        y - 4,
-      );
-      ctx.textAlign = 'right';
-      ctx.fillText(
-        `${formatScoreEs(row.tablePoints)} pts − ${formatScoreEs(Math.abs(row.penalty))} penaliz. = ${formatScoreEs(row.finalScore)} pts`,
-        730,
-        y - 4,
-      );
-      ctx.textAlign = 'left';
-    });
-
-    setPostcardUrl(canvas.toDataURL('image/png'));
-  };
-
-  return (
-    <div
-      data-testid="finished-screen"
-      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden p-2 sm:p-5 flex flex-col items-center justify-center relative select-none bg-[#E6D3B8] safe-bottom"
-    >
-      {/* Warm Evening Café Window Backdrop */}
-      <svg
-        viewBox="0 0 1440 900"
-        preserveAspectRatio="xMidYMid slice"
-        className="pointer-events-none absolute inset-0 w-full h-full"
-        aria-hidden="true"
-      >
-        <defs>
-          <radialGradient id="closing-glow" cx="50%" cy="35%" r="65%">
-            <stop offset="0%" stopColor="#FFF7E4" stopOpacity="0.88" />
-            <stop offset="55%" stopColor="#EAD9C0" stopOpacity="0.65" />
-            <stop offset="100%" stopColor="#5C3A21" stopOpacity="0.35" />
-          </radialGradient>
-        </defs>
-        <rect x="0" y="0" width="1440" height="900" fill="url(#closing-glow)" />
-        {/* Wood wainscot & brass lamps */}
-        <rect x="0" y="650" width="1440" height="250" fill="#5C3A21" opacity="0.85" />
-        <line x1="0" y1="650" x2="1440" y2="650" stroke="#C9A227" strokeWidth="4" />
-        <circle cx="240" cy="180" r="85" fill="#FFF6DE" opacity="0.45" />
-        <circle cx="1200" cy="180" r="85" fill="#FFF6DE" opacity="0.45" />
-      </svg>
-
-      {/* 3. Joyful 36-Piece Paper Confetti Shower (2–3 s, café/crema/rojo/azul) */}
-      {!reducedMotion && (
-        <div
-          className="pointer-events-none fixed inset-0 z-10 overflow-hidden"
-          aria-hidden="true"
-          data-testid="final-paper-confetti"
-        >
-          {PAPER_CONFETTI_PIECES.map((piece) => (
-            <motion.span
-              key={piece.id}
-              initial={{ y: -24, opacity: 1, rotate: 0 }}
-              animate={{ y: '94vh', opacity: [1, 1, 0], rotate: piece.rotate }}
-              transition={{
-                duration: piece.duration,
-                delay: piece.delay,
-                ease: 'easeOut',
-              }}
-              style={{
-                left: `${piece.leftPct}%`,
-                backgroundColor: piece.color,
-              }}
-              className="fixed top-0 w-3 h-2 rounded-[2px] border border-[#231712]/40 shadow-2xs"
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Main Farewell Café Postcard Sheet */}
-      <div className="relative z-20 w-full max-w-4xl cafe-paper-sheet rounded-[24px] p-3.5 sm:p-6 max-h-[96dvh] flex flex-col justify-between overflow-hidden gap-2.5 sm:gap-3.5">
-        {/* Decorative Washi Tape & Postmark Stamp */}
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute -top-2 left-1/2 -translate-x-1/2 w-28 h-4 rotate-[-1deg] bg-[#EAD9C0]/90 border border-[#8B5E3C]/35 rounded-xs shadow-2xs"
-        />
-
-        {/* Top Row: 1. Large Stamp «¡FINAL!» + Terminal Reason + Skip Button */}
-        <div className="shrink-0 flex items-center justify-between gap-2 cafe-double-rule pb-2.5">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <motion.span
-              data-testid="final-stamp-heading"
-              initial={reducedMotion ? false : { scale: 1.35, rotate: -6, opacity: 0 }}
-              animate={{ scale: 1, rotate: -2, opacity: 1 }}
-              transition={{ duration: reducedMotion ? 0 : 0.28, ease: 'easeOut' }}
-              className="inline-block px-3 py-1 rounded-xl bg-[#C96F4A] text-[#FFF9F0] border-2 border-[#1E130E] shadow-[3px_3px_0_#1E130E] font-serif font-extrabold text-lg sm:text-2xl tracking-wider uppercase shrink-0"
-            >
-              ¡FINAL!
-            </motion.span>
-            <div className="min-w-0">
-              <span className="text-[11px] font-extrabold text-[#C96F4A] block uppercase tracking-[0.14em]">
-                Postal de despedida · Sala #{snapshot.code}
-              </span>
-              <p className="text-xs text-[#6F5A4E] truncate">
-                {reasonLabels[
-                  shareResult?.terminalReason ??
-                    snapshot.gameState.terminalReason ??
-                    'last_seat_occupied'
-                ] ?? 'Partida concluida.'}
-              </p>
-            </div>
-          </div>
-
-          {recountStep !== 'final' && (
-            <button
-              type="button"
-              data-testid="skip-final-sequence-btn"
-              onClick={() => {
-                setSequenceSkipped(true);
-                setRecountStep('final');
-              }}
-              className="px-3 py-1 rounded-xl cafe-btn-paper text-xs font-bold text-[#3E2F2A] cursor-pointer shrink-0"
-            >
-              Saltar
-            </button>
-          )}
-        </div>
-
-        {/* 2. Winner Hero Showcase («Gana [nombre]» or «Victoria compartida») */}
-        {topWinner && (
-          <motion.div
-            data-testid="final-winner-hero"
-            initial={reducedMotion ? false : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: reducedMotion ? 0 : 0.24 }}
-            className="shrink-0 bg-[#FEF6E0] rounded-2xl border-2 border-[#C9A227] shadow-[0_3px_0_#1E130E] p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3"
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="p-1 rounded-2xl bg-[#FFF9F0] border-2 border-[#1E130E] shadow-[0_2px_0_#1E130E] shrink-0">
-                <PlayerAvatar avatarId={topWinner.avatarId} size={48} />
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <span className="px-2 py-0.5 rounded-full bg-[#C9A227] text-[#231712] text-[10px] font-extrabold uppercase tracking-wider">
-                    {isSharedVictory ? 'Empate en cabeza' : 'Ganador de la velada'}
-                  </span>
-                  {topWinner.isBot && (
-                    <span className="px-2 py-0.5 rounded-full bg-[#3E2F2A] text-[#FFF9F0] text-[10px] font-bold">
-                      Autómata del café
-                    </span>
-                  )}
-                </div>
-                <h1 className="font-serif font-extrabold text-xl sm:text-3xl text-[#231712] truncate mt-0.5">
-                  {isSharedVictory ? '¡Victoria compartida!' : `Gana ${topWinner.nickname}`}
-                </h1>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2.5 ml-auto">
-              <CoinTray
-                score={topWinner.finalScore}
-                playerId={`hero-${topWinner.id}`}
-                reducedMotion={reducedMotion || sequenceSkipped}
-              />
-            </div>
-          </motion.div>
-        )}
-
-        {/* 4. Staggered Standings List (1st to last, including bots) */}
-        <div
-          data-testid="final-standings-list"
-          className="flex-1 min-h-0 overflow-y-auto space-y-1.5 pr-0.5"
-        >
-          {standings.map((st, idx) => {
-            const shownScore = recountStep === 'table' ? st.tablePoints : st.finalScore;
-
-            return (
-              <motion.div
-                key={st.id}
-                data-testid={`final-standing-row-${idx + 1}`}
-                initial={reducedMotion ? false : { opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{
-                  duration: reducedMotion ? 0 : 0.2,
-                  delay: reducedMotion ? 0 : idx * 0.08,
-                }}
-                className={`p-2.5 sm:p-3 rounded-2xl border flex flex-wrap items-center justify-between gap-2 transition-all ${
-                  st.isWinner
-                    ? 'bg-[#FEF6E0]/95 border-[#C9A227] border-2 shadow-[0_2px_0_#1E130E]'
-                    : 'cafe-paper-subpanel'
-                }`}
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="w-6 h-6 rounded-full bg-[#231712] text-[#FFF9F0] font-serif font-bold text-xs flex items-center justify-center shrink-0">
-                    {idx + 1}
-                  </span>
-                  <PlayerAvatar avatarId={st.avatarId} size={30} />
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="font-serif font-bold text-sm sm:text-base text-[#231712] truncate">
-                        {st.nickname}
-                      </span>
-                      {st.isBot && (
-                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-[#FFF9F0] border border-[#231712]/20 text-[#6F5A4E]">
-                          Bot
-                        </span>
-                      )}
-                      {st.isWinner && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-extrabold text-[#3F5E4A] bg-[#E6F4EA] px-1.5 py-0.2 rounded border border-[#3F5E4A]/30">
-                          <svg
-                            width="10"
-                            height="10"
-                            viewBox="0 0 12 12"
-                            aria-hidden="true"
-                            className="shrink-0"
-                          >
-                            <polygon
-                              points="6,0.8 7.6,4.1 11.2,4.6 8.6,7.1 9.2,10.7 6,9 2.8,10.7 3.4,7.1 0.8,4.6 4.4,4.1"
-                              fill="currentColor"
-                            />
-                          </svg>
-                          <span>{isSharedVictory ? 'Victoria compartida' : 'Ganador'}</span>
-                        </span>
-                      )}
-                    </div>
-                    <span className="block text-[11px] text-[#6F5A4E] tabular-nums">
-                      Mesas y barra: <strong>{formatScoreEs(st.tablePoints)} pts</strong>
-                      {recountStep !== 'table' && (
-                        <>
-                          {' · '}Penalización:{' '}
-                          <strong className="text-[#A94438]">
-                            -{formatScoreEs(Math.abs(st.penalty))} pts
-                          </strong>{' '}
-                          ({st.naturalLeft} nat. / {st.jokerLeft} com.)
-                        </>
-                      )}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2.5 ml-auto">
-                  <CoinTray
-                    score={shownScore}
-                    playerId={st.id}
-                    reducedMotion={reducedMotion || sequenceSkipped}
-                  />
-                </div>
-              </motion.div>
-            );
-          })}
-
-          {postcardUrl && (
-            <div className="cafe-paper-subpanel p-2.5 rounded-2xl text-center space-y-1.5">
-              <img
-                src={postcardUrl}
-                alt="Postal de resultado de Cafetulia"
-                referrerPolicy="no-referrer"
-                className="mx-auto rounded-xl border border-[#231712]/20 max-h-36"
-              />
-              <a
-                href={postcardUrl}
-                download={`cafetulia-${snapshot.code}.png`}
-                className="inline-block px-3.5 py-1 rounded-xl cafe-btn-sage text-xs font-bold"
-              >
-                Descargar postal PNG
-              </a>
-            </div>
-          )}
-        </div>
-
-        {/* 5. Warm Credits & Dedication Block (O & A) */}
-        <div
-          data-testid="final-credits-block"
-          className="shrink-0 cafe-paper-subpanel px-3 py-2 rounded-2xl flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#6F5A4E]"
-        >
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-serif font-bold text-[#231712]">
-              Cafetulia — una tertulia de café
-            </span>
-            <span>· Arte original</span>
-            <span>· Gracias por jugar</span>
-          </div>
-          <span
-            data-testid="final-credits-oa"
-            className="font-serif font-bold text-[#231712] bg-[#FEF6E0] px-2.5 py-0.5 rounded-lg border border-[#C9A227] shadow-[0_1px_0_#1E130E]"
-            title="Dedicatoria del café"
-          >
-            Dedicatoria: O &amp; A
-          </span>
-        </div>
-
-        {/* 6. Clear Footer Actions */}
-        <div className="shrink-0 pt-2 border-t border-[#3E2F2A]/15 flex flex-wrap items-center justify-between gap-2">
-          <button
-            type="button"
-            data-testid="generate-postcard-btn"
-            onClick={generatePostcard}
-            className="px-3.5 py-2 rounded-xl cafe-btn-paper text-xs font-bold text-[#3E2F2A] cursor-pointer"
-          >
-            Generar postal
-          </button>
-
-          <div className="flex items-center gap-2 ml-auto">
-            <button
-              type="button"
-              data-testid="back-to-title-btn"
-              onClick={leaveRoom}
-              className="px-3.5 py-2 rounded-xl cafe-btn-paper text-xs font-bold text-[#3E2F2A] cursor-pointer"
-            >
-              Volver a la portada
-            </button>
-            <button
-              type="button"
-              data-start="true"
-              data-testid="rematch-btn"
-              onClick={() => void voteRematch(true)}
-              className="px-4 py-2 rounded-xl cafe-btn-primary text-xs font-bold cursor-pointer"
-            >
-              Votar revancha ({rematchVotesCount}/{Math.max(1, humanPlayers.length)})
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+export { FinishedScreen } from './ResultScreen';

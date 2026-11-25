@@ -66,10 +66,14 @@ export function AnimatedScore({
   value,
   reducedMotion = false,
   className = '',
+  font = 'mono',
+  pulseTone = 'default',
 }: {
   value: number;
   reducedMotion?: boolean;
   className?: string;
+  font?: 'mono' | 'serif';
+  pulseTone?: 'default' | 'none';
 }): React.ReactElement {
   const [displayed, setDisplayed] = useState(value);
   const [pulse, setPulse] = useState<'up' | 'down' | null>(null);
@@ -127,10 +131,10 @@ export function AnimatedScore({
 
   return (
     <span
-      className={`inline-block font-mono font-bold tabular-nums transition-transform duration-150 ${
-        pulse === 'up'
+      className={`inline-block ${font === 'serif' ? 'font-serif' : 'font-mono'} font-bold tabular-nums transition-transform duration-150 ${
+        pulseTone === 'default' && pulse === 'up'
           ? 'text-[#3F5E4A] scale-110'
-          : pulse === 'down'
+          : pulseTone === 'default' && pulse === 'down'
             ? 'text-[#B3261E] scale-110'
             : ''
       } ${className}`}
@@ -155,8 +159,7 @@ export function CoinTray({
 }): React.ReactElement {
   // P0.3 & P0.1: Exact coin breakdown in tooltip and full view; compact 1-coin summary in header so 4-digit scores never widen the header
   const breakdown = decomposeCoins(score);
-  const topDenom: 10 | 5 | 1 =
-    breakdown.tens > 0 ? 10 : breakdown.fives > 0 ? 5 : 1;
+  const topDenom: 10 | 5 | 1 = breakdown.tens > 0 ? 10 : breakdown.fives > 0 ? 5 : 1;
   const tooltipText =
     score === 0
       ? 'Saldo: 0 puntos (sin monedas)'
@@ -169,40 +172,38 @@ export function CoinTray({
       className="inline-flex flex-wrap items-center gap-1 shrink-0"
       title={tooltipText}
     >
-      {summaryOnly ? (
-        score !== 0 && (
-          <CoinChip
-            denomination={topDenom}
-            size={compact ? 15 : 18}
-            isNegative={breakdown.isNegative}
-          />
-        )
-      ) : (
-        breakdown.stacks.length > 0 && (
-          <div
-            className="inline-flex flex-wrap items-center gap-1"
-            data-testid={`coin-stacks-${playerId}`}
-          >
-            {breakdown.stacks.map((stack) => (
-              <span
-                key={stack.denomination}
-                className="inline-flex items-center gap-0.5 bg-[#FFF9F0]/90 px-1 py-0.2 rounded-full border border-[#3E2F2A]/15"
-              >
-                <CoinChip
-                  denomination={stack.denomination}
-                  size={compact ? 15 : 18}
-                  isNegative={breakdown.isNegative}
-                />
-                {stack.count > 1 && (
-                  <span className="font-mono font-extrabold text-[9px] sm:text-[10px] text-[#3E2F2A] tabular-nums leading-none">
-                    ×{stack.count}
-                  </span>
-                )}
-              </span>
-            ))}
-          </div>
-        )
-      )}
+      {summaryOnly
+        ? score !== 0 && (
+            <CoinChip
+              denomination={topDenom}
+              size={compact ? 15 : 18}
+              isNegative={breakdown.isNegative}
+            />
+          )
+        : breakdown.stacks.length > 0 && (
+            <div
+              className="inline-flex flex-wrap items-center gap-1"
+              data-testid={`coin-stacks-${playerId}`}
+            >
+              {breakdown.stacks.map((stack) => (
+                <span
+                  key={stack.denomination}
+                  className="inline-flex items-center gap-0.5 bg-[#FFF9F0]/90 px-1 py-0.2 rounded-full border border-[#3E2F2A]/15"
+                >
+                  <CoinChip
+                    denomination={stack.denomination}
+                    size={compact ? 15 : 18}
+                    isNegative={breakdown.isNegative}
+                  />
+                  {stack.count > 1 && (
+                    <span className="font-mono font-extrabold text-[9px] sm:text-[10px] text-[#3E2F2A] tabular-nums leading-none">
+                      ×{stack.count}
+                    </span>
+                  )}
+                </span>
+              ))}
+            </div>
+          )}
       <span className="inline-flex items-baseline gap-0.5">
         <AnimatedScore
           value={score}
@@ -246,7 +247,10 @@ function CoinFlipParticle({ item }: { item: FlyingCoinItem }): React.ReactElemen
     if (!wrapper || !spinner) return;
 
     const midX = (item.startX + item.endX) / 2;
-    const arcLift = Math.min(110, Math.max(55, Math.hypot(item.endX - item.startX, item.endY - item.startY) * 0.28));
+    const arcLift = Math.min(
+      110,
+      Math.max(55, Math.hypot(item.endX - item.startX, item.endY - item.startY) * 0.28),
+    );
     const midY = Math.min(item.startY, item.endY) - arcLift;
 
     const moveAnim = wrapper.animate(

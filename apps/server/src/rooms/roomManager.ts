@@ -4,8 +4,10 @@ import {
   createGame,
   finalScores,
   kickDisconnectedPlayer,
+  normalizeSeed,
   selectBotMove,
   selectSensibleAutoMove,
+  shuffleWithRng,
   type FinalScoreSummary,
   type GameState,
   type Move,
@@ -124,7 +126,10 @@ export function generateRoomCode(length: number = 6): string {
 }
 
 export function sanitizeNickname(raw: string): string {
-  const cleaned = raw.replace(/[^\p{L}\p{N}_\- ]/gu, '').trim().slice(0, 20);
+  const cleaned = raw
+    .replace(/[^\p{L}\p{N}_\- ]/gu, '')
+    .trim()
+    .slice(0, 20);
   return cleaned.length > 0 ? cleaned : 'Invitado';
 }
 
@@ -286,9 +291,7 @@ export class CafetuliaRoomController {
     ).length;
 
     const canJoinAsPlayer =
-      !params.asSpectator &&
-      this.phase === 'lobby' &&
-      activePlayerCount < this.config.maxPlayers;
+      !params.asSpectator && this.phase === 'lobby' && activePlayerCount < this.config.maxPlayers;
 
     const role: 'player' | 'spectator' = canJoinAsPlayer ? 'player' : 'spectator';
 
@@ -333,7 +336,10 @@ export class CafetuliaRoomController {
     partialConfig: Partial<RoomConfigSettings>,
   ): { ok: true; snapshot: RoomSnapshot } | { ok: false; message: string } {
     if (this.phase !== 'lobby') {
-      return { ok: false, message: 'No se puede cambiar la configuración con la partida iniciada.' };
+      return {
+        ok: false,
+        message: 'No se puede cambiar la configuración con la partida iniciada.',
+      };
     }
     if (requesterId !== this.hostId) {
       return { ok: false, message: 'Solo el anfitrión puede configurar la sala.' };
@@ -345,7 +351,9 @@ export class CafetuliaRoomController {
       return { ok: false, message: 'Configuración de sala inválida.' };
     }
 
-    const humanPlayers = Array.from(this.members.values()).filter((m) => m.role === 'player').length;
+    const humanPlayers = Array.from(this.members.values()).filter(
+      (m) => m.role === 'player',
+    ).length;
     if (humanPlayers + parsed.data.botCount > parsed.data.maxPlayers) {
       return {
         ok: false,
@@ -413,9 +421,16 @@ export class CafetuliaRoomController {
     }
 
     const effectiveSeed = seed ?? this.seedOverride ?? Date.now();
+    // Randomise the order of the table every match: it defines turn order and the
+    // scoreboard order, independently of who joined the room first. The seed keeps
+    // rematches/debug runs reproducible while still changing between matches.
+    const tableOrder = shuffleWithRng(
+      seatedMembers,
+      normalizeSeed(`${effectiveSeed}:table-order`),
+    ).items;
     this.gameState = createGame(
       {
-        players: seatedMembers.map((m) => ({
+        players: tableOrder.map((m) => ({
           id: m.playerId,
           nickname: m.nickname,
           avatarId: m.avatarId,
@@ -750,9 +765,14 @@ export class CafetuliaRoomController {
   public voteRematch(
     playerId: string,
     vote: boolean,
-  ): { ok: true; outcome: 'waiting' | 'restarted' | 'returned_to_lobby'; snapshot: RoomSnapshot } | { ok: false; message: string } {
+  ):
+    | { ok: true; outcome: 'waiting' | 'restarted' | 'returned_to_lobby'; snapshot: RoomSnapshot }
+    | { ok: false; message: string } {
     if (this.phase !== 'finished') {
-      return { ok: false, message: 'La votación de revancha solo está disponible al terminar la partida.' };
+      return {
+        ok: false,
+        message: 'La votación de revancha solo está disponible al terminar la partida.',
+      };
     }
 
     const member = this.members.get(playerId);

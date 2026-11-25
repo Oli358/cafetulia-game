@@ -309,28 +309,42 @@
   --ink-muted: #d8c4b6;
 }
 
-/* Turn-to-play cue: a warm frame around the whole table. */
+/* Turn-to-play cue: a warm, breathing frame around the whole table. */
 .cafe-turn-glow {
-  border: 3px solid rgba(200, 107, 70, 0.72);
+  border: 2px solid rgba(242, 193, 78, 0.55);
   box-shadow:
-    inset 0 0 0 1px rgba(254, 246, 224, 0.7),
-    inset 0 0 34px rgba(200, 161, 42, 0.34);
-  animation: cafe-turn-glow-pulse 2.4s ease-in-out infinite;
+    inset 0 0 0 2px rgba(255, 249, 240, 0.45),
+    inset 0 0 36px rgba(242, 193, 78, 0.32),
+    inset 0 0 92px rgba(201, 111, 74, 0.22);
+  animation: cafe-turn-glow-pulse 2.8s ease-in-out infinite;
+  will-change: opacity, box-shadow;
 }
 
 @keyframes cafe-turn-glow-pulse {
   0%,
   100% {
-    opacity: 0.38;
+    opacity: 0.42;
+    border-color: rgba(242, 193, 78, 0.38);
     box-shadow:
-      inset 0 0 0 1px rgba(254, 246, 224, 0.55),
-      inset 0 0 24px rgba(200, 161, 42, 0.25);
+      inset 0 0 0 1px rgba(255, 249, 240, 0.28),
+      inset 0 0 26px rgba(242, 193, 78, 0.2),
+      inset 0 0 72px rgba(201, 111, 74, 0.14);
   }
-  50% {
+  42% {
     opacity: 1;
+    border-color: rgba(255, 214, 112, 0.95);
     box-shadow:
-      inset 0 0 0 1px rgba(254, 246, 224, 0.85),
-      inset 0 0 46px rgba(200, 161, 42, 0.45);
+      inset 0 0 0 2px rgba(255, 249, 240, 0.62),
+      inset 0 0 52px rgba(242, 193, 78, 0.48),
+      inset 0 0 128px rgba(201, 111, 74, 0.3);
+  }
+  68% {
+    opacity: 0.78;
+    border-color: rgba(242, 193, 78, 0.7);
+    box-shadow:
+      inset 0 0 0 2px rgba(255, 249, 240, 0.44),
+      inset 0 0 38px rgba(242, 193, 78, 0.32),
+      inset 0 0 96px rgba(201, 111, 74, 0.2);
   }
 }
 
