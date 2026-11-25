@@ -58,6 +58,10 @@ test.describe('Cafetulia E2E v11 (menú de reservas 3D, tres mundos, lobby prepa
   test('Cumple la portada 3D con scroll interno de dos actos en 1920x900, 1280x800 y 390x844 y genera las capturas ui-v11-*.png', async ({
     page,
   }) => {
+    // Este recorrido encadena portada, ajustes, lobby y partida; en solitario ya
+    // roza los 30 s, así que necesita más margen cuando la suite corre en paralelo.
+    test.setTimeout(90_000);
+
     // 1. Portada v11: título + lata 3D, scroll interno de un viewport y carta de reservas.
     for (const vp of [
       { width: 390, height: 844, shot: 'ui-v11-portada-movil.png' },
@@ -591,7 +595,7 @@ test.describe('Cafetulia E2E v11 (menú de reservas 3D, tres mundos, lobby prepa
 
   test('avisa y vuelve a la portada si la sala desaparece durante la partida', async ({ page }) => {
     await page.goto('/?autostart=1');
-    await expect(page.getByTestId('papercraft-board')).toBeVisible();
+    await expect(page.getByTestId('papercraft-board')).toBeVisible({ timeout: 20_000 });
 
     await page.route('**/rooms/*/moves', async (route) => {
       if (route.request().method() !== 'POST') {
@@ -615,7 +619,7 @@ test.describe('Cafetulia E2E v11 (menú de reservas 3D, tres mundos, lobby prepa
     expect(result.ok).toBe(false);
     expect(result.screen).toBe('title');
     expect(result.errorBanner).toContain('La sala ya no existe');
-    await expect(page.getByTestId('title-screen')).toBeVisible();
+    await expect(page.getByTestId('title-screen')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText(/La sala ya no existe/)).toBeVisible();
   });
 

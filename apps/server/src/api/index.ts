@@ -85,38 +85,43 @@ export function registerApiRoutes(
     next();
   };
 
+  // Local development and Playwright need generous buckets; production keeps
+  // the strict values from docs/SEGURIDAD.md.
+  const rateLimitMax = (productionMax: number): number =>
+    process.env.NODE_ENV === 'production' ? productionMax : 10_000;
+
   const roomTrafficLimiter = createRateLimiter({
     windowMs: 60_000,
-    max: 600,
+    max: rateLimitMax(600),
     keyPrefix: 'rooms',
   });
   const createRoomLimiter = createRateLimiter({
     windowMs: 60 * 60_000,
-    max: 30,
+    max: rateLimitMax(30),
     keyPrefix: 'create-room',
     message: 'Se han creado demasiadas salas desde esta conexión. Espera un rato.',
   });
   const joinRoomLimiter = createRateLimiter({
     windowMs: 60_000,
-    max: 60,
+    max: rateLimitMax(60),
     keyPrefix: 'join-room',
     message: 'Demasiados intentos de entrada. Espera un momento.',
   });
   const moveLimiter = createRateLimiter({
     windowMs: 60_000,
-    max: 180,
+    max: rateLimitMax(180),
     keyPrefix: 'moves',
     message: 'Demasiadas jugadas seguidas. Espera un momento.',
   });
   const chatLimiter = createRateLimiter({
     windowMs: 60_000,
-    max: 60,
+    max: rateLimitMax(60),
     keyPrefix: 'chat',
     message: 'El chat va demasiado rápido. Espera un momento.',
   });
   const historyLimiter = createRateLimiter({
     windowMs: 60_000,
-    max: 60,
+    max: rateLimitMax(60),
     keyPrefix: 'history',
     message: 'Demasiadas consultas al historial. Espera un momento.',
   });
