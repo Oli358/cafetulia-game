@@ -56,8 +56,9 @@ La versión actual exige un token de sesión secreto para toda acción de sala. 
 - Eliminado `drizzle-orm`: solo se usaban definiciones de esquema, nunca el query builder; las consultas reales son SQL parametrizado con `node:sqlite`.
 - Eliminados `@google/genai` y `dotenv`: no se importaban en ningún punto del código.
 - Overrides de `body-parser >=1.20.9 <2` y `nanoid >=3.3.18` en `pnpm-workspace.yaml`.
+- Zod actualizado a 4.6.7; los esquemas, typecheck y tests siguen en verde.
 - `pnpm install --frozen-lockfile` verificado.
-- `pnpm audit --prod` baja de 9 a 3 avisos: 1 high de Zod (mitigado por el límite de 32 KB y esquemas acotados), 1 moderate de `uuid` y 1 low de `elliptic`, ambos en la pila de autenticación de Colyseus, que no se monta en el entrypoint actual.
+- `pnpm audit --prod` baja de 9 a 2 avisos: 1 moderate de `uuid` y 1 low de `elliptic`, ambos en la pila de autenticación de Colyseus, que no se monta en el entrypoint actual.
 
 ### Limpieza
 
@@ -74,18 +75,17 @@ La versión actual exige un token de sesión secreto para toda acción de sala. 
 2. **`/history` es público.** Devuelve códigos de sala antiguos y nicknames. No permite acciones (las salas terminadas no aceptan jugadas), pero conviene reducirlo o exigir sesión si el juego se hace público.
 3. **Rate limiter en memoria.** Suficiente para un solo proceso. Si se escala a varias instancias, mover a Redis o a un limitador compartido.
 4. **SQLite síncrono.** `node:sqlite` bloquea el event loop y en Render Free vive en `/tmp` (efímero). Para producción real, usar disco persistente o Postgres.
-5. **Zod 3 high.** El aviso afecta a colecciones enormes; el body está limitado a 32 KB y los esquemas son acotados. Actualizar a Zod 4 es una tarea aparte por el cambio de tipos.
-6. **Colyseus no está montado en `server.ts`** y en `apps/server` queda detrás de `ENABLE_COLYSEUS=1`. El código WS sigue en el repo; si se activa, hay que añadir `onAuth`, validación de origen, límites de payload y rate limiting antes de exponerlo.
-7. **Fondo de bar y foto del tablero.** La licencia del fondo sigue pendiente. La foto del tablero físico de _Café International_ no debe publicarse sin revisar derechos.
-8. **CSP y preview.** Las cabeceras se aplican en `server.ts` (producción); `vite preview` no las añade. Usar el servidor full-stack para producción.
-9. **Sin cuentas.** El token es la identidad. Si se pierde, se pierde el asiento; no hay recuperación. Para v1.0 es aceptable, pero conviene documentarlo en la UI.
+5. **Colyseus no está montado en `server.ts`** y en `apps/server` queda detrás de `ENABLE_COLYSEUS=1`. El código WS sigue en el repo; si se activa, hay que añadir `onAuth`, validación de origen, límites de payload y rate limiting antes de exponerlo.
+6. **Fondo de bar y foto del tablero.** La licencia del fondo sigue pendiente. La foto del tablero físico de _Café International_ no debe publicarse sin revisar derechos.
+7. **CSP y preview.** Las cabeceras se aplican en `server.ts` (producción); `vite preview` no las añade. Usar el servidor full-stack para producción.
+8. **Sin cuentas.** El token es la identidad. Si se pierde, se pierde el asiento; no hay recuperación. Para v1.0 es aceptable, pero conviene documentarlo en la UI.
 
 ## 4. Checklist antes de publicar
 
 - [ ] Repo privado o historial limpio de emails/rutas/URLs temporales.
 - [ ] Confirmar licencia del fondo y derechos de la foto del tablero.
 - [ ] Revisar `docs/` y capturas por datos personales.
-- [ ] Ejecutar `pnpm audit --prod` y decidir el residual de Zod/uuid/elliptic.
+- [ ] Ejecutar `pnpm audit --prod` y decidir el residual de uuid/elliptic.
 - [ ] Desplegar con `NODE_ENV=production`, `HOST=0.0.0.0`, `TRUST_PROXY=1` y HTTPS.
 - [ ] No volver a tunelizar sin Cloudflare Access o autenticación delante.
 - [ ] Probar dos clientes reales (dos perfiles/navegadores) con la nueva autenticación.

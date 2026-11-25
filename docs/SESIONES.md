@@ -21,7 +21,7 @@
 - Presencia: `lastSeenAt`, heartbeat en cada petición autenticada, barrido cada 10 s, desconexión a los 90 s, ventana de reconexión de 15 s y migración de anfitrión.
 - Cabeceras: sin `X-Powered-By`, `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, COOP/CORP, CSP de producción con `'wasm-unsafe-eval'` para Three.js y HSTS en HTTPS. `Cache-Control: no-store` en salas.
 - `HOST` por defecto `127.0.0.1`; Render usa `HOST=0.0.0.0` y `TRUST_PROXY=1`. Eliminado el script inline que envolvía `fetch`.
-- Dependencias: eliminado `drizzle-orm` (no se usaba para consultas), overrides de `body-parser` y `nanoid`, `--frozen-lockfile` verificado. `pnpm audit --prod` baja de 9 a 3 avisos, todos analizados en `docs/SEGURIDAD.md`.
+- Dependencias: eliminados `drizzle-orm`, `@google/genai` y `dotenv`; overrides de `body-parser` y `nanoid`; Zod actualizado a 4.6.7; `--frozen-lockfile` verificado. `pnpm audit --prod` baja de 9 a 2 avisos, ambos en la pila de Colyseus Auth y analizados en `docs/SEGURIDAD.md`.
 - Tests nuevos: autenticación obligatoria, rechazo de spoofing por `playerId`, token válido de invitado que no puede iniciar, colisión de prefijo que no sobrescribe al host, estado oculto durante la partida y semilla revelada al terminar.
 - Verificado: typecheck, lint, 53 tests, build, 3 E2E y build de producción con CSP en Chrome sin errores de consola.
 
@@ -32,7 +32,7 @@
 - El repositorio es público y el historial contiene el email real del autor y rutas locales; limpiarlo requiere reescritura coordinada.
 - `/history` sigue siendo público y devuelve códigos/nicknames de partidas antiguas; conviene reducirlo antes de publicar.
 - El rate limiter es en memoria (válido para un proceso); SQLite sigue siendo síncrono y efímero en Render Free.
-- Zod 3 mantiene un aviso high mitigado por el límite de 32 KB y esquemas acotados; uuid/elliptic vienen de Colyseus Auth, que no está montado.
+- uuid/elliptic vienen de Colyseus Auth, que no está montado; el resto de avisos de dependencias quedó cerrado.
 - Fondo de bar y foto del tablero siguen pendientes de licencia/derechos.
 
 **Siguiente:**
