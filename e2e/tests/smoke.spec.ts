@@ -306,6 +306,30 @@ test.describe('Cafetulia E2E v11 (menú de reservas 3D, tres mundos, lobby prepa
     expect(mobilePlayCheck.overlaps).toBe(false);
     expect(mobilePlayCheck.dockClass).toContain('backdrop-blur-lg');
 
+    // El top de puntuaciones vive entre la cabecera y el tablero, sin taparlo.
+    const mobileTopCheck = await page.evaluate(() => {
+      const header = document.querySelector('[data-testid="playing-header"]');
+      const score = document.querySelector('[data-testid="compact-scoreboard"]');
+      const boardSquare = document.querySelector('[aria-label^="Tablero ilustrado"]');
+      const h = header?.getBoundingClientRect();
+      const s = score?.getBoundingClientRect();
+      const b = boardSquare?.getBoundingClientRect();
+      return {
+        headerBottom: h?.bottom ?? 0,
+        scoreTop: s?.top ?? 0,
+        scoreBottom: s?.bottom ?? 0,
+        boardTop: b?.top ?? 0,
+      };
+    });
+    expect(mobileTopCheck.scoreTop).toBeGreaterThan(mobileTopCheck.headerBottom);
+    expect(mobileTopCheck.scoreBottom).toBeLessThan(mobileTopCheck.boardTop);
+
+    // En horizontal sobre móvil el juego se cubre con el aviso de girar.
+    await page.setViewportSize({ width: 844, height: 390 });
+    await expect(page.getByTestId('orientation-guard')).toBeVisible();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(page.getByTestId('orientation-guard')).toBeHidden();
+
     await page.screenshot({ path: path.join(REF_DIR, 'ui-v11-partida-movil.png') });
 
     // 7. P0.1 & P0.2: Header estable con puntuaciones altas (1234, 987, 9999) + exclusión mutua y popovers dentro del viewport
@@ -389,6 +413,15 @@ test.describe('Cafetulia E2E v11 (menú de reservas 3D, tres mundos, lobby prepa
     expect(handsBox!.y).toBeGreaterThanOrEqual(0);
     expect(handsBox!.x + handsBox!.width).toBeLessThanOrEqual(1280);
     expect(handsBox!.y + handsBox!.height).toBeLessThanOrEqual(800);
+
+    // El desplegable nace pegado a su botón, no al fondo del viewport.
+    const handsAnchor = await page.evaluate(() => {
+      const btn = document.querySelector('[data-testid="rival-hands-btn"]')?.getBoundingClientRect();
+      const pop = document.querySelector('[data-testid="rival-hands-popover"]')?.getBoundingClientRect();
+      return { btnBottom: btn?.bottom ?? 0, popTop: pop?.top ?? 0 };
+    });
+    expect(handsAnchor.popTop).toBeGreaterThanOrEqual(handsAnchor.btnBottom - 14);
+    expect(handsAnchor.popTop).toBeLessThan(handsAnchor.btnBottom + 24);
 
     // Probar también con 9999 puntos
     await page.evaluate(() => {

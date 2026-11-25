@@ -5,6 +5,36 @@
 
 ---
 
+## Sesión 034 - 2026-11-25 - Top de puntuaciones, fondo de bar y desplegables suaves
+
+**Objetivo:** aprovechar el espacio vacío de la partida en móvil y PC, mejorar la lectura de puntuaciones y del turno, suavizar todos los desplegables y dar ambiente de bar al fondo.
+
+**Hecho:**
+- La partida se reorganiza en una cabecera compacta de una fila y un **top de puntuaciones independiente**. En móvil va entre la cabecera y el tablero; en PC es una tarjeta compacta arriba a la izquierda y el tablero se centra en el resto. El fondo llena los laterales.
+- El top incluye tarjetas de jugador con avatar, nombre, monedas, fichas en mano y bolsa. El jugador con el turno tiene un **glow animado** (estático con `reducedMotion`).
+- El tablero móvil baja ~10 px y el top queda justo encima; el hueco superior se llena con el fondo de bar.
+- El **vuelo de monedas** sigue usando `data-player-tray`: en móvil aterriza en el top y en PC en la tarjeta izquierda del jugador. No hay dos trays con el mismo `playerId`.
+- Fondo de bar cozy aportado por el usuario en `public/backgrounds/cafe-bar.jpg` (67 KB, JPEG comprimido), con overlays cálidos. En móvil se recorta a la zona de lámparas/estanterías y se desvanece; también se usa en el lobby.
+- Los `AnchoredPopover` se anclan siempre a su botón, también en móvil; dejan de ser hojas inferiores. Entrada/salida de 0.24 s con escala, desplazamiento y origen en el ancla. Aplica a partida, lobby y portada.
+- **Aviso de orientación:** en móvil horizontal se cubre la pantalla con «Gira el teléfono». El manifest PWA se marca `portrait` y se intenta `screen.orientation.lock('portrait')`. El service worker sube a v14.
+- E2E: el top móvil queda entre cabecera y tablero, el aviso de orientación aparece/desaparece y los desplegables nacen pegados a su botón. Capturas `ui-v11-partida-*` y `ui-v11-lobby` actualizadas.
+- Verificado: `typecheck`, `lint`, 49 tests, build, 3 E2E en verde. Build de producción servido por el túnel del móvil.
+
+**Decisiones:** D-109, D-110, D-111, D-112 y D-113.
+
+**Problemas:**
+- Bloquear la orientación desde el navegador no es posible al 100 %; el aviso CSS cubre el juego y el manifest lo fija en la PWA instalada. En Safari móvil el `orientation.lock` puede requerir pantalla completa.
+- El fondo es una imagen aportada por el usuario; falta confirmar su fuente/licencia antes de publicar.
+- En móvil el tablero sigue limitado por el ancho (96vw); el aire vertical se usa para el top y el fondo, no para agrandar el tablero.
+
+**Siguiente:**
+1. Probar en el móvil real el top, el glow, los desplegables y el aviso de horizontal.
+2. Confirmar la licencia del fondo de bar.
+3. Valorar si el top móvil debe poder plegarse o quedarse fijo.
+4. Sustituir los ingredientes procedurales por GLB si el usuario los aporta.
+
+---
+
 ## Sesión 033 - 2026-11-25 - Carta sin scroll, río de ingredientes y falda del vaso
 
 **Objetivo:** aplicar el feedback de la prueba en portátil: la carta no debe tener scroll propio ni tapar el nombre del mundo, el vaso debe llevar una falda más pequeña y los ingredientes deben ser más numerosos y fluir hacia abajo al cambiar de mundo.

@@ -1546,7 +1546,7 @@ export function LobbyScreen(): React.ReactElement {
     >
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_16%,rgba(255,248,236,0.85),transparent_42%),linear-gradient(160deg,#F2D8BC_0%,#E4BE98_48%,#C98A63_100%)]"
+        className="cafe-lobby-bg pointer-events-none absolute inset-0 -z-10"
       />
       <div
         aria-hidden="true"
@@ -2607,10 +2607,15 @@ export function PlayingScreen(): React.ReactElement {
   };
 
   return (
-    <div
-      className="h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between px-1.5 py-1 sm:px-4 sm:py-1.5 gap-0.5 sm:gap-1 max-w-[1440px] mx-auto select-none safe-bottom"
-      data-testid="playing-viewport"
-    >
+    <>
+      <div
+        aria-hidden="true"
+        className="cafe-playing-bg pointer-events-none fixed inset-0 z-0"
+      />
+      <div
+        className="relative z-10 h-[100dvh] max-h-[100dvh] w-full overflow-hidden flex flex-col justify-between px-1.5 py-1 sm:px-4 sm:py-1.5 gap-0.5 sm:gap-1 max-w-[1440px] mx-auto select-none safe-bottom"
+        data-testid="playing-viewport"
+      >
       {isMyTurn && (
         <div
           data-testid="my-turn-glow"
@@ -2822,66 +2827,6 @@ export function PlayingScreen(): React.ReactElement {
                 />
               </svg>
             </button>
-          </div>
-        </div>
-
-        {/* ROW 2: Full-Width Compact Scoreboard with Summary CoinTrays & Bag Counter */}
-        <div
-          className="flex flex-col gap-0.5 max-w-full pt-0.5 border-t border-[#3E2F2A]/10"
-          data-testid="compact-scoreboard"
-        >
-          <div className="flex items-center gap-1 sm:gap-1.5 min-w-0 overflow-x-auto">
-            {gameState.players.map((p) => {
-              const pHandCount = (gameState.hands[p.id] ?? []).length;
-              const isTurn = gameState.turn === p.id;
-              const pAvatar = avatarByPlayerId[p.id] ?? p.avatarId ?? 'moka';
-              return (
-                <div
-                  key={p.id}
-                  data-testid={`scoreboard-player-${p.id}`}
-                  className={`flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-0.5 rounded-xl border text-xs transition-colors duration-200 whitespace-nowrap shrink-0 ${
-                    isTurn
-                      ? 'bg-[#FEF6E0] border-[#C96F4A] font-bold'
-                      : 'bg-[#F7EEDF] border-[#231712]/12'
-                  }`}
-                >
-                  <PlayerAvatar avatarId={pAvatar} size={16} />
-                  <span className="font-bold text-[#3E2F2A] truncate max-w-[54px] sm:max-w-[100px]">
-                    {p.nickname}
-                  </span>
-                  <CoinTray
-                    score={p.score}
-                    playerId={p.id}
-                    compact
-                    summaryOnly
-                    reducedMotion={reducedMotion}
-                  />
-                  <span
-                    className="text-[10px] font-mono font-semibold text-[#6F5A4E] bg-[#FFF9F0] px-1 py-0.2 rounded border border-[#231712]/15 tabular-nums"
-                    title={`${pHandCount} fichas en mano`}
-                  >
-                    {pHandCount}c
-                  </span>
-                </div>
-              );
-            })}
-            <span
-              data-testid="bag-counter-pill"
-              className="hidden sm:inline-block text-[11px] font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-2 py-0.5 rounded-xl border border-[#231712]/12 tabular-nums whitespace-nowrap shrink-0"
-              title="Fichas restantes en la bolsa"
-            >
-              Bolsa: {gameState.bag.length}
-            </span>
-          </div>
-
-          <div className="sm:hidden flex justify-end pr-0.5">
-            <span
-              data-testid="bag-counter-pill-mobile"
-              className="text-[10px] font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-1.5 py-0.5 rounded-lg border border-[#231712]/12 tabular-nums whitespace-nowrap"
-              title="Fichas restantes en la bolsa"
-            >
-              Bolsa: {gameState.bag.length}
-            </span>
           </div>
         </div>
       </header>
@@ -3208,31 +3153,100 @@ export function PlayingScreen(): React.ReactElement {
         </div>
       </AnchoredPopover>
 
-      {/* CENTER BOARD WORKSPACE (Row 2: Occupies its own dedicated row without overlapping hand dock) */}
-      <div className="flex-1 min-h-0 w-full flex items-center justify-center relative overflow-hidden">
-        {errorBanner && (
-          <div
-            role="alert"
-            className="absolute top-1.5 left-1/2 -translate-x-1/2 z-40 px-3.5 py-1 rounded-xl bg-[#FDECEB] border border-[#A94438] text-xs font-bold text-[#A94438] shadow-md"
-          >
-            {errorBanner}
+      {/* CONTENT: score top on mobile / left column on desktop, board on the right */}
+      <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center gap-1.5 sm:gap-2 pt-5 lg:pt-0 lg:flex-row lg:items-start">
+        <aside
+          data-testid="compact-scoreboard"
+          className="shrink-0 w-full lg:w-[248px] xl:w-[268px] rounded-2xl border-2 border-[#231712]/20 bg-[#FFF9F0]/82 backdrop-blur-md p-1.5 sm:p-2 shadow-[0_6px_20px_rgba(35,23,18,0.12)]"
+        >
+          <div className="hidden lg:flex items-center justify-between gap-2 pb-1.5 mb-1.5 border-b border-[#3E2F2A]/10">
+            <span className="font-serif font-bold text-sm text-[#2B1710]">La mesa</span>
+            <span className="text-[10px] font-mono font-bold text-[#6F5A4E]">#{snapshot.code}</span>
           </div>
-        )}
 
-        <IllustratedBoard
-          gameState={gameState}
-          selectedTile={selectedTile}
-          draftPlacements={draftPlacements}
-          seatInspections={seatInspections}
-          focusedTableId={focusedTableId}
-          nightMode={nightMode}
-          reducedMotion={reducedMotion}
-          chairToast={chairToast}
-          onDismissToast={() => setChairToast(null)}
-          onSeatClick={handleSeatClick}
-          onTableClick={handleTableClick}
-          onBarClick={handleBarClick}
-        />
+          <div className="flex lg:flex-col items-stretch gap-1 sm:gap-1.5 overflow-x-auto lg:overflow-visible pb-0.5 lg:pb-0">
+            {gameState.players.map((p) => {
+              const pHandCount = (gameState.hands[p.id] ?? []).length;
+              const isTurn = gameState.turn === p.id;
+              const pAvatar = avatarByPlayerId[p.id] ?? p.avatarId ?? 'moka';
+              return (
+                <div
+                  key={p.id}
+                  data-testid={`scoreboard-player-${p.id}`}
+                  className={`cafe-score-card flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-1 rounded-xl border text-xs transition-colors duration-200 whitespace-nowrap shrink-0 lg:w-full ${
+                    isTurn
+                      ? `${reducedMotion ? 'cafe-score-active-static' : 'cafe-score-active'} bg-[#FEF6E0] border-[#C96F4A] font-bold`
+                      : 'bg-[#F7EEDF] border-[#231712]/12'
+                  }`}
+                >
+                  <PlayerAvatar avatarId={pAvatar} size={18} />
+                  <span className="font-bold text-[#3E2F2A] truncate max-w-[58px] sm:max-w-[96px] lg:max-w-none lg:flex-1">
+                    {p.nickname}
+                  </span>
+                  <CoinTray
+                    score={p.score}
+                    playerId={p.id}
+                    compact
+                    summaryOnly
+                    reducedMotion={reducedMotion}
+                  />
+                  <span
+                    className="text-[10px] font-mono font-semibold text-[#6F5A4E] bg-[#FFF9F0] px-1 py-0.2 rounded border border-[#231712]/15 tabular-nums"
+                    title={`${pHandCount} fichas en mano`}
+                  >
+                    {pHandCount}c
+                  </span>
+                </div>
+              );
+            })}
+            <span
+              data-testid="bag-counter-pill-mobile"
+              className="lg:hidden self-center text-[10px] font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-1.5 py-0.5 rounded-lg border border-[#231712]/12 tabular-nums whitespace-nowrap shrink-0"
+              title="Fichas restantes en la bolsa"
+            >
+              Bolsa: {gameState.bag.length}
+            </span>
+          </div>
+
+          <div className="hidden lg:flex items-center justify-between gap-2 pt-1.5 mt-1.5 border-t border-[#3E2F2A]/10">
+            <span
+              data-testid="bag-counter-pill"
+              className="text-[11px] font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-2 py-0.5 rounded-xl border border-[#231712]/12 tabular-nums whitespace-nowrap"
+              title="Fichas restantes en la bolsa"
+            >
+              Bolsa: {gameState.bag.length}
+            </span>
+            <span className="text-[10px] font-bold text-[#6F5A4E]">
+              {gameState.players.length} en la mesa
+            </span>
+          </div>
+        </aside>
+
+        <div className="w-full lg:flex-1 lg:min-h-0 lg:self-stretch flex items-center justify-center relative overflow-hidden">
+          {errorBanner && (
+            <div
+              role="alert"
+              className="absolute top-1.5 left-1/2 -translate-x-1/2 z-40 px-3.5 py-1 rounded-xl bg-[#FDECEB] border border-[#A94438] text-xs font-bold text-[#A94438] shadow-md"
+            >
+              {errorBanner}
+            </div>
+          )}
+
+          <IllustratedBoard
+            gameState={gameState}
+            selectedTile={selectedTile}
+            draftPlacements={draftPlacements}
+            seatInspections={seatInspections}
+            focusedTableId={focusedTableId}
+            nightMode={nightMode}
+            reducedMotion={reducedMotion}
+            chairToast={chairToast}
+            onDismissToast={() => setChairToast(null)}
+            onSeatClick={handleSeatClick}
+            onTableClick={handleTableClick}
+            onBarClick={handleBarClick}
+          />
+        </div>
       </div>
 
       {/* BOTTOM TRANSLUCENT HAND DOCK (P1.2 — bg-[#FFF9F0]/45 backdrop-blur-lg + centered 3-col grid + cardboard tiles with subtle fan) */}
@@ -3818,7 +3832,8 @@ export function PlayingScreen(): React.ReactElement {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+      </div>
+    </>
   );
 }
 

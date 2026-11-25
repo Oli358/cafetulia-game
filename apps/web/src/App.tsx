@@ -6,6 +6,62 @@ import { FinishedScreen, LobbyScreen, PlayingScreen } from './components/Screens
 import { TitleExperience } from './title/TitleExperience';
 import { useGameStore } from './store/gameStore';
 
+function OrientationGuard(): React.ReactElement {
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!window.matchMedia('(pointer: coarse)').matches) return;
+    const orientation = screen.orientation as ScreenOrientation & {
+      lock?: (orientation: 'portrait') => Promise<void>;
+    };
+    if (orientation && typeof orientation.lock === 'function') {
+      void orientation.lock('portrait').catch(() => {
+        /* Browsers usually require fullscreen; the CSS guard still covers it. */
+      });
+    }
+  }, []);
+
+  return (
+    <div
+      data-testid="orientation-guard"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Gira el teléfono"
+      className="orientation-guard fixed inset-0 z-[200] flex-col items-center justify-center gap-4 bg-[#231712] p-6 text-center text-[#FFF9F0]"
+    >
+      <svg width="54" height="54" viewBox="0 0 54 54" fill="none" aria-hidden="true">
+        <rect
+          x="18"
+          y="6"
+          width="18"
+          height="42"
+          rx="3"
+          stroke="#F2C14E"
+          strokeWidth="2.4"
+        />
+        <path d="M23 10h8" stroke="#F2C14E" strokeWidth="2" strokeLinecap="round" />
+        <circle cx="27" cy="43" r="1.6" fill="#F2C14E" />
+        <path
+          d="M8 17a20 20 0 0 1 9-9"
+          stroke="#C96F4A"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M8 12v5h5"
+          stroke="#C96F4A"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+      <p className="font-serif text-2xl font-bold">Gira el teléfono</p>
+      <p className="max-w-xs text-sm leading-relaxed text-[#FFF9F0]/80">
+        Cafetulia se juega en vertical. Pon el móvil de pie para seguir con la tertulia.
+      </p>
+    </div>
+  );
+}
+
 export function App(): React.ReactElement {
   const screen = useGameStore((s) => s.screen);
   const activeModal = useGameStore((s) => s.activeModal);
@@ -133,6 +189,7 @@ export function App(): React.ReactElement {
           </motion.div>
         </AnimatePresence>
         <ActiveModalLayer />
+        <OrientationGuard />
       </main>
     </MotionConfig>
   );

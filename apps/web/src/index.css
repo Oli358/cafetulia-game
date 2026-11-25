@@ -330,6 +330,89 @@
   }
 }
 
+/* Fondo de bar cozy para partida y lobby */
+.cafe-playing-bg {
+  background-color: #f3e3cd;
+  background-image:
+    linear-gradient(
+      180deg,
+      rgba(255, 249, 240, 0.28) 0%,
+      rgba(255, 244, 228, 0.38) 52%,
+      rgba(255, 249, 240, 0.22) 100%
+    ),
+    url('/backgrounds/cafe-bar.jpg');
+  background-size: cover;
+  background-position: center 46%;
+  background-repeat: no-repeat;
+}
+.cafe-lobby-bg {
+  background-color: #e4be98;
+  background-image:
+    radial-gradient(circle at 50% 16%, rgba(255, 248, 236, 0.68), transparent 42%),
+    linear-gradient(
+      160deg,
+      rgba(242, 216, 188, 0.66) 0%,
+      rgba(228, 190, 152, 0.56) 48%,
+      rgba(201, 138, 99, 0.48) 100%
+    ),
+    url('/backgrounds/cafe-bar.jpg');
+  background-size: cover, cover, cover;
+  background-position: center, center, center;
+}
+@media (max-width: 640px) {
+  .cafe-playing-bg {
+    background-size: 200% auto, 200% auto;
+    background-position: 18% top, 18% top;
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 58%, transparent 94%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 58%, transparent 94%);
+  }
+  .cafe-lobby-bg {
+    background-size: cover, cover, 200% auto;
+    background-position: center, center, 18% top;
+  }
+}
+
+/* Aviso de orientación: en móvil horizontal el juego no es legible */
+.orientation-guard {
+  display: none;
+}
+@media (orientation: landscape) and (max-height: 540px) {
+  .orientation-guard {
+    display: flex;
+  }
+}
+
+/* Glow del jugador con el turno activo */
+.cafe-score-active {
+  animation: cafe-score-pulse 2.4s ease-in-out infinite;
+}
+.cafe-score-active-static {
+  box-shadow:
+    0 0 0 2px rgba(201, 111, 74, 0.55),
+    0 0 16px rgba(201, 111, 74, 0.35);
+}
+@keyframes cafe-score-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(201, 111, 74, 0.4),
+      0 0 10px rgba(201, 111, 74, 0.22);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px rgba(201, 111, 74, 0.8),
+      0 0 22px rgba(201, 111, 74, 0.48);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cafe-score-active {
+    animation: none;
+    box-shadow:
+      0 0 0 2px rgba(201, 111, 74, 0.55),
+      0 0 16px rgba(201, 111, 74, 0.35);
+  }
+}
+
 /* Cafetulia v11 — menú 3D de reservas */
 .title-experience {
   scrollbar-width: none;

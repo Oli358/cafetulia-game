@@ -62,12 +62,14 @@ export function AnchoredPopover({
     left: number;
     top: number;
     width: number;
-    isMobileSheet: boolean;
+    placement: 'top' | 'bottom';
+    originX: number;
   }>({
     left: 12,
     top: 56,
     width: Math.min(maxWidth, typeof window !== 'undefined' ? window.innerWidth - 16 : maxWidth),
-    isMobileSheet: false,
+    placement: 'bottom',
+    originX: Math.min(maxWidth, typeof window !== 'undefined' ? window.innerWidth - 16 : maxWidth) / 2,
   });
 
   const updatePosition = () => {
@@ -76,21 +78,13 @@ export function AnchoredPopover({
     const vh = window.innerHeight;
     const margin = 8;
     const width = Math.min(maxWidth, vw - margin * 2);
-    const isMobile = vw < 640;
     const panelHeight = panelRef.current?.offsetHeight || 290;
-
-    if (isMobile) {
-      const left = Math.max(margin, Math.round((vw - width) / 2));
-      const top = Math.max(margin, Math.min(vh - panelHeight - margin, vh - panelHeight - 12));
-      setCoords({ left, top, width, isMobileSheet: true });
-      return;
-    }
 
     const anchorEl = anchorRef.current;
     if (!anchorEl) {
       const left = Math.max(margin, Math.round((vw - width) / 2));
       const top = Math.max(margin, Math.round((vh - panelHeight) / 2));
-      setCoords({ left, top, width, isMobileSheet: false });
+      setCoords({ left, top, width, placement: 'bottom', originX: width / 2 });
       return;
     }
 
@@ -99,23 +93,41 @@ export function AnchoredPopover({
       preferPlacement === 'bottom-start' ? rect.left : rect.right - width;
     desiredLeft = Math.max(margin, Math.min(vw - width - margin, Math.round(desiredLeft)));
 
-    let desiredTop =
-      preferPlacement === 'top-end' ? rect.top - panelHeight - 6 : rect.bottom + 6;
-    if (desiredTop + panelHeight + margin > vh) {
-      const aboveTop = rect.top - panelHeight - 6;
-      if (aboveTop >= margin) {
-        desiredTop = aboveTop;
+    // Anchor every popover to its trigger, also on mobile. If there is no room
+    // below, flip above; the panel keeps its own scroll for very tall menus.
+    const belowTop = rect.bottom + 10;
+    const aboveTop = rect.top - panelHeight - 10;
+    let desiredTop = preferPlacement === 'top-end' ? aboveTop : belowTop;
+    let placement: 'top' | 'bottom' = preferPlacement === 'top-end' ? 'top' : 'bottom';
+    if (placement === 'bottom') {
+      if (belowTop + panelHeight + margin > vh) {
+        if (aboveTop >= margin) {
+          desiredTop = aboveTop;
+          placement = 'top';
+        } else {
+          desiredTop = Math.max(margin, vh - panelHeight - margin);
+          placement = desiredTop < rect.top ? 'top' : 'bottom';
+        }
+      }
+    } else if (aboveTop < margin) {
+      if (belowTop + panelHeight + margin <= vh) {
+        desiredTop = belowTop;
+        placement = 'bottom';
       } else {
-        desiredTop = Math.max(margin, vh - panelHeight - margin);
+        desiredTop = margin;
       }
     }
     desiredTop = Math.max(margin, Math.round(desiredTop));
+
+    const anchorCenter = rect.left + rect.width / 2;
+    const originX = Math.max(12, Math.min(width - 12, Math.round(anchorCenter - desiredLeft)));
 
     setCoords({
       left: desiredLeft,
       top: desiredTop,
       width,
-      isMobileSheet: false,
+      placement,
+      originX,
     });
   };
 
@@ -180,23 +192,35 @@ export function AnchoredPopover({
             initial={
               reducedMotion
                 ? { opacity: 1 }
-                : { opacity: 0, y: coords.isMobileSheet ? 16 : -6, scale: 0.97 }
+                : {
+                    opacity: 0,
+                    y: coords.placement === 'top' ? 10 : -10,
+                    scale: 0.96,
+                  }
             }
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={
               reducedMotion
                 ? { opacity: 0 }
-                : { opacity: 0, y: coords.isMobileSheet ? 12 : -4, scale: 0.97 }
+                : {
+                    opacity: 0,
+                    y: coords.placement === 'top' ? 7 : -7,
+                    scale: 0.97,
+                  }
             }
-            transition={{ duration: reducedMotion ? 0 : 0.16, ease: 'easeOut' }}
+            transition={{
+              duration: reducedMotion ? 0 : 0.24,
+              ease: [0.22, 1, 0.36, 1],
+            }}
             style={{
               position: 'fixed',
               left: `${coords.left}px`,
               top: `${coords.top}px`,
               width: `${coords.width}px`,
               maxHeight: 'calc(100dvh - 16px)',
+              transformOrigin: `${coords.originX}px ${coords.placement === 'top' ? 'bottom' : 'top'}`,
             }}
-            className="pointer-events-auto overflow-y-auto cafe-paper-sheet text-[#3E2F2A] rounded-2xl p-3 text-xs"
+            className="pointer-events-auto overflow-y-auto cafe-paper-sheet text-[#3E2F2A] rounded-2xl p-3 text-xs shadow-[0_18px_44px_rgba(35,23,18,0.24)]"
           >
             {children}
           </motion.div>

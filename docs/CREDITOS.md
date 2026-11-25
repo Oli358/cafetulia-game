@@ -20,6 +20,12 @@ El vaso de café para llevar, sus etiquetas, los ingredientes restantes (naranja
 vainilla, cardamomo, chocolate y cacao), los papeles de la portada y el resto de
 la interfaz son arte original de Cafetulia generado en el propio proyecto.
 
+## Fondos
+
+| Archivo local | Obra | Origen | Notas |
+| --- | --- | --- | --- |
+| `public/backgrounds/cafe-bar.jpg` | Fondo de bar cozy en tonos cálidos | Imagen aportada por el usuario | Comprimida a JPEG (67 KB) desde el archivo original de Descargas. **Pendiente de confirmar fuente y licencia antes de publicar.** |
+
 ## Sonido
 
 La música y los efectos proceden del sistema de audio original del proyecto.
