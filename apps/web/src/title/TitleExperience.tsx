@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { CAFE_DAILY_PHRASES, getCafeGreeting } from '@cafetulia/ui';
 import { CafetuliaLockup, CafetuliaLogo, PlayerAvatar } from '../art/CharacterPortrait';
 import { soundEngine } from '../audio/soundEngine';
+import { PlayerName } from '../components/PlayerName';
 import { AvatarDropdownPicker, SubtitlesDropdownPicker } from '../components/TitlePickers';
 import { useGameStore } from '../store/gameStore';
 import { FloatingMenuPapers } from './FloatingMenuPapers';
@@ -645,12 +646,16 @@ function ReservationCard({
               onClick={() => toggleOverlay('avatar')}
               className="inline-flex min-h-[34px] items-center gap-2 rounded-lg px-1 text-left text-[11px] font-bold text-[#2B1710] hover:bg-[#F7EEDF]"
             >
-              <PlayerAvatar avatarId={avatarId} size={26} />
+              <PlayerAvatar avatarId={avatarId} size={32} />
               <span className="min-w-0">
                 <span className="block text-[9px] font-extrabold uppercase tracking-wider text-[#6C564A]">
                   Tu ficha
                 </span>
-                <span className="block max-w-[120px] truncate">{nickname || 'Cafetero'}</span>
+                <PlayerName
+                  nickname={nickname || 'Cafetero'}
+                  className="block max-w-[120px] truncate font-bold"
+                  showAura={false}
+                />
               </span>
             </button>
             <SubtitlesDropdownPicker compact />
@@ -711,6 +716,11 @@ export function TitleExperience(): React.ReactElement {
   const modeConfig = getMenuMode(mode);
   const theme = modeConfig.theme;
   const greetingText = useMemo(() => getCafeGreeting(nickname), [nickname]);
+  const greetingName = nickname.trim();
+  const greetingPrefix =
+    greetingName && greetingText.endsWith(greetingName)
+      ? greetingText.slice(0, -greetingName.length)
+      : null;
   const dailyPhrase = CAFE_DAILY_PHRASES[phraseIndex] ?? CAFE_DAILY_PHRASES[0];
 
   const heroOpacity = 1 - smoothstep(0.2, 0.58, progress);
@@ -905,7 +915,16 @@ export function TitleExperience(): React.ReactElement {
                       className="h-1.5 w-1.5 rounded-full"
                       style={{ backgroundColor: theme.accent }}
                     />
-                    <span className="truncate">{greetingText}</span>
+                    <span className="truncate">
+                    {greetingPrefix !== null ? (
+                      <>
+                        {greetingPrefix}
+                        <PlayerName nickname={greetingName} showAura={false} />
+                      </>
+                    ) : (
+                      greetingText
+                    )}
+                  </span>
                   </p>
                 </div>
               </div>

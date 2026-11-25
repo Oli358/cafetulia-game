@@ -11,6 +11,7 @@ import {
   type AchievementTone,
 } from '../utils/achievements';
 import { AnimatedScore } from './CoinTray';
+import { PlayerName } from './PlayerName';
 
 const RESULT_BG = '/backgrounds/cafe-bar.jpg';
 
@@ -452,7 +453,7 @@ export function FinishedScreen(): React.ReactElement {
                     />
                     <div className="flex items-center gap-3">
                       <div className="relative shrink-0">
-                        <div className="rounded-2xl border-2 border-[#1E130E] bg-[#FEF6E0] p-1 shadow-[0_2px_0_#1E130E]">
+                        <div className="rounded-full border-2 border-[#1E130E] bg-[#FEF6E0] p-1 shadow-[0_2px_0_#1E130E]">
                           <PlayerAvatar avatarId={topWinner.avatarId} size={64} />
                         </div>
                         <span className="absolute -left-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-[#1E130E] bg-[#C9A227] text-[#231712] shadow-[0_2px_0_#1E130E]">
@@ -470,10 +471,17 @@ export function FinishedScreen(): React.ReactElement {
                             </span>
                           )}
                         </div>
-                        <h1 className="mt-1 truncate font-serif text-3xl font-extrabold leading-tight text-[#231712] sm:text-5xl">
-                          {isSharedVictory
-                            ? winners.map((winner) => winner.nickname).join(' & ')
-                            : topWinner.nickname}
+                        <h1 className="mt-1 break-words font-serif text-3xl font-extrabold leading-tight text-[#231712] sm:text-5xl">
+                          {isSharedVictory ? (
+                            winners.map((winner, index) => (
+                              <React.Fragment key={winner.id}>
+                                {index > 0 ? ' & ' : null}
+                                <PlayerName nickname={winner.nickname} />
+                              </React.Fragment>
+                            ))
+                          ) : (
+                            <PlayerName nickname={topWinner.nickname} />
+                          )}
                         </h1>
                         <p className="mt-0.5 text-[11px] text-[#6F5A4E]">
                           {isSharedVictory
@@ -545,11 +553,11 @@ export function FinishedScreen(): React.ReactElement {
                             </span>
                           )}
                         </div>
-                        <div className="mt-1.5 rounded-xl border border-[#231712]/15 bg-[#F5EBDD] p-1">
+                        <div className="mt-1.5 rounded-full border border-[#231712]/15 bg-[#F5EBDD] p-1">
                           <PlayerAvatar avatarId={st.avatarId} size={40} />
                         </div>
-                        <h3 className="mt-1 w-full truncate font-serif text-sm font-bold text-[#231712]">
-                          {st.nickname}
+                        <h3 className="mt-1 w-full break-words font-serif text-sm font-bold text-[#231712]">
+                          <PlayerName nickname={st.nickname} />
                         </h3>
                         <div className="mt-0.5 flex items-baseline justify-center gap-0.5">
                           <AnimatedScore
@@ -633,10 +641,10 @@ export function FinishedScreen(): React.ReactElement {
                             <div className="mt-1.5 flex items-center gap-1.5">
                               <PlayerAvatar
                                 avatarId={avatarById.get(achievement.playerId) ?? 'moka'}
-                                size={18}
+                                size={24}
                               />
                               <span className="truncate text-[10px] font-extrabold text-[#3E2F2A]">
-                                {owner}
+                                <PlayerName nickname={owner} showAura={false} />
                               </span>
                             </div>
                           </div>

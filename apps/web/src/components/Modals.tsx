@@ -1278,8 +1278,8 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
               />
 
               <div className="flex flex-wrap items-center gap-3">
-                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-[#231712]/25 bg-[#F5EBDD] shadow-inner">
-                  <PlayerAvatar avatarId={avatarId} size={44} />
+                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#231712]/25 bg-[#F5EBDD] shadow-inner ring-2 ring-[#C9A227]/40">
+                  <PlayerAvatar avatarId={avatarId} size={56} />
                 </span>
                 <div className="min-w-0 flex-1">
                   <label className="block text-[9px] font-extrabold uppercase tracking-[0.14em] text-[#8A7365]">
@@ -1356,7 +1356,7 @@ function SettingsContent({ onClose }: { onClose: () => void }): React.ReactEleme
                               : 'border-[#231712]/10 bg-[#FFF9F0] hover:-translate-y-0.5 hover:border-[#231712]/30'
                           }`}
                         >
-                          <PlayerAvatar avatarId={av.id} size={28} />
+                          <PlayerAvatar avatarId={av.id} size={40} />
                           <span className="mt-0.5 line-clamp-2 min-h-[20px] w-full text-center text-[8px] font-bold leading-tight">
                             {av.label}
                           </span>

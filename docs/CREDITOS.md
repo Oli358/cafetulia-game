@@ -20,6 +20,9 @@ El vaso de café para llevar, sus etiquetas, los ingredientes restantes (naranja
 vainilla, cardamomo, chocolate y cacao), los papeles de la portada y el resto de
 la interfaz son arte original de Cafetulia generado en el propio proyecto.
 
+Los 12 retratos de avatar (incluidos Hans, Lucía, Dilara y William) y los 8 emblemas
+de café se generan con los componentes SVG originales del proyecto.
+
 ## Fondos
 
 | Archivo local | Obra | Origen | Notas |

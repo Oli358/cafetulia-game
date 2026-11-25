@@ -77,7 +77,8 @@ describe('moveHelper & UI v6/v7 specifications', () => {
   });
 
   it('defines 16 pre-made selectable avatars without photo uploads', () => {
-    expect(PRESET_AVATARS.length).toBe(16);
+    expect(PRESET_AVATARS.length).toBe(20);
+    expect(PRESET_AVATARS.filter((a) => a.kind === 'character')).toHaveLength(12);
     expect(PRESET_AVATARS.some((a) => a.id === 'espresso')).toBe(true);
     expect(PRESET_AVATARS.some((a) => a.id === 'gato')).toBe(true);
   });

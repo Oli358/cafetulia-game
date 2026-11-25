@@ -27,6 +27,7 @@ import {
 import { AnimatedScore, CoinTray, FlyingCoinsLayer, type CoinFlightEvent } from './CoinTray';
 import { IllustratedBoard, type ChairToastInfo } from './IllustratedBoard';
 import { AnchoredPopover } from './Modals';
+import { PlayerName } from './PlayerName';
 import { AvatarDropdownPicker as TitleAvatarPicker } from './TitlePickers';
 import { LobbyFloatingIngredients } from '../title/LobbyFloatingIngredients';
 
@@ -61,135 +62,6 @@ function BagIcon({ className }: { className?: string }): React.ReactElement {
       <path d="M9 11.5h6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
       <circle cx="12" cy="15.2" r="1.7" stroke="currentColor" strokeWidth="1.6" />
     </svg>
-  );
-}
-
-/**
- * Keyboard & ARIA accessible Avatar Dropdown / Bottom Sheet (P0.2 & P0.4)
- * Uses global activeOverlay === 'avatar' and portal AnchoredPopover.
- */
-function AvatarDropdownPicker({ compact = false }: { compact?: boolean }): React.ReactElement {
-  const avatarId = useGameStore((s) => s.avatarId);
-  const setAvatarId = useGameStore((s) => s.setAvatarId);
-  const activeOverlay = useGameStore((s) => s.activeOverlay);
-  const toggleOverlay = useGameStore((s) => s.toggleOverlay);
-  const setActiveOverlay = useGameStore((s) => s.setActiveOverlay);
-  const btnRef = useRef<HTMLButtonElement | null>(null);
-
-  const open = activeOverlay === 'avatar';
-
-  const currentAvatar = PRESET_AVATARS.find((a) => a.id === avatarId) ?? {
-    id: 'espresso',
-    label: 'Taza Espresso',
-    bg: '#C96F4A',
-    kind: 'icon' as const,
-  };
-
-  return (
-    <div className="relative" data-testid="title-avatar-picker">
-      <button
-        ref={btnRef}
-        type="button"
-        data-testid="avatar-dropdown-btn"
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        aria-controls="avatar-dropdown-popover"
-        onClick={() => toggleOverlay('avatar')}
-        className={`inline-flex items-center justify-between gap-2 rounded-xl bg-[#F7EEDF] border border-[#231712]/25 text-[#3E2F2A] font-bold hover:bg-[#EAD9C0] transition-colors cursor-pointer ${
-          compact ? 'min-h-[38px] px-2.5 text-xs' : 'min-h-[44px] px-3 text-xs sm:text-sm w-full'
-        }`}
-      >
-        <span className="inline-flex items-center gap-2 min-w-0">
-          <PlayerAvatar avatarId={avatarId} size={compact ? 22 : 26} />
-          <span className="truncate">{currentAvatar.label}</span>
-        </span>
-        <svg
-          width="10"
-          height="6"
-          viewBox="0 0 10 6"
-          aria-hidden="true"
-          className="text-[#6F5A4E] shrink-0"
-        >
-          <path
-            d="M1 1l4 4 4-4"
-            stroke="currentColor"
-            strokeWidth="1.8"
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </button>
-
-      <AnchoredPopover
-        open={open}
-        onClose={() => setActiveOverlay(null)}
-        anchorRef={btnRef}
-        id="avatar-dropdown-popover"
-        role="radiogroup"
-        ariaLabel="Elige tu avatar"
-        testId="avatar-dropdown-popover"
-        maxWidth={360}
-        preferPlacement="bottom-start"
-      >
-        <div className="space-y-2">
-          <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-1.5">
-            <span className="font-serif font-bold text-sm">Elige tu avatar (16)</span>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveOverlay(null);
-                btnRef.current?.focus();
-              }}
-              aria-label="Cerrar selector de avatar"
-              className="px-2 py-1 rounded-lg bg-[#F7EEDF] text-xs font-bold text-[#6F5A4E] hover:text-[#3E2F2A] cursor-pointer inline-flex items-center justify-center"
-            >
-              <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
-                <path
-                  d="M1.5 1.5l7 7M8.5 1.5l-7 7"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </button>
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-1.5 snap-x snap-mandatory">
-            {PRESET_AVATARS.map((av) => {
-              const active = avatarId === av.id;
-              return (
-                <button
-                  key={av.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={active}
-                  data-testid={`avatar-option-${av.id}`}
-                  onClick={() => {
-                    void setAvatarId(av.id);
-                    setActiveOverlay(null);
-                    btnRef.current?.focus();
-                  }}
-                  title={av.label}
-                  className={`snap-start shrink-0 w-[78px] min-h-[92px] flex flex-col items-center justify-center p-1.5 rounded-xl border transition-transform cursor-pointer ${
-                    active
-                      ? 'bg-[#FEF6E0] border-[#C96F4A] ring-2 ring-[#C96F4A] scale-103'
-                      : 'bg-[#F7EEDF]/75 border-[#3E2F2A]/10 hover:bg-[#F7EEDF]'
-                  }`}
-                >
-                  <PlayerAvatar avatarId={av.id} size={40} />
-                  <span className="text-[9px] font-bold leading-tight w-full text-center mt-1">
-                    {av.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-          <p className="text-[10px] font-semibold text-[#6F5A4E]">
-            Desliza para elegir · tu emblema se ve en la mesa
-          </p>
-        </div>
-      </AnchoredPopover>
-    </div>
   );
 }
 
@@ -1114,9 +986,9 @@ export function TitleScreen(): React.ReactElement {
               }}
               aria-label={`Cambiar avatar actual (${currentAvatar.label})`}
               title="Pulsa para cambiar tu avatar"
-              className="relative group shrink-0 w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-[#FEF6E0] border-2 border-[#231712] shadow-[0_3px_0_#231712] flex items-center justify-center hover:-translate-y-0.5 active:translate-y-0.5 transition-transform cursor-pointer focus:outline-2 focus:outline-[#C86B46]"
+              className="relative group shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#FEF6E0] border-2 border-[#231712] shadow-[0_3px_0_#231712] flex items-center justify-center hover:-translate-y-0.5 active:translate-y-0.5 transition-transform cursor-pointer focus:outline-2 focus:outline-[#C86B46]"
             >
-              <PlayerAvatar avatarId={avatarId} size={38} />
+              <PlayerAvatar avatarId={avatarId} size={48} />
               <span className="absolute -bottom-1 -right-1 px-1.5 py-0.2 rounded-md bg-[#C86B46] text-[#FFFDF8] text-[9px] font-extrabold border border-[#231712]">
                 Ficha
               </span>
@@ -1162,7 +1034,7 @@ export function TitleScreen(): React.ReactElement {
             </div>
 
             <div className="grid grid-cols-2 gap-1.5">
-              <AvatarDropdownPicker compact />
+              <TitleAvatarPicker compact />
               <SubtitlesDropdownPicker compact />
             </div>
           </div>
@@ -1875,18 +1747,40 @@ export function LobbyScreen(): React.ReactElement {
                       <>
                         <div className="flex items-center gap-2 min-w-0">
                           <div className="relative shrink-0">
-                            <div className="p-0.5 rounded-xl bg-[#FEF6E0] border-2 border-[#231712]">
-                              <PlayerAvatar avatarId={member.avatarId} size={34} />
+                            <div className="rounded-full border-2 border-[#231712] bg-[#FEF6E0] p-0.5 ring-2 ring-[#C9A227]/35">
+                              <PlayerAvatar avatarId={member.avatarId} size={44} />
                             </div>
                             <span className="absolute -top-1.5 -left-1.5 w-4.5 h-4.5 rounded-full bg-[#231712] text-[#FFFDF8] text-[9px] font-mono font-extrabold flex items-center justify-center">
                               {idx + 1}
                             </span>
                           </div>
                           <div className="min-w-0">
-                            <span className="font-serif font-bold text-xs sm:text-sm text-[#231712] block truncate">
-                              {member.nickname}
-                              {member.id === snapshot.hostId ? ' · Anfitrión' : ''}
-                              {isMe ? ' (Tú)' : ''}
+                            <span className="flex min-w-0 flex-wrap items-center gap-1 font-serif font-bold text-xs text-[#231712] sm:text-sm">
+                              <PlayerName nickname={member.nickname} />
+                              {member.id === snapshot.hostId ? (
+                                <span title="Anfitrión" aria-label="Anfitrión" className="shrink-0">
+                                  <svg
+                                    width="11"
+                                    height="9"
+                                    viewBox="0 0 12 10"
+                                    fill="none"
+                                    aria-hidden="true"
+                                  >
+                                    <path
+                                      d="M1 3.5 L3.5 5.5 L6 1.5 L8.5 5.5 L11 3.5 L10 8.5 H2 Z"
+                                      fill="#C9A227"
+                                      stroke="#231712"
+                                      strokeWidth="1"
+                                      strokeLinejoin="round"
+                                    />
+                                  </svg>
+                                </span>
+                              ) : null}
+                              {isMe ? (
+                                <span className="shrink-0 rounded-full bg-[#231712] px-1.5 py-[1px] text-[8px] font-extrabold uppercase leading-none tracking-wide text-[#FFFDF8]">
+                                  Tú
+                                </span>
+                              ) : null}
                             </span>
                             <div className="flex items-center gap-1 mt-0.5 flex-wrap">
                               {isBot ? (
@@ -2733,7 +2627,13 @@ export function PlayingScreen(): React.ReactElement {
                 }`}
                 data-testid="turn-indicator"
               >
-                {isMyTurn ? 'Tu turno' : `Turno: ${activePlayerObj?.nickname ?? 'Rival'}`}
+                {isMyTurn ? (
+                  'Tu turno'
+                ) : (
+                  <>
+                    Turno: <PlayerName nickname={activePlayerObj?.nickname ?? 'Rival'} />
+                  </>
+                )}
               </div>
               {remainingSeconds !== null && (
                 <span
@@ -2986,10 +2886,11 @@ export function PlayingScreen(): React.ReactElement {
               return (
                 <div key={p.id} className="bg-[#F7EEDF] p-2 rounded-xl space-y-1.5">
                   <div className="flex items-center justify-between text-xs gap-2">
-                    <span className="inline-flex items-center gap-1.5 font-bold min-w-0 truncate">
-                      <PlayerAvatar avatarId={pAvatar} size={18} />
-                      <span className="truncate">
-                        {p.nickname} {p.id === myPlayerId ? '(Tú)' : ''}
+                    <span className="inline-flex items-center gap-1.5 font-bold min-w-0">
+                      <PlayerAvatar avatarId={pAvatar} size={24} />
+                      <span className="min-w-0">
+                        <PlayerName nickname={p.nickname} />
+                        {p.id === myPlayerId ? ' (Tú)' : ''}
                       </span>
                     </span>
                     <div className="flex items-center gap-1.5 shrink-0">
@@ -3232,9 +3133,9 @@ export function PlayingScreen(): React.ReactElement {
                       >
                         {rank}º
                       </span>
-                      <PlayerAvatar avatarId={pAvatar} size={18} />
-                      <span className="min-w-0 flex-1 truncate font-bold text-[#3E2F2A]">
-                        {p.nickname}
+                      <PlayerAvatar avatarId={pAvatar} size={24} />
+                      <span className="min-w-0 flex-1 font-bold text-[#3E2F2A]">
+                        <PlayerName nickname={p.nickname} />
                       </span>
                       <span
                         className="shrink-0 rounded border border-[#231712]/15 bg-[#FFF9F0] px-1 py-0.2 font-mono text-[9px] font-semibold tabular-nums text-[#6F5A4E]"
@@ -3815,9 +3716,14 @@ export function PlayingScreen(): React.ReactElement {
                               className="p-2.5 rounded-xl cafe-paper-subpanel text-[#3E2F2A] flex items-center justify-between gap-2"
                             >
                               <div className="flex items-center gap-1.5 min-w-0">
-                                <PlayerAvatar avatarId={plAvatar} size={18} />
+                                <PlayerAvatar avatarId={plAvatar} size={24} />
                                 <div className="truncate">
-                                  <span className="font-bold">{pl?.nickname ?? pid}:</span>{' '}
+                                  <PlayerName
+                                    nickname={pl?.nickname ?? pid}
+                                    className="font-bold"
+                                    showAura={false}
+                                  />
+                                  :{' '}
                                   <span>{desc}</span>
                                 </div>
                               </div>
@@ -3851,9 +3757,14 @@ export function PlayingScreen(): React.ReactElement {
                               key={msg.id}
                               className="p-2 rounded-xl cafe-paper-subpanel flex items-center gap-2"
                             >
-                              <PlayerAvatar avatarId={msgAvatar} size={20} />
+                              <PlayerAvatar avatarId={msgAvatar} size={24} />
                               <div>
-                                <span className="font-bold text-[#3E2F2A]">{msg.nickname}: </span>
+                                <PlayerName
+                                  nickname={msg.nickname}
+                                  className="font-bold text-[#3E2F2A]"
+                                  showAura={false}
+                                />
+                                :{' '}
                                 <span className={msg.emote ? 'text-base' : 'text-[#6F5A4E]'}>
                                   {msg.emote ?? msg.text}
                                 </span>

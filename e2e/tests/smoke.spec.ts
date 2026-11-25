@@ -37,9 +37,19 @@ type TestGameState = {
   hands: Record<string, Array<Record<string, unknown>>>;
 };
 
+type TestMember = {
+  id: string;
+  nickname: string;
+  avatarId: string;
+  role: string;
+  ready: boolean;
+};
+
 type TestSnapshot = {
   code: string;
+  hostId: string;
   phase: string;
+  members: TestMember[];
   gameState: TestGameState | null;
 };
 
@@ -621,6 +631,54 @@ test.describe('Cafetulia E2E v11 (menú de reservas 3D, tres mundos, lobby prepa
     expect(result.errorBanner).toContain('La sala ya no existe');
     await expect(page.getByTestId('title-screen')).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText(/La sala ya no existe/)).toBeVisible();
+  });
+
+  test('marca a los fundadores y activa el aura solo con Oli + Walford/Abril', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.goto('/?autostart=1');
+    await expect(page.getByTestId('papercraft-board')).toBeVisible({ timeout: 20_000 });
+
+    const setup = await page.evaluate(() => {
+      const store = (window as unknown as { __CAFETULIA_STORE__: TestStoreShape })
+        .__CAFETULIA_STORE__;
+      const snap = store.getState().snapshot;
+      if (!snap) return null;
+      const members = snap.members.map((member, index) => ({
+        ...member,
+        nickname: index === 0 ? 'Oli' : 'Abril',
+        role: 'player',
+        ready: true,
+      }));
+      store.setState({
+        roomCode: null,
+        screen: 'lobby',
+        reducedMotion: false,
+        snapshot: { ...snap, phase: 'lobby', members },
+      });
+      return members.length;
+    });
+    expect(setup).toBeGreaterThanOrEqual(2);
+
+    await expect(page.locator('[data-founder="oli"]').first()).toBeVisible();
+    await expect(page.locator('[data-founder="walford"]').first()).toBeVisible();
+    await expect(page.locator('[data-duo="true"]').first()).toBeVisible();
+    await expect(page.locator('.cafe-player-name__heart').first()).toBeVisible();
+
+    await page.evaluate(() => {
+      const store = (window as unknown as { __CAFETULIA_STORE__: TestStoreShape })
+        .__CAFETULIA_STORE__;
+      const snap = store.getState().snapshot;
+      if (!snap) return;
+      const members = snap.members.map((member, index) => ({
+        ...member,
+        nickname: index === 0 ? 'Oli' : 'Oli358',
+      }));
+      store.setState({ snapshot: { ...snap, members } });
+    });
+
+    await expect(page.locator('[data-founder="oli"]').first()).toBeVisible();
+    await expect(page.locator('[data-duo="true"]')).toHaveCount(0);
+    await expect(page.locator('.cafe-player-name__heart')).toHaveCount(0);
   });
 
   test('mantiene la portada y la carta usables sin WebGL', async ({ page }) => {

@@ -704,3 +704,131 @@
     transform: rotate(var(--paper-rotate, 0deg));
   }
 }
+
+/* Player name flair: fundadores y aura de corazones */
+.cafe-player-name {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: baseline;
+}
+
+.cafe-player-name__text {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+}
+
+.cafe-player-name--founder .cafe-player-name__text {
+  color: #8a5a12;
+  background-image: linear-gradient(180deg, #f8e6ad 0%, #d9a72f 48%, #8a5510 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 2px rgba(224, 165, 38, 0.45));
+  animation: cafe-founder-glow 4.8s ease-in-out infinite;
+}
+
+.cafe-player-name--duo .cafe-player-name__text {
+  filter: drop-shadow(0 0 5px rgba(224, 165, 38, 0.72));
+}
+
+.cafe-player-name__hearts {
+  position: absolute;
+  inset: -7px -12px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.cafe-player-name__heart {
+  position: absolute;
+  bottom: 38%;
+  color: #120c09;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0;
+  filter: drop-shadow(0 0 1px rgba(255, 248, 236, 0.95));
+  animation-name: cafe-heart-rise;
+  animation-timing-function: ease-out;
+  animation-iteration-count: infinite;
+}
+
+.cafe-player-name__heart:nth-child(even) {
+  animation-name: cafe-heart-rise-alt;
+}
+
+@keyframes cafe-founder-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 2px rgba(224, 165, 38, 0.4));
+  }
+  50% {
+    filter: drop-shadow(0 0 6px rgba(224, 165, 38, 0.78));
+  }
+}
+
+@keyframes cafe-heart-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 4px, 0) scale(0.55) rotate(-8deg);
+  }
+  18% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(4px, -20px, 0) scale(1.1) rotate(10deg);
+  }
+}
+
+@keyframes cafe-heart-rise-alt {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 4px, 0) scale(0.55) rotate(8deg);
+  }
+  18% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(-4px, -20px, 0) scale(1.1) rotate(-10deg);
+  }
+}
+
+.reduced-motion .cafe-player-name__text,
+.reduced-motion .cafe-player-name__hearts {
+  animation: none !important;
+}
+
+.reduced-motion .cafe-player-name__hearts {
+  display: none;
+}
+
+.high-contrast .cafe-player-name--founder .cafe-player-name__text {
+  background-image: none;
+  -webkit-text-fill-color: #5a3a08;
+  color: #5a3a08;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cafe-player-name__text,
+  .cafe-player-name__hearts {
+    animation: none !important;
+  }
+
+  .cafe-player-name__hearts {
+    display: none;
+  }
+}
+@media (forced-colors: active) {
+  .cafe-player-name--founder .cafe-player-name__text {
+    background-image: none;
+    -webkit-text-fill-color: CanvasText;
+    color: CanvasText;
+    filter: none;
+  }
+
+  .cafe-player-name__hearts {
+    display: none;
+  }
+}

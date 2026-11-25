@@ -5,6 +5,35 @@
 
 ---
 
+## Sesión 038 - 2026-11-26 - Personalización: nombres especiales y retratos
+
+**Objetivo:** dar identidad visual a los fundadores, mejorar los avatares y añadir el aura de corazones cuando Oli y Walford/Abril comparten mesa.
+
+**Hecho:**
+- Nuevo `playerFlair` con reglas de apodo: contiene `oli` (incluye `Oli358`) → fundador; contiene `abril`, `walfoord` o `walford` → fundador. Sin distinguir mayúsculas ni acentos.
+- `PlayerName` centraliza el dorado con glow de fundador y el aura de corazones negros.
+- El aura solo se activa si hay al menos dos personas distintas, una de cada grupo; dos Olis o dos Abriles/Walfords no la activan. Los bots no cuentan.
+- Aplicado en saludo de portada, ficha del menú, asientos del lobby, cabecera de turno, listas de manos, chat y clasificación final. En chat y zonas muy estrechas se mantiene el dorado pero se ocultan los corazones para no recortarlos.
+- Añadidos 4 retratos nuevos (Hans, Lucía, Dilara y William) hasta 12 retratos; se mantienen 8 emblemas de café. Total: 20 avatares.
+- `CharacterPortrait` admite variante `portrait` (círculo, sin bandera de ficha) y `PlayerAvatar` la usa en toda la app.
+- Selector de avatar rediseñado en cuadrícula, con retratos a 54 px, emblemas separados y estados de selección; el selector de Ajustes también usa retratos mayores.
+- Aumentados los avatares en lobby (44 px), cabecera (32 px), listas (24 px), ficha de portada (32 px) y tarjeta de Ajustes (56 px).
+- Añadidos tests de las reglas de nombre y del aura; typecheck, lint, tests y E2E en verde.
+
+**Decisiones:** D-122.
+
+**Problemas:**
+- El tratamiento va por apodo, así que cualquiera puede imitarlo. Se acepta como cosmético mientras no haya cuentas verificadas.
+- La coincidencia por subcadena hace que nombres como «Olivia» también reciban el dorado; es lo acordado.
+- En modo de movimiento reducido el aura se oculta y el brillo queda estático.
+
+**Siguiente:**
+1. Probar los retratos y el aura en un móvil real.
+2. Marcos de avatar, títulos y tarjeta de perfil más adelante.
+3. Revisar si el sello de fundador necesita un icono junto al nombre.
+
+---
+
 ## Sesión 037 - 2026-11-25 - Nuevo logo, cabeceras e iconos
 
 **Objetivo:** integrar el símbolo y el lockup aportados por el usuario, poner el logo en la pestaña del navegador y en la PWA, y usarlo en las cabeceras y la portada.

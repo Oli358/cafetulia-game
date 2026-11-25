@@ -299,14 +299,20 @@ export function CharacterPortrait({
   size = 64,
   sipping = false,
   tileId,
+  variant = 'tile',
 }: {
   nation: TileNation;
   gender: Gender;
   size?: number;
   sipping?: boolean;
   tileId?: string;
+  variant?: 'tile' | 'portrait';
 }): React.ReactElement {
   const isFemale = gender === 'F';
+  const isPortrait = variant === 'portrait';
+  const personTransform = isPortrait
+    ? 'translate(50 50) scale(1.16) translate(-50 -50)'
+    : undefined;
   const isAltJoker = Boolean(tileId && (tileId.endsWith('_2') || tileId.endsWith('4')));
   const frameBg = TILE_FRAME_COLORS[(nation as NationKey) ?? 'fr'] ?? '#F4F1EA';
   const meta =
@@ -333,6 +339,13 @@ export function CharacterPortrait({
       aria-hidden="true"
       className="select-none shrink-0 block"
     >
+      {isPortrait ? (
+        <g>
+          <circle cx="50" cy="50" r="49" fill={frameBg} />
+          <ellipse cx="41" cy="27" rx="32" ry="23" fill="#FFFDF8" opacity="0.18" />
+        </g>
+      ) : (
+        <>
       {/* 1. ROUNDED SQUARE CARDBOARD TILE BASE WITH THICKNESS BEVEL */}
       <rect
         x="2"
@@ -385,7 +398,10 @@ export function CharacterPortrait({
           strokeWidth="3"
         />
       </g>
+        </>
+      )}
 
+      <g transform={personTransform}>
       {/* 3. FEMALE BACK HAIR (Drawn behind shoulders/neck for clear female silhouette) */}
       {isFemale && nation !== 'joker' && (
         <g>
@@ -1278,6 +1294,10 @@ export function CharacterPortrait({
           <path d="M18 5 Q24 9 18 13" fill="none" stroke={ink} strokeWidth="2.4" />
         </g>
       )}
+      </g>
+      {isPortrait && (
+        <circle cx="50" cy="50" r="48" fill="none" stroke={ink} strokeWidth="3" />
+      )}
     </svg>
   );
 }
@@ -1294,25 +1314,36 @@ export function PlayerAvatar({
   if (preset.kind === 'character' && preset.nation && preset.gender) {
     return (
       <span
-        className="inline-flex items-center justify-center rounded-lg overflow-hidden shrink-0"
+        className="cafe-player-avatar inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFF8EC] shadow-[0_2px_0_rgba(35,23,18,0.28)]"
+        style={{ width: size, height: size }}
         title={preset.label}
+        role="img"
+        aria-label={preset.label}
       >
         <CharacterPortrait
           nation={preset.nation as TileNation}
           gender={preset.gender}
           size={size}
+          variant="portrait"
         />
       </span>
     );
   }
 
   return (
+    <span
+      className="cafe-player-avatar inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#FFF8EC] shadow-[0_2px_0_rgba(35,23,18,0.28)]"
+      style={{ width: size, height: size }}
+      title={preset.label}
+      role="img"
+      aria-label={preset.label}
+    >
     <svg
       width={size}
       height={size}
       viewBox="0 0 40 40"
-      aria-label={preset.label}
-      className="inline-block shrink-0 select-none rounded-full shadow-2xs"
+      aria-hidden="true"
+      className="inline-block shrink-0 select-none"
     >
       <circle cx="20" cy="20" r="18.5" fill={preset.bg} stroke="#3E2F2A" strokeWidth="2.2" />
       <circle cx="20" cy="20" r="15.5" fill="#FFF9F0" stroke="#3E2F2A" strokeWidth="1.2" />
@@ -1399,6 +1430,7 @@ export function PlayerAvatar({
         </g>
       )}
     </svg>
+    </span>
   );
 }
 

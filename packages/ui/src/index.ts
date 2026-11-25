@@ -726,6 +726,10 @@ export type PresetAvatarId =
   | 'kofi'
   | 'nadia'
   | 'raj'
+  | 'hans'
+  | 'lucia'
+  | 'dilara'
+  | 'william'
   | 'arlequin';
 
 export type PresetAvatarMeta = {
@@ -753,6 +757,10 @@ export const PRESET_AVATARS: PresetAvatarMeta[] = [
   { id: 'kofi', label: 'Kofi (África)', bg: '#D98E3A', kind: 'character', nation: 'af', gender: 'M' },
   { id: 'nadia', label: 'Nadia (Rusia)', bg: '#4F7C8A', kind: 'character', nation: 'ru', gender: 'F' },
   { id: 'raj', label: 'Raj (India)', bg: '#D9822B', kind: 'character', nation: 'in', gender: 'M' },
+  { id: 'hans', label: 'Hans (Alemania)', bg: '#24579A', kind: 'character', nation: 'al', gender: 'M' },
+  { id: 'lucia', label: 'Lucía (España)', bg: '#C83E31', kind: 'character', nation: 'es', gender: 'F' },
+  { id: 'dilara', label: 'Dilara (Turquía)', bg: '#B33A3A', kind: 'character', nation: 'tu', gender: 'F' },
+  { id: 'william', label: 'William (Inglaterra)', bg: '#1E4E8C', kind: 'character', nation: 'en', gender: 'M' },
   { id: 'arlequin', label: 'Arlequín (Comodín)', bg: '#C9A227', kind: 'character', nation: 'joker', gender: 'M' },
 ];
 

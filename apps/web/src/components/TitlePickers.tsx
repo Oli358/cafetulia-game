@@ -4,6 +4,81 @@ import { PlayerAvatar } from '../art/CharacterPortrait';
 import { useGameStore } from '../store/gameStore';
 import { AnchoredPopover } from './Modals';
 
+function AvatarOption({
+  avatar,
+  active,
+  onSelect,
+}: {
+  avatar: (typeof PRESET_AVATARS)[number];
+  active: boolean;
+  onSelect: () => void;
+}): React.ReactElement {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={active}
+      aria-label={avatar.label}
+      data-testid={`avatar-option-${avatar.id}`}
+      onClick={onSelect}
+      title={avatar.label}
+      className={`relative flex min-h-[98px] flex-col items-center justify-center gap-1 rounded-2xl border-2 p-1.5 transition-all cursor-pointer ${
+        active
+          ? 'border-[#C96F4A] bg-[#FEF6E0] ring-2 ring-[#C96F4A]/45 shadow-[0_3px_0_#231712] scale-[1.02]'
+          : 'border-[#3E2F2A]/10 bg-[#F7EEDF]/75 hover:-translate-y-0.5 hover:border-[#C96F4A]/40 hover:bg-[#F7EEDF]'
+      }`}
+    >
+      <PlayerAvatar avatarId={avatar.id} size={54} />
+      <span className="w-full text-center text-[9px] font-bold leading-tight text-[#3E2F2A]">
+        {avatar.label}
+      </span>
+      {active && (
+        <span
+          aria-hidden="true"
+          className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full border border-[#231712] bg-[#C9A227] text-[9px] font-black text-[#231712]"
+        >
+          ✓
+        </span>
+      )}
+    </button>
+  );
+}
+
+function AvatarSection({
+  title,
+  subtitle,
+  items,
+  activeId,
+  onSelect,
+}: {
+  title: string;
+  subtitle: string;
+  items: (typeof PRESET_AVATARS)[number][];
+  activeId: string;
+  onSelect: (id: string) => void;
+}): React.ReactElement {
+  return (
+    <section>
+      <div className="mb-1.5 flex items-baseline justify-between gap-2">
+        <h3 className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#3E2F2A]">
+          {title}
+        </h3>
+        <span className="text-[9px] font-semibold text-[#8A7365]">{subtitle}</span>
+      </div>
+      <div className="grid grid-cols-4 gap-2">
+        {items.map((avatar) => (
+          <AvatarOption
+            key={avatar.id}
+            avatar={avatar}
+            active={activeId === avatar.id}
+            onSelect={() => onSelect(avatar.id)}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function AvatarDropdownPicker({
   compact = false,
   iconOnly = false,
@@ -44,7 +119,7 @@ export function AvatarDropdownPicker({
         aria-label={iconOnly ? `Cambiar avatar (${currentAvatar.label})` : undefined}
       >
         <span className="inline-flex items-center gap-2 min-w-0">
-          <PlayerAvatar avatarId={avatarId} size={compact ? 26 : 26} />
+          <PlayerAvatar avatarId={avatarId} size={compact ? 32 : 36} />
           {!iconOnly && <span className="truncate max-w-[110px]">{currentAvatar.label}</span>}
         </span>
         {!iconOnly && (
@@ -75,12 +150,17 @@ export function AvatarDropdownPicker({
         role="radiogroup"
         ariaLabel="Elige tu avatar"
         testId="avatar-dropdown-popover"
-        maxWidth={360}
+        maxWidth={372}
         preferPlacement="bottom-start"
       >
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="flex items-center justify-between border-b border-[#3E2F2A]/10 pb-1.5">
-            <span className="font-serif font-bold text-sm">Elige tu avatar (16)</span>
+            <div>
+              <span className="font-serif font-bold text-sm">Tu identidad en la mesa</span>
+              <span className="ml-1.5 text-[9px] font-bold text-[#8A7365]">
+                {PRESET_AVATARS.length} opciones
+              </span>
+            </div>
             <button
               type="button"
               onClick={() => {
@@ -100,38 +180,33 @@ export function AvatarDropdownPicker({
               </svg>
             </button>
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-1.5 snap-x snap-mandatory">
-            {PRESET_AVATARS.map((av) => {
-              const active = avatarId === av.id;
-              return (
-                <button
-                  key={av.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={active}
-                  data-testid={`avatar-option-${av.id}`}
-                  onClick={() => {
-                    void setAvatarId(av.id);
-                    setActiveOverlay(null);
-                    btnRef.current?.focus();
-                  }}
-                  title={av.label}
-                  className={`snap-start shrink-0 w-[78px] min-h-[92px] flex flex-col items-center justify-center p-1.5 rounded-xl border transition-transform cursor-pointer ${
-                    active
-                      ? 'bg-[#FEF6E0] border-[#C96F4A] ring-2 ring-[#C96F4A] scale-103'
-                      : 'bg-[#F7EEDF]/75 border-[#3E2F2A]/10 hover:bg-[#F7EEDF]'
-                  }`}
-                >
-                  <PlayerAvatar avatarId={av.id} size={40} />
-                  <span className="text-[9px] font-bold leading-tight w-full text-center mt-1">
-                    {av.label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+
+          <AvatarSection
+            title="Retratos de tertulia"
+            subtitle="Caras nuevas"
+            items={PRESET_AVATARS.filter((avatar) => avatar.kind === 'character')}
+            activeId={avatarId}
+            onSelect={(id) => {
+              void setAvatarId(id);
+              setActiveOverlay(null);
+              btnRef.current?.focus();
+            }}
+          />
+
+          <AvatarSection
+            title="Emblemas de café"
+            subtitle="Clásicos"
+            items={PRESET_AVATARS.filter((avatar) => avatar.kind === 'icon')}
+            activeId={avatarId}
+            onSelect={(id) => {
+              void setAvatarId(id);
+              setActiveOverlay(null);
+              btnRef.current?.focus();
+            }}
+          />
+
           <p className="text-[10px] font-semibold text-[#6F5A4E]">
-            Desliza para elegir · tu emblema se ve en la mesa
+            El retrato te acompaña en el lobby, la partida y la postal final.
           </p>
         </div>
       </AnchoredPopover>
