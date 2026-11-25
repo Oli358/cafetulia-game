@@ -16,26 +16,6 @@
     <meta name="apple-mobile-web-app-title" content="Cafetulia" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <script>
-      (function() {
-        try {
-          const originalFetch = window.fetch;
-          let currentFetch = originalFetch;
-          Object.defineProperty(window, 'fetch', {
-            configurable: true,
-            enumerable: true,
-            get() {
-              return currentFetch;
-            },
-            set(val) {
-              currentFetch = val;
-            }
-          });
-        } catch (e) {
-          // ignore
-        }
-      })();
-    </script>
   </head>
   <body>
     <div id="root"></div>

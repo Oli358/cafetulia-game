@@ -5,6 +5,45 @@
 
 ---
 
+## Sesión 036 - 2026-11-25 - Auditoría y blindaje de seguridad
+
+**Objetivo:** revisar todo el código en busca de secretos, claves de IA, datos personales y vulnerabilidades del juego antes de publicar, y separar los arreglos de seguridad en un commit propio.
+
+**Hecho:**
+
+- Auditoría completa de árbol de trabajo e historial git: sin claves reales de IA, tokens de GitHub/Slack, claves privadas ni contraseñas. `.env` nunca estuvo versionado; solo `.env.example` con placeholders.
+- **Bloqueante corregido:** la API REST confiaba en `playerId`/`senderId` del cuerpo. Ahora todas las acciones exigen `Authorization: Bearer <token>` y el servidor resuelve el miembro por token. Un `playerId` público ya no sirve para actuar.
+- **Bloqueante corregido:** los `playerId` se derivaban de los primeros 10 caracteres del token. Ahora son UUID aleatorios, independientes del token, y `joinOrReconnect` rechaza colisiones y nunca sobrescribe a otro miembro.
+- **Bloqueante operativo:** túnel de Cloudflare detenido y URL temporal retirada; `cloudflared.exe` fuera del repo y en `.gitignore`.
+- Tokens de sesión fuertes (`crypto.randomBytes(32)`), regeneración de tokens antiguos/cortos en el cliente y validación mínima de 24 caracteres.
+- Estado oculto: durante la partida la bolsa se serializa con placeholders de la misma longitud, `rngState` y `seed` a 0 y la semilla del evento `game_started` oculta. Al terminar se revela el estado completo.
+- Límites: `express.json` 32 KB sin inflate, rate limiting por IP para salas/uniones/jugadas/chat, máximo 500 salas y 12 miembros por sala, TTL de 2 h y `POST /leave` para liberar silla.
+- Presencia: `lastSeenAt`, heartbeat en cada petición autenticada, barrido cada 10 s, desconexión a los 90 s, ventana de reconexión de 15 s y migración de anfitrión.
+- Cabeceras: sin `X-Powered-By`, `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, COOP/CORP, CSP de producción con `'wasm-unsafe-eval'` para Three.js y HSTS en HTTPS. `Cache-Control: no-store` en salas.
+- `HOST` por defecto `127.0.0.1`; Render usa `HOST=0.0.0.0` y `TRUST_PROXY=1`. Eliminado el script inline que envolvía `fetch`.
+- Dependencias: eliminado `drizzle-orm` (no se usaba para consultas), overrides de `body-parser` y `nanoid`, `--frozen-lockfile` verificado. `pnpm audit --prod` baja de 9 a 3 avisos, todos analizados en `docs/SEGURIDAD.md`.
+- Tests nuevos: autenticación obligatoria, rechazo de spoofing por `playerId`, token válido de invitado que no puede iniciar, colisión de prefijo que no sobrescribe al host, estado oculto durante la partida y semilla revelada al terminar.
+- Verificado: typecheck, lint, 53 tests, build, 3 E2E y build de producción con CSP en Chrome sin errores de consola.
+
+**Decisiones:** D-117, D-118, D-119 y D-120.
+
+**Problemas:**
+
+- El repositorio es público y el historial contiene el email real del autor y rutas locales; limpiarlo requiere reescritura coordinada.
+- `/history` sigue siendo público y devuelve códigos/nicknames de partidas antiguas; conviene reducirlo antes de publicar.
+- El rate limiter es en memoria (válido para un proceso); SQLite sigue siendo síncrono y efímero en Render Free.
+- Zod 3 mantiene un aviso high mitigado por el límite de 32 KB y esquemas acotados; uuid/elliptic vienen de Colyseus Auth, que no está montado.
+- Fondo de bar y foto del tablero siguen pendientes de licencia/derechos.
+
+**Siguiente:**
+
+1. Revisar el checklist de `docs/SEGURIDAD.md` antes de publicar.
+2. Probar dos clientes reales en navegadores/perfiles distintos.
+3. Decidir si `/history` se limita a sesiones autenticadas.
+4. Planificar migración de SQLite y rate limiter compartido si se escala.
+
+---
+
 ## Sesión 035 - 2026-11-25 - Móvil sin lupa, tutorial jugable y ajustes por capítulos
 
 **Objetivo:** verificar el estado del repo al llegar al PC de casa, arrancar la app con Chrome MCP y aplicar el feedback de móvil más el rediseño de tutorial, reglas y ajustes.
@@ -296,7 +335,7 @@
   - Pendiente menor: a 1280 algunos nombres de jugadores del lobby se truncan demasiado (“Cafetero · An…”, “Baris…”); se puede ajustar en un pase pequeño.
 - Montaje:
   - Servidor de producción local en `127.0.0.1:3000`.
-  - Túnel HTTPS activo para PWA: `https://tech-stays-correctly-rpg.trycloudflare.com`.
+  - Túnel HTTPS activo para PWA: `<url-temporal-retirada>`.
   - Iconos, manifest y service worker funcionando.
 
 **Decisiones:**
@@ -429,8 +468,8 @@
 
 - `server.ts` acepta `HOST` (por defecto `0.0.0.0` para Render).
 - Servidor de producción reiniciado con `HOST=127.0.0.1`: el puerto `3000` ya no escucha en la LAN.
-- `http://172.20.10.6:3000` queda cerrado; `http://127.0.0.1:3000` sigue funcionando para el túnel.
-- Cloudflare Tunnel sigue activo: `https://logging-pretty-flow-expression.trycloudflare.com`.
+- `http://<ip-lan>:3000` queda cerrado; `http://127.0.0.1:3000` sigue funcionando para el túnel.
+- Cloudflare Tunnel sigue activo: `<url-temporal-retirada>`.
 - Verificado `/health` por localhost y por el túnel; la LAN devuelve conexión rechazada.
 
 **Decisiones:**
@@ -463,8 +502,8 @@
 - Añadidos iconos PWA reales: `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` y `apple-touch-icon.png`; actualizado `manifest.webmanifest`, `index.html`, `sw.js` (`cafetulia-shell-v4`) y cabeceras de iconos.
 - Añadido fallback de copiado al portapapeles para HTTP/móvil, evitando el `NotAllowedError` de `navigator.clipboard`.
 - Montado build de producción en `0.0.0.0:3000` y túnel HTTPS de Cloudflare:
-  - LAN: `http://172.20.10.6:3000` (Wi-Fi; puerto 3000).
-  - PWA HTTPS: `https://logging-pretty-flow-expression.trycloudflare.com`.
+  - LAN: `http://<ip-lan>:3000` (Wi-Fi; puerto 3000).
+  - PWA HTTPS: `<url-temporal-retirada>`.
   - Comprobado con CDP: `Page.getInstallabilityErrors` devuelve `[]`; manifest e iconos sirven 200; service worker activo.
 - La PWA se puede instalar desde el túnel HTTPS; el HTTP local sirve para jugar en la misma Wi-Fi, pero no para service worker/PWA en móvil.
 

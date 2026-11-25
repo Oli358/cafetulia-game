@@ -92,6 +92,14 @@ describe('Phase 3: Online Server, Rooms, Reconnection, Timer & Persistence', () 
     // 3) Valid move -> succeeds and records event in SQLite move_events table
     const hand = started.snapshot.gameState!.hands[currentTurnId]!;
     const naturalTile = hand.find((t) => t.nation !== 'joker')!;
+    // Public snapshots never reveal the bag order, RNG state or seed while playing.
+    const publicState = room.getSnapshot().gameState!;
+    expect(publicState.bag.length).toBeGreaterThan(0);
+    expect(publicState.bag.every((tile) => tile.id.startsWith('hidden_bag_'))).toBe(true);
+    expect(publicState.seed).toBe(0);
+    expect(publicState.rngState).toBe(0);
+    expect(publicState.log[0]?.type === 'game_started' ? publicState.log[0].seed : null).toBe(0);
+
     const validRes = room.submitMove(currentTurnId, {
       type: 'bar',
       tileId: naturalTile.id,
@@ -265,16 +273,21 @@ describe('Phase 3: Online Server, Rooms, Reconnection, Timer & Persistence', () 
     expect(chatRes.ok).toBe(true);
     expect(receivedChat).toEqual(['Ana:¡Buenas tardes!:☕']);
 
-    // Play a quick game to completion by setting bag to 4 tiles and playing a bar move
+    // Play a quick game to completion by shrinking the bag in the authoritative
+    // server state. The public snapshot hides the bag during play.
     room.startGame(p1Id, 321);
-    const gs = room.getSnapshot().gameState!;
-    gs.bag = gs.bag.slice(0, 4);
+    const internal = room as unknown as {
+      gameState: { bag: Tile[]; turn: string; hands: Record<string, Tile[]> };
+    };
+    internal.gameState.bag = internal.gameState.bag.slice(0, 4);
+    const gs = internal.gameState;
     const activeId = gs.turn;
     const natTile: Tile = gs.hands[activeId]!.find((t) => t.nation !== 'joker')!;
 
     const moveRes = room.submitMove(activeId, { type: 'bar', tileId: natTile.id });
     expect(moveRes.ok).toBe(true);
     expect(room.getSnapshot().phase).toBe('finished');
+    expect(room.getSnapshot().gameState!.seed).not.toBe(0);
 
     // Share result payload is ready
     const shareData = room.getShareResultPayload();
@@ -321,14 +334,99 @@ describe('Phase 3: Online Server, Rooms, Reconnection, Timer & Persistence', () 
         body: JSON.stringify({ nickname: 'Anfitriona', config: { maxPlayers: 3 } }),
       });
       expect(createRes.status).toBe(201);
-      const createdBody = (await createRes.json()) as { code: string; snapshot: { config: { maxPlayers: number } } };
+      const createdBody = (await createRes.json()) as {
+        code: string;
+        hostToken: string;
+        snapshot: { config: { maxPlayers: number } };
+      };
       expect(createdBody.code).toHaveLength(6);
       expect(createdBody.snapshot.config.maxPlayers).toBe(3);
+      expect(createdBody.hostToken.length).toBeGreaterThanOrEqual(24);
 
-      const getRes = await fetch(`${baseUrl}/rooms/${createdBody.code}`);
+      const unauthenticated = await fetch(`${baseUrl}/rooms/${createdBody.code}`);
+      expect(unauthenticated.status).toBe(401);
+
+      const getRes = await fetch(`${baseUrl}/rooms/${createdBody.code}`, {
+        headers: { Authorization: `Bearer ${createdBody.hostToken}` },
+      });
       expect(getRes.status).toBe(200);
       const getBody = (await getRes.json()) as { code: string };
       expect(getBody.code).toBe(createdBody.code);
+    } finally {
+      server.close();
+    }
+  });
+
+  it('requires the session token for actions and never derives player ids from tokens', async () => {
+    const app = createApp(registry, store);
+    const server = app.listen(0);
+    const address = server.address();
+    const port = typeof address === 'object' && address ? address.port : 0;
+    const baseUrl = `http://127.0.0.1:${port}`;
+
+    try {
+      const createRes = await fetch(`${baseUrl}/rooms`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nickname: 'Anfitriona' }),
+      });
+      const created = (await createRes.json()) as {
+        code: string;
+        hostId: string;
+        hostToken: string;
+      };
+      expect(created.hostId).not.toBe(`p_${created.hostToken.slice(0, 10)}`);
+
+      const guestToken = `tok_${'g'.repeat(40)}`;
+      const joinRes = await fetch(`${baseUrl}/rooms/${created.code}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nickname: 'Invitado', token: guestToken }),
+      });
+      expect(joinRes.status).toBe(200);
+
+      // A public playerId is not a credential.
+      const spoofedStart = await fetch(`${baseUrl}/rooms/${created.code}/start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: created.hostId }),
+      });
+      expect(spoofedStart.status).toBe(401);
+
+      // A valid guest token still cannot start someone else's room.
+      const guestStart = await fetch(`${baseUrl}/rooms/${created.code}/start`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${guestToken}`,
+        },
+        body: JSON.stringify({}),
+      });
+      expect(guestStart.status).toBe(400);
+
+      const hostStart = await fetch(`${baseUrl}/rooms/${created.code}/start`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${created.hostToken}`,
+        },
+        body: JSON.stringify({}),
+      });
+      expect(hostStart.status).toBe(200);
+
+      // A token that shares the host token prefix must become a new member, never overwrite the host.
+      const prefixToken = `${created.hostToken.slice(0, 10)}${'x'.repeat(40)}`;
+      const spoofJoin = await fetch(`${baseUrl}/rooms/${created.code}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nickname: 'Spoof', token: prefixToken }),
+      });
+      const spoofBody = (await spoofJoin.json()) as {
+        playerId: string;
+        snapshot: { hostId: string };
+      };
+      expect(spoofBody.playerId).not.toBe(created.hostId);
+      expect(spoofBody.snapshot.hostId).toBe(created.hostId);
     } finally {
       server.close();
     }

@@ -2,6 +2,7 @@ import colyseusPkg, { type Client } from 'colyseus';
 import {
   CafetuliaRoomController,
   defaultRoomRegistry,
+  generateSessionToken,
   type RoomConfigSettings,
 } from './roomManager.js';
 
@@ -29,7 +30,7 @@ export class CafetuliaColyseusRoom extends Room {
       this.controller = existing;
     } else {
       this.controller = defaultRoomRegistry.createRoom({
-        hostToken: options.token ?? `tok_${Date.now()}`,
+        hostToken: options.token ?? generateSessionToken(),
         hostNickname: options.nickname ?? 'Anfitrión',
         hostAvatarId: options.avatarId,
         config: options.config,

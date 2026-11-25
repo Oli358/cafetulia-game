@@ -5,7 +5,7 @@
 
 ## 1. Estado actual
 
-- Repositorio **local** inicializado en `C:\Users\olive\Desktop\cafe-international`.
+- Repositorio **local** inicializado en `<repo>`.
 - Repositorio remoto: <https://github.com/Oli358/cafetulia-game.git>
 - Rama principal: `main`.
 - Nombre del proyecto: **Cafetulia**.

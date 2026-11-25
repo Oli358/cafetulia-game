@@ -20,6 +20,14 @@ coverage/
 playwright-report/
 test-results/
 
+# Datos locales y binarios de túnel
+data/
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+cloudflared.exe
+
 # Sistema
 .DS_Store
 Thumbs.db

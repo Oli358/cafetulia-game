@@ -8,7 +8,11 @@ import type {
   FinalScoreSummary,
 } from '@cafetulia/engine';
 import { soundEngine } from '../audio/soundEngine';
-import { recordFinishedGameLocally, type LocalPlayerStats, loadLocalStats } from '../utils/moveHelper';
+import {
+  recordFinishedGameLocally,
+  type LocalPlayerStats,
+  loadLocalStats,
+} from '../utils/moveHelper';
 
 let moveRequestInFlight = false;
 
@@ -186,7 +190,10 @@ type CafetuliaClientState = {
   // Server room actions
   createRoom: (customConfig?: Partial<RoomConfigSettings>) => Promise<boolean>;
   joinRoom: (code: string, asSpectator?: boolean) => Promise<boolean>;
-  quickStartWithBots: (botCount?: number, difficulty?: 'basic' | 'medium' | 'hard') => Promise<boolean>;
+  quickStartWithBots: (
+    botCount?: number,
+    difficulty?: 'basic' | 'medium' | 'hard',
+  ) => Promise<boolean>;
   updateRoomConfig: (patch: Partial<RoomConfigSettings>) => Promise<void>;
   toggleReady: (ready: boolean) => Promise<void>;
   addBot: (difficulty: 'basic' | 'medium' | 'hard') => Promise<void>;
@@ -200,17 +207,42 @@ type CafetuliaClientState = {
   leaveRoom: () => void;
 };
 
+function createGuestToken(): string {
+  const cryptoApi = typeof globalThis !== 'undefined' ? globalThis.crypto : undefined;
+  if (cryptoApi?.randomUUID) {
+    return `tok_${cryptoApi.randomUUID().replace(/-/g, '')}${cryptoApi
+      .randomUUID()
+      .replace(/-/g, '')
+      .slice(0, 16)}`;
+  }
+  if (cryptoApi?.getRandomValues) {
+    const bytes = new Uint8Array(32);
+    cryptoApi.getRandomValues(bytes);
+    return `tok_${Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('')}`;
+  }
+  const randomPart = Array.from({ length: 4 }, () => Math.random().toString(36).slice(2)).join('');
+  return `tok_${Date.now().toString(36)}${randomPart}`;
+}
+
 function getInitialToken(): string {
-  if (typeof window === 'undefined') return 'tok_default_guest';
+  if (typeof window === 'undefined') return createGuestToken();
   try {
     const existing = window.localStorage.getItem('cafetulia_guest_token');
-    if (existing && existing.length >= 6) return existing;
-    const created = `tok_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 9)}`;
+    if (existing && existing.length >= 24) return existing;
+    const created = createGuestToken();
     window.localStorage.setItem('cafetulia_guest_token', created);
     return created;
   } catch {
-    return `tok_${Date.now().toString(36)}_guest`;
+    return createGuestToken();
   }
+}
+
+function authHeaders(token: string): Record<string, string> {
+  return { Authorization: `Bearer ${token}` };
+}
+
+function jsonAuthHeaders(token: string): Record<string, string> {
+  return { 'Content-Type': 'application/json', ...authHeaders(token) };
 }
 
 function getInitialNickname(): string {
@@ -311,13 +343,13 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
     } catch {
       // ignore
     }
-    const { roomCode, myPlayerId } = get();
+    const { roomCode, myPlayerId, guestToken } = get();
     if (roomCode && myPlayerId) {
       try {
         const res = await fetch(`/rooms/${roomCode}/avatar`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ playerId: myPlayerId, avatarId: clean }),
+          headers: jsonAuthHeaders(guestToken),
+          body: JSON.stringify({ avatarId: clean }),
         });
         const data = await res.json();
         if (res.ok && data.snapshot) {
@@ -455,7 +487,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   setPendingNegativeConfirm: (pending) => set({ pendingNegativeConfirm: pending }),
 
   createRoom: async (customConfig) => {
-    const { nickname, avatarId, guestToken } = get();
+    const { nickname, avatarId } = get();
     const trimmed = nickname.trim() || 'Anfitrión';
     set({ isBusy: true, errorBanner: null });
     try {
@@ -465,7 +497,6 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
         body: JSON.stringify({
           nickname: trimmed,
           avatarId,
-          token: guestToken,
           config: customConfig,
         }),
       });
@@ -476,6 +507,14 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
         return false;
       }
       soundEngine.playSfx('uiCreateRoom');
+      if (typeof data.hostToken === 'string' && data.hostToken.length >= 24) {
+        set({ guestToken: data.hostToken });
+        try {
+          window.localStorage.setItem('cafetulia_guest_token', data.hostToken);
+        } catch {
+          // private mode / storage unavailable
+        }
+      }
       set({
         isBusy: false,
         roomCode: data.code,
@@ -556,13 +595,13 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   },
 
   updateRoomConfig: async (patch) => {
-    const { roomCode, myPlayerId } = get();
+    const { roomCode, myPlayerId, guestToken } = get();
     if (!roomCode || !myPlayerId) return;
     soundEngine.playSfx('uiToggle');
     const res = await fetch(`/rooms/${roomCode}/config`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId: myPlayerId, config: patch }),
+      headers: jsonAuthHeaders(guestToken),
+      body: JSON.stringify({ config: patch }),
     });
     const data = await res.json();
     if (res.ok && data.snapshot) {
@@ -571,13 +610,13 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   },
 
   toggleReady: async (ready) => {
-    const { roomCode, myPlayerId } = get();
+    const { roomCode, myPlayerId, guestToken } = get();
     if (!roomCode || !myPlayerId) return;
     soundEngine.playSfx('uiReady');
     const res = await fetch(`/rooms/${roomCode}/ready`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId: myPlayerId, ready }),
+      headers: jsonAuthHeaders(guestToken),
+      body: JSON.stringify({ ready }),
     });
     const data = await res.json();
     if (res.ok && data.snapshot) {
@@ -586,12 +625,12 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   },
 
   addBot: async (difficulty) => {
-    const { roomCode, myPlayerId } = get();
+    const { roomCode, myPlayerId, guestToken } = get();
     if (!roomCode || !myPlayerId) return;
     const res = await fetch(`/rooms/${roomCode}/bots`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId: myPlayerId, difficulty }),
+      headers: jsonAuthHeaders(guestToken),
+      body: JSON.stringify({ difficulty }),
     });
     const data = await res.json();
     if (res.ok && data.snapshot) {
@@ -604,11 +643,12 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   },
 
   removeBot: async (botId) => {
-    const { roomCode, myPlayerId } = get();
+    const { roomCode, myPlayerId, guestToken } = get();
     if (!roomCode || !myPlayerId) return;
     soundEngine.playSfx('uiLeave');
-    const res = await fetch(`/rooms/${roomCode}/bots/${botId}?playerId=${myPlayerId}`, {
+    const res = await fetch(`/rooms/${roomCode}/bots/${encodeURIComponent(botId)}`, {
       method: 'DELETE',
+      headers: authHeaders(guestToken),
     });
     const data = await res.json();
     if (res.ok && data.snapshot) {
@@ -617,12 +657,12 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   },
 
   startGame: async () => {
-    const { roomCode, myPlayerId } = get();
+    const { roomCode, myPlayerId, guestToken } = get();
     if (!roomCode || !myPlayerId) return false;
     const res = await fetch(`/rooms/${roomCode}/start`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId: myPlayerId }),
+      headers: jsonAuthHeaders(guestToken),
+      body: JSON.stringify({}),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -647,18 +687,28 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
     if (moveRequestInFlight) return false;
     moveRequestInFlight = true;
     try {
-      const { roomCode, myPlayerId } = get();
+      const { roomCode, myPlayerId, guestToken } = get();
       if (!roomCode || !myPlayerId) return false;
       const res = await fetch(`/rooms/${roomCode}/moves`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ playerId: myPlayerId, move }),
+        headers: jsonAuthHeaders(guestToken),
+        body: JSON.stringify({ move }),
       });
       const data = (await res.json().catch(() => ({}))) as {
         snapshot?: RoomSnapshot;
         error?: string | { code?: string; message?: string };
         message?: string;
       };
+
+      if (res.status === 401) {
+        soundEngine.playSfx('uiError');
+        set(
+          roomLostPatch(
+            'Tu sesión ha caducado. Vuelve a entrar en la sala con tu enlace o crea una nueva.',
+          ),
+        );
+        return false;
+      }
 
       if (!res.ok) {
         soundEngine.playSfx('uiError');
@@ -745,12 +795,12 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   },
 
   sendChat: async (text, isEmote = false) => {
-    const { roomCode, myPlayerId } = get();
+    const { roomCode, myPlayerId, guestToken } = get();
     if (!roomCode || !myPlayerId || !text.trim()) return;
     const res = await fetch(`/rooms/${roomCode}/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ senderId: myPlayerId, text, isEmote }),
+      headers: jsonAuthHeaders(guestToken),
+      body: JSON.stringify({ text, isEmote }),
     });
     const data = await res.json();
     if (res.ok && data.snapshot) {
@@ -759,12 +809,12 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   },
 
   voteRematch: async (accept) => {
-    const { roomCode, myPlayerId } = get();
+    const { roomCode, myPlayerId, guestToken } = get();
     if (!roomCode || !myPlayerId) return;
     const res = await fetch(`/rooms/${roomCode}/rematch`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ playerId: myPlayerId, accept }),
+      headers: jsonAuthHeaders(guestToken),
+      body: JSON.stringify({ accept }),
     });
     const data = await res.json();
     if (res.ok && data.snapshot) {
@@ -780,16 +830,24 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   },
 
   pollRoom: async () => {
-    const { roomCode, screen } = get();
+    const { roomCode, screen, guestToken } = get();
     if (!roomCode || screen === 'title') return;
     try {
-      const res = await fetch(`/rooms/${roomCode}`);
+      const res = await fetch(`/rooms/${roomCode}`, { headers: authHeaders(guestToken) });
       const data = (await res.json().catch(() => ({}))) as {
         snapshot?: RoomSnapshot;
         shareResult?: ShareResultPayload | null;
         error?: string;
         message?: string;
       };
+      if (res.status === 401) {
+        set(
+          roomLostPatch(
+            'Tu sesión ha caducado. Vuelve a entrar en la sala con tu enlace o crea una nueva.',
+          ),
+        );
+        return;
+      }
       if (res.status === 404 || data.error === 'ROOM_NOT_FOUND') {
         set(
           roomLostPatch(
@@ -841,6 +899,13 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
 
   leaveRoom: () => {
     soundEngine.playSfx('uiLeave');
+    const { roomCode, guestToken } = get();
+    if (roomCode) {
+      void fetch(`/rooms/${roomCode}/leave`, {
+        method: 'POST',
+        headers: authHeaders(guestToken),
+      }).catch(() => undefined);
+    }
     set({
       screen: 'title',
       roomCode: null,
@@ -859,12 +924,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
   },
 }));
 
-if (
-  typeof window !== 'undefined' &&
-  (import.meta.env.DEV ||
-    import.meta.env.MODE !== 'production' ||
-    (typeof navigator !== 'undefined' && navigator.webdriver))
-) {
+if (typeof window !== 'undefined' && import.meta.env.DEV) {
   (window as unknown as { __CAFETULIA_STORE__?: typeof useGameStore }).__CAFETULIA_STORE__ =
     useGameStore;
 }

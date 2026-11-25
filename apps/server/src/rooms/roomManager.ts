@@ -1,3 +1,4 @@
+import { randomBytes, randomInt, randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import {
   applyMove,
@@ -24,6 +25,17 @@ export type { RoomConfigSettings };
 
 export const RECONNECT_GRACE_MS = 15_000;
 export const MAX_TIMER_SECONDS = 180;
+export const MEMBER_IDLE_MS = 90_000;
+export const MAX_MEMBERS_PER_ROOM = 12;
+export const MAX_ROOMS = 500;
+export const ROOM_IDLE_TTL_MS = 2 * 60 * 60 * 1000;
+
+export class RoomCapacityError extends Error {
+  public constructor(message: string) {
+    super(message);
+    this.name = 'RoomCapacityError';
+  }
+}
 
 export const ALLOWED_EMOTES = ['☕', '👏', '😂', '🤔', '🎉', '🥐', '😅', '❤️'] as const;
 export type AllowedEmote = (typeof ALLOWED_EMOTES)[number];
@@ -81,6 +93,7 @@ export type RoomMember = {
   kickedFromMatch: boolean;
   botDifficulty?: 'basic' | 'medium' | 'hard';
   rematchVote?: boolean;
+  lastSeenAt: number;
 };
 
 export type EphemeralChatMessage = {
@@ -98,7 +111,7 @@ export type RoomSnapshot = {
   hostId: string;
   phase: 'lobby' | 'playing' | 'finished';
   config: RoomConfigSettings;
-  members: (Omit<RoomMember, 'token'> & { id: string })[];
+  members: (Omit<RoomMember, 'token' | 'lastSeenAt'> & { id: string })[];
   gameState: GameState | null;
   turnDeadlineAt: number | null;
   turnDeadlineMs: number | null;
@@ -119,10 +132,18 @@ const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export function generateRoomCode(length: number = 6): string {
   let code = '';
   for (let i = 0; i < length; i++) {
-    const idx = Math.floor(Math.random() * CODE_CHARS.length);
+    const idx = randomInt(CODE_CHARS.length);
     code += CODE_CHARS[idx] ?? 'A';
   }
   return code;
+}
+
+export function generateSessionToken(): string {
+  return `tok_${randomBytes(32).toString('base64url')}`;
+}
+
+function generatePlayerId(): string {
+  return `p_${randomUUID().replace(/-/g, '')}`;
 }
 
 export function sanitizeNickname(raw: string): string {
@@ -157,6 +178,7 @@ export class CafetuliaRoomController {
   private readonly ephemeralChat: EphemeralChatMessage[] = [];
   private readonly reconnectGraceMs: number;
   private seedOverride?: number | string;
+  private lastActivityAt = Date.now();
 
   constructor(options: {
     code?: string;
@@ -176,7 +198,7 @@ export class CafetuliaRoomController {
     const parsedConfig = RoomConfigSchema.parse(options.config ?? {});
     this.config = parsedConfig;
 
-    const hostId = `p_${options.hostToken.slice(0, 10)}`;
+    const hostId = generatePlayerId();
     this.hostId = hostId;
 
     this.members.set(hostId, {
@@ -189,6 +211,7 @@ export class CafetuliaRoomController {
       ready: true,
       isHost: true,
       kickedFromMatch: false,
+      lastSeenAt: Date.now(),
     });
 
     this.syncBotsInLobby();
@@ -209,12 +232,40 @@ export class CafetuliaRoomController {
     };
   }
 
+  /**
+   * The bag order, RNG state and seed are server-only while the match is live.
+   * The client only needs the bag size, so placeholders preserve the length
+   * without leaking the next tiles. Once the match is finished there is no
+   * competitive advantage and the full state can be shown.
+   */
+  private getPublicGameState(): GameState | null {
+    if (!this.gameState) return null;
+    if (this.phase === 'finished') return this.gameState;
+
+    const placeholders: GameState['bag'] = this.gameState.bag.map((_tile, index) => ({
+      id: `hidden_bag_${index}`,
+      nation: 'joker',
+      gender: 'M',
+    }));
+
+    return {
+      ...this.gameState,
+      bag: placeholders,
+      rngState: 0,
+      seed: 0,
+      log: this.gameState.log.map((event) =>
+        event.type === 'game_started' ? { ...event, seed: 0 } : event,
+      ),
+    };
+  }
+
   public getSnapshot(): RoomSnapshot {
+    this.lastActivityAt = Date.now();
     const rematchVotes: Record<string, boolean> = {};
-    const publicMembers: (Omit<RoomMember, 'token'> & { id: string })[] = [];
+    const publicMembers: (Omit<RoomMember, 'token' | 'lastSeenAt'> & { id: string })[] = [];
 
     for (const m of this.members.values()) {
-      const { token: _hiddenToken, ...pub } = m;
+      const { token: _hiddenToken, lastSeenAt: _lastSeenAt, ...pub } = m;
       publicMembers.push({ ...pub, id: m.playerId });
       if (m.rematchVote !== undefined) {
         rematchVotes[m.playerId] = m.rematchVote;
@@ -227,12 +278,42 @@ export class CafetuliaRoomController {
       phase: this.phase,
       config: { ...this.config },
       members: publicMembers,
-      gameState: this.gameState,
+      gameState: this.getPublicGameState(),
       turnDeadlineAt: this.turnDeadlineAt,
       turnDeadlineMs: this.turnDeadlineAt,
       rematchVotes,
       chat: [...this.ephemeralChat],
     };
+  }
+
+  /**
+   * Resolves the secret session token to the member that owns it.
+   * The token is the only credential accepted by the HTTP API; public player ids
+   * are never enough to act on behalf of a member.
+   */
+  public findMemberByToken(token: string | undefined): RoomMember | null {
+    if (!token) return null;
+    for (const member of this.members.values()) {
+      if (member.role !== 'bot' && member.token === token) {
+        const now = Date.now();
+        member.lastSeenAt = now;
+        this.lastActivityAt = now;
+        if (!member.connected) {
+          member.connected = true;
+          const pendingTimer = this.reconnectTimers.get(member.playerId);
+          if (pendingTimer) {
+            clearTimeout(pendingTimer);
+            this.reconnectTimers.delete(member.playerId);
+          }
+          if (this.gameState) {
+            const gp = this.gameState.players.find((p) => p.id === member.playerId);
+            if (gp) gp.connected = true;
+          }
+        }
+        return member;
+      }
+    }
+    return null;
   }
 
   /**
@@ -285,7 +366,14 @@ export class CafetuliaRoomController {
       }
     }
 
-    const playerId = `p_${params.token.slice(0, 10)}`;
+    if (this.members.size >= MAX_MEMBERS_PER_ROOM) {
+      throw new RoomCapacityError('La sala está llena. Entra cuando se libere una silla.');
+    }
+
+    let playerId = generatePlayerId();
+    while (this.members.has(playerId)) {
+      playerId = generatePlayerId();
+    }
     const activePlayerCount = Array.from(this.members.values()).filter(
       (m) => m.role === 'player' || m.role === 'bot',
     ).length;
@@ -305,6 +393,7 @@ export class CafetuliaRoomController {
       ready: true,
       isHost: false,
       kickedFromMatch: false,
+      lastSeenAt: Date.now(),
     });
 
     this.persistRoom();
@@ -383,7 +472,7 @@ export class CafetuliaRoomController {
       const botId = `bot_${i + 1}`;
       this.members.set(botId, {
         playerId: botId,
-        token: `bot_token_${i + 1}`,
+        token: generateSessionToken(),
         nickname: botNames[i] ?? `Bot ${i + 1}`,
         avatarId: botAvatars[i] ?? 'moka',
         role: 'bot',
@@ -392,6 +481,7 @@ export class CafetuliaRoomController {
         isHost: false,
         kickedFromMatch: false,
         botDifficulty: this.config.botDifficulty,
+        lastSeenAt: Date.now(),
       });
     }
   }
@@ -538,6 +628,20 @@ export class CafetuliaRoomController {
 
     member.connected = false;
 
+    if (member.isHost) {
+      const nextHost = Array.from(this.members.values()).find(
+        (candidate) =>
+          candidate.playerId !== member.playerId &&
+          candidate.connected &&
+          candidate.role === 'player',
+      );
+      if (nextHost) {
+        member.isHost = false;
+        nextHost.isHost = true;
+        this.hostId = nextHost.playerId;
+      }
+    }
+
     if (this.phase !== 'playing' || member.role !== 'player' || member.kickedFromMatch) {
       this.emitState([]);
       return;
@@ -556,6 +660,36 @@ export class CafetuliaRoomController {
     }, this.reconnectGraceMs);
 
     this.reconnectTimers.set(playerId, timer);
+  }
+
+  public leaveRoom(playerId: string): void {
+    const member = this.members.get(playerId);
+    if (!member) return;
+
+    if (this.phase === 'lobby') {
+      if (member.isHost) {
+        const nextHost = Array.from(this.members.values()).find(
+          (candidate) =>
+            candidate.playerId !== member.playerId &&
+            candidate.connected &&
+            candidate.role === 'player',
+        );
+        if (nextHost) {
+          nextHost.isHost = true;
+          this.hostId = nextHost.playerId;
+        }
+      }
+      this.members.delete(playerId);
+      this.persistRoom();
+      this.emitState([]);
+      return;
+    }
+
+    this.handleDisconnect(playerId);
+  }
+
+  public memberCount(): number {
+    return this.members.size;
   }
 
   public expelDisconnectedPlayer(playerId: string): void {
@@ -689,16 +823,25 @@ export class CafetuliaRoomController {
     }
 
     const parsed = ChatMessageSchema.safeParse(rawPayload);
-    if (!parsed.success || (!parsed.data.text && !parsed.data.emote)) {
+    if (!parsed.success) {
+      return { ok: false, message: 'Mensaje de chat inválido.' };
+    }
+
+    const cleanText = parsed.data.text
+      ?.replace(/\p{C}/gu, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 140);
+    if (!cleanText && !parsed.data.emote) {
       return { ok: false, message: 'Mensaje de chat inválido.' };
     }
 
     const chatMsg: EphemeralChatMessage = {
-      id: `chat_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      id: `chat_${Date.now()}_${randomBytes(4).toString('hex')}`,
       senderId,
       nickname: member.nickname,
       avatarId: member.avatarId,
-      text: parsed.data.text,
+      text: cleanText,
       emote: parsed.data.emote,
       sentAt: Date.now(),
     };
@@ -864,6 +1007,23 @@ export class CafetuliaRoomController {
     }
   }
 
+  /**
+   * Marks silent human members as disconnected after a heartbeat gap and starts
+   * the normal reconnection/expulsion flow. Runs periodically from the registry.
+   */
+  public sweepPresence(now: number = Date.now(), idleMs: number = MEMBER_IDLE_MS): void {
+    for (const member of this.members.values()) {
+      if (member.role === 'bot' || !member.connected) continue;
+      if (now - member.lastSeenAt > idleMs) {
+        this.handleDisconnect(member.playerId);
+      }
+    }
+  }
+
+  public isIdle(now: number = Date.now(), ttlMs: number = ROOM_IDLE_TTL_MS): boolean {
+    return now - this.lastActivityAt > ttlMs;
+  }
+
   public dispose(): void {
     this.clearTurnTimer();
     for (const timer of this.reconnectTimers.values()) {
@@ -889,6 +1049,12 @@ export class RoomRegistry {
     reconnectGraceMs?: number;
     seed?: number | string;
   }): CafetuliaRoomController {
+    if (this.rooms.size >= MAX_ROOMS) {
+      throw new RoomCapacityError(
+        'El café está lleno de mesas. Espera un momento o reinicia el servidor.',
+      );
+    }
+
     let code = generateRoomCode();
     while (this.rooms.has(code)) {
       code = generateRoomCode();
@@ -910,7 +1076,33 @@ export class RoomRegistry {
   }
 
   public getRoom(code: string): CafetuliaRoomController | undefined {
-    return this.rooms.get(code.toUpperCase());
+    const normalized = code.toUpperCase();
+    const room = this.rooms.get(normalized);
+    if (room && room.isIdle()) {
+      room.dispose();
+      this.rooms.delete(normalized);
+      return undefined;
+    }
+    return room;
+  }
+
+  public removeRoom(code: string): void {
+    const normalized = code.toUpperCase();
+    const room = this.rooms.get(normalized);
+    if (!room) return;
+    room.dispose();
+    this.rooms.delete(normalized);
+  }
+
+  public sweepPresence(now: number = Date.now()): void {
+    for (const [code, room] of this.rooms) {
+      if (room.isIdle(now)) {
+        room.dispose();
+        this.rooms.delete(code);
+        continue;
+      }
+      room.sweepPresence(now);
+    }
   }
 
   public clearAll(): void {

@@ -19,26 +19,6 @@
     <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <script>
-      (function() {
-        try {
-          const originalFetch = window.fetch;
-          let currentFetch = originalFetch;
-          Object.defineProperty(window, 'fetch', {
-            configurable: true,
-            enumerable: true,
-            get() {
-              return currentFetch;
-            },
-            set(val) {
-              currentFetch = val;
-            }
-          });
-        } catch (e) {
-          // ignore
-        }
-      })();
-    </script>
   </head>
   <body>
     <div id="root"></div>

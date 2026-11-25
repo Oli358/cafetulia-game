@@ -9,10 +9,6 @@ import type {
   PlayerId,
   TerminalReason,
 } from '@cafetulia/engine';
-import { roomsTable, moveEventsTable, matchHistoryTable } from './schema.js';
-
-export { roomsTable, moveEventsTable, matchHistoryTable };
-
 export type RoomConfigSettings = {
   maxPlayers: 2 | 3 | 4;
   botCount: 0 | 1 | 2 | 3;
