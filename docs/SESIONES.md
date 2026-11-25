@@ -5,6 +5,38 @@
 
 ---
 
+## Sesión 037 - 2026-11-25 - Nuevo logo, cabeceras e iconos
+
+**Objetivo:** integrar el símbolo y el lockup aportados por el usuario, poner el logo en la pestaña del navegador y en la PWA, y usarlo en las cabeceras y la portada.
+
+**Hecho:**
+- Recibidos `Logo.jpg` y `logoconletra.jpg` en la raíz; se han archivado como originales en `docs/referencias/marca/`.
+- Recorte del fondo gris y conversión a PNG transparente (maestros):
+  - `public/brand/cafetulia-symbol.png` (450×573).
+  - `public/brand/cafetulia-lockup.png` (604×337).
+- Derivados ligeros en WebP para la app: `public/brand/cafetulia-symbol.webp` (180×229, 15 KB) y `public/brand/cafetulia-lockup.webp` (480×268, 24 KB).
+- La cabecera de portada, lobby y partida usa ahora el símbolo nuevo + el texto «Cafetulia»; en móvil el texto se oculta cuando hace falta.
+- La portada muestra el lockup horizontal junto a la línea «Salón de té y tertulia · Juego para 2–4» y el saludo; en escritorio van en fila para no solaparse con el titular.
+- Generados `favicon-16.png`, `favicon-32.png`, `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` y `apple-touch-icon.png` a partir del símbolo, sobre fondo crema.
+- Actualizados `index.html`, `apps/web/index.html`, los dos `manifest.webmanifest` y el service worker (`v16`) para usar los iconos nuevos. Los enlaces de favicon llevan `?v=logo2` para saltar la caché.
+- Documentados los originales y derivados en `docs/CREDITOS.md`.
+- Verificado: typecheck, lint, test, build y E2E en verde, también a través del túnel móvil.
+
+**Decisiones:** D-121.
+
+**Problemas:**
+- Los originales son JPG con fondo gris; los PNG transparentes son el activo de la app.
+- El icono maskable usa fondo crema con el símbolo al 62 % para respetar la zona segura.
+- La caché de la PWA se ha subido a `v16`; si el móvil ya tenía la app instalada, puede necesitar recargar una vez.
+- El recorrido E2E largo rozaba el límite de 30 s; se le da margen de 90 s, 20 s al arrancar la partida y 15 s al volver a portada tras perder la sala. La suite pasa a un worker porque las escenas 3D en paralelo se quedaban sin frames y las transiciones de Motion no terminaban.
+- Los límites de la API se relajan fuera de producción para que las repeticiones de Playwright no agoten las cuotas de creación de salas.
+
+**Siguiente:**
+1. Validar el logo en móvil real y en la pestaña del navegador.
+2. Mantener los originales en `docs/referencias/marca/` como referencia.
+
+---
+
 ## Sesión 036 - 2026-11-25 - Auditoría y blindaje de seguridad
 
 **Objetivo:** revisar todo el código en busca de secretos, claves de IA, datos personales y vulnerabilidades del juego antes de publicar, y separar los arreglos de seguridad en un commit propio.

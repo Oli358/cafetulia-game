@@ -1411,60 +1411,34 @@ export function CafetuliaLogo({
 }): React.ReactElement {
   return (
     <div className="inline-flex items-center gap-2 select-none">
-      <svg
-        width={compact ? 28 : 42}
-        height={compact ? 28 : 42}
-        viewBox="0 0 64 64"
-        aria-hidden="true"
-        className="shrink-0"
+      <img
+        src="/brand/cafetulia-symbol.webp"
+        alt="Cafetulia"
+        width={180}
+        height={229}
+        draggable={false}
+        className={`w-auto object-contain ${compact ? 'h-8 sm:h-9' : 'h-12 sm:h-16'}`}
+      />
+      <span
+        className={`font-serif font-bold tracking-tight text-[#3E2F2A] block leading-none ${
+          compact ? 'text-lg sm:text-xl' : 'text-3xl sm:text-4xl'
+        } ${hideTextOnMobile ? 'hidden sm:block' : 'block'}`}
       >
-        <ellipse
-          cx="32"
-          cy="52"
-          rx="24"
-          ry="6"
-          fill="#C9A227"
-          stroke="#231712"
-          strokeWidth="2.8"
-        />
-        <path
-          d="M14 24 L50 24 L46 46 Q44 52 32 52 Q20 52 18 46 Z"
-          fill="#FFF9F0"
-          stroke="#231712"
-          strokeWidth="3"
-        />
-        <path d="M16 32 L48 32 L47 38 L17 38 Z" fill="#C96F4A" />
-        <path
-          d="M49 28 Q60 28 58 38 Q56 45 46 43"
-          fill="none"
-          stroke="#231712"
-          strokeWidth="3"
-          strokeLinecap="round"
-        />
-        <path
-          d="M25 18 Q23 12 27 8"
-          fill="none"
-          stroke="#B9855A"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-        />
-        <path
-          d="M35 19 Q33 11 38 7"
-          fill="none"
-          stroke="#C96F4A"
-          strokeWidth="2.6"
-          strokeLinecap="round"
-        />
-      </svg>
-      <div className={hideTextOnMobile ? 'hidden sm:block' : 'block'}>
-        <span
-          className={`font-serif font-bold tracking-tight text-[#3E2F2A] block leading-none ${
-            compact ? 'text-lg sm:text-xl' : 'text-3xl sm:text-4xl'
-          }`}
-        >
-          Cafetulia
-        </span>
-      </div>
+        Cafetulia
+      </span>
     </div>
+  );
+}
+
+export function CafetuliaLockup({ className = '' }: { className?: string }): React.ReactElement {
+  return (
+    <img
+      src="/brand/cafetulia-lockup.webp"
+      alt="Cafetulia · Juego de mesa"
+      width={480}
+      height={268}
+      draggable={false}
+      className={`w-auto object-contain ${className}`}
+    />
   );
 }

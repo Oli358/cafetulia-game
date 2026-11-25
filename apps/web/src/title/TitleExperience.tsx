@@ -1,7 +1,7 @@
 import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { CAFE_DAILY_PHRASES, getCafeGreeting } from '@cafetulia/ui';
-import { CafetuliaLogo, PlayerAvatar } from '../art/CharacterPortrait';
+import { CafetuliaLockup, CafetuliaLogo, PlayerAvatar } from '../art/CharacterPortrait';
 import { soundEngine } from '../audio/soundEngine';
 import { AvatarDropdownPicker, SubtitlesDropdownPicker } from '../components/TitlePickers';
 import { useGameStore } from '../store/gameStore';
@@ -114,50 +114,6 @@ class SceneBoundary extends React.Component<
     if (this.state.failed) return null;
     return this.props.children;
   }
-}
-
-function CupSeal({
-  color,
-  accent,
-  className,
-}: {
-  color: string;
-  accent: string;
-  className?: string;
-}): React.ReactElement {
-  return (
-    <svg viewBox="0 0 64 64" aria-hidden="true" className={className} fill="none">
-      <circle
-        cx="32"
-        cy="32"
-        r="30"
-        fill="rgba(255,248,236,0.35)"
-        stroke={accent}
-        strokeWidth="1.5"
-      />
-      <ellipse cx="32" cy="52" rx="21" ry="5" fill={accent} opacity="0.9" />
-      <path
-        d="M17 25 L47 25 L43 44 Q41 50 32 50 Q23 50 21 44 Z"
-        fill="#FFF8EC"
-        stroke={color}
-        strokeWidth="2.4"
-        strokeLinejoin="round"
-      />
-      <path d="M18.5 32 L45.5 32 L44 38 L20 38 Z" fill={accent} />
-      <path
-        d="M47 28 Q56 28 54 37 Q52 43 44 41"
-        stroke={color}
-        strokeWidth="2.4"
-        strokeLinecap="round"
-      />
-      <path
-        d="M26 19 Q24 13 28 9 M36 20 Q34 12 39 8"
-        stroke={accent}
-        strokeWidth="2.2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
 }
 
 function RotateIcon({ className }: { className?: string }): React.ReactElement {
@@ -935,22 +891,24 @@ export function TitleExperience(): React.ReactElement {
               className="absolute left-[4%] right-[4%] top-[22%] sm:top-[27%]"
               style={{ color: '#2B1710' }}
             >
-              <div className="flex items-center gap-2.5 sm:gap-3">
-                <CupSeal color="#2B1710" accent={theme.accent} className="h-8 w-8 shrink-0 sm:h-10 sm:w-10" />
-                <p className="text-[9px] font-extrabold uppercase tracking-[0.24em] opacity-75 sm:text-[11px]">
-                  Salón de té y tertulia · Juego para 2–4
-                </p>
+              <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-3">
+                <CafetuliaLockup className="h-11 shrink-0 drop-shadow-[0_2px_4px_rgba(35,23,18,0.12)] sm:h-16" />
+                <div className="min-w-0">
+                  <p className="text-[9px] font-extrabold uppercase tracking-[0.24em] opacity-75 sm:text-[11px]">
+                    Salón de té y tertulia · Juego para 2–4
+                  </p>
+                  <p
+                    data-testid="title-greeting"
+                    className="mt-1.5 inline-flex max-w-full items-center gap-1.5 text-[10px] font-bold opacity-70 sm:text-xs"
+                  >
+                    <span
+                      className="h-1.5 w-1.5 rounded-full"
+                      style={{ backgroundColor: theme.accent }}
+                    />
+                    <span className="truncate">{greetingText}</span>
+                  </p>
+                </div>
               </div>
-              <p
-                data-testid="title-greeting"
-                className="mt-2 inline-flex max-w-full items-center gap-1.5 text-[10px] font-bold opacity-70 sm:text-xs"
-              >
-                <span
-                  className="h-1.5 w-1.5 rounded-full"
-                  style={{ backgroundColor: theme.accent }}
-                />
-                <span className="truncate">{greetingText}</span>
-              </p>
 
               {errorBanner && progress < 0.2 && (
                 <div

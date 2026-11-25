@@ -1,10 +1,17 @@
 /* global self, caches, fetch, URL */
-const CACHE_NAME = 'cafetulia-shell-v14';
+const CACHE_NAME = 'cafetulia-shell-v16';
 const SHELL_ASSETS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
-  '/icon.svg',
+  '/favicon-16.png',
+  '/favicon-32.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/icon-maskable-512.png',
+  '/apple-touch-icon.png',
+  '/brand/cafetulia-symbol.webp',
+  '/brand/cafetulia-lockup.webp',
 ];
 
 self.addEventListener('install', (event) => {
