@@ -287,6 +287,14 @@ test.describe('Cafetulia E2E v11 (menú de reservas 3D, tres mundos, lobby prepa
       () => document.documentElement.scrollHeight <= window.innerHeight + 1,
     );
     expect(widePlayCheck).toBe(true);
+    const boardCenterCheck = await page.evaluate(() => {
+      const board = document.querySelector('[aria-label^="Tablero ilustrado"]')?.getBoundingClientRect();
+      return {
+        boardCenter: board ? board.left + board.width / 2 : 0,
+        viewportCenter: window.innerWidth / 2,
+      };
+    });
+    expect(Math.abs(boardCenterCheck.boardCenter - boardCenterCheck.viewportCenter)).toBeLessThanOrEqual(2);
     await page.screenshot({ path: path.join(REF_DIR, 'ui-v11-partida-1920.png') });
 
     // 6. Verificar Partida en 390x844 sin scroll ni solape entre tablero y dock y captura ui-v11-partida-movil.png

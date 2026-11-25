@@ -50,6 +50,27 @@ export type ArcadeCalloutEvent = {
 const JOKER_SWAP_EXPLANATION =
   'Entregas una ficha natural que podría ocupar esa silla y recuperas el comodín. No puntúas y no robas. Úsalo solo si te conviene.';
 
+function BagIcon({ className }: { className?: string }): React.ReactElement {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
+      <path
+        d="M8 7.5c0-2.2 1.8-4 4-4s4 1.8 4 4"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M6.3 8h11.4l1.2 9.6a2 2 0 0 1-2 2.2H7.1a2 2 0 0 1-2-2.2L6.3 8Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path d="M9 11.5h6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <circle cx="12" cy="15.2" r="1.7" stroke="currentColor" strokeWidth="1.6" />
+    </svg>
+  );
+}
+
 /**
  * Keyboard & ARIA accessible Avatar Dropdown / Bottom Sheet (P0.2 & P0.4)
  * Uses global activeOverlay === 'avatar' and portal AnchoredPopover.
@@ -3153,18 +3174,22 @@ export function PlayingScreen(): React.ReactElement {
         </div>
       </AnchoredPopover>
 
-      {/* CONTENT: score top on mobile / left column on desktop, board on the right */}
-      <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-center gap-1.5 sm:gap-2 pt-5 lg:pt-0 lg:flex-row lg:items-start">
+      {/* CONTENT: ledger on top (mobile) / floating left (desktop), board centered */}
+      <div className="relative flex-1 min-h-0 w-full flex flex-col items-center justify-center gap-1.5 sm:gap-2 pt-3 lg:pt-0 lg:flex-row lg:items-start">
         <aside
           data-testid="compact-scoreboard"
-          className="shrink-0 w-full lg:w-[248px] xl:w-[268px] rounded-2xl border-2 border-[#231712]/20 bg-[#FFF9F0]/82 backdrop-blur-md p-1.5 sm:p-2 shadow-[0_6px_20px_rgba(35,23,18,0.12)]"
+          className="cafe-paper-sheet shrink-0 w-full rounded-2xl border-2 border-[#231712]/25 p-2 lg:w-[248px] xl:absolute xl:left-0 xl:top-0 xl:z-20 xl:w-[270px]"
         >
-          <div className="hidden lg:flex items-center justify-between gap-2 pb-1.5 mb-1.5 border-b border-[#3E2F2A]/10">
+          <div className="flex items-center justify-between gap-2 pb-1 mb-1 border-b-2 border-[#3E2F2A]/15">
             <span className="font-serif font-bold text-sm text-[#2B1710]">La mesa</span>
-            <span className="text-[10px] font-mono font-bold text-[#6F5A4E]">#{snapshot.code}</span>
+            <span className="text-[9px] font-mono font-bold text-[#6F5A4E]">#{snapshot.code}</span>
+          </div>
+          <div className="hidden lg:grid grid-cols-[1fr_auto] gap-2 px-1 pb-1 text-[8px] font-extrabold uppercase tracking-[0.14em] text-[#7B5236]/80">
+            <span>Jugador</span>
+            <span>Monedas · total</span>
           </div>
 
-          <div className="flex lg:flex-col items-stretch gap-1 sm:gap-1.5 overflow-x-auto lg:overflow-visible pb-0.5 lg:pb-0">
+          <div className="grid grid-cols-2 gap-1.5 lg:flex lg:flex-col lg:gap-1">
             {gameState.players.map((p) => {
               const pHandCount = (gameState.hands[p.id] ?? []).length;
               const isTurn = gameState.turn === p.id;
@@ -3173,52 +3198,62 @@ export function PlayingScreen(): React.ReactElement {
                 <div
                   key={p.id}
                   data-testid={`scoreboard-player-${p.id}`}
-                  className={`cafe-score-card flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-2 py-1 rounded-xl border text-xs transition-colors duration-200 whitespace-nowrap shrink-0 lg:w-full ${
+                  className={`cafe-score-card flex flex-col gap-1 rounded-xl border px-1.5 py-1 text-xs transition-colors duration-200 ${
                     isTurn
-                      ? `${reducedMotion ? 'cafe-score-active-static' : 'cafe-score-active'} bg-[#FEF6E0] border-[#C96F4A] font-bold`
-                      : 'bg-[#F7EEDF] border-[#231712]/12'
+                      ? `${reducedMotion ? 'cafe-score-active-static' : 'cafe-score-active'} bg-[#FEF6E0] border-[#C96F4A]`
+                      : 'bg-[#F7EEDF]/85 border-[#231712]/12'
                   }`}
                 >
-                  <PlayerAvatar avatarId={pAvatar} size={18} />
-                  <span className="font-bold text-[#3E2F2A] truncate max-w-[58px] sm:max-w-[96px] lg:max-w-none lg:flex-1">
-                    {p.nickname}
-                  </span>
-                  <CoinTray
-                    score={p.score}
-                    playerId={p.id}
-                    compact
-                    summaryOnly
-                    reducedMotion={reducedMotion}
-                  />
-                  <span
-                    className="text-[10px] font-mono font-semibold text-[#6F5A4E] bg-[#FFF9F0] px-1 py-0.2 rounded border border-[#231712]/15 tabular-nums"
-                    title={`${pHandCount} fichas en mano`}
-                  >
-                    {pHandCount}c
-                  </span>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <PlayerAvatar avatarId={pAvatar} size={18} />
+                    <span className="font-bold text-[#3E2F2A] truncate flex-1">{p.nickname}</span>
+                    <span
+                      className="text-[9px] font-mono font-semibold text-[#6F5A4E] bg-[#FFF9F0] px-1 py-0.2 rounded border border-[#231712]/15 tabular-nums"
+                      title={`${pHandCount} fichas en mano`}
+                    >
+                      {pHandCount}c
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1 min-w-0">
+                    <CoinTray
+                      score={p.score}
+                      playerId={p.id}
+                      compact
+                      reducedMotion={reducedMotion}
+                    />
+                  </div>
                 </div>
               );
             })}
-            <span
-              data-testid="bag-counter-pill-mobile"
-              className="lg:hidden self-center text-[10px] font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-1.5 py-0.5 rounded-lg border border-[#231712]/12 tabular-nums whitespace-nowrap shrink-0"
-              title="Fichas restantes en la bolsa"
-            >
-              Bolsa: {gameState.bag.length}
-            </span>
           </div>
 
-          <div className="hidden lg:flex items-center justify-between gap-2 pt-1.5 mt-1.5 border-t border-[#3E2F2A]/10">
-            <span
-              data-testid="bag-counter-pill"
-              className="text-[11px] font-mono font-bold text-[#6F5A4E] bg-[#F7EEDF] px-2 py-0.5 rounded-xl border border-[#231712]/12 tabular-nums whitespace-nowrap"
-              title="Fichas restantes en la bolsa"
-            >
-              Bolsa: {gameState.bag.length}
-            </span>
-            <span className="text-[10px] font-bold text-[#6F5A4E]">
-              {gameState.players.length} en la mesa
-            </span>
+          <div
+            data-testid="bag-counter-pill"
+            className="mt-2 rounded-xl border-2 border-[#C9A227]/55 bg-[#FEF6E0] px-2 py-1.5"
+            title={`Fichas restantes en la bolsa: ${gameState.bag.length} de 100`}
+          >
+            <div className="flex items-center gap-2">
+              <BagIcon className="h-5 w-5 shrink-0 text-[#7B5236]" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-[#7B5236]">
+                    Bolsa de fichas
+                  </span>
+                  <span className="font-mono text-xs font-extrabold text-[#3E2F2A] tabular-nums">
+                    {gameState.bag.length}
+                    <span className="text-[9px] font-bold text-[#6F5A4E]"> / 100</span>
+                  </span>
+                </div>
+                <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[#231712]/12">
+                  <div
+                    className="h-full rounded-full bg-[#C9A227] transition-[width] duration-500"
+                    style={{
+                      width: `${Math.min(100, Math.max(0, (gameState.bag.length / 100) * 100))}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </aside>
 

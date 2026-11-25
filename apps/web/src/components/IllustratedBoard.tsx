@@ -138,7 +138,7 @@ export function IllustratedBoard({
       data-testid="papercraft-board"
     >
       {/* Mobile Zoom / Pan Quick Toggle (outside the board so it never covers a chair) */}
-      <div className="sm:hidden w-[min(96vw,calc(100dvh-252px))] flex justify-end pb-1 px-0.5">
+      <div className="sm:hidden w-[min(96vw,calc(100dvh-410px))] flex justify-end pb-1 px-0.5">
         <div className="flex items-center gap-1 bg-[#FFF9F0]/92 backdrop-blur-xs px-1.5 py-0.5 rounded-xl border border-[#231712]/30 shadow-xs">
           <button
             type="button"
@@ -204,7 +204,7 @@ export function IllustratedBoard({
           const y = Math.round(((e.clientY - rect.top) / rect.height) * 100);
           setPointerPct({ x: Math.max(10, Math.min(90, x)), y: Math.max(10, Math.min(90, y)) });
         }}
-        className={`relative aspect-square w-[min(96vw,calc(100dvh-252px))] h-[min(96vw,calc(100dvh-252px))] sm:w-[min(93vw,calc(100dvh-204px))] sm:h-[min(93vw,calc(100dvh-204px))] rounded-[20px] sm:rounded-[26px] border-3 overflow-hidden shrink-0 transition-colors ${
+        className={`relative aspect-square w-[min(96vw,calc(100dvh-410px))] h-[min(96vw,calc(100dvh-410px))] sm:w-[min(93vw,calc(100dvh-204px))] sm:h-[min(93vw,calc(100dvh-204px))] rounded-[20px] sm:rounded-[26px] border-3 overflow-hidden shrink-0 transition-colors ${
           nightMode
             ? 'bg-[#282D3A] border-[#C9A227]/65 text-[#FFF9F0] shadow-[0_6px_0_#141720,0_16px_32px_rgba(0,0,0,0.45)]'
             : 'bg-[#EFE3CE] border-[#231712] text-[#3E2F2A] shadow-[0_5px_0_#1E130E,0_14px_28px_rgba(35,23,18,0.22),inset_0_2px_0_rgba(255,253,248,0.85)]'

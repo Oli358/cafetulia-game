@@ -10,9 +10,10 @@
 **Objetivo:** aprovechar el espacio vacío de la partida en móvil y PC, mejorar la lectura de puntuaciones y del turno, suavizar todos los desplegables y dar ambiente de bar al fondo.
 
 **Hecho:**
-- La partida se reorganiza en una cabecera compacta de una fila y un **top de puntuaciones independiente**. En móvil va entre la cabecera y el tablero; en PC es una tarjeta compacta arriba a la izquierda y el tablero se centra en el resto. El fondo llena los laterales.
-- El top incluye tarjetas de jugador con avatar, nombre, monedas, fichas en mano y bolsa. El jugador con el turno tiene un **glow animado** (estático con `reducedMotion`).
-- El tablero móvil baja ~10 px y el top queda justo encima; el hueco superior se llena con el fondo de bar.
+- La partida se reorganiza en una cabecera compacta de una fila y una **tabla de la casa** independiente. En móvil es una rejilla 2×2 con los 4 jugadores visibles a la vez, sin slider; en PC es una lista vertical que flota arriba a la izquierda sobre el fondo. El tablero recupera el centro exacto del ancho completo.
+- Cada fila muestra avatar, nombre, fichas en mano y el **desglose de monedas 10/5/1 con su total**. El jugador con el turno tiene un **glow animado** (estático con `reducedMotion`).
+- La **bolsa de fichas** es un bloque destacado con icono, contador `X / 100` y barra de progreso.
+- El tablero móvil se adapta al nuevo top (`100dvh - 410px`) para que tabla y tablero quepan sin solaparse; en 390×844 mantiene 375 px y baja hasta ~291 px.
 - El **vuelo de monedas** sigue usando `data-player-tray`: en móvil aterriza en el top y en PC en la tarjeta izquierda del jugador. No hay dos trays con el mismo `playerId`.
 - Fondo de bar cozy aportado por el usuario en `public/backgrounds/cafe-bar.jpg` (67 KB, JPEG comprimido), con overlays cálidos. En móvil se recorta a la zona de lámparas/estanterías y se desvanece; también se usa en el lobby.
 - Los `AnchoredPopover` se anclan siempre a su botón, también en móvil; dejan de ser hojas inferiores. Entrada/salida de 0.24 s con escala, desplazamiento y origen en el ancla. Aplica a partida, lobby y portada.

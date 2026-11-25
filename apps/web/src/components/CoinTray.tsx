@@ -166,7 +166,7 @@ export function CoinTray({
     <div
       data-player-tray={playerId}
       data-testid={`coin-tray-${playerId}`}
-      className="inline-flex items-center gap-1 shrink-0 whitespace-nowrap"
+      className="inline-flex flex-wrap items-center gap-1 shrink-0"
       title={tooltipText}
     >
       {summaryOnly ? (
@@ -180,7 +180,7 @@ export function CoinTray({
       ) : (
         breakdown.stacks.length > 0 && (
           <div
-            className="inline-flex items-center gap-1"
+            className="inline-flex flex-wrap items-center gap-1"
             data-testid={`coin-stacks-${playerId}`}
           >
             {breakdown.stacks.map((stack) => (
