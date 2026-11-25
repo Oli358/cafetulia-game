@@ -29,23 +29,10 @@ function OrientationGuard(): React.ReactElement {
       className="orientation-guard fixed inset-0 z-[200] flex-col items-center justify-center gap-4 bg-[#231712] p-6 text-center text-[#FFF9F0]"
     >
       <svg width="54" height="54" viewBox="0 0 54 54" fill="none" aria-hidden="true">
-        <rect
-          x="18"
-          y="6"
-          width="18"
-          height="42"
-          rx="3"
-          stroke="#F2C14E"
-          strokeWidth="2.4"
-        />
+        <rect x="18" y="6" width="18" height="42" rx="3" stroke="#F2C14E" strokeWidth="2.4" />
         <path d="M23 10h8" stroke="#F2C14E" strokeWidth="2" strokeLinecap="round" />
         <circle cx="27" cy="43" r="1.6" fill="#F2C14E" />
-        <path
-          d="M8 17a20 20 0 0 1 9-9"
-          stroke="#C96F4A"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-        />
+        <path d="M8 17a20 20 0 0 1 9-9" stroke="#C96F4A" strokeWidth="2.2" strokeLinecap="round" />
         <path
           d="M8 12v5h5"
           stroke="#C96F4A"
@@ -78,12 +65,7 @@ export function App(): React.ReactElement {
 
   // Sync body dataset state for E2E & Ultra Mode inspection + crossfade music theme per screen
   useEffect(() => {
-    const mapped =
-      screen === 'playing'
-        ? 'playing'
-        : screen === 'finished'
-          ? 'gameover'
-          : 'title';
+    const mapped = screen === 'playing' ? 'playing' : screen === 'finished' ? 'gameover' : 'title';
     document.body.dataset.state = mapped;
     soundEngine.setScreenTheme(screen);
   }, [screen]);
@@ -110,7 +92,9 @@ export function App(): React.ReactElement {
     const autostart = params.get('autostart');
     if (roomParam) {
       void joinRoom(roomParam);
-    } else if (autostart === '1') {
+    } else if (autostart === '1' && import.meta.env.DEV) {
+      // E2E/dev convenience only: a shared production link must not create
+      // and start a room without the user touching the interface.
       void quickStartWithBots(1, 'medium');
     }
   }, [joinRoom, quickStartWithBots]);
@@ -155,17 +139,9 @@ export function App(): React.ReactElement {
         <AnimatePresence mode="wait">
           <motion.div
             key={screen}
-            initial={
-              reducedMotion
-                ? { opacity: 1 }
-                : { opacity: 0, y: 12, scale: 0.992 }
-            }
+            initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 12, scale: 0.992 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={
-              reducedMotion
-                ? { opacity: 0 }
-                : { opacity: 0, y: -10, scale: 1.006 }
-            }
+            exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -10, scale: 1.006 }}
             transition={{
               duration: reducedMotion ? 0 : 0.25,
               ease: [0.22, 1, 0.36, 1],

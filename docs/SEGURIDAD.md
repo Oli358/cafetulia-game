@@ -38,6 +38,7 @@ La versión actual exige un token de sesión secreto para toda acción de sala. 
 - Rate limiting en memoria: 600 req/min por IP para `/rooms`, 30 salas/hora, 60 uniones/min, 180 jugadas/min y 60 mensajes de chat/min.
 - `MAX_ROOMS = 500`, `MAX_MEMBERS_PER_ROOM = 12` (4 jugadores + 8 espectadores) y salas inactivas de más de 2 horas se eliminan.
 - `POST /rooms/:code/leave` libera la silla; el lobby elimina al miembro que se va.
+- `?autostart=1` queda limitado a desarrollo; un enlace compartido en producción no crea ni inicia una sala sin interacción.
 - Barrido de presencia cada 10 s: un miembro sin heartbeat durante 90 s pasa a desconectado y entra en la ventana de reconexión de 15 s.
 - Se mantiene el temporizador de turno opcional y la jugada automática existente.
 
