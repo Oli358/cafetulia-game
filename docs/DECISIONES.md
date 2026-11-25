@@ -1,6 +1,6 @@
 # Registro de decisiones
 
-> Documento vivo. Se añaden decisiones nuevas al final. Última actualización: 2026-10-22.
+> Documento vivo. Se añaden decisiones nuevas al final. Última actualización: 2026-11-25.
 
 Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 
@@ -109,3 +109,7 @@ Estados posibles: **Cerrada**, **Pendiente**, **Aplazada**.
 | D-101 | 2026-11-25 | El objeto flotante de la portada es un vaso de café para llevar, no una lata | Cerrada | Feedback del usuario: la lata no encajaba con café. Vaso procedural troncocónico, tapa crema con boquilla, falda kraft y sello dorado; tres etiquetas y color de cuerpo por mundo |
 | D-102 | 2026-11-25 | El layout de escritorio compacto cubre desde 901 px y usa cámara más abierta entre 901 y 1099 px | Cerrada | Arregla la ventana de PC a media anchura (~960 px): carta a la izquierda y vaso a la derecha, sin hoja inferior a todo el ancho. El móvil real queda por debajo de 900 px |
 | D-103 | 2026-11-25 | La carta móvil se compacta: sin fila de ficha/subtítulos y con CTA a todo el ancho | Cerrada | Deja visible la parte superior del vaso y evita que la hoja inferior parezca un formulario estirado; los subtítulos siguen accesibles desde Ajustes |
+| D-104 | 2026-11-25 | La carta de reservas no tiene scroll propio: se dimensiona por contenido y se compacta por altura | Cerrada | En ≤760 px se oculta la descripción larga y en ≤700 px la fila de ficha/subtítulos; el título del mundo siempre queda visible por encima de la carta |
+| D-105 | 2026-11-25 | El cambio de mundo usa un flujo vertical continuo de ingredientes | Cerrada | El grupo saliente baja y se desvanece; el entrante aparece por arriba y se asienta. Sin desplazamiento lateral ni cambios de escala; duración ~1,5 s |
+| D-106 | 2026-11-25 | 24 ingredientes por mundo, con capa de fondo, y falda kraft reducida al 23% del vaso | Cerrada | Más densidad en el aire y una falda que deja respirar la etiqueta; la capa de fondo usa escalas menores y z negativo para dar profundidad |
+| D-107 | 2026-11-25 | El gesto de rueda que abre el menú no cambia de mundo | Cerrada | La rueda solo cambia de mundo con el menú abierto (`progress ≥ 0.985`) y tras 900 ms de gracia; así un solo notch solo revela la carta. El título del mundo usa crossfade solapado (`popLayout`) para no dejar un hueco |

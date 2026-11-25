@@ -168,11 +168,11 @@ function CoffeeCupModel({
   );
 
   useFrame((_, delta) => {
-    bodyMaterial.color.lerp(bodyTarget, 1 - Math.exp(-4 * delta));
+    bodyMaterial.color.lerp(bodyTarget, 1 - Math.exp(-2.2 * delta));
     MENU_MODES.forEach((item) => {
       const target = item.id === mode ? 1 : 0;
       const current = opacities.current[item.id];
-      const next = THREE.MathUtils.damp(current, target, 3.2, delta);
+      const next = THREE.MathUtils.damp(current, target, 1.7, delta);
       opacities.current[item.id] = next;
       const material = labelMaterials[item.id];
       material.opacity = next;
@@ -213,17 +213,17 @@ function CoffeeCupModel({
         <cylinderGeometry args={[0.045, 0.045, 0.012, 20]} />
       </mesh>
 
-      {/* Kraft heat sleeve with a small stamped seal. */}
-      <mesh position={[0, 0.64, 0]} material={sleeveMaterial}>
-        <cylinderGeometry args={[0.622, 0.538, 0.9, 96, 1, true]} />
+      {/* Kraft heat sleeve: low and short so the printed cup keeps the spotlight. */}
+      <mesh position={[0, 0.46, 0]} material={sleeveMaterial}>
+        <cylinderGeometry args={[0.583, 0.535, 0.56, 96, 1, true]} />
       </mesh>
-      {[0.19, 1.09].map((y) => (
+      {[0.18, 0.74].map((y) => (
         <mesh key={y} position={[0, y, 0]} rotation={[Math.PI / 2, 0, 0]} material={sleeveInk}>
-          <torusGeometry args={[y === 0.19 ? 0.539 : 0.623, 0.006, 4, 96]} />
+          <torusGeometry args={[y === 0.18 ? 0.536 : 0.584, 0.006, 4, 96]} />
         </mesh>
       ))}
-      <mesh position={[0, 0.72, 0.592]} rotation={[Math.PI / 2, 0, 0]} material={sealMaterial}>
-        <cylinderGeometry args={[0.072, 0.072, 0.008, 24]} />
+      <mesh position={[0, 0.47, 0.566]} rotation={[Math.PI / 2, 0, 0]} material={sealMaterial}>
+        <cylinderGeometry args={[0.052, 0.052, 0.008, 24]} />
       </mesh>
 
       {/* Paper seams at the base and under the lid. */}
@@ -521,7 +521,6 @@ function FloatingIngredient({
   const outer = useRef<THREE.Group | null>(null);
   const inner = useRef<THREE.Group | null>(null);
   const offset = useRef({ x: 0, y: 0 });
-  const intro = useRef(0);
   const world = useMemo(() => new THREE.Vector3(), []);
   const phase = useMemo(() => {
     let hash = 0;
@@ -530,7 +529,6 @@ function FloatingIngredient({
   }, [spec.id]);
   useFrame((state, delta) => {
     if (!outer.current || !inner.current) return;
-    intro.current = Math.min(1, intro.current + delta * 2.1);
     const time = state.clock.elapsedTime;
     let targetX = 0;
     let targetY = 0;
@@ -555,8 +553,7 @@ function FloatingIngredient({
       ? 0
       : Math.sin(time * 0.55 + phase * 6) * 0.08 + influence * 0.45;
     inner.current.rotation.x = reducedMotion ? 0 : Math.cos(time * 0.4 + phase * 5) * 0.05;
-    const targetScale = 0.72 + intro.current * 0.28;
-    inner.current.scale.setScalar(targetScale * (1 - influence * 0.08));
+    inner.current.scale.setScalar(1 - influence * 0.08);
   });
   return (
     <group position={spec.position} rotation={spec.rotation} scale={spec.scale}>
@@ -586,7 +583,9 @@ function IngredientGroup({
   layout: 'mobile' | 'desktop';
 }): React.ReactElement {
   const root = useRef<THREE.Group | null>(null);
-  const visibility = useRef(active ? 1 : 0);
+  const flow = useRef(active ? 0 : -1);
+  const previousActive = useRef(active);
+  const reveal = useRef(0);
   const materials = useRef<THREE.Material[]>([]);
 
   useEffect(() => {
@@ -599,7 +598,7 @@ function IngredientGroup({
       const childMaterials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       childMaterials.forEach((material) => {
         material.transparent = true;
-        material.opacity = active ? 1 : 0;
+        material.opacity = 0;
         material.depthWrite = false;
         material.needsUpdate = true;
         collected.push(material);
@@ -609,24 +608,39 @@ function IngredientGroup({
     // Only the mount matters here: opacity is animated in useFrame afterwards.
   }, []);
 
+  useEffect(() => {
+    if (active && !previousActive.current) {
+      // Enter from above, unless it is still leaving: then let it turn around
+      // smoothly instead of teleporting across the cup.
+      flow.current = flow.current <= -0.9 ? 1 : Math.min(flow.current, 0);
+    }
+    previousActive.current = active;
+  }, [active]);
+
   useFrame((_, delta) => {
     if (!root.current) return;
-    const reveal = THREE.MathUtils.smoothstep(progress, 0.45, 0.88);
-    const target = active ? reveal : 0;
-    visibility.current = reducedMotion
-      ? target
-      : THREE.MathUtils.damp(visibility.current, target, 3.2, delta);
-    const visible = visibility.current;
-    root.current.visible = visible > 0.005;
-    root.current.position.x = (1 - visible) * 1.6;
-    root.current.position.y = (1 - visible) * -0.1;
-    root.current.position.z = (1 - visible) * -0.3;
-    root.current.rotation.y = (1 - visible) * 0.25;
-    const baseScale = layout === 'mobile' ? 0.62 : 1;
-    root.current.scale.setScalar(baseScale * (0.35 + visible * 0.65));
+    const targetReveal = THREE.MathUtils.smoothstep(progress, 0.45, 0.88);
+    reveal.current = reducedMotion
+      ? targetReveal
+      : THREE.MathUtils.damp(reveal.current, targetReveal, 3.4, delta);
+    const targetFlow = active ? 0 : -1;
+    flow.current = reducedMotion
+      ? targetFlow
+      : THREE.MathUtils.damp(flow.current, targetFlow, 1.8, delta);
+
+    const currentFlow = flow.current;
+    const currentReveal = reveal.current;
+    // The whole set travels vertically: it drops in from above and leaves
+    // downwards like a slow current, never sideways.
+    const y = currentFlow * 3.2 + (1 - currentReveal) * 1.15;
+    const opacity = Math.max(0, 1 - Math.abs(currentFlow)) * currentReveal;
+    root.current.visible = opacity > 0.004;
+    root.current.position.set(0, y, 0);
+    root.current.rotation.x = currentFlow * 0.16;
+    root.current.scale.setScalar(layout === 'mobile' ? 0.62 : 1);
     materials.current.forEach((material) => {
-      material.opacity = visible;
-      material.depthWrite = visible > 0.98;
+      material.opacity = opacity;
+      material.depthWrite = opacity > 0.98;
     });
   });
   return (
@@ -677,19 +691,39 @@ function WaveIngredients({
   );
 }
 function ModeLights({ mode }: { mode: MenuModeConfig }): React.ReactElement {
+  const glowLight = useRef<THREE.DirectionalLight | null>(null);
+  const accentLight = useRef<THREE.PointLight | null>(null);
+  const spotLight = useRef<THREE.SpotLight | null>(null);
+  const glowTarget = useMemo(() => new THREE.Color(mode.theme.glow), [mode]);
+  const accentTarget = useMemo(() => new THREE.Color(mode.theme.canColor), [mode]);
+
+  useFrame((_, delta) => {
+    const blend = 1 - Math.exp(-1.8 * delta);
+    glowLight.current?.color.lerp(glowTarget, blend);
+    accentLight.current?.color.lerp(accentTarget, blend);
+    spotLight.current?.color.lerp(glowTarget, blend);
+  });
+
   return (
     <group>
       <ambientLight intensity={0.78} color="#FFF3DF" />
       <directionalLight position={[4.5, 7, 6]} intensity={2.05} color="#FFF1D6" />
-      <directionalLight position={[-5, 3.5, -4]} intensity={1.05} color={mode.theme.glow} />
+      <directionalLight
+        ref={glowLight}
+        position={[-5, 3.5, -4]}
+        intensity={1.05}
+        color={mode.theme.glow}
+      />
       <directionalLight position={[-4.5, 2.5, 6]} intensity={1.15} color="#FFF4E4" />
       <pointLight
+        ref={accentLight}
         position={[2.5, 2.2, 2.5]}
         intensity={2.4}
         distance={9}
         color={mode.theme.canColor}
       />
       <spotLight
+        ref={spotLight}
         position={[0, 6, 3.5]}
         angle={0.7}
         penumbra={0.85}
@@ -767,6 +801,8 @@ function SceneContent({
   const cup = useRef<THREE.Group | null>(null);
   const targetRotation = useRef(MODE_ROTATIONS[mode]);
   const smoothProgress = useRef(0);
+  const progressRef = useRef(progress);
+  progressRef.current = progress;
   const lastMode = useRef<MenuMode>(mode);
   const modeRef = useRef<MenuMode>(mode);
   const servingRef = useRef(false);
@@ -775,6 +811,8 @@ function SceneContent({
   const dragStartRotation = useRef(0);
   const dragDistance = useRef(0);
   const lastWheelAt = useRef(0);
+  const menuOpenedAt = useRef(0);
+  const menuWasOpen = useRef(false);
   const pointerWorld = useRef(new THREE.Vector3(999, 999, 0));
   const pointerNdc = useMemo(() => new THREE.Vector3(), []);
   const pointerDirection = useMemo(() => new THREE.Vector3(), []);
@@ -853,6 +891,10 @@ function SceneContent({
     const element = gl.domElement;
     const onWheel = (event: WheelEvent) => {
       if (!interactive) return;
+      // Ignore the tail of the scroll gesture that opens the menu: a single
+      // notch must reveal the card without also switching worlds.
+      if (progressRef.current < 0.985) return;
+      if (performance.now() - menuOpenedAt.current < 900) return;
       if (Math.abs(event.deltaY) < 2) return;
       event.preventDefault();
       const now = performance.now();
@@ -867,6 +909,9 @@ function SceneContent({
     return () => element.removeEventListener('wheel', onWheel);
   }, [gl, interactive, selectMode]);
   useFrame((state, delta) => {
+    const menuOpen = progress >= 0.985;
+    if (menuOpen && !menuWasOpen.current) menuOpenedAt.current = performance.now();
+    menuWasOpen.current = menuOpen;
     smoothProgress.current = reducedMotion
       ? progress
       : THREE.MathUtils.damp(smoothProgress.current, progress, 5, delta);
@@ -907,7 +952,7 @@ function SceneContent({
       const desired = targetRotation.current + scrollSpin + (1 - p) * 0.12;
       cup.current.rotation.y = reducedMotion
         ? desired
-        : THREE.MathUtils.damp(cup.current.rotation.y, desired, 4.5, delta);
+        : THREE.MathUtils.damp(cup.current.rotation.y, desired, 3, delta);
     }
   });
   const handlePointerDown = (event: ThreeEvent<PointerEvent>) => {

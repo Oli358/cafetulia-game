@@ -119,6 +119,34 @@ test.describe('Cafetulia E2E v11 (menú de reservas 3D, tres mundos, lobby prepa
     await expect(page.getByTestId('title-menu-card')).toBeVisible();
     await expect(page.getByTestId('menu-mode-join')).toBeVisible();
 
+    // 2a. En portátiles de 700 px de alto la carta no debe tener scroll propio
+    // ni tapar el nombre del mundo.
+    await page.setViewportSize({ width: 1280, height: 700 });
+    await page.waitForTimeout(300);
+    await page.getByTestId('title-screen').evaluate((el) => {
+      el.scrollTop = el.clientHeight;
+    });
+    await page.waitForTimeout(700);
+    for (const modeId of ['join', 'create', 'solo'] as const) {
+      await page.getByTestId(`menu-mode-${modeId}`).click();
+      await page.waitForTimeout(400);
+      const menuLayout = await page.evaluate(() => {
+        const card = document.querySelector('[data-testid="title-menu-card"]') as HTMLElement | null;
+        const title = document.querySelector('[data-testid="title-screen"] h2') as HTMLElement | null;
+        if (!card || !title) return null;
+        return {
+          cardScrolls: card.scrollHeight > card.clientHeight + 1,
+          cardTop: card.getBoundingClientRect().top,
+          titleBottom: title.getBoundingClientRect().bottom,
+        };
+      });
+      expect(menuLayout).not.toBeNull();
+      expect(menuLayout!.cardScrolls).toBe(false);
+      expect(menuLayout!.cardTop).toBeGreaterThan(menuLayout!.titleBottom);
+    }
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.waitForTimeout(400);
+
     await page.getByTestId('subtitles-dropdown-btn').click();
     await expect(page.getByTestId('subtitles-dropdown-popover')).toBeVisible();
     await page.getByTestId('subtitle-mode-key').click();

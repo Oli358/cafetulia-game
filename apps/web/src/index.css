@@ -353,6 +353,23 @@
   }
 }
 
+/* La carta de reservas se compacta por altura: nunca debe tener scroll propio. */
+@media (max-height: 760px) {
+  .menu-world-description {
+    display: none;
+  }
+}
+@media (max-height: 700px) {
+  .menu-card-avatar {
+    display: none !important;
+  }
+}
+@media (max-height: 660px) {
+  .menu-reservation-card {
+    padding: 10px;
+  }
+}
+
 /* Ingredientes flotantes del lobby: viven en los márgenes, no en la mesa */
 @keyframes lobby-drift {
   0%, 100% {

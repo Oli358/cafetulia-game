@@ -5,6 +5,37 @@
 
 ---
 
+## Sesión 033 - 2026-11-25 - Carta sin scroll, río de ingredientes y falda del vaso
+
+**Objetivo:** aplicar el feedback de la prueba en portátil: la carta no debe tener scroll propio ni tapar el nombre del mundo, el vaso debe llevar una falda más pequeña y los ingredientes deben ser más numerosos y fluir hacia abajo al cambiar de mundo.
+
+**Hecho:**
+- La carta de reservas deja de tener `overflow-y-auto` y altura máxima. Se compacta (paddings, pestañas, campos y CTA) para caber sin scroll en 1920×900, 1280×800, **1280×700**, 960×800 y 390×844.
+- En alturas ≤760 px se oculta la descripción larga del mundo y en ≤700 px la fila de ficha/subtítulos; la carta nunca tapa el título.
+- El título del mundo baja de tamaño y sube de posición; el bloque `LLUVIA.` + notas queda siempre visible por encima de la carta.
+- La falda kraft del vaso baja de 0.9 a 0.56 unidades (~23% de la altura) y se recoloca; el sello se reduce.
+- Los ingredientes pasan de 10 a **24 por mundo**, con una segunda capa de fondo más pequeña y profunda. Los slots se redistribuyen en un anillo más amplio alrededor del vaso.
+- El cambio de mundo ya no desliza los ingredientes en horizontal: el grupo activo baja y se desvanece, y el nuevo entra desde arriba y se asienta, con una duración más lenta (~1,5 s). Sin cambios de escala ni rotaciones extra.
+- Se suavizan las luces (color interpolado), el color del cuerpo del vaso, el crossfade de etiquetas, el fondo y la rotación del vaso.
+- La prueba en el navegador real (1397×607) confirmó que la carta no tiene scroll y que el título no se tapa. También reveló dos fallos, ya corregidos: (1) los eventos residuales de la rueda que abre el menú podían cambiar de mundo; ahora la rueda solo cambia de mundo con el menú abierto (`progress ≥ 0.985`) y tras 900 ms de gracia; (2) el título usaba `AnimatePresence mode="wait"` y dejaba un hueco entre mundos; ahora hace crossfade solapado con `popLayout`.
+- Nuevo test E2E: en 1280×700, para los tres mundos, la carta no tiene scroll y su borde superior queda por debajo del título.
+- Verificado: typecheck, lint, 49 tests, build y 3 E2E en verde. Prueba manual con navegador real: póster → un notch → pestañas → arrastre del vaso → vuelta a la carta → reentrada conservando el mundo → partida rápida cargada.
+
+**Decisiones:** D-104, D-105 y D-106.
+
+**Problemas:**
+- Los ingredientes procedurales (flor, vainilla, cardamomo, chocolate, naranja) siguen sin ser fotorrealistas; el usuario valora bajar GLB para sustituirlos.
+- En móvil la hoja inferior sigue tapando la parte baja de la etiqueta del vaso; es el siguiente punto a valorar.
+- Las capturas `ui-v11-portada-*` se regeneraron con la falda nueva; las de lobby/partida/final se revirtieron por ruido de renderizado.
+
+**Siguiente:**
+1. Valorar GLB para flor de café, vainilla, cardamomo, chocolate, naranja y cacao.
+2. Decidir si la carta móvil se pliega o se deja como hoja inferior.
+3. Probar el flujo de giro/río en el portátil y ajustar tiempos si hace falta.
+4. Preparar `?room=CODE` y la relación entre mundo y música.
+
+---
+
 ## Sesión 032 - 2026-11-25 - Vaso para llevar y arreglo de pantallas reducidas
 
 **Objetivo:** corregir el menú en ventanas de PC a media anchura y en móvil, y sustituir la lata por un vaso de café para llevar, que encaja mejor con Cafetulia.

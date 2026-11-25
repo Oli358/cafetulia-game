@@ -46,26 +46,40 @@ export type MenuModeConfig = {
 };
 
 /**
- * Ingredients sit on a loose wave around the floating can: above, then down
- * the right side, with a couple of foreground accents. Keeping the same slots
- * for all modes lets the outgoing set slide away and the incoming set flow in
- * through the same rhythm.
+ * Ingredients sit on a loose ring around the floating cup: above, down both
+ * sides and a few foreground accents. Every mode uses the same slots, so the
+ * outgoing set can flow down out of frame while the incoming set drops in from
+ * above through the same rhythm, like a slow vertical current.
  */
 const waveSlots: Array<{
   position: [number, number, number];
   rotation: [number, number, number];
   scale: number;
 }> = [
-  { position: [-1.2, 2.3, 0.15], rotation: [0.3, 0.5, 0.8], scale: 0.82 },
-  { position: [-0.35, 2.6, -0.35], rotation: [0.6, 0.2, -0.4], scale: 0.72 },
-  { position: [0.5, 2.45, 0.25], rotation: [0.2, -0.5, 0.5], scale: 0.78 },
-  { position: [1.25, 2.0, -0.15], rotation: [0.8, 0.3, 0.2], scale: 0.85 },
-  { position: [1.8, 1.3, 0.35], rotation: [0.4, 0.2, 0.9], scale: 0.9 },
-  { position: [2.1, 0.5, 0.85], rotation: [0.1, 0.7, -0.6], scale: 0.82 },
-  { position: [2.0, -0.35, 0.15], rotation: [0.5, -0.3, 0.2], scale: 0.78 },
-  { position: [1.55, -1.1, 0.75], rotation: [0.3, 0.4, -0.8], scale: 0.83 },
-  { position: [0.7, -1.5, 1.15], rotation: [0.9, 0.1, 0.3], scale: 0.66 },
-  { position: [-0.45, -1.25, 0.75], rotation: [0.2, 0.6, 0.7], scale: 0.7 },
+  { position: [-1.85, 2.0, 0.1], rotation: [0.3, 0.5, 0.8], scale: 0.78 },
+  { position: [-1.05, 2.45, -0.35], rotation: [0.6, 0.2, -0.4], scale: 0.68 },
+  { position: [-0.25, 2.7, 0.2], rotation: [0.2, -0.5, 0.5], scale: 0.72 },
+  { position: [0.55, 2.62, -0.2], rotation: [0.8, 0.3, 0.2], scale: 0.76 },
+  { position: [1.35, 2.35, 0.35], rotation: [0.4, 0.2, 0.9], scale: 0.82 },
+  { position: [2.1, 1.95, -0.1], rotation: [0.1, 0.7, -0.6], scale: 0.86 },
+  { position: [2.55, 1.2, 0.3], rotation: [0.5, -0.3, 0.2], scale: 0.8 },
+  { position: [2.75, 0.35, -0.25], rotation: [0.3, 0.4, -0.8], scale: 0.76 },
+  { position: [2.6, -0.45, 0.45], rotation: [0.9, 0.1, 0.3], scale: 0.72 },
+  { position: [2.2, -1.15, 0.1], rotation: [0.2, 0.6, 0.7], scale: 0.68 },
+  { position: [1.45, -1.65, 0.55], rotation: [0.6, -0.2, 0.4], scale: 0.72 },
+  { position: [0.6, -1.9, -0.2], rotation: [0.4, 0.3, -0.5], scale: 0.66 },
+  { position: [-0.25, -1.8, 0.25], rotation: [0.7, 0.1, 0.6], scale: 0.64 },
+  { position: [-1.5, 0.9, -0.3], rotation: [0.2, 0.5, -0.7], scale: 0.7 },
+  { position: [-1.9, 0.1, 0.4], rotation: [0.5, -0.4, 0.3], scale: 0.66 },
+  { position: [-1.75, -0.7, 0.0], rotation: [0.3, 0.2, 0.9], scale: 0.62 },
+  { position: [1.1, 1.6, -0.9], rotation: [0.4, -0.2, 0.5], scale: 0.52 },
+  { position: [0.2, 1.2, -1.1], rotation: [0.7, 0.3, -0.4], scale: 0.46 },
+  { position: [2.05, 0.0, -0.85], rotation: [0.2, 0.6, 0.3], scale: 0.5 },
+  { position: [-0.9, 1.7, -0.7], rotation: [0.5, -0.1, 0.7], scale: 0.5 },
+  { position: [-1.55, 0.55, 0.55], rotation: [0.4, 0.3, -0.6], scale: 0.62 },
+  { position: [1.8, 0.75, 0.7], rotation: [0.2, -0.5, 0.4], scale: 0.66 },
+  { position: [2.35, 1.65, 0.45], rotation: [0.6, 0.1, -0.3], scale: 0.62 },
+  { position: [1.95, -1.75, 0.65], rotation: [0.3, 0.5, -0.8], scale: 0.6 },
 ];
 
 function ingredients(kinds: IngredientKind[]): IngredientSpec[] {
@@ -115,6 +129,20 @@ export const MENU_MODES: MenuModeConfig[] = [
       'cinnamon',
       'bean',
       'orange',
+      'cinnamon',
+      'bean',
+      'orange',
+      'cinnamon',
+      'bean',
+      'orange',
+      'bean',
+      'cinnamon',
+      'orange',
+      'bean',
+      'bean',
+      'cinnamon',
+      'orange',
+      'bean',
     ]),
   },
   {
@@ -149,6 +177,20 @@ export const MENU_MODES: MenuModeConfig[] = [
       'flower',
       'vanilla',
       'bean',
+      'flower',
+      'cardamom',
+      'vanilla',
+      'flower',
+      'bean',
+      'cardamom',
+      'flower',
+      'vanilla',
+      'cardamom',
+      'bean',
+      'flower',
+      'vanilla',
+      'cardamom',
+      'flower',
     ]),
   },
   {
@@ -183,6 +225,20 @@ export const MENU_MODES: MenuModeConfig[] = [
       'chocolate',
       'cocoa',
       'anise',
+      'chocolate',
+      'bean',
+      'anise',
+      'cocoa',
+      'chocolate',
+      'anise',
+      'cocoa',
+      'chocolate',
+      'anise',
+      'bean',
+      'chocolate',
+      'anise',
+      'cocoa',
+      'chocolate',
     ]),
   },
 ];

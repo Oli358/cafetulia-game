@@ -424,7 +424,7 @@ function ModeTabs({
     <div
       role="tablist"
       aria-label="Tipo de reserva"
-      className="mt-2 grid grid-cols-3 gap-1 rounded-full border border-[#231712]/10 bg-[#F7EEDF] p-1"
+      className="mt-1.5 grid grid-cols-3 gap-1 rounded-full border border-[#231712]/10 bg-[#F7EEDF] p-1"
     >
       {MENU_MODES.map((item) => {
         const active = item.id === mode;
@@ -440,7 +440,7 @@ function ModeTabs({
               soundEngine.playSfx('uiToggle');
               onChange(item.id);
             }}
-            className={`min-h-[42px] rounded-full px-2 text-[11px] sm:text-xs font-extrabold transition-all cursor-pointer ${
+            className={`min-h-[38px] rounded-full px-2 text-[11px] sm:text-xs font-extrabold transition-colors duration-500 cursor-pointer ${
               active
                 ? 'shadow-[0_2px_0_rgba(35,23,18,0.25)]'
                 : 'text-[#6C564A] hover:text-[#2B1710]'
@@ -482,7 +482,7 @@ function ServeControl({
   const disabled = !canServe || isBusy || serving;
 
   return (
-    <div className="mt-2 flex items-stretch justify-between gap-3 border-t border-[#231712]/10 pt-2 lg:items-end">
+    <div className="mt-1.5 flex items-stretch justify-between gap-3 border-t border-[#231712]/10 pt-2 lg:items-end">
       <div className="hidden min-w-0 lg:block">
         <p className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#B8512F]">
           {canServe ? 'Gira el vaso para servir' : 'Completa la reserva'}
@@ -500,7 +500,7 @@ function ServeControl({
         data-testid={testId}
         disabled={disabled}
         onClick={onServe}
-        className="group inline-flex min-h-[52px] w-full shrink-0 items-center justify-center gap-2 rounded-2xl border-2 border-[#231712] bg-[#B8512F] px-3.5 py-2 text-left text-[#FFF8EC] shadow-[0_3px_0_#231712] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 lg:w-auto"
+        className="group inline-flex min-h-[48px] w-full shrink-0 items-center justify-center gap-2 rounded-2xl border-2 border-[#231712] bg-[#B8512F] px-3.5 py-1.5 text-left text-[#FFF8EC] shadow-[0_3px_0_#231712] transition-transform hover:-translate-y-0.5 active:translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-45 lg:w-auto"
       >
         <RotateIcon className="h-5 w-5 transition-transform group-hover:rotate-45" />
         <span className="leading-tight">
@@ -558,7 +558,7 @@ function ReservationCard({
   return (
     <div
       className={`pointer-events-none absolute z-30 ${
-        layout === 'desktop' ? 'bottom-[5%] left-[4%] w-[min(400px,38vw)]' : 'inset-x-2 bottom-2'
+        layout === 'desktop' ? 'bottom-[4%] left-[4%] w-[min(430px,42vw)]' : 'inset-x-2 bottom-2'
       }`}
       style={{
         opacity: smoothstep(0.55, 0.9, progress),
@@ -571,15 +571,14 @@ function ReservationCard({
     >
       <motion.section
         data-testid="title-menu-card"
-        className="pointer-events-auto overflow-y-auto overscroll-contain rounded-[24px] border border-[#231712]/15 p-3 shadow-[0_18px_60px_rgba(35,23,18,0.24)] backdrop-blur-md sm:p-4"
+        className="menu-reservation-card pointer-events-auto rounded-[24px] border border-[#231712]/15 p-3 shadow-[0_18px_60px_rgba(35,23,18,0.24)] backdrop-blur-md transition-colors duration-700"
         style={{
           backgroundColor: `${theme.paper}f2`,
           color: '#2B1710',
           pointerEvents: active ? 'auto' : 'none',
-          maxHeight: layout === 'mobile' ? '50dvh' : '60dvh',
         }}
         animate={{ borderColor: `${theme.accent}55` }}
-        transition={{ duration: 0.45 }}
+        transition={{ duration: 0.7 }}
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -589,14 +588,14 @@ function ReservationCard({
             >
               Reserva de la casa · {modeConfig.blend}
             </p>
-            <h2 className="mt-1 font-serif text-xl font-bold leading-tight sm:text-[26px]">
+            <h2 className="mt-0.5 font-serif text-lg font-bold leading-tight sm:text-[22px]">
               {modeConfig.title}
             </h2>
           </div>
           <button
             type="button"
             onClick={onBack}
-            className="hidden min-h-[38px] shrink-0 items-center gap-1 rounded-full border border-[#231712]/15 bg-[#FFF8EC]/70 px-2.5 text-[10px] font-extrabold text-[#6C564A] hover:text-[#2B1710] sm:inline-flex"
+            className="hidden min-h-[34px] shrink-0 items-center gap-1 rounded-full border border-[#231712]/15 bg-[#FFF8EC]/70 px-2.5 text-[10px] font-extrabold text-[#6C564A] hover:text-[#2B1710] sm:inline-flex"
           >
             ← Carta
           </button>
@@ -608,12 +607,12 @@ function ReservationCard({
           key={mode}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.22 }}
-          className="mt-2 space-y-2"
+          transition={{ duration: 0.32 }}
+          className="mt-1.5 space-y-1.5"
         >
           {mode === 'join' && (
             <label className="block">
-              <span className="mb-1 block text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#6C564A]">
+              <span className="mb-0.5 block text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#6C564A]">
                 Código de la reserva
               </span>
               <input
@@ -626,13 +625,13 @@ function ReservationCard({
                 autoCapitalize="characters"
                 autoCorrect="off"
                 spellCheck={false}
-                className="min-h-[50px] w-full rounded-xl border border-[#231712]/20 bg-[#FFFDF8] px-3 font-mono text-lg font-extrabold uppercase tracking-[0.18em] text-[#2B1710] outline-none transition focus:border-[#B8512F] focus:ring-2 focus:ring-[#B8512F]/20"
+                className="min-h-[46px] w-full rounded-xl border border-[#231712]/20 bg-[#FFFDF8] px-3 font-mono text-base font-extrabold uppercase tracking-[0.18em] text-[#2B1710] outline-none transition focus:border-[#B8512F] focus:ring-2 focus:ring-[#B8512F]/20"
               />
             </label>
           )}
 
           <label className="block">
-            <span className="mb-1 block text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#6C564A]">
+            <span className="mb-0.5 block text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#6C564A]">
               Tu nombre en la mesa
             </span>
             <input
@@ -642,19 +641,19 @@ function ReservationCard({
               onChange={(event) => setNickname(event.target.value)}
               placeholder="Tu apodo"
               maxLength={24}
-              className="min-h-[50px] w-full rounded-xl border border-[#231712]/20 bg-[#FFFDF8] px-3 text-sm font-bold text-[#2B1710] outline-none transition focus:border-[#B8512F] focus:ring-2 focus:ring-[#B8512F]/20"
+              className="min-h-[46px] w-full rounded-xl border border-[#231712]/20 bg-[#FFFDF8] px-3 text-sm font-bold text-[#2B1710] outline-none transition focus:border-[#B8512F] focus:ring-2 focus:ring-[#B8512F]/20"
             />
           </label>
 
           {mode === 'create' && (
-            <p className="rounded-xl border border-[#3F5E4A]/20 bg-[#E9EEDC]/70 px-3 py-2 text-[11px] font-semibold leading-snug text-[#3F5E4A]">
+            <p className="rounded-xl border border-[#3F5E4A]/20 bg-[#E9EEDC]/70 px-2.5 py-1.5 text-[10px] font-semibold leading-snug text-[#3F5E4A]">
               La sala se prepara al instante. Comensales, bots y tiempo se ajustan en el lobby.
             </p>
           )}
 
           {mode === 'solo' && (
             <div>
-              <span className="mb-1 block text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#6C564A]">
+              <span className="mb-0.5 block text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#6C564A]">
                 Dificultad del bot
               </span>
               <div className="grid grid-cols-3 gap-1.5">
@@ -670,7 +669,7 @@ function ReservationCard({
                       type="button"
                       data-testid={`difficulty-${item.id}`}
                       onClick={() => setDifficulty(item.id as 'basic' | 'medium' | 'hard')}
-                      className={`min-h-[42px] rounded-xl border text-xs font-bold transition-colors ${
+                      className={`min-h-[38px] rounded-xl border text-xs font-bold transition-colors ${
                         selected
                           ? 'border-[#C8A12A] bg-[#C8A12A]/15 text-[#2B1710]'
                           : 'border-[#231712]/10 bg-[#FFF8EC]/60 text-[#6C564A] hover:text-[#2B1710]'
@@ -684,13 +683,13 @@ function ReservationCard({
             </div>
           )}
 
-          <div className="hidden items-center justify-between gap-2 rounded-xl border border-[#231712]/10 bg-[#FFF8EC]/55 px-2.5 py-2 sm:flex">
+          <div className="menu-card-avatar hidden items-center justify-between gap-2 rounded-xl border border-[#231712]/10 bg-[#FFF8EC]/55 px-2.5 py-1.5 sm:flex">
             <button
               type="button"
               onClick={() => toggleOverlay('avatar')}
-              className="inline-flex min-h-[38px] items-center gap-2 rounded-lg px-1 text-left text-[11px] font-bold text-[#2B1710] hover:bg-[#F7EEDF]"
+              className="inline-flex min-h-[34px] items-center gap-2 rounded-lg px-1 text-left text-[11px] font-bold text-[#2B1710] hover:bg-[#F7EEDF]"
             >
-              <PlayerAvatar avatarId={avatarId} size={30} />
+              <PlayerAvatar avatarId={avatarId} size={26} />
               <span className="min-w-0">
                 <span className="block text-[9px] font-extrabold uppercase tracking-wider text-[#6C564A]">
                   Tu ficha
@@ -704,7 +703,7 @@ function ReservationCard({
           {errorBanner && progress >= 0.2 && (
             <div
               role="alert"
-              className="rounded-xl border border-[#A63F34]/30 bg-[#FDECEB] px-3 py-2 text-xs font-bold text-[#A63F34]"
+              className="rounded-xl border border-[#A63F34]/30 bg-[#FDECEB] px-2.5 py-1.5 text-[11px] font-bold text-[#A63F34]"
             >
               {errorBanner}
             </div>
@@ -856,12 +855,12 @@ export function TitleExperience(): React.ReactElement {
             <motion.div
               className="absolute inset-0"
               animate={{ backgroundColor: theme.bgBottom }}
-              transition={{ duration: reducedMotion ? 0 : 1.05, ease: [0.33, 0, 0.2, 1] }}
+              transition={{ duration: reducedMotion ? 0 : 1.4, ease: [0.33, 0, 0.2, 1] }}
             />
             <motion.div
               className="absolute inset-0"
               animate={{ backgroundColor: theme.bgTop }}
-              transition={{ duration: reducedMotion ? 0 : 1.05, ease: [0.33, 0, 0.2, 1] }}
+              transition={{ duration: reducedMotion ? 0 : 1.4, ease: [0.33, 0, 0.2, 1] }}
               style={{
                 maskImage:
                   'linear-gradient(180deg, #000 0%, rgba(0,0,0,0.55) 58%, transparent 100%)',
@@ -1041,31 +1040,32 @@ export function TitleExperience(): React.ReactElement {
             aria-hidden={!reserveVisible}
           >
             <div
-              className="pointer-events-none absolute left-[4%] top-[13%] max-w-[86%] sm:top-[15%] sm:max-w-[62%]"
+              className="pointer-events-none absolute left-[4%] top-[10%] max-w-[88%] sm:top-[12%] sm:max-w-[58%]"
               style={{ color: '#FFF8EC' }}
             >
               <p className="text-[9px] font-extrabold uppercase tracking-[0.24em] opacity-70 sm:text-[11px]">
                 Mundo 0{modeConfig.index + 1} · Mezcla de la casa
               </p>
-              <AnimatePresence mode="wait">
-                <motion.h2
+              <AnimatePresence mode="popLayout" initial={false}>
+                <motion.div
                   key={mode}
                   initial={reducedMotion ? false : { opacity: 0, y: 18 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -14 }}
-                  transition={{ duration: reducedMotion ? 0 : 0.35, ease: [0.22, 1, 0.36, 1] }}
-                  className="mt-1 font-serif text-[clamp(3rem,15vw,4.5rem)] font-semibold uppercase leading-[0.82] tracking-[-0.06em] sm:text-[clamp(3.5rem,8vw,9rem)]"
+                  transition={{ duration: reducedMotion ? 0 : 0.5, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  {modeConfig.blend}
-                  <span style={{ color: theme.glow }}>.</span>
-                </motion.h2>
+                  <h2 className="mt-1 font-serif text-[clamp(2.6rem,13vw,4rem)] font-semibold uppercase leading-[0.82] tracking-[-0.06em] sm:text-[clamp(3rem,6.6vw,7.5rem)]">
+                    {modeConfig.blend}
+                    <span style={{ color: theme.glow }}>.</span>
+                  </h2>
+                  <p className="mt-1 font-serif text-sm italic opacity-90 sm:mt-2 sm:text-lg">
+                    {modeConfig.blendNote}
+                  </p>
+                  <p className="menu-world-description mt-1 hidden max-w-[380px] text-[11px] font-semibold leading-snug opacity-65 sm:block sm:text-xs">
+                    {modeConfig.description}
+                  </p>
+                </motion.div>
               </AnimatePresence>
-              <p className="mt-1 font-serif text-sm italic opacity-90 sm:mt-2 sm:text-xl">
-                {modeConfig.blendNote}
-              </p>
-              <p className="mt-1 hidden max-w-[380px] text-[11px] font-semibold leading-snug opacity-65 sm:block sm:text-xs">
-                {modeConfig.description}
-              </p>
             </div>
 
             <div
