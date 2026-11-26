@@ -14,9 +14,10 @@
 - El arrastre del vaso solo avanza o retrocede **un mundo por gesto**. La dirección sale del gesto (izquierda = siguiente, derecha = anterior) y el umbral es de 50 px; ya no se usa el ángulo más corto, que confundía giros largos con giros inversos.
 - La rueda espera a que el vaso esté cerca del destino (≤0.08 rad) y mantiene 700 ms entre notches, así que no se salta una parada.
 - **Enter** en el código o en el nombre dispara la acción principal de la carta (`joinRoom`, `createRoom` o `quickStartWithBots`) sin pulsar el botón. Añadido `enterKeyHint="go"`.
+- El aviso de error de la carta se **limpia al volver a la portada** (rueda arriba o «← Carta»), así no queda flotando sobre el póster. El aviso de «sala perdida» se conserva en la portada.
 - Verificado: `typecheck`, `lint`, **61 tests**, build y el E2E principal en aislado. La suite E2E completa tuvo un fallo intermitente en la inyección de puntuaciones altas de un test existente, no relacionado con estos cambios.
 
-**Decisiones:** D-125, D-126 y D-127.
+**Decisiones:** D-125, D-126, D-127 y D-128.
 
 **Problemas:**
 - El test E2E de puntuaciones altas puede fallar si el poll de la sala pisa la inyección sintética; pasa al ejecutarlo aislado.

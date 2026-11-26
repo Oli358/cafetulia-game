@@ -700,6 +700,7 @@ export function TitleExperience(): React.ReactElement {
   const setActiveModal = useGameStore((s) => s.setActiveModal);
   const setActiveOverlay = useGameStore((s) => s.setActiveOverlay);
   const errorBanner = useGameStore((s) => s.errorBanner);
+  const setErrorBanner = useGameStore((s) => s.setErrorBanner);
   const isBusy = useGameStore((s) => s.isBusy);
   const reducedMotion = useGameStore((s) => s.reducedMotion);
 
@@ -765,7 +766,10 @@ export function TitleExperience(): React.ReactElement {
       event.preventDefault();
       if (locked) return;
       locked = true;
-      if (!goingDown) setActiveOverlay(null);
+      if (!goingDown) {
+        setActiveOverlay(null);
+        setErrorBanner(null);
+      }
       element.scrollTo({
         top: goingDown ? element.clientHeight : 0,
         behavior: reducedMotion ? 'auto' : 'smooth',
@@ -782,7 +786,7 @@ export function TitleExperience(): React.ReactElement {
       element.removeEventListener('wheel', onWheel);
       window.clearTimeout(unlockTimer);
     };
-  }, [reducedMotion, setActiveOverlay]);
+  }, [reducedMotion, setActiveOverlay, setErrorBanner]);
 
   const handleModeChange = (next: MenuMode) => {
     setMode(next);
@@ -812,6 +816,7 @@ export function TitleExperience(): React.ReactElement {
   const handleBack = () => {
     scrollRef.current?.scrollTo({ top: 0, behavior: reducedMotion ? 'auto' : 'smooth' });
     setActiveOverlay(null);
+    setErrorBanner(null);
   };
 
   return (
