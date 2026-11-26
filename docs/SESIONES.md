@@ -5,6 +5,30 @@
 
 ---
 
+## Sesión 041 - 2026-11-26 - Menú del vaso: textura, giro paso a paso y Enter
+
+**Objetivo:** dar más ambiente al menú de selección, evitar que un giro salte de Unirse a Café solo y permitir entrar con Enter desde el código.
+
+**Hecho:**
+- Añadida una textura de bar (`cafe-menu-bg`) sobre el color del mundo, con desenfoque, `mix-blend-soft-light` y recorte móvil a lámparas/estanterías.
+- El arrastre del vaso solo avanza o retrocede **un mundo por gesto**. La dirección sale del gesto (izquierda = siguiente, derecha = anterior) y el umbral es de 50 px; ya no se usa el ángulo más corto, que confundía giros largos con giros inversos.
+- La rueda espera a que el vaso esté cerca del destino (≤0.08 rad) y mantiene 700 ms entre notches, así que no se salta una parada.
+- **Enter** en el código o en el nombre dispara la acción principal de la carta (`joinRoom`, `createRoom` o `quickStartWithBots`) sin pulsar el botón. Añadido `enterKeyHint="go"`.
+- Verificado: `typecheck`, `lint`, **61 tests**, build y el E2E principal en aislado. La suite E2E completa tuvo un fallo intermitente en la inyección de puntuaciones altas de un test existente, no relacionado con estos cambios.
+
+**Decisiones:** D-125, D-126 y D-127.
+
+**Problemas:**
+- El test E2E de puntuaciones altas puede fallar si el poll de la sala pisa la inyección sintética; pasa al ejecutarlo aislado.
+- Falta probar la textura y el Enter en el móvil real.
+
+**Siguiente:**
+1. Probar en móvil el fondo del menú y el Enter del código.
+2. Estabilizar el test de puntuaciones altas si vuelve a fallar.
+3. Valorar más capas de ambiente en el menú si la textura se queda corta.
+
+---
+
 ## Sesión 040 - 2026-11-26 - Volver a la sala y avisos de desconexión
 
 **Objetivo:** separar «volver a la sala» de «volver al menú», detectar antes las desconexiones y mostrarlas de forma clara en la partida.

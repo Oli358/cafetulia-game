@@ -6,7 +6,6 @@ import {
   getMenuMode,
   MENU_MODES,
   MODE_ROTATIONS,
-  nearestModeFromRotation,
   type IngredientSpec,
   type MenuMode,
   type MenuModeConfig,
@@ -874,9 +873,24 @@ function SceneContent({
         onServeRef.current();
         return;
       }
-      const nearest = nearestModeFromRotation(targetRotation.current);
-      targetRotation.current = nearestEquivalent(MODE_ROTATIONS[nearest], targetRotation.current);
-      selectMode(nearest);
+      // A single drag can only advance one world. The direction comes from the
+      // gesture itself: dragging left moves forward, dragging right moves back.
+      const currentMode = modeRef.current;
+      const currentIndex = getMenuMode(currentMode).index;
+      const currentBase = MODE_ROTATIONS[currentMode];
+      const dragPx = dragDistance.current;
+      if (Math.abs(dragPx) < 50) {
+        targetRotation.current = nearestEquivalent(currentBase, targetRotation.current);
+        return;
+      }
+      const goingForward = dragPx < 0;
+      const nextIndex = goingForward
+        ? (currentIndex + 1) % MENU_MODES.length
+        : (currentIndex + MENU_MODES.length - 1) % MENU_MODES.length;
+      const nextMode = MENU_MODES[nextIndex];
+      if (!nextMode) return;
+      targetRotation.current = nearestEquivalent(MODE_ROTATIONS[nextMode.id], targetRotation.current);
+      selectMode(nextMode.id);
     };
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp);
@@ -898,9 +912,18 @@ function SceneContent({
       // notch must reveal the card without also switching worlds.
       if (progressRef.current < 0.985) return;
       if (performance.now() - menuOpenedAt.current < 900) return;
+      // Do not accept a new wheel notch while the cup is still turning toward
+      // the previous world: one gesture must equal one stop.
+      if (cup.current) {
+        const rotationDelta = Math.atan2(
+          Math.sin(cup.current.rotation.y - targetRotation.current),
+          Math.cos(cup.current.rotation.y - targetRotation.current),
+        );
+        if (Math.abs(rotationDelta) > 0.08) return;
+      }
       event.preventDefault();
       const now = performance.now();
-      if (now - lastWheelAt.current < 380) return;
+      if (now - lastWheelAt.current < 700) return;
       lastWheelAt.current = now;
       const currentIndex = getMenuMode(modeRef.current).index;
       const next = MENU_MODES[(currentIndex + 1) % MENU_MODES.length];

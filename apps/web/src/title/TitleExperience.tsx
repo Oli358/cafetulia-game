@@ -511,6 +511,11 @@ function ReservationCard({
   const avatarId = useGameStore((s) => s.avatarId);
   const toggleOverlay = useGameStore((s) => s.toggleOverlay);
   const active = progress > 0.55;
+  const submitOnEnter = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    if (canServe) onServe();
+  };
 
   return (
     <div
@@ -582,6 +587,8 @@ function ReservationCard({
                 autoCapitalize="characters"
                 autoCorrect="off"
                 spellCheck={false}
+                enterKeyHint="go"
+                onKeyDown={submitOnEnter}
                 className="min-h-[46px] w-full rounded-xl border border-[#231712]/20 bg-[#FFFDF8] px-3 font-mono text-base font-extrabold uppercase tracking-[0.18em] text-[#2B1710] outline-none transition focus:border-[#B8512F] focus:ring-2 focus:ring-[#B8512F]/20"
               />
             </label>
@@ -598,6 +605,8 @@ function ReservationCard({
               onChange={(event) => setNickname(event.target.value)}
               placeholder="Tu apodo"
               maxLength={24}
+              enterKeyHint="go"
+              onKeyDown={submitOnEnter}
               className="min-h-[46px] w-full rounded-xl border border-[#231712]/20 bg-[#FFFDF8] px-3 text-sm font-bold text-[#2B1710] outline-none transition focus:border-[#B8512F] focus:ring-2 focus:ring-[#B8512F]/20"
             />
           </label>
@@ -838,6 +847,10 @@ export function TitleExperience(): React.ReactElement {
                 WebkitMaskImage:
                   'linear-gradient(180deg, #000 0%, rgba(0,0,0,0.55) 58%, transparent 100%)',
               }}
+            />
+            <div
+              aria-hidden="true"
+              className="cafe-menu-bg pointer-events-none absolute inset-0 opacity-55 mix-blend-soft-light"
             />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_65%_35%,rgba(255,248,236,0.32),transparent_42%),linear-gradient(180deg,transparent_45%,rgba(35,23,18,0.28))]" />
           </div>

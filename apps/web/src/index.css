@@ -360,6 +360,21 @@
   }
 }
 
+/* Textura de bar para el menú de selección del vaso */
+.cafe-menu-bg {
+  background-image: url('/backgrounds/cafe-bar.jpg');
+  background-size: cover;
+  background-position: center;
+  filter: blur(1.5px) saturate(0.9);
+  transform: scale(1.04);
+}
+@media (max-width: 640px) {
+  .cafe-menu-bg {
+    background-size: 200% auto;
+    background-position: 18% top;
+  }
+}
+
 /* Fondo de bar cozy para partida y lobby */
 .cafe-playing-bg {
   background-color: #f3e3cd;
