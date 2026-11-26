@@ -29,6 +29,8 @@ export const MEMBER_IDLE_MS = 90_000;
 export const MAX_MEMBERS_PER_ROOM = 12;
 export const MAX_ROOMS = 500;
 export const ROOM_IDLE_TTL_MS = 2 * 60 * 60 * 1000;
+export const BOT_REACTION_MIN_MS = 1_000;
+export const BOT_REACTION_MAX_MS = 2_000;
 
 export class RoomCapacityError extends Error {
   public constructor(message: string) {
@@ -722,8 +724,9 @@ export class CafetuliaRoomController {
   }
 
   /**
-   * Schedules either an immediate Bot move or the optional turn timer (max 180s).
-   * When the turn timer expires, executes a sensible automatic move and logs it in the event log (never in chat).
+   * Schedules a bot move with a short "thinking" pause, or the optional turn
+   * timer (max 180s) for humans. When the timer expires, executes a sensible
+   * automatic move and logs it in the event log (never in chat).
    */
   private scheduleTurnProcessing(): void {
     this.clearTurnTimer();
@@ -736,14 +739,24 @@ export class CafetuliaRoomController {
     const currentMember = this.members.get(currentTurnPlayerId);
 
     if (currentMember?.role === 'bot') {
-      const botMove = selectBotMove(
-        this.gameState,
-        currentTurnPlayerId,
-        currentMember.botDifficulty ?? this.config.botDifficulty,
-      );
-      if (botMove) {
-        this.submitMove(currentTurnPlayerId, botMove);
-      }
+      const delayMs = randomInt(BOT_REACTION_MIN_MS, BOT_REACTION_MAX_MS + 1);
+      this.turnTimerHandle = setTimeout(() => {
+        this.turnTimerHandle = null;
+        if (!this.gameState || this.phase !== 'playing') return;
+        if (this.gameState.turn !== currentTurnPlayerId) return;
+
+        const stillBot = this.members.get(currentTurnPlayerId);
+        if (!stillBot || stillBot.role !== 'bot') return;
+
+        const botMove = selectBotMove(
+          this.gameState,
+          currentTurnPlayerId,
+          stillBot.botDifficulty ?? this.config.botDifficulty,
+        );
+        if (botMove) {
+          this.submitMove(currentTurnPlayerId, botMove);
+        }
+      }, delayMs);
       return;
     }
 

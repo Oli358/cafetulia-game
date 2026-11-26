@@ -5,6 +5,30 @@
 
 ---
 
+## Sesión 039 - 2026-11-26 - Monedas al marcador y pausa de los bots
+
+**Objetivo:** corregir el vuelo de las monedas para que lleguen al jugador correcto y hacer que los bots reaccionen con una pausa natural.
+
+**Hecho:**
+- Añadido `data-player-tray` al marcador de puntos de cada jugador en la mesa. Las monedas positivas vuelan de la silla/barra a su tarjeta, y las penalizaciones salen de ahí hacia la barra.
+- `FlyingCoinsLayer` ya no usa la parte superior de la pantalla como destino de emergencia: si el destino no existe, no lanza la moneda.
+- Los bots esperan una pausa aleatoria de 1000–2000 ms antes de calcular y ejecutar su jugada. El temporizador se cancela si cambia el turno, la partida termina o la sala se destruye.
+- Añadida prueba de servidor con relojes falsos para comprobar que no juegan antes de 1 s y sí han jugado a los 2,1 s.
+- Añadida prueba E2E de que cada jugador tiene un destino visible para las monedas.
+- Verificado: typecheck, lint, 60 tests, 5 E2E y build.
+
+**Decisiones:** D-123.
+
+**Problemas:**
+- La pausa del bot puede sumar hasta 2 s por turno; es intencionada para que no parezca instantáneo.
+- Si en el futuro se oculta el marcador en algún layout, las monedas no se lanzarán en vez de volar a un punto incorrecto.
+
+**Siguiente:**
+1. Probar la pausa y el vuelo de monedas en móvil.
+2. Valorar un indicador discreto de «pensando» durante el turno del bot.
+
+---
+
 ## Sesión 038 - 2026-11-26 - Personalización: nombres especiales y retratos
 
 **Objetivo:** dar identidad visual a los fundadores, mejorar los avatares y añadir el aura de corazones cuando Oli y Walford/Abril comparten mesa.

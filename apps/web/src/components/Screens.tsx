@@ -3151,7 +3151,10 @@ export function PlayingScreen(): React.ReactElement {
                       >
                         {coinLine}
                       </span>
-                      <span className="shrink-0 text-right leading-none">
+                      <span
+                        data-player-tray={p.id}
+                        className="shrink-0 text-right leading-none"
+                      >
                         <AnimatedScore
                           value={p.score}
                           reducedMotion={reducedMotion}

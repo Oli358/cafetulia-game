@@ -149,6 +149,42 @@ describe('Phase 3: Online Server, Rooms, Reconnection, Timer & Persistence', () 
     }
   });
 
+  it('4b. makes bots wait between 1 and 2 seconds before their move', () => {
+    vi.useFakeTimers();
+
+    let botRoom: CafetuliaRoomController | null = null;
+    for (let seed = 1; seed <= 100; seed++) {
+      const room = registry.createRoom({
+        hostToken: `token_bot_host_${seed}`,
+        hostNickname: 'Ana',
+        seed,
+      });
+      const hostId = room.getSnapshot().hostId;
+      room.updateConfig(hostId, {
+        maxPlayers: 2,
+        botCount: 1,
+        botDifficulty: 'medium',
+      });
+      room.startGame(hostId, seed);
+
+      if (room.getSnapshot().gameState?.turn === 'bot_1') {
+        botRoom = room;
+        break;
+      }
+      room.dispose();
+    }
+
+    expect(botRoom).not.toBeNull();
+    if (!botRoom) return;
+
+    const logBefore = botRoom.getSnapshot().gameState!.log.length;
+    vi.advanceTimersByTime(999);
+    expect(botRoom.getSnapshot().gameState!.log.length).toBe(logBefore);
+
+    vi.advanceTimersByTime(1_101);
+    expect(botRoom.getSnapshot().gameState!.log.length).toBeGreaterThan(logBefore);
+  });
+
   it('6. handles 15-second reconnection window and expulsion after timeout (hand to bag, seated stay, returns as spectator)', () => {
     vi.useFakeTimers();
 

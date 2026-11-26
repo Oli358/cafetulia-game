@@ -633,6 +633,25 @@ test.describe('Cafetulia E2E v11 (menú de reservas 3D, tres mundos, lobby prepa
     await expect(page.getByText(/La sala ya no existe/)).toBeVisible();
   });
 
+  test('las monedas tienen como destino la tarjeta de cada jugador', async ({ page }) => {
+    await page.goto('/?autostart=1');
+    await expect(page.getByTestId('papercraft-board')).toBeVisible({ timeout: 20_000 });
+
+    const targets = await page.evaluate(() => {
+      const store = (window as unknown as { __CAFETULIA_STORE__: TestStoreShape })
+        .__CAFETULIA_STORE__;
+      const snap = store.getState().snapshot;
+      if (!snap?.gameState) return [];
+      return snap.gameState.players.map((player) => ({
+        id: player.id,
+        hasTray: Boolean(document.querySelector(`[data-player-tray="${player.id}"]`)),
+      }));
+    });
+
+    expect(targets.length).toBeGreaterThan(0);
+    expect(targets.every((target) => target.hasTray)).toBe(true);
+  });
+
   test('marca a los fundadores y activa el aura solo con Oli + Walford/Abril', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/?autostart=1');

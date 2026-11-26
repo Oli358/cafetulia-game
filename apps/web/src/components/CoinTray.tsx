@@ -367,10 +367,14 @@ export function FlyingCoinsLayer({
       const srcRect = srcEl?.getBoundingClientRect();
       const dstRect = dstEl?.getBoundingClientRect();
 
+      // Si el destino no está visible (por ejemplo, una tarjeta oculta), es
+      // mejor no lanzar la moneda que hacer que vuele a un punto arbitrario.
+      if (!dstRect) continue;
+
       const startX = srcRect ? srcRect.left + srcRect.width / 2 : window.innerWidth / 2;
       const startY = srcRect ? srcRect.top + srcRect.height / 2 : window.innerHeight / 2;
-      const endX = dstRect ? dstRect.left + dstRect.width / 2 : window.innerWidth / 2;
-      const endY = dstRect ? dstRect.top + dstRect.height / 2 : 36;
+      const endX = dstRect.left + dstRect.width / 2;
+      const endY = dstRect.top + dstRect.height / 2;
 
       const { chips } = decomposeCoins(Math.abs(f.delta));
       const visualChips = chips.slice(0, 8);
