@@ -217,7 +217,7 @@ export function FinishedScreen(): React.ReactElement {
   const shareResult = useGameStore((s) => s.shareResult);
   const reducedMotion = useGameStore((s) => s.reducedMotion);
   const voteRematch = useGameStore((s) => s.voteRematch);
-  const leaveRoom = useGameStore((s) => s.leaveRoom);
+  const returnToLobby = useGameStore((s) => s.returnToLobby);
   const [postcardUrl, setPostcardUrl] = useState<string | null>(null);
   const [confettiBurst, setConfettiBurst] = useState(0);
   const [recountStep, setRecountStep] = useState<'table' | 'penalty' | 'final'>(
@@ -261,6 +261,7 @@ export function FinishedScreen(): React.ReactElement {
           nickname: p.nickname,
           isBot,
           avatarId: member?.avatarId ?? p.avatarId ?? 'moka',
+          connected: member?.connected ?? true,
           tablePoints: score?.tableAndBarScore ?? p.score,
           naturalLeft: score?.naturalTilesRemaining ?? 0,
           jokerLeft: score?.jokersRemaining ?? 0,
@@ -476,11 +477,17 @@ export function FinishedScreen(): React.ReactElement {
                             winners.map((winner, index) => (
                               <React.Fragment key={winner.id}>
                                 {index > 0 ? ' & ' : null}
-                                <PlayerName nickname={winner.nickname} />
+                                <PlayerName
+                                  nickname={winner.nickname}
+                                  disconnected={!winner.connected}
+                                />
                               </React.Fragment>
                             ))
                           ) : (
-                            <PlayerName nickname={topWinner.nickname} />
+                            <PlayerName
+                              nickname={topWinner.nickname}
+                              disconnected={!topWinner.connected}
+                            />
                           )}
                         </h1>
                         <p className="mt-0.5 text-[11px] text-[#6F5A4E]">
@@ -557,7 +564,7 @@ export function FinishedScreen(): React.ReactElement {
                           <PlayerAvatar avatarId={st.avatarId} size={40} />
                         </div>
                         <h3 className="mt-1 w-full break-words font-serif text-sm font-bold text-[#231712]">
-                          <PlayerName nickname={st.nickname} />
+                          <PlayerName nickname={st.nickname} disconnected={!st.connected} />
                         </h3>
                         <div className="mt-0.5 flex items-baseline justify-center gap-0.5">
                           <AnimatedScore
@@ -764,11 +771,11 @@ export function FinishedScreen(): React.ReactElement {
               </button>
               <button
                 type="button"
-                data-testid="back-to-title-btn"
-                onClick={leaveRoom}
+                data-testid="back-to-lobby-btn"
+                onClick={() => void returnToLobby()}
                 className="min-h-[34px] rounded-xl border border-[#FFF9F0]/25 bg-[#FFF9F0]/10 px-2.5 text-[10px] font-bold text-[#FFF9F0] transition-colors hover:bg-[#FFF9F0]/20"
               >
-                Volver a la portada
+                Volver a la sala
               </button>
               <button
                 type="button"

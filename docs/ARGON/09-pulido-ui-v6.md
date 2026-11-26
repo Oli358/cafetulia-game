@@ -81,7 +81,7 @@ Cafetulia es un juego cozy online de 2–4 jugadores basado en *Café Internatio
 3. **Confeti** de papel en colores café/crema/rojo/azul, durante 2–3 s. No uses solo la lluvia de monedas; el confeti debe ser visible y alegre.
 4. **Ranking** completo en filas que entran escalonadas: posición, avatar, nombre, puntos, desglose y penalización. Los bots también aparecen.
 5. **Créditos/postal** al final, con aparición suave: «Cafetulia — una tertulia de café», «Arte original», «Gracias por jugar» y una dedicatoria discreta **O & A** (sin nombres completos ni datos personales).
-6. **Acciones** al terminar la secuencia: «Revancha» (con estado de voto), «Compartir/Generar postal» y «Volver a la portada». Deben ser accesibles antes de que acabe la animación con un botón «Saltar».
+6. **Acciones** al terminar la secuencia: «Revancha» (con estado de voto), «Compartir/Generar postal» y «Volver a la sala». Deben ser accesibles antes de que acabe la animación con un botón «Saltar». La salida al menú se hace desde el lobby.
 
 - Respeta `prefers-reduced-motion`: muestra el estado final sin animaciones largas.
 - No bloquees la interacción más de lo necesario; el botón de omitir debe estar siempre visible.

@@ -41,6 +41,13 @@ export type ArcadeCalloutEvent = {
   isKeyMoment: boolean;
 };
 
+type PresenceNotice = {
+  id: string;
+  nickname: string;
+  kind: 'disconnected' | 'reconnected';
+  at: number;
+};
+
 const JOKER_SWAP_EXPLANATION =
   'Entregas una ficha natural que podría ocupar esa silla y recuperas el comodín. No puntúas y no robas. Úsalo solo si te conviene.';
 
@@ -1756,7 +1763,10 @@ export function LobbyScreen(): React.ReactElement {
                           </div>
                           <div className="min-w-0">
                             <span className="flex min-w-0 flex-wrap items-center gap-1 font-serif font-bold text-xs text-[#231712] sm:text-sm">
-                              <PlayerName nickname={member.nickname} />
+                              <PlayerName
+                                nickname={member.nickname}
+                                disconnected={!member.connected}
+                              />
                               {member.id === snapshot.hostId ? (
                                 <span title="Anfitrión" aria-label="Anfitrión" className="shrink-0">
                                   <svg
@@ -1783,7 +1793,11 @@ export function LobbyScreen(): React.ReactElement {
                               ) : null}
                             </span>
                             <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-                              {isBot ? (
+                              {!member.connected ? (
+                                <span className="inline-flex items-center gap-1 rounded-md border border-[#A63F34]/40 bg-[#FDECEB] px-1.5 py-0.2 text-[10px] font-extrabold uppercase tracking-wider text-[#A63F34]">
+                                  Desconectado
+                                </span>
+                              ) : isBot ? (
                                 <span className="px-1.5 py-0.2 rounded-md bg-[#FEF6E0] border border-[#231712] text-[10px] font-extrabold text-[#231712]">
                                   Autómata{' '}
                                   {member.botDifficulty === 'hard'
@@ -2070,8 +2084,10 @@ export function PlayingScreen(): React.ReactElement {
   const [chairToast, setChairToast] = useState<ChairToastInfo | null>(null);
   const [coinFlights, setCoinFlights] = useState<CoinFlightEvent[]>([]);
   const [calloutQueue, setCalloutQueue] = useState<ArcadeCalloutEvent[]>([]);
+  const [presenceNotices, setPresenceNotices] = useState<PresenceNotice[]>([]);
   const lastLogLengthRef = useRef<number>(0);
   const announcedLastRoundRef = useRef<boolean>(false);
+  const previousPresenceRef = useRef<Map<string, boolean> | null>(null);
 
   const gameState = snapshot?.gameState;
 
@@ -2100,6 +2116,14 @@ export function PlayingScreen(): React.ReactElement {
     }
     return map;
   }, [snapshot?.members, gameState?.players]);
+
+  const connectedByPlayerId = useMemo(() => {
+    const map: Record<string, boolean> = {};
+    for (const m of snapshot?.members ?? []) {
+      map[m.id] = m.connected;
+    }
+    return map;
+  }, [snapshot?.members]);
 
   // Live rank by total coins. Ties share position; the turn glow is independent.
   const rankByPlayerId = useMemo(() => {
@@ -2144,6 +2168,58 @@ export function PlayingScreen(): React.ReactElement {
     }, 1450);
     return () => clearTimeout(timer);
   }, [calloutQueue]);
+
+  // Detect disconnected/reconnected players from the authoritative snapshot.
+  useEffect(() => {
+    const members = snapshot?.members;
+    if (!members || members.length === 0) return;
+
+    const nextPresence = new Map(members.map((member) => [member.id, member.connected]));
+    const previousPresence = previousPresenceRef.current;
+    previousPresenceRef.current = nextPresence;
+
+    if (!previousPresence) return;
+
+    const notices: PresenceNotice[] = [];
+    for (const member of members) {
+      if (member.role === 'bot') continue;
+      const previousConnected = previousPresence.get(member.id);
+      if (previousConnected === true && !member.connected) {
+        notices.push({
+          id: `presence-off-${member.id}-${Date.now()}`,
+          nickname: member.nickname,
+          kind: 'disconnected',
+          at: Date.now(),
+        });
+      } else if (previousConnected === false && member.connected) {
+        notices.push({
+          id: `presence-on-${member.id}-${Date.now()}`,
+          nickname: member.nickname,
+          kind: 'reconnected',
+          at: Date.now(),
+        });
+      }
+    }
+
+    if (notices.length === 0) return;
+    setPresenceNotices((previous) => [...previous, ...notices].slice(-20));
+
+    if (subtitleMode !== 'off') {
+      setCalloutQueue((previous) => [
+        ...previous,
+        ...notices.map((notice) => ({
+          id: `callout-${notice.id}`,
+          title: notice.kind === 'disconnected' ? 'DESCONEXIÓN' : 'RECONEXIÓN',
+          subtitle:
+            notice.kind === 'disconnected'
+              ? `${notice.nickname} se ha desconectado`
+              : `${notice.nickname} ha vuelto a la mesa`,
+          tone: notice.kind === 'disconnected' ? ('red' as const) : ('green' as const),
+          isKeyMoment: true,
+        })),
+      ]);
+    }
+  }, [snapshot?.members, subtitleMode]);
 
   // Detect new scoring, bar penalty, joker, table completion, and last round events
   useEffect(() => {
@@ -2631,7 +2707,13 @@ export function PlayingScreen(): React.ReactElement {
                   'Tu turno'
                 ) : (
                   <>
-                    Turno: <PlayerName nickname={activePlayerObj?.nickname ?? 'Rival'} />
+                    Turno:{' '}
+                    <PlayerName
+                      nickname={activePlayerObj?.nickname ?? 'Rival'}
+                      disconnected={
+                        activePlayerObj ? connectedByPlayerId[activePlayerObj.id] === false : false
+                      }
+                    />
                   </>
                 )}
               </div>
@@ -2889,7 +2971,10 @@ export function PlayingScreen(): React.ReactElement {
                     <span className="inline-flex items-center gap-1.5 font-bold min-w-0">
                       <PlayerAvatar avatarId={pAvatar} size={24} />
                       <span className="min-w-0">
-                        <PlayerName nickname={p.nickname} />
+                        <PlayerName
+                          nickname={p.nickname}
+                          disconnected={connectedByPlayerId[p.id] === false}
+                        />
                         {p.id === myPlayerId ? ' (Tú)' : ''}
                       </span>
                     </span>
@@ -2969,7 +3054,7 @@ export function PlayingScreen(): React.ReactElement {
               onClick={() => setActiveOverlay('drawer')}
               className="w-full text-left px-3 py-2 rounded-xl bg-[#F7EEDF] font-bold text-[#3E2F2A] hover:bg-[#EAD9C0] cursor-pointer"
             >
-              Tertulia y registro ({gameState.log.length})
+              Tertulia y registro ({gameState.log.length + presenceNotices.length})
             </button>
             <button
               type="button"
@@ -3101,6 +3186,7 @@ export function PlayingScreen(): React.ReactElement {
                 const isTurn = gameState.turn === p.id;
                 const pAvatar = avatarByPlayerId[p.id] ?? p.avatarId ?? 'moka';
                 const rank = rankByPlayerId.get(p.id) ?? 1;
+                const isDisconnected = connectedByPlayerId[p.id] === false;
                 const breakdown = decomposeCoins(p.score);
                 const coinLine =
                   p.score === 0
@@ -3135,7 +3221,7 @@ export function PlayingScreen(): React.ReactElement {
                       </span>
                       <PlayerAvatar avatarId={pAvatar} size={24} />
                       <span className="min-w-0 flex-1 font-bold text-[#3E2F2A]">
-                        <PlayerName nickname={p.nickname} />
+                        <PlayerName nickname={p.nickname} disconnected={isDisconnected} />
                       </span>
                       <span
                         className="shrink-0 rounded border border-[#231712]/15 bg-[#FFF9F0] px-1 py-0.2 font-mono text-[9px] font-semibold tabular-nums text-[#6F5A4E]"
@@ -3146,10 +3232,14 @@ export function PlayingScreen(): React.ReactElement {
                     </div>
                     <div className="flex items-end justify-between gap-1">
                       <span
-                        className="min-w-0 truncate font-mono text-[8px] font-semibold tabular-nums text-[#8A7365]"
-                        title="Desglose de monedas 10 / 5 / 1"
+                        className={`min-w-0 truncate font-mono text-[8px] font-semibold tabular-nums ${
+                          isDisconnected ? 'font-bold text-[#A63F34]' : 'text-[#8A7365]'
+                        }`}
+                        title={
+                          isDisconnected ? 'Jugador desconectado' : 'Desglose de monedas 10 / 5 / 1'
+                        }
                       >
-                        {coinLine}
+                        {isDisconnected ? 'desconectado' : coinLine}
                       </span>
                       <span
                         data-player-tray={p.id}
@@ -3625,7 +3715,7 @@ export function PlayingScreen(): React.ReactElement {
                             : 'text-[#6F5A4E]'
                         }`}
                       >
-                        Registro ({gameState.log.length})
+                        Registro ({gameState.log.length + presenceNotices.length})
                       </button>
                       <button
                         type="button"
@@ -3663,7 +3753,44 @@ export function PlayingScreen(): React.ReactElement {
                     className="flex-1 overflow-y-auto space-y-2 py-3 pr-1 text-xs"
                     data-testid="move-log-list"
                   >
-                    {gameState.log.length === 0 ? (
+                    {presenceNotices.length > 0 && (
+                      <div className="space-y-2" data-testid="presence-log-list">
+                        {presenceNotices
+                          .slice()
+                          .reverse()
+                          .map((notice) => (
+                            <div
+                              key={notice.id}
+                              data-testid="presence-log-entry"
+                              data-presence={notice.kind}
+                              className={`rounded-xl border p-2.5 ${
+                                notice.kind === 'disconnected'
+                                  ? 'border-[#A63F34]/35 bg-[#FDECEB] text-[#A63F34]'
+                                  : 'border-[#3F5E4A]/35 bg-[#E6F4EA] text-[#3F5E4A]'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-[9px] font-extrabold uppercase tracking-[0.14em]">
+                                  {notice.kind === 'disconnected' ? 'Desconexión' : 'Reconexión'}
+                                </span>
+                                <span className="font-mono text-[9px] font-semibold opacity-70">
+                                  {new Date(notice.at).toLocaleTimeString('es-ES', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
+                                </span>
+                              </div>
+                              <p className="mt-0.5 font-bold">
+                                {notice.nickname}{' '}
+                                {notice.kind === 'disconnected'
+                                  ? 'se ha desconectado'
+                                  : 'ha vuelto a la mesa'}
+                              </p>
+                            </div>
+                          ))}
+                      </div>
+                    )}
+                    {gameState.log.length === 0 && presenceNotices.length === 0 ? (
                       <p className="text-[#6F5A4E] italic">
                         Aún no se han realizado jugadas. El jugador inicial abre el café.
                       </p>

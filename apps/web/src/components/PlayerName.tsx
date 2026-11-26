@@ -15,10 +15,12 @@ export function PlayerName({
   nickname,
   className = '',
   showAura = true,
+  disconnected = false,
 }: {
   nickname: string;
   className?: string;
   showAura?: boolean;
+  disconnected?: boolean;
 }): React.ReactElement {
   const duoActive = useGameStore((state) =>
     showAura ? hasFounderDuo(state.snapshot?.members ?? []) : false,
@@ -26,16 +28,26 @@ export function PlayerName({
   const flair = getPlayerFlair(nickname);
 
   if (!flair.founder) {
-    return <span className={className}>{nickname}</span>;
+    return (
+      <span
+        className={`${disconnected ? 'cafe-player-name--disconnected' : ''} ${className}`.trim()}
+        data-disconnected={disconnected ? 'true' : undefined}
+        title={disconnected ? 'Desconectado' : undefined}
+      >
+        {nickname}
+      </span>
+    );
   }
 
   return (
     <span
       className={`cafe-player-name cafe-player-name--founder ${
         duoActive ? 'cafe-player-name--duo' : ''
-      } ${className}`.trim()}
+      } ${disconnected ? 'cafe-player-name--disconnected' : ''} ${className}`.trim()}
       data-founder={flair.groups.join(' ')}
       data-duo={duoActive ? 'true' : undefined}
+      data-disconnected={disconnected ? 'true' : undefined}
+      title={disconnected ? 'Desconectado' : undefined}
     >
       <span className="cafe-player-name__text">{nickname}</span>
       {duoActive && (

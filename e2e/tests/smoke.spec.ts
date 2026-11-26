@@ -43,6 +43,7 @@ type TestMember = {
   avatarId: string;
   role: string;
   ready: boolean;
+  connected: boolean;
 };
 
 type TestSnapshot = {
@@ -579,7 +580,7 @@ test.describe('Cafetulia E2E v11 (menú de reservas 3D, tres mundos, lobby prepa
     await expect(page.getByTestId('final-credits-oa')).toContainText('O & A');
     await expect(page.getByTestId('rematch-btn')).toBeVisible();
     await expect(page.getByTestId('generate-postcard-btn')).toBeVisible();
-    await expect(page.getByTestId('back-to-title-btn')).toBeVisible();
+    await expect(page.getByTestId('back-to-lobby-btn')).toContainText('Volver a la sala');
 
     const skipBtn = page.getByTestId('skip-final-sequence-btn');
     if (await skipBtn.isVisible()) {
@@ -650,6 +651,45 @@ test.describe('Cafetulia E2E v11 (menú de reservas 3D, tres mundos, lobby prepa
 
     expect(targets.length).toBeGreaterThan(0);
     expect(targets.every((target) => target.hasTray)).toBe(true);
+  });
+
+  test('tacha al jugador desconectado y lo registra en rojo', async ({ page }) => {
+    await page.goto('/?autostart=1');
+    await expect(page.getByTestId('papercraft-board')).toBeVisible({ timeout: 20_000 });
+    await page.waitForTimeout(300);
+
+    const targetId = await page.evaluate(() => {
+      const store = (window as unknown as { __CAFETULIA_STORE__: TestStoreShape })
+        .__CAFETULIA_STORE__;
+      const snap = store.getState().snapshot;
+      if (!snap?.gameState) return null;
+      const disconnected = snap.gameState.players.find((player) => !player.isBot)?.id;
+      const member = snap.members.find((candidate) => candidate.id !== disconnected);
+      if (!disconnected || !member) return null;
+      const members = snap.members.map((candidate) =>
+        candidate.id === member.id
+          ? { ...candidate, nickname: 'Marta', role: 'player', connected: false }
+          : candidate,
+      );
+      const players = snap.gameState.players.map((player) =>
+        player.id === member.id ? { ...player, nickname: 'Marta' } : player,
+      );
+      store.setState({
+        roomCode: null,
+        snapshot: {
+          ...snap,
+          members,
+          gameState: { ...snap.gameState, players },
+        },
+      });
+      return member.id;
+    });
+    expect(targetId).not.toBeNull();
+
+    await expect(page.locator('[data-disconnected="true"]').first()).toBeVisible();
+    await page.getByTestId('open-drawer-btn').click();
+    await expect(page.getByTestId('presence-log-entry')).toContainText('Marta se ha desconectado');
+    await expect(page.locator('[data-presence="disconnected"]')).toBeVisible();
   });
 
   test('marca a los fundadores y activa el aura solo con Oli + Walford/Abril', async ({ page }) => {

@@ -5,6 +5,34 @@
 
 ---
 
+## Sesión 040 - 2026-11-26 - Volver a la sala y avisos de desconexión
+
+**Objetivo:** separar «volver a la sala» de «volver al menú», detectar antes las desconexiones y mostrarlas de forma clara en la partida.
+
+**Hecho:**
+- La pantalla final cambia «Volver a la portada» por **«Volver a la sala»**, que devuelve la sala al lobby sin salir de ella. La revancha sigue iniciando una partida nueva directamente cuando todos votan.
+- El cliente sigue consultando la sala también en la pantalla final, para que los votos de revancha y la vuelta al lobby se reflejen en todas las pestañas, no solo en la que pulsa.
+- Añadido `notifyLeaving` con `fetch(..., { keepalive: true })` en `pagehide`: al cerrar o navegar fuera de la pestaña se avisa al servidor, que marca al jugador como desconectado al momento. El barrido de presencia sigue cubriendo caídas de red.
+- `PlayerName` admite estado desconectado: nombre tachado en rojo, opacidad reducida y sin aura de corazones.
+- El lobby muestra una chapa roja «Desconectado»; el marcador de la partida muestra «desconectado» bajo el nombre y la cabecera del turno también tacha al jugador.
+- La clasificación final y el ganador también tachan a los jugadores desconectados.
+- El registro de partida añade avisos de presencia: entrada roja «X se ha desconectado» y entrada verde «X ha vuelto a la mesa», con hora. El contador del registro incluye estos avisos.
+- Los avisos de desconexión/reconexión también salen como callout rojo/verde en la partida.
+- Añadida prueba de servidor para volver al lobby y prueba E2E de jugador tachado + registro rojo.
+- Verificado: typecheck, lint, 61 tests, 6 E2E y build.
+
+**Decisiones:** D-124.
+
+**Problemas:**
+- «Volver a la sala» afecta a toda la sala, no solo al jugador que pulsa; para salir solo está «Salir de la partida».
+- La desconexión por cierre/navegación es inmediata; una pérdida de red sin `pagehide` sigue dependiendo del heartbeat y puede tardar más.
+
+**Siguiente:**
+1. Probar el cierre de pestaña y la reconexión en dos móviles.
+2. Valorar mostrar una cuenta atrás de reconexión en el asiento tachado.
+
+---
+
 ## Sesión 039 - 2026-11-26 - Monedas al marcador y pausa de los bots
 
 **Objetivo:** corregir el vuelo de las monedas para que lleguen al jugador correcto y hacer que los bots reaccionen con una pausa natural.

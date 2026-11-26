@@ -202,6 +202,8 @@ type CafetuliaClientState = {
   submitMove: (move: Move) => Promise<boolean>;
   sendChat: (text: string, isEmote?: boolean) => Promise<void>;
   voteRematch: (accept: boolean) => Promise<void>;
+  returnToLobby: () => Promise<void>;
+  notifyLeaving: () => void;
   pollRoom: () => Promise<void>;
   fetchHistory: () => Promise<void>;
   leaveRoom: () => void;
@@ -829,6 +831,21 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
     }
   },
 
+  returnToLobby: async () => {
+    await get().voteRematch(false);
+    set({ shareResult: null });
+  },
+
+  notifyLeaving: () => {
+    const { roomCode, screen, guestToken } = get();
+    if (!roomCode || screen === 'title') return;
+    void fetch(`/rooms/${roomCode}/leave`, {
+      method: 'POST',
+      headers: authHeaders(guestToken),
+      keepalive: true,
+    }).catch(() => undefined);
+  },
+
   pollRoom: async () => {
     const { roomCode, screen, guestToken } = get();
     if (!roomCode || screen === 'title') return;
@@ -904,6 +921,7 @@ export const useGameStore = create<CafetuliaClientState>((set, get) => ({
       void fetch(`/rooms/${roomCode}/leave`, {
         method: 'POST',
         headers: authHeaders(guestToken),
+        keepalive: true,
       }).catch(() => undefined);
     }
     set({

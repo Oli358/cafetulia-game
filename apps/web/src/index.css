@@ -832,3 +832,14 @@
     display: none;
   }
 }
+.cafe-player-name--disconnected,
+.cafe-player-name--disconnected .cafe-player-name__text {
+  text-decoration: line-through;
+  text-decoration-color: #a63f34;
+  text-decoration-thickness: 2px;
+  opacity: 0.62;
+}
+
+.cafe-player-name--disconnected .cafe-player-name__hearts {
+  display: none;
+}

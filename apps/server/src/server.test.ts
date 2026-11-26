@@ -291,6 +291,31 @@ describe('Phase 3: Online Server, Rooms, Reconnection, Timer & Persistence', () 
     room.dispose();
   });
 
+  it('8b. returns the room to the lobby when a player chooses back to the room', () => {
+    const room = registry.createRoom({
+      hostToken: 'token_back_host',
+      hostNickname: 'Ana',
+      seed: 77,
+    });
+    const hostId = room.getSnapshot().hostId;
+    room.joinOrReconnect({ token: 'token_back_guest', nickname: 'Bruno' });
+    room.startGame(hostId, 77);
+
+    const internal = room as unknown as {
+      gameState: { bag: Tile[]; turn: string; hands: Record<string, Tile[]> };
+    };
+    internal.gameState.bag = internal.gameState.bag.slice(0, 4);
+    const activeId = internal.gameState.turn;
+    const naturalTile = internal.gameState.hands[activeId]!.find((tile) => tile.nation !== 'joker')!;
+    expect(room.submitMove(activeId, { type: 'bar', tileId: naturalTile.id }).ok).toBe(true);
+
+    const back = room.voteRematch(hostId, false);
+    expect(back.ok && back.outcome).toBe('returned_to_lobby');
+    expect(room.getSnapshot().phase).toBe('lobby');
+    expect(room.getSnapshot().gameState).toBeNull();
+    room.dispose();
+  });
+
   it('8, 9 & 10. keeps ephemeral chat separate from DB, trims match history to 5 games, and requires unanimous rematch vote', () => {
     const room = registry.createRoom({
       hostToken: 'token_p1_host',

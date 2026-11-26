@@ -60,6 +60,7 @@ export function App(): React.ReactElement {
   const quickStartWithBots = useGameStore((s) => s.quickStartWithBots);
   const joinRoom = useGameStore((s) => s.joinRoom);
   const pollRoom = useGameStore((s) => s.pollRoom);
+  const notifyLeaving = useGameStore((s) => s.notifyLeaving);
   const setActiveModal = useGameStore((s) => s.setActiveModal);
   const setActiveOverlay = useGameStore((s) => s.setActiveOverlay);
 
@@ -69,6 +70,17 @@ export function App(): React.ReactElement {
     document.body.dataset.state = mapped;
     soundEngine.setScreenTheme(screen);
   }, [screen]);
+
+  // Avisa a la sala si la pestaña se cierra o se navega fuera. Así los demás
+  // ven la desconexión sin esperar al barrido de presencia de 90 s.
+  useEffect(() => {
+    const onPageHide = (event: PageTransitionEvent) => {
+      if (event.persisted) return;
+      notifyLeaving();
+    };
+    window.addEventListener('pagehide', onPageHide);
+    return () => window.removeEventListener('pagehide', onPageHide);
+  }, [notifyLeaving]);
 
   // Unlock Web Audio on first tap/click/keydown for iOS Safari & Android Chrome
   useEffect(() => {
@@ -99,9 +111,10 @@ export function App(): React.ReactElement {
     }
   }, [joinRoom, quickStartWithBots]);
 
-  // Poll authoritative room state while in lobby or playing
+  // Poll authoritative room state while in lobby, playing or final. The final
+  // screen needs it to see rematch votes and returns to the room from others.
   useEffect(() => {
-    if (screen !== 'lobby' && screen !== 'playing') return;
+    if (screen === 'title') return;
     const interval = setInterval(() => {
       void pollRoom();
     }, 1500);
