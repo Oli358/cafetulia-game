@@ -8,6 +8,8 @@ services:
     # Render Free plan (sin coste; usa /tmp para SQLite efímero porque Free no admite discos persistentes).
     # Si se pasa a plan "starter" (de pago), descomentar el bloque "disk" y apuntar SQLITE_DB_PATH a /var/data/cafetulia.sqlite.
     plan: free
+    # Frankfurt: menor latencia para España que el region por defecto (Oregon).
+    region: frankfurt
     # NODE_ENV=development solo para instalar también las devDependencies que necesita el build (tsc, vite, etc.).
     buildCommand: NODE_ENV=development npx pnpm install --frozen-lockfile=true && npx pnpm build
     startCommand: npx tsx server.ts
