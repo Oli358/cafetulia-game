@@ -5,6 +5,28 @@
 
 ---
 
+## Sesión 044 - 2026-11-26 - Keepalive solo durante el juego
+
+**Objetivo:** evitar gastar las 750 h del plan free de Render cuando no hay nadie jugando.
+
+**Hecho:**
+- Eliminado `.github/workflows/render-keepalive.yml` y el ping externo cada 5 minutos.
+- Se mantiene el **latido del cliente** cada 25 s solo en lobby, partida y pantalla final; en la portada no hay tráfico.
+- Render puede dormir a los 15 minutos sin sala/partida; el primer acceso tras inactividad tarda ~50 s.
+- La variable `RENDER_URL` deja de ser necesaria.
+- Servicio live en <https://cafetulia.onrender.com>; `/health` responde `{"status":"ok"}` y el CI de `main` está verde.
+
+**Decisiones:** D-133.
+
+**Problemas:**
+- Arranque en frío de ~50 s tras inactividad; es el precio de no tener ping 24/7.
+- SQLite sigue siendo efímero en el plan free.
+
+**Siguiente:**
+- Nada más de código: el proyecto queda congelado como base del TFG.
+
+---
+
 ## Sesión 043 - 2026-11-26 - Merge a main y base del TFG
 
 **Objetivo:** cerrar la versión estable en `main`, dejarla lista para Render y congelar la funcionalidad como base del TFG.
