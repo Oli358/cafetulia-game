@@ -5,6 +5,29 @@
 
 ---
 
+## Sesión 043 - 2026-11-26 - Merge a main y base del TFG
+
+**Objetivo:** cerrar la versión estable en `main`, dejarla lista para Render y congelar la funcionalidad como base del TFG.
+
+**Hecho:**
+- Merge **fast-forward** de `home/menu-cafe-3d` a `main` en `a9b8054`.
+- `render.yaml` apunta a `main`; la guía `docs/DESPLIEGUE-RENDER.md` se actualiza a la rama estable.
+- **No se añaden funcionalidades nuevas**: base de datos, automatizaciones y logros quedan para fases posteriores del TFG.
+- Estado verificado: `typecheck`, `lint`, **61 tests**, build, E2E principal y E2E de sala perdida en verde. El test de puntuaciones altas sigue siendo intermitente en la suite completa.
+
+**Decisiones:** D-132.
+
+**Problemas:**
+- El plan free de Render sigue necesitando el ping externo o UptimeRobot para no dormirse fuera de partida.
+- SQLite es efímero en free; la persistencia real queda para la fase de base de datos del TFG.
+
+**Siguiente:**
+1. Crear el servicio en Render desde `main`.
+2. Configurar `RENDER_URL` y el keepalive.
+3. Congelar el código y planificar las fases del TFG: base de datos, automatizaciones y logros.
+
+---
+
 ## Sesión 042 - 2026-11-26 - Preparación del despliegue en Render
 
 **Objetivo:** dejar el repo listo para publicar en Render y evitar que el plan free duerma el servidor durante una partida.

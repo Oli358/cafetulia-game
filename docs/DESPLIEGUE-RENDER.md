@@ -1,12 +1,12 @@
 # Despliegue en Render
 
-> Preparado el **26/11/2026** para la rama `home/menu-cafe-3d`.
+> Preparado el **26/11/2026** para la rama `main`, ya con la versión estable mergeada.
 > El objetivo es que el servidor no se duerma mientras hay una partida y dejar el despliegue listo para hoy.
 
 ## Qué queda preparado
 
 - `render.yaml` con:
-  - Rama `home/menu-cafe-3d` (cambiar a `main` tras el merge).
+  - Rama `main` (versión estable).
   - Node **24.20.0**, plan free, health check en `/health`.
   - `NODE_ENV=production` en ejecución, pero el build instala también devDependencies (`NODE_ENV=development` solo para `pnpm install`).
   - Sin `PORT` fijo: Render inyecta el suyo.
@@ -20,7 +20,7 @@
 
 1. Subir la rama (ya está): `git push origin home/menu-cafe-3d`.
 2. En Render: **New → Blueprint**, conectar el repo `Oli358/cafetulia-game` y aplicar `render.yaml`.
-3. Si Render pregunta la rama, elegir `home/menu-cafe-3d`.
+3. Si Render pregunta la rama, elegir `main`.
 4. Esperar el build y abrir la URL del servicio. Comprobar `https://TU-URL.onrender.com/health` → `{"status":"ok"}`.
 5. En GitHub: **Settings → Secrets and variables → Actions → Variables → New repository variable**:
    - Nombre: `RENDER_URL`
@@ -49,8 +49,8 @@ Render Free duerme el servicio tras **15 minutos sin tráfico**. Hay dos capas:
 
 Notas:
 - GitHub puede retrasar los workflows programados y los desactiva tras 60 días sin actividad en el repo; si pasa, se reactivan desde la pestaña Actions.
-- **Los workflows programados de GitHub solo se ejecutan desde la rama por defecto (`main`).** Si Render despliega `home/menu-cafe-3d`, el ping automático no se ejecutará hasta mergear a `main`; el `workflow_dispatch` manual sí se puede lanzar desde esa rama.
-- Alternativa independiente de la rama: un monitor HTTP gratuito tipo **UptimeRobot** cada 5 minutos apuntando a `https://TU-URL.onrender.com/health`. Es la opción más simple si no quieres mergear todavía.
+- **Los workflows programados de GitHub solo se ejecutan desde la rama por defecto (`main`).** El workflow ya está en `main`, así que el ping automático se ejecutará. Si algún día se despliega otra rama, recordar que el ping programado no se lanzará desde ella; el `workflow_dispatch` manual sí.
+- Alternativa independiente de la rama: un monitor HTTP gratuito tipo **UptimeRobot** cada 5 minutos apuntando a `https://TU-URL.onrender.com/health`. Es la opción más simple si no quieres depender de GitHub.
 - Si se quiere garantía total, el plan **Starter** de Render no duerme el servicio y permite disco persistente.
 - El plan free tiene 750 h/mes; un servicio siempre encendido consume ~720 h/mes. No conviene tener varios servicios free siempre despiertos.
 

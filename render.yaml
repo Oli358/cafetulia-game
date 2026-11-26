@@ -2,8 +2,8 @@ services:
   - type: web
     name: cafetulia
     runtime: node
-    # Rama de trabajo actual. Cambiar a "main" después del merge.
-    branch: home/menu-cafe-3d
+    # Rama de producción estable.
+    branch: main
     autoDeploy: true
     # Render Free plan (sin coste; usa /tmp para SQLite efímero porque Free no admite discos persistentes).
     # Si se pasa a plan "starter" (de pago), descomentar el bloque "disk" y apuntar SQLITE_DB_PATH a /var/data/cafetulia.sqlite.
