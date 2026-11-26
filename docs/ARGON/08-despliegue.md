@@ -1,5 +1,7 @@
 # Fase 8 — Despliegue
 
+> Guía operativa actual: [DESPLIEGUE-RENDER.md](../DESPLIEGUE-RENDER.md).
+
 **Objetivo:** publicar la v1.0 en Render y dejarla jugable.
 
 ```text

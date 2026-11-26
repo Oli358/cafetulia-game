@@ -2,10 +2,14 @@ services:
   - type: web
     name: cafetulia
     runtime: node
+    # Rama de trabajo actual. Cambiar a "main" después del merge.
+    branch: home/menu-cafe-3d
+    autoDeploy: true
     # Render Free plan (sin coste; usa /tmp para SQLite efímero porque Free no admite discos persistentes).
     # Si se pasa a plan "starter" (de pago), descomentar el bloque "disk" y apuntar SQLITE_DB_PATH a /var/data/cafetulia.sqlite.
     plan: free
-    buildCommand: npx pnpm install --frozen-lockfile=true && npx pnpm build
+    # NODE_ENV=development solo para instalar también las devDependencies que necesita el build (tsc, vite, etc.).
+    buildCommand: NODE_ENV=development npx pnpm install --frozen-lockfile=true && npx pnpm build
     startCommand: npx tsx server.ts
     healthCheckPath: /health
     envVars:
@@ -15,8 +19,7 @@ services:
         value: production
       - key: HOST
         value: 0.0.0.0
-      - key: PORT
-        value: 3000
+      # PORT lo inyecta Render; no fijarlo aquí.
       - key: TRUST_PROXY
         value: '1'
       - key: SQLITE_DB_PATH

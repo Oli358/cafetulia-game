@@ -121,6 +121,21 @@ export function App(): React.ReactElement {
     return () => clearInterval(interval);
   }, [screen, pollRoom]);
 
+  // Render Free duerme el servicio tras 15 minutos sin tráfico. Mientras haya
+  // una sala o partida abierta, mandamos un latido ligero además del poll.
+  // El ping externo de .github/workflows/render-keepalive.yml cubre el resto.
+  useEffect(() => {
+    if (screen === 'title') return;
+    const ping = () => {
+      void fetch(`/health?t=${Date.now()}`, { cache: 'no-store' }).catch(() => {
+        /* El servidor puede estar despertando; el siguiente latido lo reintenta. */
+      });
+    };
+    ping();
+    const interval = window.setInterval(ping, 25_000);
+    return () => window.clearInterval(interval);
+  }, [screen]);
+
   // Global keyboard shortcuts. The title now has a reservation form, so we
   // only keep Escape for closing overlays/modals.
   useEffect(() => {

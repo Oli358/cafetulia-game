@@ -5,6 +5,32 @@
 
 ---
 
+## Sesión 042 - 2026-11-26 - Preparación del despliegue en Render
+
+**Objetivo:** dejar el repo listo para publicar en Render y evitar que el plan free duerma el servidor durante una partida.
+
+**Hecho:**
+- `tsx` pasa a **dependencies** para que `npx tsx server.ts` funcione en producción aunque se instale sin devDependencies.
+- `render.yaml`: rama `home/menu-cafe-3d`, Node 24.20.0, build que instala devDependencies, sin `PORT` fijo, health check `/health` y SQLite en `/tmp`.
+- **Latido del cliente** `GET /health?t=...` cada 25 s en lobby, partida y pantalla final, además del poll de sala de 1,5 s.
+- Workflow `.github/workflows/render-keepalive.yml`: ping externo cada 5 minutos con la variable `RENDER_URL`.
+- Guía `docs/DESPLIEGUE-RENDER.md` con pasos, variables, keepalive y limitaciones del plan free.
+- Verificado: `typecheck`, `lint`, **61 tests**, build, E2E principal y E2E de sala perdida en verde. El test de puntuaciones altas sigue siendo intermitente en la suite completa.
+
+**Decisiones:** D-129, D-130 y D-131.
+
+**Problemas:**
+- La URL de Render está pendiente de crear; `RENDER_URL` debe configurarse en GitHub después del primer deploy.
+- El plan free usa SQLite efímero: las salas se pierden al reiniciar o desplegar.
+- GitHub puede retrasar los workflows programados y los desactiva tras 60 días sin actividad.
+
+**Siguiente:**
+1. Crear el Blueprint en Render con `render.yaml`.
+2. Configurar `RENDER_URL` y ejecutar el workflow de keepalive.
+3. Probar una partida real desde el móvil y dejar la pestaña abierta más de 15 minutos.
+
+---
+
 ## Sesión 041 - 2026-11-26 - Menú del vaso: textura, giro paso a paso y Enter
 
 **Objetivo:** dar más ambiente al menú de selección, evitar que un giro salte de Unirse a Café solo y permitir entrar con Enter desde el código.
