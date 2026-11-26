@@ -5,6 +5,29 @@
 
 ---
 
+## Sesión 045 - 2026-11-26 - Prioridad disponibilidad: keepalive 24/7
+
+**Objetivo:** poder jugar cuando apetezca, aunque el plan free consuma horas.
+
+**Hecho:**
+- Restaurado el workflow `.github/workflows/render-keepalive.yml` con ping a `/health` cada 5 minutos y ejecución manual.
+- Restaurado `healthCheckPath: /health` en `render.yaml`.
+- El latido del cliente se mantiene mientras hay lobby, partida o final.
+- La variable `RENDER_URL` vuelve a ser necesaria.
+- Se acepta el consumo de ~720 h/mes del plan free para un servicio siempre disponible.
+
+**Decisiones:** D-134 (sustituye a D-133).
+
+**Problemas:**
+- El plan free tiene 750 h/mes; un servicio siempre despierto consume casi todas. Los otros servicios deben ser esporádicos o de pago.
+- SQLite sigue siendo efímero.
+
+**Siguiente:**
+- Configurar `RENDER_URL` y dejar el workflow en verde.
+- Probar la app desde el móvil.
+
+---
+
 ## Sesión 044 - 2026-11-26 - Keepalive solo durante el juego
 
 **Objetivo:** evitar gastar las 750 h del plan free de Render cuando no hay nadie jugando.

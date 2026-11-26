@@ -122,8 +122,8 @@ export function App(): React.ReactElement {
   }, [screen, pollRoom]);
 
   // Render Free duerme el servicio tras 15 minutos sin tráfico. El latido
-  // solo se envía mientras hay una sala o partida abierta; al cerrar la app
-  // el servidor puede dormir. No hay ping externo 24/7.
+  // del cliente mantiene el servicio despierto mientras hay una sala o partida;
+  // el workflow externo lo mantiene disponible también fuera de partida.
   useEffect(() => {
     if (screen === 'title') return;
     const ping = () => {
